@@ -26,159 +26,31 @@
 
 module ALMA.Physics.Quantum.Rotation where
 
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_; _/_; _⊓_)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_; _/_)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-comm
-  ; *-identityˡ; *-distribˡ-+; *-distribʳ-+; neg-distribˡ-*; neg-distribʳ-*)
+  (+-assoc; +-comm; +-identityʳ; *-comm; *-identityˡ; *-distribʳ-+)
 open import Data.Integer.Base using (ℤ; 1ℤ) renaming (_+_ to _ℤ+_)
 open import Data.Product.Base using (_×_; _,_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.Gaussian using (ℂ; re; im; norm²)
+open import ALMA.Physics.RationalKit as Kit using
+  (+interchange; swap-mid; sq+; sq-; cancel-pair)
 
 ------------------------------------------------------------------------
--- Ring rearrangement lemmas
+-- Local ring lemmas
 --
--- Hand chains; the ℚ reflection solver is quadratic-exponential on
--- these forms and is avoided on purpose.
+-- cross-vanish, factor-left, factor-right and cross-eq carry four-term
+-- shapes specific to the rotation matrix; they stay local. rot-real is
+-- the core real-vector computation.
 --
--- 环重排引理
+-- 本地环引理
 --
--- 手工链；ℚ 反射求解器在这些二次式上指数级膨胀，故有意不用。
+-- cross-vanish、factor-left、factor-right、cross-eq 携带专为旋转矩阵
+-- 定制的四项形状，留在本地；rot-real 是核心的实向量计算。
 
 private
-  -- (a + b) + (c + d) = (a + c) + (b + d).
-  --
-  -- (a + b) + (c + d) = (a + c) + (b + d)。
-  +-interchange : ∀ a b c d → (a + b) + (c + d) ≡ (a + c) + (b + d)
-  +-interchange a b c d = let open ≡-Reasoning in begin
-    (a + b) + (c + d)
-    ≡⟨ +-assoc a b (c + d) ⟩
-    a + (b + (c + d))
-    ≡⟨ cong (a +_) (sym (+-assoc b c d)) ⟩
-    a + ((b + c) + d)
-    ≡⟨ cong (a +_) (cong (_+ d) (+-comm b c)) ⟩
-    a + ((c + b) + d)
-    ≡⟨ cong (a +_) (+-assoc c b d) ⟩
-    a + (c + (b + d))
-    ≡⟨ sym (+-assoc a c (b + d)) ⟩
-    (a + c) + (b + d) ∎
-
-  -- (x*y)*(z*w) = (x*z)*(y*w): swap the two middle factors.
-  --
-  -- (x*y)*(z*w) = (x*z)*(y*w)：交换两个中间因子。
-  swap-mid : ∀ x y z w → (x * y) * (z * w) ≡ (x * z) * (y * w)
-  swap-mid x y z w = let open ≡-Reasoning in begin
-    (x * y) * (z * w)
-    ≡⟨ *-assoc x y (z * w) ⟩
-    x * (y * (z * w))
-    ≡⟨ cong (x *_) (sym (*-assoc y z w)) ⟩
-    x * ((y * z) * w)
-    ≡⟨ cong (x *_) (cong (_* w) (*-comm y z)) ⟩
-    x * ((z * y) * w)
-    ≡⟨ cong (x *_) (*-assoc z y w) ⟩
-    x * (z * (y * w))
-    ≡⟨ sym (*-assoc x z (y * w)) ⟩
-    (x * z) * (y * w) ∎
-
-  -- x * (-y) = -(x*y) and (-x) * y = -(x*y).
-  --
-  -- 异号相乘等于乘积取负。
-  n*ʳ : ∀ x y → x * (- y) ≡ - (x * y)
-  n*ʳ x y = sym (neg-distribʳ-* x y)
-
-  n*ˡ : ∀ x y → (- x) * y ≡ - (x * y)
-  n*ˡ x y = sym (neg-distribˡ-* x y)
-
-  -- -(-q) = q: the inverse of an inverse is the original element.
-  --
-  -- -(-q) = q：逆之逆即原元（群逆唯一）。
-  ‿-‿ : ∀ q → - (- q) ≡ q
-  ‿-‿ q = let open ≡-Reasoning in begin
-    - (- q)
-    ≡⟨ sym (+-identityʳ (- (- q))) ⟩
-    - (- q) + 0ℚ
-    ≡⟨ cong (- (- q) +_) (sym (+-inverseˡ q)) ⟩
-    - (- q) + ((- q) + q)
-    ≡⟨ sym (+-assoc (- (- q)) (- q) q) ⟩
-    (- (- q) + (- q)) + q
-    ≡⟨ cong (_+ q) (+-inverseˡ (- q)) ⟩
-    0ℚ + q
-    ≡⟨ +-identityˡ q ⟩
-    q ∎
-
-  -- (-x)*(-x) = x*x.
-  --
-  -- (-x)*(-x) = x*x。
-  neg-neg-square : ∀ x → (- x) * (- x) ≡ x * x
-  neg-neg-square x = let open ≡-Reasoning in begin
-    (- x) * (- x)
-    ≡⟨ sym (neg-distribˡ-* x (- x)) ⟩
-    - (x * (- x))
-    ≡⟨ cong -_ (n*ʳ x x) ⟩
-    - (- (x * x))
-    ≡⟨ ‿-‿ (x * x) ⟩
-    x * x ∎
-
-  -- (x + y)² = x² + y² + (x*y + x*y).
-  --
-  -- (x + y)² = x² + y² + (x*y + x*y)。
-  sq+ : ∀ x y → (x + y) * (x + y) ≡
-                x * x + (y * y + (x * y + x * y))
-  sq+ x y = let open ≡-Reasoning in begin
-    (x + y) * (x + y)
-    ≡⟨ *-distribʳ-+ (x + y) x y ⟩
-    x * (x + y) + y * (x + y)
-    ≡⟨ cong₂ _+_ (*-distribˡ-+ x x y) (*-distribˡ-+ y x y) ⟩
-    (x * x + x * y) + (y * x + y * y)
-    ≡⟨ cong (λ t → (x * x + x * y) + (t + y * y)) (*-comm y x) ⟩
-    (x * x + x * y) + (x * y + y * y)
-    ≡⟨ +-assoc (x * x) (x * y) (x * y + y * y) ⟩
-    x * x + (x * y + (x * y + y * y))
-    ≡⟨ cong (x * x +_) (sym (+-assoc (x * y) (x * y) (y * y))) ⟩
-    x * x + ((x * y + x * y) + y * y)
-    ≡⟨ cong (x * x +_) (+-comm (x * y + x * y) (y * y)) ⟩
-    x * x + (y * y + (x * y + x * y)) ∎
-
-  -- (x - y)² = x² + y² - (x*y + x*y)
-  --
-  -- Written with explicit signs so it lines up with sq+ for cross-term
-  -- cancellation.
-  --
-  -- (x - y)² = x² + y² - (x*y + x*y)
-  --
-  -- 显式带负号以便与 sq+ 抵消交叉项。
-  sq- : ∀ x y → (x - y) * (x - y) ≡
-                x * x + (y * y + (- (x * y) + - (x * y)))
-  sq- x y = let open ≡-Reasoning in begin
-    (x - y) * (x - y)
-    ≡⟨ refl ⟩
-    (x + (- y)) * (x + (- y))
-    ≡⟨ sq+ x (- y) ⟩
-    x * x + ((- y) * (- y) + (x * (- y) + x * (- y)))
-    ≡⟨ cong (x * x +_)
-            (cong₂ _+_ (neg-neg-square y)
-                      (cong₂ _+_ (n*ʳ x y) (n*ʳ x y))) ⟩
-    x * x + (y * y + (- (x * y) + - (x * y))) ∎
-
-  -- (-t + -t) + (t + t) = 0.
-  --
-  -- (-t + -t) + (t + t) = 0。
-  cancel-pair : ∀ t → (- t + - t) + (t + t) ≡ 0ℚ
-  cancel-pair t = let open ≡-Reasoning in begin
-    (- t + - t) + (t + t)
-    ≡⟨ +-assoc (- t) (- t) (t + t) ⟩
-    - t + ((- t) + (t + t))
-    ≡⟨ cong (- t +_) (sym (+-assoc (- t) t t)) ⟩
-    - t + (((- t) + t) + t)
-    ≡⟨ cong (- t +_) (cong₂ _+_ (+-inverseˡ t) refl) ⟩
-    - t + (0ℚ + t)
-    ≡⟨ cong (- t +_) (+-identityˡ t) ⟩
-    - t + t
-    ≡⟨ +-inverseˡ t ⟩
-    0ℚ ∎
-
   -- Given u*v = x*y, the squared sum of a difference and a sum has its
   -- cross terms cancel, leaving the four plain squares.
   --
@@ -193,9 +65,9 @@ private
     (x² + (y² + P)) + (u² + (v² + Q))
     ≡⟨ cong₂ _+_ (sym (+-assoc x² y² P)) (sym (+-assoc u² v² Q)) ⟩
     ((x² + y²) + P) + ((u² + v²) + Q)
-    ≡⟨ +-interchange (x² + y²) P (u² + v²) Q ⟩
+    ≡⟨ +interchange (x² + y²) P (u² + v²) Q ⟩
     ((x² + y²) + (u² + v²)) + (P + Q)
-    ≡⟨ cong (_+ (P + Q)) (+-interchange x² y² u² v²) ⟩
+    ≡⟨ cong (_+ (P + Q)) (+interchange x² y² u² v²) ⟩
     ((x² + u²) + (y² + v²)) + (P + Q)
     ≡⟨ cong (((x² + u²) + (y² + v²)) +_) (cancel-pair t) ⟩
     ((x² + u²) + (y² + v²)) + 0ℚ
@@ -209,8 +81,6 @@ private
     Q  = t + t
 
   -- (c*a)² + (s*a)² = (c² + s²)*a².
-  --
-  -- (c*a)² + (s*a)² = (c² + s²)*a²。
   factor-left : ∀ c s a →
     (c * a) * (c * a) + (s * a) * (s * a) ≡ (c * c + s * s) * (a * a)
   factor-left c s a = let open ≡-Reasoning in begin
@@ -221,8 +91,6 @@ private
     (c * c + s * s) * (a * a) ∎
 
   -- (s*d)² + (c*d)² = (c² + s²)*d².
-  --
-  -- (s*d)² + (c*d)² = (c² + s²)*d²。
   factor-right : ∀ c s d →
     (s * d) * (s * d) + (c * d) * (c * d) ≡ (c * c + s * s) * (d * d)
   factor-right c s d = let open ≡-Reasoning in begin
@@ -251,8 +119,7 @@ private
   -- a real 2-vector. Cross terms cancel; c² + s² = 1 closes the
   -- diagonals.
   --
-  -- 实核心：实旋转保持实 2-向量的平方欧氏范数；交叉项抵消，c²+s²=1
-  -- 收口。
+  -- 实核心：实旋转保持实 2-向量的平方欧氏范数；交叉项抵消，c²+s²=1收口。
   rot-real : ∀ c s a d → c * c + s * s ≡ 1ℚ →
     (c * a - s * d) * (c * a - s * d) +
     (s * a + c * d) * (s * a + c * d) ≡ a * a + d * d
@@ -302,13 +169,13 @@ rot-pres : ∀ c s → c * c + s * s ≡ 1ℚ → ∀ z w →
 rot-pres c s h (a , b) (d , e) = let open ≡-Reasoning in begin
   (sq (c * a - s * d) + sq (c * b - s * e)) +
   (sq (s * a + c * d) + sq (s * b + c * e))
-  ≡⟨ +-interchange (sq (c * a - s * d)) (sq (c * b - s * e))
+  ≡⟨ +interchange (sq (c * a - s * d)) (sq (c * b - s * e))
                    (sq (s * a + c * d)) (sq (s * b + c * e)) ⟩
   (sq (c * a - s * d) + sq (s * a + c * d)) +
   (sq (c * b - s * e) + sq (s * b + c * e))
   ≡⟨ cong₂ _+_ (rot-real c s a d h) (rot-real c s b e h) ⟩
   (a * a + d * d) + (b * b + e * e)
-  ≡⟨ +-interchange (a * a) (d * d) (b * b) (e * e) ⟩
+  ≡⟨ +interchange (a * a) (d * d) (b * b) (e * e) ⟩
   (a * a + b * b) + (d * d + e * e) ∎
   where
   sq : ℚ → ℚ

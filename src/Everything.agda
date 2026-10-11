@@ -18,6 +18,7 @@ import ALMA.Base.RelEquipment
 import ALMA.Base.MCorrTerminalSequence
 import ALMA.Base.MCorrInitialAlgebra
 import ALMA.Base.WContainerInstance
+import ALMA.Physics.RationalKit
 import ALMA.Physics.CausalOrder
 import ALMA.Physics.CausalSlice
 import ALMA.Physics.Quantum.Gaussian
@@ -31,6 +32,7 @@ import ALMA.Physics.Newton.Poisson
 import ALMA.Physics.Newton.Quadratic
 import ALMA.Physics.Newton.QuadraticBilinear
 import ALMA.Physics.Newton.QuadraticSkew
+import ALMA.Physics.Newton.QuadraticJacobi
 import ALMA.Base.DetCat
 
 import ALMA.Base.Equivalence

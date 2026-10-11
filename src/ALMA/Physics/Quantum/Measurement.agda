@@ -31,9 +31,8 @@ module ALMA.Physics.Quantum.Measurement where
 open import Data.Nat.Base using (ℕ)
 open import Data.Fin.Base using (Fin)
 open import Data.Product.Base using (_,_)
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _/_; _-_)
-open import Data.Rational.Properties using
-  ( *-zeroˡ; *-identityˡ; +-identityʳ )
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _/_)
+open import Data.Rational.Properties using (*-zeroˡ; *-identityˡ; +-identityʳ)
 open import Data.Integer.Base using (1ℤ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; _≢_; refl; sym; trans; cong; module ≡-Reasoning)

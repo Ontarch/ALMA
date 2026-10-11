@@ -37,9 +37,8 @@ module ALMA.Physics.CausalSlice where
 open import Agda.Primitive using (Level; _⊔_)
 open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Data.Empty using (⊥)
-open import Data.Product.Base using (_×_; _,_)
+open import Data.Product.Base using (_×_)
 open import Data.Nat.Base using (ℕ; suc)
-open import Relation.Nullary.Negation using (¬_)
 
 open import ALMA.Base.MCorrSetoid using (SysEq)
 open import ALMA.Physics.CausalOrder using (Acyclic; Antichain; _⇝⁺_; step; more)

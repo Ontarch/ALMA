@@ -28,10 +28,9 @@
 module ALMA.Physics.Newton.Quadratic where
 
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; -_)
-open import Data.Rational.Properties using
-  (+-identityˡ; +-identityʳ; *-identityˡ; *-zeroˡ)
-open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; module ≡-Reasoning)
+open import Relation.Binary.PropositionalEquality using (_≡_; cong; module ≡-Reasoning)
+
+open import ALMA.Physics.RationalKit as Kit using (norm1; norm-tail)
 
 ------------------------------------------------------------------------
 -- Quadratic observables
@@ -86,6 +85,28 @@ twoℚ fourℚ : ℚ
 twoℚ  = 1ℚ + 1ℚ
 fourℚ = twoℚ + twoℚ
 
+-- Assemble six field equalities into an equality of records.
+--
+-- 由六个字段等式组装为记录相等。
+mkObs : ∀ {lc la lb ld le lf rc ra rb rd re rf}
+      → lc ≡ rc → la ≡ ra → lb ≡ rb
+      → ld ≡ rd → le ≡ re → lf ≡ rf
+      → obs lc la lb ld le lf ≡ obs rc ra rb rd re rf
+mkObs pc pa pb pd pe pf = let open ≡-Reasoning in begin
+  obs _ _ _ _ _ _
+  ≡⟨ cong (λ x → obs x _ _ _ _ _) pc ⟩
+  obs _ _ _ _ _ _
+  ≡⟨ cong (λ x → obs _ x _ _ _ _) pa ⟩
+  obs _ _ _ _ _ _
+  ≡⟨ cong (λ x → obs _ _ x _ _ _) pb ⟩
+  obs _ _ _ _ _ _
+  ≡⟨ cong (λ x → obs _ _ _ x _ _) pd ⟩
+  obs _ _ _ _ _ _
+  ≡⟨ cong (λ x → obs _ _ _ _ x _) pe ⟩
+  obs _ _ _ _ _ _
+  ≡⟨ cong (obs _ _ _ _ _) pf ⟩
+  obs _ _ _ _ _ _ ∎
+
 ------------------------------------------------------------------------
 -- Canonical Poisson bracket
 --
@@ -128,33 +149,6 @@ infix 6 bracket
 --
 -- 每条先化简单位/零因子（k*1 = k、k*0 = 0、0 + k = k），再与所示基
 -- 观测量匹配。
-
-private
-  -- Normalise a coefficient built from unit and zero factors.
-  --
-  -- 化简由单位与零因子构成的系数。
-  norm1 : ∀ k → 1ℚ * k + - (0ℚ * k) ≡ k
-  norm1 k = let open ≡-Reasoning in begin
-    1ℚ * k + - (0ℚ * k)
-    ≡⟨ cong (λ x → 1ℚ * k + - x) (*-zeroˡ k) ⟩
-    1ℚ * k + - 0ℚ
-    ≡⟨ cong (λ x → x + - 0ℚ) (*-identityˡ k) ⟩
-    k + - 0ℚ
-    ≡⟨ +-identityʳ k ⟩
-    k ∎
-
-  -- Strip three leading zero summands of a four-term coefficient.
-  --
-  -- 消去四项系数开头的三个零加项。
-  norm-tail : ∀ k → 0ℚ + (0ℚ + (0ℚ + k)) ≡ k
-  norm-tail k = let open ≡-Reasoning in begin
-    0ℚ + (0ℚ + (0ℚ + k))
-    ≡⟨ +-identityˡ (0ℚ + (0ℚ + k)) ⟩
-    0ℚ + (0ℚ + k)
-    ≡⟨ +-identityˡ (0ℚ + k) ⟩
-    0ℚ + k
-    ≡⟨ +-identityˡ k ⟩
-    k ∎
 
 -- {q,p} = 1.
 bracket-qp : bracket qO pO ≡ one

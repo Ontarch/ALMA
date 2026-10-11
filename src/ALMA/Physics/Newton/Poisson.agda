@@ -34,9 +34,11 @@ open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; -_)
 open import Data.Rational.Properties using
   (+-assoc; +-identityˡ; +-identityʳ; +-inverseʳ; +-comm; *-assoc
   ; *-comm; *-zeroˡ; *-zeroʳ; *-identityˡ; *-distribˡ-+; *-distribʳ-+
-  ; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*)
+  ; neg-distrib-+; neg-distribʳ-*)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+
+open import ALMA.Physics.RationalKit as Kit using (neg-involutive)
 
 ------------------------------------------------------------------------
 -- Affine observables and the canonical bracket
@@ -123,24 +125,10 @@ bracket-skew (obs _ a b) (obs _ a' b') =
     b * a' + - (a * b')
     ≡⟨ +-comm (b * a') (- (a * b')) ⟩
     - (a * b') + b * a'
-    ≡⟨ cong (λ x → - (a * b') + x) (sym (‿-‿ (b * a'))) ⟩
+    ≡⟨ cong (λ x → - (a * b') + x) (sym (neg-involutive (b * a'))) ⟩
     - (a * b') + - (- (b * a'))
     ≡⟨ sym (neg-distrib-+ (a * b') (- (b * a'))) ⟩
     - (a * b' + - (b * a')) ∎
-    where
-    ‿-‿ : ∀ x → - (- x) ≡ x
-    ‿-‿ x = let open ≡-Reasoning in begin
-      - (- x)
-      ≡⟨ sym (+-identityˡ (- (- x))) ⟩
-      0ℚ + - (- x)
-      ≡⟨ cong (λ z → z + - (- x)) (sym (+-inverseʳ x)) ⟩
-      (x + - x) + - (- x)
-      ≡⟨ +-assoc x (- x) (- (- x)) ⟩
-      x + ((- x) + - (- x))
-      ≡⟨ cong (x +_) (+-inverseʳ (- x)) ⟩
-      x + 0ℚ
-      ≡⟨ +-identityʳ x ⟩
-      x ∎
 
 -- Canonical (Heisenberg) relations.
 --

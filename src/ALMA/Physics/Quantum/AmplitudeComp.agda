@@ -39,16 +39,17 @@ module ALMA.Physics.Quantum.AmplitudeComp where
 
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_; _/_) 
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; +-inverseʳ
-  ; *-assoc; *-comm; *-identityˡ; *-distribˡ-+; *-distribʳ-+
-  ; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*)
+  (+-assoc; +-comm; +-identityʳ; +-inverseʳ; *-assoc; *-comm; *-identityˡ
+  ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*)
 open import Data.Integer.Base using (ℤ; 1ℤ) renaming (_+_ to _ℤ+_)
-open import Data.Product.Base using (_×_; _,_)
+open import Data.Product.Base using (_,_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.Quantum.Gaussian using
-  (ℂ; re; im; conj; norm²; _+ᶜ_; _*ᶜ_; norm²-mul; norm²-conj)
+open import ALMA.Physics.Quantum.Gaussian
+  using (ℂ; re; conj; norm²; _+ᶜ_; _*ᶜ_; norm²-mul; norm²-conj)
+open import ALMA.Physics.RationalKit as Kit
+  using (neg-involutive; neg-neg-mul; sq+; +interchange; flat4; sub-+-assoc; *ʳ-sub; *ˡ-sub)
 
 -- Additive inverse on ℚ[i], componentwise.
 --
@@ -57,117 +58,16 @@ open import ALMA.Physics.Quantum.Gaussian using
 -ᶜ_ (a , b) = (- a , - b)
 
 ------------------------------------------------------------------------
--- Rational kit
+-- Local helpers not in RationalKit
 --
--- The Gaussian copies are private; reprove what is needed.
+-- perm4 and gather-t have four-term shapes specific to the complex
+-- multiplication tables below, so they stay local.
 --
--- 有理工具
+-- RationalKit 之外的本地辅助引理
 --
--- Gaussian 中相应引理为私有，按需重证。
+-- perm4 与 gather-t 是为下面复数乘法表量身定做的四项形状，故留在本地。
 
 private
-  ‿-‿ : ∀ x → - (- x) ≡ x
-  ‿-‿ x = let open ≡-Reasoning in begin
-    - (- x)
-    ≡⟨ sym (+-identityˡ (- (- x))) ⟩
-    0ℚ + - (- x)
-    ≡⟨ cong (λ z → z + - (- x)) (sym (+-inverseʳ x)) ⟩
-    (x + - x) + - (- x)
-    ≡⟨ +-assoc x (- x) (- (- x)) ⟩
-    x + ((- x) + - (- x))
-    ≡⟨ cong (x +_) (+-inverseʳ (- x)) ⟩
-    x + 0ℚ
-    ≡⟨ +-identityʳ x ⟩
-    x ∎
-
-  -‿*- : ∀ x y → (- x) * (- y) ≡ x * y
-  -‿*- x y = let open ≡-Reasoning in begin
-    (- x) * (- y)
-    ≡⟨ sym (neg-distribˡ-* x (- y)) ⟩
-    - (x * (- y))
-    ≡⟨ cong -_ (sym (neg-distribʳ-* x y)) ⟩
-    - (- (x * y))
-    ≡⟨ ‿-‿ (x * y) ⟩
-    x * y ∎
-
-  -- (x + y)² = x² + y² + (x*y + x*y).
-  --
-  -- (x + y)² = x² + y² + (x*y + x*y)。
-  sq+ : ∀ x y → (x + y) * (x + y) ≡
-                x * x + (y * y + (x * y + x * y))
-  sq+ x y = let open ≡-Reasoning in begin
-    (x + y) * (x + y)
-    ≡⟨ *-distribʳ-+ (x + y) x y ⟩
-    x * (x + y) + y * (x + y)
-    ≡⟨ cong₂ _+_ (*-distribˡ-+ x x y) (*-distribˡ-+ y x y) ⟩
-    (x * x + x * y) + (y * x + y * y)
-    ≡⟨ cong (λ z → (x * x + x * y) + (z + y * y)) (*-comm y x) ⟩
-    (x * x + x * y) + (x * y + y * y)
-    ≡⟨ +-assoc (x * x) (x * y) (x * y + y * y) ⟩
-    x * x + (x * y + (x * y + y * y))
-    ≡⟨ cong (x * x +_) (sym (+-assoc (x * y) (x * y) (y * y))) ⟩
-    x * x + ((x * y + x * y) + y * y)
-    ≡⟨ cong (x * x +_) (+-comm (x * y + x * y) (y * y)) ⟩
-    x * x + (y * y + (x * y + x * y)) ∎
-
-  -- (a + b) + (c + d) = (a + c) + (b + d).
-  --
-  -- (a + b) + (c + d) = (a + c) + (b + d)。
-  +-interchange : ∀ a b c d → (a + b) + (c + d) ≡ (a + c) + (b + d)
-  +-interchange a b c d = let open ≡-Reasoning in begin
-    (a + b) + (c + d)
-    ≡⟨ +-assoc a b (c + d) ⟩
-    a + (b + (c + d))
-    ≡⟨ cong (a +_) (sym (+-assoc b c d)) ⟩
-    a + ((b + c) + d)
-    ≡⟨ cong (a +_) (cong (_+ d) (+-comm b c)) ⟩
-    a + ((c + b) + d)
-    ≡⟨ cong (a +_) (+-assoc c b d) ⟩
-    a + (c + (b + d))
-    ≡⟨ sym (+-assoc a c (b + d)) ⟩
-    (a + c) + (b + d) ∎
-
-  -- Subtraction distributes over multiplication on either side.
-  --
-  -- 减法对乘法的两侧分配。
-  *ʳ-sub : ∀ x y z → (x - y) * z ≡ x * z - y * z
-  *ʳ-sub x y z = let open ≡-Reasoning in begin
-    (x - y) * z
-    ≡⟨ *-distribʳ-+ z x (- y) ⟩
-    x * z + (- y) * z
-    ≡⟨ cong (x * z +_) (sym (neg-distribˡ-* y z)) ⟩
-    x * z - y * z ∎
-
-  *ˡ-sub : ∀ x y z → x * (y - z) ≡ x * y - x * z
-  *ˡ-sub x y z = let open ≡-Reasoning in begin
-    x * (y - z)
-    ≡⟨ *-distribˡ-+ x y (- z) ⟩
-    x * y + x * (- z)
-    ≡⟨ cong (x * y +_) (sym (neg-distribʳ-* x z)) ⟩
-    x * y - x * z ∎
-
-  -- X - (Y + Z) = (X - Y) - Z.
-  --
-  -- X - (Y + Z) = (X - Y) - Z。
-  sub-+-assoc : ∀ X Y Z → X - (Y + Z) ≡ (X - Y) - Z
-  sub-+-assoc X Y Z = let open ≡-Reasoning in begin
-    X - (Y + Z)
-    ≡⟨ cong (X +_) (neg-distrib-+ Y Z) ⟩
-    X + (- Y + - Z)
-    ≡⟨ sym (+-assoc X (- Y) (- Z)) ⟩
-    (X - Y) - Z ∎
-
-  -- Left-nested four-sum to right-nested.
-  --
-  -- 左结合四项和转为右结合。
-  flat4 : ∀ p q r s → ((p + q) + r) + s ≡ p + (q + (r + s))
-  flat4 p q r s = let open ≡-Reasoning in begin
-    ((p + q) + r) + s
-    ≡⟨ +-assoc (p + q) r s ⟩
-    (p + q) + (r + s)
-    ≡⟨ +-assoc p q (r + s) ⟩
-    p + (q + (r + s)) ∎
-
   -- Rotate the last three addends: a+b+c+d = a+c+d+b.
   --
   -- 末三项轮换：a+b+c+d = a+c+d+b。
@@ -176,7 +76,7 @@ private
     a + (b + (c + d))
     ≡⟨ sym (+-assoc a b (c + d)) ⟩
     (a + b) + (c + d)
-    ≡⟨ +-interchange a b c d ⟩
+    ≡⟨ +interchange a b c d ⟩
     (a + c) + (b + d)
     ≡⟨ cong ((a + c) +_) (+-comm b d) ⟩
     (a + c) + (d + b)
@@ -190,13 +90,13 @@ private
              ((P + Q) + t) + ((R + S) + (- t)) ≡ (P + R) + (Q + S)
   gather-t P Q R S t = let open ≡-Reasoning in begin
     ((P + Q) + t) + ((R + S) + (- t))
-    ≡⟨ +-interchange (P + Q) t (R + S) (- t) ⟩
+    ≡⟨ +interchange (P + Q) t (R + S) (- t) ⟩
     ((P + Q) + (R + S)) + (t + (- t))
     ≡⟨ cong (((P + Q) + (R + S)) +_) (+-inverseʳ t) ⟩
     ((P + Q) + (R + S)) + 0ℚ
     ≡⟨ +-identityʳ ((P + Q) + (R + S)) ⟩
     (P + Q) + (R + S)
-    ≡⟨ +-interchange P Q R S ⟩
+    ≡⟨ +interchange P Q R S ⟩
     (P + R) + (Q + S) ∎
 
 ------------------------------------------------------------------------
@@ -311,7 +211,7 @@ private
   --
   -- 共轭为对合且保持乘积：ℚ[i] 交换，故 conj(xy)=conj x·conj y。
   conj-invol : ∀ z → conj (conj z) ≡ z
-  conj-invol (a , b) = cong (a ,_) (‿-‿ b)
+  conj-invol (a , b) = cong (a ,_) (neg-involutive b)
 
   conj-neg : ∀ z → conj (-ᶜ z) ≡ -ᶜ conj z
   conj-neg (a , b) = refl
@@ -327,7 +227,7 @@ private
         - (b * (- d))
         ≡⟨ cong -_ (sym (neg-distribʳ-* b d)) ⟩
         - (- (b * d))
-        ≡⟨ ‿-‿ (b * d) ⟩
+        ≡⟨ neg-involutive (b * d) ⟩
         b * d ∎) ⟩
       a * c - b * d ∎
     imag = let open ≡-Reasoning in begin
@@ -349,9 +249,9 @@ private
       ≡⟨ cong₂ _-_ (sym (neg-distribˡ-* a c))
                     (sym (neg-distribˡ-* b d)) ⟩
       - (a * c) - - (b * d)
-      ≡⟨ cong (λ z → - (a * c) + z) (‿-‿ (b * d)) ⟩
+      ≡⟨ cong (λ z → - (a * c) + z) (neg-involutive (b * d)) ⟩
       - (a * c) + b * d
-      ≡⟨ cong (λ z → - (a * c) + z) (sym (‿-‿ (b * d))) ⟩
+      ≡⟨ cong (λ z → - (a * c) + z) (sym (neg-involutive (b * d))) ⟩
       - (a * c) + - (- (b * d))
       ≡⟨ sym (neg-distrib-+ (a * c) (- (b * d))) ⟩
       - (a * c - b * d) ∎
@@ -376,21 +276,19 @@ private
   re-neg : ∀ z → re (-ᶜ z) ≡ - re z
   re-neg (a , b) = refl
 
-  norm²-neg : ∀ z → norm² (-ᶜ z) ≡ norm² z
-  norm²-neg (a , b) =
-    cong₂ _+_ (-‿*- a a) (-‿*- b b)
+norm²-neg : ∀ z → norm² (-ᶜ z) ≡ norm² z
+norm²-neg (a , b) =
+  cong₂ _+_ (neg-neg-mul a a) (neg-neg-mul b b)
 
 ------------------------------------------------------------------------
 -- Polarization
 --
 -- |x + y|² = |x|² + |y|² + 2·Re(conj x · y).
+-- Interference term: twice the real part of the Hermitian overlap.
 --
 -- 极化恒等式
 --
 -- |x + y|² = |x|² + |y|² + 2·Re(conj x · y)。
-
--- Interference term: twice the real part of the Hermitian overlap.
---
 -- 干涉项：Hermite 内积实部的两倍。
 cross : ℂ → ℂ → ℚ
 cross x y = re (conj x *ᶜ y) + re (conj x *ᶜ y)
@@ -402,7 +300,7 @@ private
     (a * d) - ((- b) * e)
     ≡⟨ cong (λ z → (a * d) - z) (sym (neg-distribˡ-* b e)) ⟩
     (a * d) - (- (b * e))
-    ≡⟨ cong (λ z → (a * d) + z) (‿-‿ (b * e)) ⟩
+    ≡⟨ cong (λ z → (a * d) + z) (neg-involutive (b * e)) ⟩
     a * d + b * e ∎
 
 norm²-add : ∀ (x y : ℂ) →
@@ -411,9 +309,9 @@ norm²-add (a , b) (d , e) = let open ≡-Reasoning in begin
   (a + d) * (a + d) + (b + e) * (b + e)
   ≡⟨ cong₂ _+_ (sq+ a d) (sq+ b e) ⟩
   (a² + (d² + P)) + (b² + (e² + Q))
-  ≡⟨ +-interchange a² (d² + P) b² (e² + Q) ⟩
+  ≡⟨ +interchange a² (d² + P) b² (e² + Q) ⟩
   (a² + b²) + ((d² + P) + (e² + Q))
-  ≡⟨ cong ((a² + b²) +_) (+-interchange d² P e² Q) ⟩
+  ≡⟨ cong ((a² + b²) +_) (+interchange d² P e² Q) ⟩
   (a² + b²) + ((d² + e²) + (P + Q))
   ≡⟨ cong (λ z → (a² + b²) + ((d² + e²) + z)) swap ⟩
   (a² + b²) + ((d² + e²) + cross (a , b) (d , e))
@@ -425,7 +323,7 @@ norm²-add (a , b) (d , e) = let open ≡-Reasoning in begin
   ovl = re (conj (a , b) *ᶜ (d , e))
   swap = let open ≡-Reasoning in begin
     P + Q
-    ≡⟨ +-interchange (a * d) (a * d) (b * e) (b * e) ⟩
+    ≡⟨ +interchange (a * d) (a * d) (b * e) (b * e) ⟩
     (a * d + b * e) + (a * d + b * e)
     ≡⟨ sym (cong₂ _+_ (re-overlap a b d e) (re-overlap a b d e)) ⟩
     ovl + ovl ∎
@@ -529,13 +427,11 @@ private
 -- Main theorem
 --
 -- A complex 2×2 unitary conserves total norm.
+-- U = [[u, v], [-conj v, conj u]], with carried |u|² + |v|² = 1.
 --
 -- 主定理
 --
 -- 复 2×2 幺正保持总范数。
-
--- U = [[u, v], [-conj v, conj u]], with carried |u|² + |v|² = 1.
---
 -- U = [[u, v], [-conj v, conj u]]，携带 |u|² + |v|² = 1。
 unitary2-pres : ∀ (u v α β : ℂ) →
                 norm² u + norm² v ≡ 1ℚ →

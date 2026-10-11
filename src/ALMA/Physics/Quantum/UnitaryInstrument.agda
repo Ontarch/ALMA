@@ -27,13 +27,12 @@
 
 module ALMA.Physics.Quantum.UnitaryInstrument where
 
-open import Data.Nat.Base using (ℕ)
-open import Data.Fin.Base using (Fin; zero; suc)
+open import Data.Fin.Base using (Fin)
 open import Data.Product.Base using (Σ; _,_; proj₁; proj₂)
 open import Data.Vec using (Vec; []; _∷_; lookup)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; -_)
 open import Data.Rational.Properties using
-  (+-identityʳ; +-comm; +-identityˡ; +-inverseʳ; +-assoc; neg-distribˡ-*; neg-distribʳ-*)
+  (+-identityʳ; +-comm; neg-distribˡ-*; neg-distribʳ-*)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
@@ -42,47 +41,15 @@ open import ALMA.Physics.Quantum.Gaussian using
 open import ALMA.Physics.Quantum.FiniteVec using (sumFin)
 open import ALMA.Physics.Quantum.Measurement using (Instrument)
 open import ALMA.Physics.Quantum.AmplitudeComp using
-  (-ᶜ_; unitary2-pres; u₃₄₅; v₃₄₅; pythagoras-345)
+  (-ᶜ_; unitary2-pres; u₃₄₅; v₃₄₅; norm²-neg; pythagoras-345)
+open import ALMA.Physics.RationalKit as Kit using (neg-involutive)
 
 private
-  -- Double negation and (-x)² = x² over ℚ.
-  --
-  -- ℚ 上的双重否定与 (-x)² = x²。
-  ‿-‿ : ∀ x → - (- x) ≡ x
-  ‿-‿ x = let open ≡-Reasoning in begin
-    - (- x)
-    ≡⟨ sym (+-identityˡ (- (- x))) ⟩
-    0ℚ + - (- x)
-    ≡⟨ cong (λ z → z + - (- x)) (sym (+-inverseʳ x)) ⟩
-    (x + - x) + - (- x)
-    ≡⟨ +-assoc x (- x) (- (- x)) ⟩
-    x + ((- x) + - (- x))
-    ≡⟨ cong (x +_) (+-inverseʳ (- x)) ⟩
-    x + 0ℚ
-    ≡⟨ +-identityʳ x ⟩
-    x ∎
-
-  sq-neg : ∀ x → (- x) * (- x) ≡ x * x
-  sq-neg x = let open ≡-Reasoning in begin
-    (- x) * (- x)
-    ≡⟨ sym (neg-distribˡ-* x (- x)) ⟩
-    - (x * (- x))
-    ≡⟨ cong -_ (sym (neg-distribʳ-* x x)) ⟩
-    - (- (x * x))
-    ≡⟨ ‿-‿ (x * x) ⟩
-    x * x ∎
-
-  -- Componentwise negation leaves the squared norm fixed.
-  --
-  -- 逐分量取负不改变平方范数。
-  norm²-negᶜ : ∀ z → norm² (-ᶜ z) ≡ norm² z
-  norm²-negᶜ (a , b) = cong₂ _+_ (sq-neg a) (sq-neg b)
-
   -- |-conj z|² = |z|²: conjugation then sign both preserve norm.
   --
   -- |-conj z|² = |z|²：共轭与取负均保范数。
   neg-conj-norm : ∀ z → norm² (-ᶜ conj z) ≡ norm² z
-  neg-conj-norm z = trans (norm²-negᶜ (conj z)) (norm²-conj z)
+  neg-conj-norm z = trans (norm²-neg (conj z)) (norm²-conj z)
 
   -- Sum of squared norms along a Vec, polymorphic in its length.
   --

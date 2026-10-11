@@ -20,19 +20,19 @@ module ALMA.Physics.Quantum.FiniteVec where
 
 open import Data.Nat.Base using (ℕ; zero; suc)
 open import Data.Fin.Base using (Fin; zero; suc)
-open import Data.Product.Base using (_×_; _,_)
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _≤_; -_)
-open import Data.Rational.Base using (mkℚ; ∣_∣; NonNegative; nonNegative)
+open import Data.Product.Base using (_,_)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _≤_)
+open import Data.Rational.Base using (mkℚ; ∣_∣)
 open import Data.Integer.Base using (+[1+_]; -[1+_]; +0)
 open import Data.Rational.Properties using
-  (+-assoc; +-identityˡ; +-identityʳ; +-inverseʳ; +-mono-≤
-  ; neg-distribˡ-*; neg-distribʳ-*; *-zeroˡ; *-identityˡ; 0≤∣p∣
-  ; ∣-∣-nonNeg; *-monoʳ-≤-nonNeg; ≤-reflexive; module ≤-Reasoning)
+  (+-identityˡ; +-mono-≤; *-zeroˡ; *-identityˡ; 0≤∣p∣; ∣-∣-nonNeg
+  ; *-monoʳ-≤-nonNeg; ≤-reflexive; module ≤-Reasoning)
 open import Function.Base using (_∘_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.Gaussian using (ℂ; _*ᶜ_; norm²; norm²-mul; Unit)
+open import ALMA.Physics.RationalKit as Kit using (neg-neg-square)
 
 ------------------------------------------------------------------------
 -- Rational squares are nonnegative
@@ -45,36 +45,6 @@ open import ALMA.Physics.Quantum.Gaussian using (ℂ; _*ᶜ_; norm²; norm²-mul
 -- ℚ 上的双重否定、符号乘积与平方律，用于下面证明每个 Born 权重非负。
 
 private
-  -- Double negation: -(-x) = x.
-  --
-  -- 双重否定：-(-x) = x。
-  ‿-‿ : ∀ x → - (- x) ≡ x
-  ‿-‿ x = let open ≡-Reasoning in begin
-    - (- x)
-    ≡⟨ sym (+-identityˡ (- (- x))) ⟩
-    0ℚ + - (- x)
-    ≡⟨ cong (λ z → z + - (- x)) (sym (+-inverseʳ x)) ⟩
-    (x + - x) + - (- x)
-    ≡⟨ +-assoc x (- x) (- (- x)) ⟩
-    x + ((- x) + - (- x))
-    ≡⟨ cong (x +_) (+-inverseʳ (- x)) ⟩
-    x + 0ℚ
-    ≡⟨ +-identityʳ x ⟩
-    x ∎
-
-  -- (-x)(-y) = xy; specialised below to (-x)² = x².
-  --
-  -- 负负相乘：(-x)(-y) = xy，下取 (-x)² = x²。
-  neg-neg-product : ∀ x → (- x) * (- x) ≡ x * x
-  neg-neg-product x = let open ≡-Reasoning in begin
-    (- x) * (- x)
-    ≡⟨ sym (neg-distribˡ-* x (- x)) ⟩
-    - (x * (- x))
-    ≡⟨ cong -_ (sym (neg-distribʳ-* x x)) ⟩
-    - (- (x * x))
-    ≡⟨ ‿-‿ (x * x) ⟩
-    x * x ∎
-
   -- |x|² = x² by sign cases on the normalised numerator.
   --
   -- 按规范化分子的符号分情形：|x|² = x²。
@@ -83,7 +53,7 @@ private
   abs²≡² (mkℚ +0       _ _) = refl
   abs²≡² x@(mkℚ -[1+ _ ] _ _) = let open ≡-Reasoning in begin
     ∣ x ∣ * ∣ x ∣
-    ≡⟨ neg-neg-product x ⟩
+    ≡⟨ neg-neg-square x ⟩
     x * x ∎
 
   -- Every rational square is nonnegative, via |x| ≥ 0.

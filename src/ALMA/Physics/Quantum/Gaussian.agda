@@ -13,8 +13,7 @@
 -- conservation under unitaries; norm²-conj says conjugation preserves
 -- the modulus; and Unit, unit-norm-mul say unit-modulus phases
 -- (norm² = 1) are closed under multiplication, the phase group used by
--- diagonal unitaries. All identities are short ring-algebra chains,
--- keeping proof terms small under --double-check.
+-- diagonal unitaries.
 --
 -- 定量标量纤维：高斯有理数作为精确振幅
 --
@@ -25,8 +24,7 @@
 -- 为实平方模（z 的 Born 权重）；norm²-mul：|uv|² = |u|²|v|² 是模的
 -- 乘法性，幺正下概率守恒背后的恒等式；norm²-conj 说共轭保模；Unit、
 -- unit-norm-mul 说单位模相位（norm² = 1）对乘法封闭，即对角幺正所用的
--- 相位群。全部恒等式为简短环等式链，使 --double-check 下证明项保持
--- 精小。
+-- 相位群。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -34,15 +32,16 @@
 module ALMA.Physics.Quantum.Gaussian where
 
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Data.Product.Base using (_×_; _,_; proj₁; proj₂)
+open import Data.Product.Base using (_×_; _,_)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; +-inverseʳ; *-assoc
-  ; *-comm; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribʳ-*; neg-distribˡ-*)
+  (+-assoc; +-comm; +-identityʳ; +-inverseˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+)
 open import Relation.Binary.PropositionalEquality using
   (trans; sym; cong; cong₂; module ≡-Reasoning)
-
 open ≡-Reasoning
+
+open import ALMA.Physics.RationalKit as Kit using
+  (neg-neg-mul; sq+; sq-; sq-comm; cross-eq)
 
 ------------------------------------------------------------------------
 -- Gaussian rationals in rectangular form
@@ -101,135 +100,6 @@ norm²-1ᶜ = refl
 -- 下面结构恒等式所用的简短环等式链。
 
 private
-
-  -- Double negation: -(-x) = x.
-  --
-  -- 双重否定：-(-x) = x。
-  ‿-‿ : ∀ x → - (- x) ≡ x
-  ‿-‿ x = begin
-    - (- x)
-    ≡⟨ sym (+-identityˡ (- (- x))) ⟩
-    0ℚ + - (- x)
-    ≡⟨ cong (λ z → z + - (- x)) (sym (+-inverseʳ x)) ⟩
-    (x + - x) + - (- x)
-    ≡⟨ +-assoc x (- x) (- (- x)) ⟩
-    x + ((- x) + - (- x))
-    ≡⟨ cong (x +_) (+-inverseʳ (- x)) ⟩
-    x + 0ℚ
-    ≡⟨ +-identityʳ x ⟩
-    x ∎
-
-  -- Product of two negatives: (-x)(-y) = xy.
-  --
-  -- 负负得正：(-x)(-y) = xy。
-  -‿*- : ∀ x y → (- x) * (- y) ≡ x * y
-  -‿*- x y = begin
-    (- x) * (- y)
-    ≡⟨ sym (neg-distribˡ-* x (- y)) ⟩
-    - (x * (- y))
-    ≡⟨ cong -_ (sym (neg-distribʳ-* x y)) ⟩
-    - (- (x * y))
-    ≡⟨ ‿-‿ (x * y) ⟩
-    x * y ∎
-
-  -- (x + y)² = x² + y² + 2xy.
-  --
-  -- (x + y)² = x² + y² + 2xy。
-  sq+ : ∀ x y →
-        (x + y) * (x + y)
-      ≡ x * x + (y * y + (x * y + x * y))
-  sq+ x y = begin
-    (x + y) * (x + y)
-    ≡⟨ *-distribʳ-+ (x + y) x y ⟩
-    x * (x + y) + y * (x + y)
-    ≡⟨ cong₂ _+_ (*-distribˡ-+ x x y) (*-distribˡ-+ y x y) ⟩
-    (x * x + x * y) + (y * x + y * y)
-    ≡⟨ cong (λ z → (x * x + x * y) + (z + y * y)) (*-comm y x) ⟩
-    (x * x + x * y) + (x * y + y * y)
-    ≡⟨ +-assoc (x * x) (x * y) (x * y + y * y) ⟩
-    x * x + (x * y + (x * y + y * y))
-    ≡⟨ cong (x * x +_) (sym (+-assoc (x * y) (x * y) (y * y))) ⟩
-    x * x + ((x * y + x * y) + y * y)
-    ≡⟨ cong (x * x +_) (+-comm (x * y + x * y) (y * y)) ⟩
-    x * x + (y * y + (x * y + x * y)) ∎
-
-  -- (x - y)² = x² + y² - 2xy.
-  --
-  -- (x - y)² = x² + y² - 2xy。
-  sq- : ∀ x y →
-        (x - y) * (x - y)
-      ≡ x * x + (y * y - (x * y + x * y))
-  sq- x y = begin
-    (x - y) * (x - y)
-    ≡⟨ sq+ x (- y) ⟩
-    x * x + ((- y) * (- y) + (x * (- y) + x * (- y)))
-    ≡⟨ cong (x * x +_) step ⟩
-    x * x + (y * y - (x * y + x * y)) ∎
-    where
-    step : (- y) * (- y) + (x * (- y) + x * (- y))
-         ≡ y * y - (x * y + x * y)
-    step = begin
-      (- y) * (- y) + (x * (- y) + x * (- y))
-      ≡⟨ cong (λ z → z + (x * (- y) + x * (- y))) (-‿*- y y) ⟩
-      y * y + (x * (- y) + x * (- y))
-      ≡⟨ cong (λ z → y * y + (z + z)) (sym (neg-distribʳ-* x y)) ⟩
-      y * y + (- (x * y) + - (x * y))
-      ≡⟨ cong (y * y +_) (sym (neg-distrib-+ (x * y) (x * y))) ⟩
-      y * y - (x * y + x * y) ∎
-
-  -- (xy)² = x²y²: squares commute across a product.
-  --
-  -- 平方跨过乘积交换：(xy)² = x²y²。
-  sq-comm : ∀ x y → (x * y) * (x * y) ≡ (x * x) * (y * y)
-  sq-comm x y = begin
-    (x * y) * (x * y)
-    ≡⟨ *-assoc x y (x * y) ⟩
-    x * (y * (x * y))
-    ≡⟨ cong (x *_) (sym (*-assoc y x y)) ⟩
-    x * ((y * x) * y)
-    ≡⟨ cong (λ z → x * (z * y)) (*-comm y x) ⟩
-    x * ((x * y) * y)
-    ≡⟨ cong (x *_) (*-assoc x y y) ⟩
-    x * (x * (y * y))
-    ≡⟨ sym (*-assoc x x (y * y)) ⟩
-    (x * x) * (y * y) ∎
-
-  -- Both mixed products reorder to the same monomial abcd, so the cross
-  -- terms coincide: (ac)(bd) = (ad)(bc).
-  --
-  -- 两个混合积都重排为同一单项式 abcd，故交叉项相同：(ac)(bd)=(ad)(bc)。
-  cross-eq : ∀ a b c d → (a * c) * (b * d) ≡ (a * d) * (b * c)
-  cross-eq a b c d = trans canon₁ (sym canon₂)
-    where
-    canon₁ : (a * c) * (b * d) ≡ (a * b) * (c * d)
-    canon₁ = begin
-      (a * c) * (b * d)
-      ≡⟨ *-assoc a c (b * d) ⟩
-      a * (c * (b * d))
-      ≡⟨ cong (a *_) (sym (*-assoc c b d)) ⟩
-      a * ((c * b) * d)
-      ≡⟨ cong (λ z → a * (z * d)) (*-comm c b) ⟩
-      a * ((b * c) * d)
-      ≡⟨ cong (a *_) (*-assoc b c d) ⟩
-      a * (b * (c * d))
-      ≡⟨ sym (*-assoc a b (c * d)) ⟩
-      (a * b) * (c * d) ∎
-    canon₂ : (a * d) * (b * c) ≡ (a * b) * (c * d)
-    canon₂ = begin
-      (a * d) * (b * c)
-      ≡⟨ *-assoc a d (b * c) ⟩
-      a * (d * (b * c))
-      ≡⟨ cong (a *_) (sym (*-assoc d b c)) ⟩
-      a * ((d * b) * c)
-      ≡⟨ cong (λ z → a * (z * c)) (*-comm d b) ⟩
-      a * ((b * d) * c)
-      ≡⟨ cong (a *_) (*-assoc b d c) ⟩
-      a * (b * (d * c))
-      ≡⟨ cong (λ z → a * (b * z)) (*-comm d c) ⟩
-      a * (b * (c * d))
-      ≡⟨ sym (*-assoc a b (c * d)) ⟩
-      (a * b) * (c * d) ∎
-
   -- A paired positive and negative copy of t cancels additively.
   --
   -- 一正一负两份 t 在加法下相消。
@@ -289,7 +159,7 @@ private
 --
 -- 共轭保持平方模。
 norm²-conj : ∀ (u : ℂ) → norm² (conj u) ≡ norm² u
-norm²-conj (a , b) = cong (a * a +_) (-‿*- b b)
+norm²-conj (a , b) = cong (a * a +_) (neg-neg-mul b b)
 
 -- Multiplicativity of the squared modulus: |uv|² = |u|²|v|².
 --
@@ -318,9 +188,22 @@ norm²-mul (a , b) (c , d) = begin
   a²c² = (a * a) * (c * c) ; b²d² = (b * b) * (d * d)
   a²d² = (a * a) * (d * d) ; b²c² = (b * b) * (c * c)
 
+  -- (x - y)² = x² + y² - 2xy, regrouped so that the pair of negative
+  -- cross terms is a single `- (P + P)`, matching kill's shape.
+  --
+  -- (x - y)² = x² + y² - 2xy，重排使成对的负交叉项合并为一个
+  -- `- (P + P)`，以匹配 kill 的形状。
   real-part : (ac - bd) * (ac - bd) ≡ U - (P + P)
-  real-part = trans (sq- ac bd)
-                     (sym (+-assoc (ac * ac) (bd * bd) (- (P + P))))
+  real-part = begin
+    (ac - bd) * (ac - bd)
+      ≡⟨ sq- ac bd ⟩
+    ac * ac + (bd * bd + (- (ac * bd) + - (ac * bd)))
+      ≡⟨ cong (ac * ac +_)
+           (cong (bd * bd +_)
+             (sym (neg-distrib-+ (ac * bd) (ac * bd)))) ⟩
+    ac * ac + (bd * bd + - (P + P))
+      ≡⟨ sym (+-assoc (ac * ac) (bd * bd) (- (P + P))) ⟩
+    (ac * ac + bd * bd) + - (P + P) ∎
 
   imag-part : (ad + bc) * (ad + bc) ≡ V + (Q + Q)
   imag-part = trans (sq+ ad bc)

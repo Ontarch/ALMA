@@ -54,7 +54,7 @@ open import Agda.Builtin.Equality using (_≡_; refl)
 open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Data.Empty using (⊥)
 open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
-open import Data.Product.Base using (_×_; proj₁; proj₂)
+open import Data.Product.Base using (_×_)
 open import Relation.Nullary.Negation using (¬_)
 
 open import ALMA.Base.MCorrSetoid using (SysEq)

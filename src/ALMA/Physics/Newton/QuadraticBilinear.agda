@@ -16,91 +16,55 @@
 
 module ALMA.Physics.Newton.QuadraticBilinear where
 
-open import Data.Rational using (_+_; _*_; -_)
+open import Data.Rational using (ℚ; _+_; _*_; -_)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; *-assoc; *-comm; *-distribˡ-+; *-distribʳ-+
-  ; neg-distrib-+; neg-distribʳ-*)
+  (+-assoc; *-distribˡ-+; *-distribʳ-+; neg-distrib-+)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.Newton.Quadratic as Q using
-  (Obs; obs; bracket; add; scale; twoℚ; fourℚ)
+open import ALMA.Physics.Newton.Quadratic as Q
+  using (Obs; obs; bracket; add; scale; twoℚ; fourℚ; mkObs)
+open import ALMA.Physics.RationalKit as Kit using
+  (pairs2; pairs4; front; frontS; front-neg; factor2; factor4; front-negS)
 
 ------------------------------------------------------------------------
--- Additive rearrangement
+-- Local helpers
 --
--- 加法重排
+-- 本地辅助引理
 
 private
-  -- (x + y) + (u + v) = (x + u) + (y + v).
-  swap4 : ∀ x y u v → (x + y) + (u + v) ≡ (x + u) + (y + v)
-  swap4 x y u v = let open ≡-Reasoning in begin
-    (x + y) + (u + v)
-    ≡⟨ +-assoc x y (u + v) ⟩
-    x + (y + (u + v))
-    ≡⟨ cong (x +_) (sym (+-assoc y u v)) ⟩
-    x + ((y + u) + v)
-    ≡⟨ cong (x +_) (cong (λ z → z + v) (+-comm y u)) ⟩
-    x + ((u + y) + v)
-    ≡⟨ cong (x +_) (+-assoc u y v) ⟩
-    x + (u + (y + v))
-    ≡⟨ sym (+-assoc x u (y + v)) ⟩
-    (x + u) + (y + v) ∎
-
-  -- Regroup two interleaved pairs:
-  --   (x₁ + y₁) + (x₂ + y₂) = (x₁ + x₂) + (y₁ + y₂).
+  -- Split a scalar-prefixed summand s*((u+v))*z into s*u*z + s*v*z.
   --
-  -- 重排两对交错项。
-  pairs2 : ∀ x₁ x₂ y₁ y₂ →
-           (x₁ + y₁) + (x₂ + y₂) ≡ (x₁ + x₂) + (y₁ + y₂)
-  pairs2 x₁ x₂ y₁ y₂ = swap4 x₁ y₁ x₂ y₂
+  -- 把形如 s*((u+v))*z 的加项拆成 s*u*z + s*v*z。
+  splitSZ : ∀ s z u v →
+            (s * (u + v)) * z ≡ (s * u) * z + (s * v) * z
+  splitSZ s z u v = let open ≡-Reasoning in begin
+    (s * (u + v)) * z
+    ≡⟨ cong (λ t → t * z) (*-distribˡ-+ s u v) ⟩
+    (s * u + s * v) * z
+    ≡⟨ *-distribʳ-+ z (s * u) (s * v) ⟩
+    (s * u) * z + (s * v) * z ∎
 
-  -- Regroup four interleaved pairs into two left-associated groups.
+  -- Split a negated summand -((u+v)*z) into -(u*z) + -(v*z).
   --
-  -- 把四对交错项重排为两个左结合组。
-  pairs4 : ∀ x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ →
-          (((x₁ + y₁) + (x₂ + y₂)) + ((x₃ + y₃) + (x₄ + y₄)))
-          ≡ ((((x₁ + x₂) + x₃) + x₄) + (((y₁ + y₂) + y₃) + y₄))
-  pairs4 x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ = let open ≡-Reasoning in begin
-      (((x₁ + y₁) + (x₂ + y₂)) + ((x₃ + y₃) + (x₄ + y₄)))
-    ≡⟨ cong₂ _+_ (swap4 x₁ y₁ x₂ y₂) (swap4 x₃ y₃ x₄ y₄) ⟩
-      (((x₁ + x₂) + (y₁ + y₂)) + ((x₃ + x₄) + (y₃ + y₄)))
-    ≡⟨ swap4 (x₁ + x₂) (y₁ + y₂) (x₃ + x₄) (y₃ + y₄) ⟩
-      (((x₁ + x₂) + (x₃ + x₄)) + ((y₁ + y₂) + (y₃ + y₄)))
-    ≡⟨ cong₂ _+_ (sym (+-assoc (x₁ + x₂) x₃ x₄))
-                 (sym (+-assoc (y₁ + y₂) y₃ y₄)) ⟩
-      ((((x₁ + x₂) + x₃) + x₄) + (((y₁ + y₂) + y₃) + y₄)) ∎
+  -- 把 -((u+v)*z) 拆成 -(u*z) + -(v*z)。
+  splitNeg : ∀ z u v →
+             - ((u + v) * z) ≡ - (u * z) + - (v * z)
+  splitNeg z u v = let open ≡-Reasoning in begin
+    - ((u + v) * z)
+    ≡⟨ cong -_ (*-distribʳ-+ z u v) ⟩
+    - (u * z + v * z)
+    ≡⟨ neg-distrib-+ (u * z) (v * z) ⟩
+    - (u * z) + - (v * z) ∎
 
-  -- (u + v) * z = u*z + v*z.
-  splitR : ∀ z u v → (u + v) * z ≡ u * z + v * z
-  splitR z u v = *-distribʳ-+ z u v
-
-  -- s * (u + v) = s*u + s*v.
-  splitL : ∀ s u v → s * (u + v) ≡ s * u + s * v
-  splitL s u v = *-distribˡ-+ s u v
-
--- Assemble six field equalities into an equality of records.
---
--- 由六个字段等式组装为记录相等。
-private
-  mk : ∀ {lc la lb ld le lf rc ra rb rd re rf}
-     → lc ≡ rc → la ≡ ra → lb ≡ rb
-     → ld ≡ rd → le ≡ re → lf ≡ rf
-     → obs lc la lb ld le lf ≡ obs rc ra rb rd re rf
-  mk pc pa pb pd pe pf = let open ≡-Reasoning in begin
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs x _ _ _ _ _) pc ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ x _ _ _ _) pa ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ x _ _ _) pb ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ _ x _ _) pd ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ _ _ x _) pe ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (obs _ _ _ _ _) pf ⟩
-    obs _ _ _ _ _ _ ∎
+  splitNegSZ : ∀ s z u v →
+               - ((s * (u + v)) * z) ≡ - ((s * u) * z) + - ((s * v) * z)
+  splitNegSZ s z u v = let open ≡-Reasoning in begin
+    - ((s * (u + v)) * z)
+    ≡⟨ cong -_ (splitSZ s z u v) ⟩
+    - ((s * u) * z + (s * v) * z)
+    ≡⟨ neg-distrib-+ ((s * u) * z) ((s * v) * z) ⟩
+    - ((s * u) * z) + - ((s * v) * z) ∎
 
 ------------------------------------------------------------------------
 -- Additive linearity in the first argument
@@ -110,11 +74,8 @@ private
 bracket-addˡ : ∀ f g h →
                bracket (add f g) h ≡ add (bracket f h) (bracket g h)
 bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
-             (obs _ A B D E F) = mk c-c q-c p-c d-c e-c f-c
+             (obs _ A B D E F) = mkObs c-c q-c p-c d-c e-c f-c
   where
-  -- f- and g-parts of every monomial (signs included).
-  --
-  -- 每个单项式的 f 部与 g 部（含符号）。
   x₁ = a * E;           y₁ = a' * E
   x₂ = twoℚ * d * B;    y₂ = twoℚ * d' * B
   x₃ = - (e * A);       y₃ = - (e' * A)
@@ -135,46 +96,13 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
         in begin
     (a + a') * B + - ((b + b') * A)
     ≡⟨ cong₂ (λ X Y → X + - Y)
-             (splitR B a a') (splitR A b b') ⟩
+             (*-distribʳ-+ B a a') (*-distribʳ-+ A b b') ⟩
     (c₁ + c₁') + - (b * A + b' * A)
     ≡⟨ cong ((c₁ + c₁') +_)
             (neg-distrib-+ (b * A) (b' * A)) ⟩
     (c₁ + c₁') + (- (b * A) + - (b' * A))
     ≡⟨ pairs2 c₁ (- (b * A)) c₁' (- (b' * A)) ⟩
     (c₁ + - (b * A)) + (c₁' + - (b' * A)) ∎
-
-  -- Split a scalar-prefixed summand s*((u+v))*z into s*u*z + s*v*z.
-  --
-  -- 把形如 s*((u+v))*z 的加项拆成 s*u*z + s*v*z。
-  splitSZ : ∀ s z u v →
-            (s * (u + v)) * z ≡ (s * u) * z + (s * v) * z
-  splitSZ s z u v = let open ≡-Reasoning in begin
-    (s * (u + v)) * z
-    ≡⟨ cong (λ t → t * z) (splitL s u v) ⟩
-    (s * u + s * v) * z
-    ≡⟨ splitR z (s * u) (s * v) ⟩
-    (s * u) * z + (s * v) * z ∎
-
-  -- Split a negated summand -((u+v)*z) into -(u*z) + -(v*z).
-  --
-  -- 把 -((u+v)*z) 拆成 -(u*z) + -(v*z)。
-  splitNeg : ∀ z u v →
-             - ((u + v) * z) ≡ - (u * z) + - (v * z)
-  splitNeg z u v = let open ≡-Reasoning in begin
-    - ((u + v) * z)
-    ≡⟨ cong -_ (splitR z u v) ⟩
-    - (u * z + v * z)
-    ≡⟨ neg-distrib-+ (u * z) (v * z) ⟩
-    - (u * z) + - (v * z) ∎
-
-  splitNegSZ : ∀ s z u v →
-               - ((s * (u + v)) * z) ≡ - ((s * u) * z) + - ((s * v) * z)
-  splitNegSZ s z u v = let open ≡-Reasoning in begin
-    - ((s * (u + v)) * z)
-    ≡⟨ cong -_ (splitSZ s z u v) ⟩
-    - ((s * u) * z + (s * v) * z)
-    ≡⟨ neg-distrib-+ ((s * u) * z) ((s * v) * z) ⟩
-    - ((s * u) * z) + - ((s * v) * z) ∎
 
   q-c = let open ≡-Reasoning
             u1 = (a + a') * E
@@ -184,7 +112,7 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
         in begin
       (((u1 + u2) + u3) + u4)
     ≡⟨ cong (λ t → (((t + u2) + u3) + u4))
-            (splitR E a a') ⟩
+            (*-distribʳ-+ E a a') ⟩
       ((((x₁ + y₁) + u2) + u3) + u4)
     ≡⟨ cong (λ t → ((((x₁ + y₁) + t) + u3) + u4))
             (splitSZ twoℚ B d d') ⟩
@@ -211,7 +139,7 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
             (splitSZ twoℚ F a a') ⟩
       ((((X₁ + Y₁) + u2) + u3) + u4)
     ≡⟨ cong (λ t → ((((X₁ + Y₁) + t) + u3) + u4))
-            (splitR B e e') ⟩
+            (*-distribʳ-+ B e e') ⟩
       ((((X₁ + Y₁) + (X₂ + Y₂)) + u3) + u4)
     ≡⟨ cong (λ t → ((((X₁ + Y₁) + (X₂ + Y₂)) + t) + u4))
             (splitNeg E b b') ⟩
@@ -262,60 +190,10 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
 --
 -- 第一参数的数乘线性
 
-private
-  -- s*(r*x) = r*(s*x).
-  swap-scalar : ∀ {r} s x → (s * (r * x)) ≡ r * (s * x)
-  swap-scalar {r} s x = let open ≡-Reasoning in begin
-    s * (r * x)
-    ≡⟨ sym (*-assoc s r x) ⟩
-    (s * r) * x
-    ≡⟨ cong (λ z → z * x) (*-comm s r) ⟩
-    (r * s) * x
-    ≡⟨ *-assoc r s x ⟩
-    r * (s * x) ∎
-
-  -- (r*x)*z = r*(x*z).
-  front : ∀ {r} z x → (r * x) * z ≡ r * (x * z)
-  front {r} z x = *-assoc r x z
-
-  -- (s*(r*x))*z = r*((s*x)*z).
-  frontS : ∀ {r} s z x → (s * (r * x)) * z ≡ r * ((s * x) * z)
-  frontS {r} s z x = let open ≡-Reasoning in begin
-    (s * (r * x)) * z
-    ≡⟨ cong (λ t → t * z) (swap-scalar {r} s x) ⟩
-    (r * (s * x)) * z
-    ≡⟨ *-assoc r (s * x) z ⟩
-    r * ((s * x) * z) ∎
-
-  -- -(r*x) = r*(-x).
-  front-neg : ∀ {r} x → - (r * x) ≡ r * (- x)
-  front-neg {r} x = neg-distribʳ-* r x
-
-  -- r*x + r*(-y) = r*(x + -y).
-  factor2 : ∀ {r} x y → r * x + r * (- y) ≡ r * (x + - y)
-  factor2 {r} x y = sym (*-distribˡ-+ r x (- y))
-
-  -- Factor r from four left-associated signed summands.
-  --
-  -- 从四个左结合的带符号加项中提出 r。
-  factor4 : ∀ {r} x y z w →
-            (((r * x + r * y) + r * (- z)) + r * (- w))
-            ≡ r * (((x + y) + - z) + - w)
-  factor4 {r} x y z w = let open ≡-Reasoning in begin
-      (((r * x + r * y) + r * (- z)) + r * (- w))
-    ≡⟨ cong (λ t → (t + r * (- z)) + r * (- w))
-            (sym (*-distribˡ-+ r x y)) ⟩
-      ((r * (x + y) + r * (- z)) + r * (- w))
-    ≡⟨ cong (λ t → t + r * (- w))
-            (sym (*-distribˡ-+ r (x + y) (- z))) ⟩
-      r * ((x + y) + - z) + r * (- w)
-    ≡⟨ sym (*-distribˡ-+ r ((x + y) + - z) (- w)) ⟩
-      r * (((x + y) + - z) + - w) ∎
-
 bracket-scaleˡ : ∀ r f g →
                  bracket (scale r f) g ≡ scale r (bracket f g)
 bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
-  mk c-c q-c p-c d-c e-c f-c
+  mkObs c-c q-c p-c d-c e-c f-c
   where
   c-c = let open ≡-Reasoning in begin
     (r * a) * B + - ((r * b) * A)
@@ -325,18 +203,6 @@ bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
     r * (a * B) + r * (- (b * A))
     ≡⟨ factor2 {r} (a * B) (b * A) ⟩
     r * (a * B + - (b * A)) ∎
-
-  -- Transform one negated, scalar-prefixed summand to r*(-target).
-  --
-  -- 把一个带负号、带数乘前缀的加项变形为 r*(-target)。
-  front-negS : ∀ s z x →
-               - ((s * (r * x)) * z) ≡ r * (- ((s * x) * z))
-  front-negS s z x = let open ≡-Reasoning in begin
-    - ((s * (r * x)) * z)
-    ≡⟨ cong -_ (frontS {r} s z x) ⟩
-    - (r * ((s * x) * z))
-    ≡⟨ front-neg {r} ((s * x) * z) ⟩
-    r * (- ((s * x) * z)) ∎
 
   q-c = let open ≡-Reasoning
             u1 = (r * a) * E
@@ -355,7 +221,7 @@ bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
       (((r * (a * E) + r * (twoℚ * d * B)) + r * (- (e * A))) + u4)
     ≡⟨ cong (λ t → (((r * (a * E) + r * (twoℚ * d * B))
                     + r * (- (e * A))) + t))
-            (front-negS twoℚ D b) ⟩
+            (front-negS {r} twoℚ D b) ⟩
       (((r * (a * E) + r * (twoℚ * d * B)) + r * (- (e * A)))
        + r * (- (twoℚ * b * D)))
     ≡⟨ factor4 {r} (a * E) (twoℚ * d * B) (e * A) (twoℚ * b * D) ⟩
@@ -379,7 +245,7 @@ bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
       (((r * (twoℚ * a * F) + r * (e * B)) + r * (- (b * E))) + u4)
     ≡⟨ cong (λ t → (((r * (twoℚ * a * F) + r * (e * B))
                     + r * (- (b * E))) + t))
-            (front-negS twoℚ A f) ⟩
+            (front-negS {r} twoℚ A f) ⟩
       (((r * (twoℚ * a * F) + r * (e * B)) + r * (- (b * E)))
        + r * (- (twoℚ * f * A)))
     ≡⟨ factor4 {r} (twoℚ * a * F) (e * B) (b * E) (twoℚ * f * A) ⟩

@@ -2,61 +2,21 @@
 -- Algebraic Newtonian mechanics: Jacobi identity and the harmonic
 -- oscillator
 --
--- The quadratic Poisson bracket of the preceding slices is ℚ-bilinear
--- (QuadraticBilinear, QuadraticSkew) and skew-symmetric (QuadraticSkew).
--- This slice closes the Lie-algebra axiomatics with the Jacobi identity
---
---   { {f, g}, h } + { {g, h}, f } + { {h, f}, g } = 0,
---
--- then instantiates the algebraic dynamics on the harmonic oscillator
---
---   H = (q² + p²) / 2,   d = f = 1/2 over ℚ,
---
--- for which the Hamiltonian vector field X_H u = {u, H} gives
---
---   q̇ = {q, H} = p,   ṗ = {p, H} = −q,   {H, H} = 0.
---
--- The equations of motion are linear and stay in the degree≤1 sector:
--- the affine Heisenberg–Poisson algebra of the Poisson slice is exactly
--- the deg≤1 truncation of this quadratic algebra, so the oscillator is
--- the first dynamics whose velocities leave the constant (central)
--- sector and rotate within h₃. Everything is exact over ℚ; no analysis,
--- limits or real numbers enter.
---
--- Proof method. Every Jacobi coefficient is a universal polynomial in
--- the rational coordinates of f, g, h, hence a ring identity over ℚ.
--- The standard-library ℚ ring decision procedure discharges each of the
--- six coefficients. A thin reflection wrapper fully normalises the goal
--- first so that the nested bracket, the componentwise addition and the
--- record projections unfold to raw ring operations. This introduces no
--- transport, no cast and no subst: reflection only reconstructs a proof
--- of propositional equality from the ring homomorphism.
+-- Continuing from the preceding slices (QuadraticBilinear,
+-- QuadraticSkew), which gave ℚ-bilinearity and skew-symmetry, this
+-- slice closes the Lie-algebra axiomatics with the Jacobi identity and
+-- then instantiates the algebraic dynamics on the harmonic oscillator,
+-- whose velocities leave the constant (central) sector and rotate
+-- within h₃. Everything is exact over ℚ. Every coefficient is a universal polynomial over ℚ,
+-- so the standard-library ℚ ring solver discharges it.
 --
 -- 代数版牛顿力学：Jacobi 恒等式与谐振子
 --
--- 前序切片中的二次 Poisson 括号已具备 ℚ-双线性（QuadraticBilinear、
--- QuadraticSkew）与反对称性（QuadraticSkew）。本切片以 Jacobi 恒等式
---
---   { {f, g}, h } + { {g, h}, f } + { {h, f}, g } = 0
---
--- 闭合其 Lie 代数公理，继而把代数动力学实例化为谐振子
---
---   H = (q² + p²) / 2，  即在 ℚ 上取 d = f = 1/2，
---
--- 其哈密顿向量场 X_H u = {u, H} 给出
---
---   q̇ = {q, H} = p，   ṗ = {p, H} = −q，   {H, H} = 0。
---
--- 运动方程是线性的，且始终停留在次数≤1 的截段：Poisson 切片中的仿射
--- Heisenberg–Poisson 代数正是本二次代数的 deg≤1 截断。因此谐振子是
--- 首个速度离开常数（中心）截段、在 h₃ 内部旋转的动力学系统。全部结论
--- 在 ℚ 上精确成立，不涉及任何分析、极限或实数。
---
--- 证明方法。Jacobi 的每个系数都是 f、g、h 的 ℚ 坐标上的全称多项式，
--- 因而是 ℚ 上的环恒等式。标准库的 ℚ 环判定过程逐一消去六个系数。一层
--- 轻量反射包装先对目标做完全范式化，使嵌套括号、逐分量加法与记录投影
--- 全部展开为裸环运算。此处不引入任何 transport、cast 或 subst：反射仅
--- 经由环同态重写出命题相等的证明项。
+-- 承接前序切片（QuadraticBilinear、QuadraticSkew）已给的 ℚ-双线性与
+-- 反对称性，本切片以 Jacobi 恒等式闭合其 Lie 代数公理，继而把代数动力学
+-- 实例化为谐振子——其速度离开常数（中心）截段、在 h₃ 内部旋转。全部结论
+-- 在 ℚ 上精确成立。每个系数都是 ℚ 上的
+-- 全称多项式，故由标准库 ℚ 环求解器消去。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -67,16 +27,13 @@ open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _*_; _/_)
 open import Data.Integer using (1ℤ)
 open import Data.List.Base using (_∷_; [])
 open import Data.Unit.Base using (⊤)
-open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; module ≡-Reasoning)
-
-open import Reflection
-open import Reflection.TCM
-open import Tactic.RingSolver as RingSolver using (solve-macro)
 open import Data.Rational.Tactic.RingSolver as RationalRing
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+open import Reflection
+open import Tactic.RingSolver as RingSolver using (solve-macro)
 
 open import ALMA.Physics.Newton.Quadratic as Q using
-  (Obs; obs; bracket; add; neg; zero; qO; pO; twoℚ)
+  (Obs; obs; bracket; add; neg; zero; qO; pO; twoℚ; mkObs)
 
 ------------------------------------------------------------------------
 -- Normalising ring-solver entry
@@ -102,36 +59,6 @@ macro
     solve-macro vars (quote RationalRing.ring) solver-hole
     commitTC
     unify hole solver-hole
-
-------------------------------------------------------------------------
--- Field-wise record assembly
---
--- Six coefficient equalities assemble into an equality of observables;
--- copied in the same cong-chaining style as the preceding slices.
---
--- 逐字段记录组装
---
--- 六个系数等式组装为一条观测量相等；沿用前序切片的 cong 链式风格。
-
-private
-  mkObs : ∀ {lc la lb ld le lf rc ra rb rd re rf}
-        → lc ≡ rc → la ≡ ra → lb ≡ rb
-        → ld ≡ rd → le ≡ re → lf ≡ rf
-        → obs lc la lb ld le lf ≡ obs rc ra rb rd re rf
-  mkObs pc pa pb pd pe pf = let open ≡-Reasoning in begin
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs x _ _ _ _ _) pc ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ x _ _ _ _) pa ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ x _ _ _) pb ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ _ x _ _) pd ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ _ _ x _) pe ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (obs _ _ _ _ _) pf ⟩
-    obs _ _ _ _ _ _ ∎
 
 ------------------------------------------------------------------------
 -- Self-bracket
@@ -203,9 +130,6 @@ jacobi (obs _ a b d e f)
 -- H = (q² + p²)/2 的两个二次项系数均取有理数 1/2。对平方求导产生的因子
 -- 2 与 1/2 相消，即 2·(1/2) = 1，故运动方程精确成立。
 
--- One half in ℚ, written as the fraction 1 / 2.
---
--- ℚ 中的二分之一，写成分数 1 / 2。
 halfℚ : ℚ
 halfℚ = 1ℤ / 2
 
@@ -228,14 +152,10 @@ X : Obs → Obs → Obs
 X H u = bracket u H
 
 -- q̇ = {q, H} = p.
---
--- q̇ = {q, H} = p。
 harmonic-qdot : X H-harmonic qO ≡ pO
 harmonic-qdot = refl
 
 -- ṗ = {p, H} = −q.
---
--- ṗ = {p, H} = −q。
 harmonic-pdot : X H-harmonic pO ≡ neg qO
 harmonic-pdot = refl
 

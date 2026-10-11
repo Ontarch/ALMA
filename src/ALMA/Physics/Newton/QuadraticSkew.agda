@@ -21,139 +21,16 @@
 
 module ALMA.Physics.Newton.QuadraticSkew where
 
-open import Data.Rational using (0ℚ; _+_; _*_; -_)
-open import Data.Rational.Properties using
-  (+-comm; +-assoc; +-identityˡ; +-identityʳ; +-inverseˡ; *-comm
-  ; *-assoc; neg-distrib-+; neg-distribʳ-*)
-open import Relation.Binary.PropositionalEquality using
-  (_≡_; sym; cong; cong₂; module ≡-Reasoning)
+open import Data.Rational using (_+_; _*_; -_)
+open import Data.Rational.Properties using (+-comm; *-comm; neg-distrib-+; neg-distribʳ-*)
+open import Relation.Binary.PropositionalEquality
+  using (_≡_; sym; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.Newton.Quadratic as Q using
-  (Obs; obs; bracket; add; scale; neg; twoℚ; fourℚ)
+open import ALMA.Physics.Newton.Quadratic as Q
+  using (Obs; obs; bracket; add; scale; neg; twoℚ; fourℚ; mkObs)
 open import ALMA.Physics.Newton.QuadraticBilinear using (bracket-addˡ; bracket-scaleˡ)
-
-------------------------------------------------------------------------
--- Auxiliary rearrangement lemmas
---
--- 辅助重排引理
-
-private
-  -- Assemble six field equalities into an equality of observables.
-  --
-  -- 由六个字段等式组装为观测量相等。
-  mkObs : ∀ {lc la lb ld le lf rc ra rb rd re rf}
-        → lc ≡ rc → la ≡ ra → lb ≡ rb
-        → ld ≡ rd → le ≡ re → lf ≡ rf
-        → obs lc la lb ld le lf ≡ obs rc ra rb rd re rf
-  mkObs pc pa pb pd pe pf = let open ≡-Reasoning in begin
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs x _ _ _ _ _) pc ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ x _ _ _ _) pa ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ x _ _ _) pb ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ _ x _ _) pd ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (λ x → obs _ _ _ _ x _) pe ⟩
-    obs _ _ _ _ _ _
-    ≡⟨ cong (obs _ _ _ _ _) pf ⟩
-    obs _ _ _ _ _ _ ∎
-
-  -- Flip the last two factors of a left-associated triple product.
-  --
-  -- 翻转左结合三元乘积的后两个因子。
-  flip3 : ∀ s x y → (s * x) * y ≡ (s * y) * x
-  flip3 s x y = let open ≡-Reasoning in begin
-    (s * x) * y
-    ≡⟨ *-assoc s x y ⟩
-    s * (x * y)
-    ≡⟨ cong (s *_) (*-comm x y) ⟩
-    s * (y * x)
-    ≡⟨ sym (*-assoc s y x) ⟩
-    (s * y) * x ∎
-
-  -- Rotate the first two of four summands to the end.
-  --
-  -- 将四个加项的前两个移到末尾。
-  rot4 : ∀ X Y U V → ((X + Y) + U) + V ≡ ((U + V) + X) + Y
-  rot4 X Y U V = let open ≡-Reasoning in begin
-    ((X + Y) + U) + V
-    ≡⟨ +-assoc (X + Y) U V ⟩
-    (X + Y) + (U + V)
-    ≡⟨ +-comm (X + Y) (U + V) ⟩
-    (U + V) + (X + Y)
-    ≡⟨ sym (+-assoc (U + V) X Y) ⟩
-    ((U + V) + X) + Y ∎
-
-  -- Reverse the order of four summands.
-  --
-  -- 反转四个加项的次序。
-  rev4 : ∀ X Y U V → ((X + Y) + U) + V ≡ ((V + U) + Y) + X
-  rev4 X Y U V = let open ≡-Reasoning in begin
-    ((X + Y) + U) + V
-    ≡⟨ +-assoc (X + Y) U V ⟩
-    (X + Y) + (U + V)
-    ≡⟨ +-comm (X + Y) (U + V) ⟩
-    (U + V) + (X + Y)
-    ≡⟨ cong₂ _+_ (+-comm U V) (+-comm X Y) ⟩
-    (V + U) + (Y + X)
-    ≡⟨ sym (+-assoc (V + U) Y X) ⟩
-    ((V + U) + Y) + X ∎
-
-  -- Double negation: - (- x) = x.
-  --
-  -- 双重否定：- (- x) = x。
-  neg-involutive : ∀ x → - (- x) ≡ x
-  neg-involutive x = let open ≡-Reasoning in begin
-    - (- x)
-    ≡⟨ sym (+-identityʳ (- (- x))) ⟩
-    - (- x) + 0ℚ
-    ≡⟨ cong (λ t → - (- x) + t) (sym (+-inverseˡ x)) ⟩
-    - (- x) + (- x + x)
-    ≡⟨ sym (+-assoc (- (- x)) (- x) x) ⟩
-    (- (- x) + - x) + x
-    ≡⟨ cong (λ t → t + x) (+-inverseˡ (- x)) ⟩
-    0ℚ + x
-    ≡⟨ +-identityˡ x ⟩
-    x ∎
-
-  -- Fold the distributed negation of a two-term signed sum:
-  -- -(x + - y) = - x + y.
-  --
-  -- 折叠两项带符号和的展开取负：-(x + - y) = - x + y。
-  foldNeg : ∀ x y → - (x + - y) ≡ - x + y
-  foldNeg x y = let open ≡-Reasoning in begin
-    - (x + - y)
-    ≡⟨ neg-distrib-+ x (- y) ⟩
-    - x + - (- y)
-    ≡⟨ cong (- x +_) (neg-involutive y) ⟩
-    - x + y ∎
-
-  -- Negation of a four-term signed sum, with the last two summands
-  -- written - c and - d:
-  --   - (((a + b) + - c) + - d) = ((- a + - b) + c) + d.
-  --
-  -- 四项带符号和取负，后两项写成 - c、- d：
-  --   - (((a + b) + - c) + - d) = ((- a + - b) + c) + d。
-  neg4 : ∀ a b c d →
-         - (((a + b) + - c) + - d) ≡ ((- a + - b) + c) + d
-  neg4 a b c d = let open ≡-Reasoning in begin
-      - (((a + b) + - c) + - d)
-    ≡⟨ neg-distrib-+ ((a + b) + - c) (- d) ⟩
-      - ((a + b) + - c) + - (- d)
-    ≡⟨ cong₂ _+_ (inner a b c) (neg-involutive d) ⟩
-      ((- a + - b) + c) + d ∎
-    where
-    inner : ∀ a b c → - ((a + b) + - c) ≡ (- a + - b) + c
-    inner a b c = let open ≡-Reasoning in begin
-      - ((a + b) + - c)
-      ≡⟨ neg-distrib-+ (a + b) (- c) ⟩
-      - (a + b) + - (- c)
-      ≡⟨ cong (λ t → - (a + b) + t) (neg-involutive c) ⟩
-      - (a + b) + c
-      ≡⟨ cong (λ t → t + c) (neg-distrib-+ a b) ⟩
-      (- a + - b) + c ∎
+open import ALMA.Physics.RationalKit as Kit
+  using (neg-involutive; foldNeg; neg4; rot4; rev4; flip3)
 
 ------------------------------------------------------------------------
 -- Skew-symmetry
@@ -281,6 +158,8 @@ neg-add (obs c a b d e f) (obs c' a' b' d' e' f') =
         (neg-distrib-+ d d') (neg-distrib-+ e e') (neg-distrib-+ f f')
 
 -- - (r f) = r (- f).
+--
+-- - (r f) = r (- f)。
 neg-scale : ∀ r f → neg (scale r f) ≡ scale r (neg f)
 neg-scale r (obs c a b d e f) =
   mkObs (neg-distribʳ-* r c) (neg-distribʳ-* r a) (neg-distribʳ-* r b)

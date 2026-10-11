@@ -31,12 +31,13 @@ open import Data.Nat.Base as Nat using (ℕ)
 open import Data.Fin.Base using (Fin; zero; suc)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-identityˡ; +-identityʳ; *-comm; *-zeroʳ; *-identityʳ; *-distribˡ-+)
+  (+-identityˡ; *-comm; *-zeroʳ; *-identityʳ; *-distribˡ-+)
 open import Function.Base using (_∘_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.FiniteVec using (sumFin; sumFin-cong)
+open import ALMA.Physics.RationalKit as Kit using (+interchange)
 
 ------------------------------------------------------------------------
 -- Finite-sum algebra over ℚ
@@ -56,23 +57,6 @@ private
     ≡⟨ sumFin-zero n ⟩
     0ℚ ∎
 
-  -- (a + b) + (c + d) = (a + c) + (b + d).
-  --
-  -- 加法交叉重排。
-  +-interchange : ∀ a b c d → (a + b) + (c + d) ≡ (a + c) + (b + d)
-  +-interchange a b c d = let open ≡-Reasoning in begin
-    (a + b) + (c + d)
-    ≡⟨ +-assoc a b (c + d) ⟩
-    a + (b + (c + d))
-    ≡⟨ cong (a +_) (sym (+-assoc b c d)) ⟩
-    a + ((b + c) + d)
-    ≡⟨ cong (a +_) (cong (_+ d) (+-comm b c)) ⟩
-    a + ((c + b) + d)
-    ≡⟨ cong (a +_) (+-assoc c b d) ⟩
-    a + (c + (b + d))
-    ≡⟨ sym (+-assoc a c (b + d)) ⟩
-    (a + c) + (b + d) ∎
-
   -- Pointwise addition lifts to sums.
   --
   -- 逐点加法提升至求和。
@@ -84,7 +68,7 @@ private
     ≡⟨ cong ((g zero + h zero) +_)
             (sumFin-+ (g ∘ suc) (h ∘ suc)) ⟩
     (g zero + h zero) + (sumFin (g ∘ suc) + sumFin (h ∘ suc))
-    ≡⟨ +-interchange (g zero) (h zero)
+    ≡⟨ +interchange (g zero) (h zero)
                      (sumFin (g ∘ suc)) (sumFin (h ∘ suc)) ⟩
     (g zero + sumFin (g ∘ suc)) + (h zero + sumFin (h ∘ suc)) ∎
 
