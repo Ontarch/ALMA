@@ -36,9 +36,8 @@ open import Relation.Binary.Structures using (IsEquivalence)
 open import Categories.Category.Core using (Category)
 
 open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using ( SysEq; EqOn; propEqOn; idAdjˢ; _≈Mˢ_
-        ; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans )
+open import ALMA.Base.MCorrSetoid using
+  (SysEq; EqOn; propEqOn; idAdjˢ; _≈Mˢ_; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
 open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ)
 
 open SysEq

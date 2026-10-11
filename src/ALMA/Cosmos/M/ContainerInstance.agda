@@ -33,8 +33,7 @@ open import Categories.Category.Core using (Category)
 open import Categories.Functor.Core using (Functor)
 open import Categories.Functor using () renaming (id to idF)
 
-open import ALMA.Base.MCorrSetoid
-  using (EqOn; propEqOn; FiberAdjˢ; idAdjˢ; Stepˢ)
+open import ALMA.Base.MCorrSetoid using (EqOn; propEqOn; FiberAdjˢ; idAdjˢ; Stepˢ)
 open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ; idFMˢ)
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)

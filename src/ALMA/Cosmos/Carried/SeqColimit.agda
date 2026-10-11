@@ -31,9 +31,9 @@ open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Agda.Builtin.Equality using (_≡_)
 open import Data.Nat.Base using (ℕ; zero; suc)
 
-open import ALMA.Base.MCorr
-  using (Sys; FMap; _≈F_; idF; compF; I; A; ≈F-refl; ≈F-trans
-        ; ∘-resp-≈; sym-assoc-f; identityʳ-f)
+open import ALMA.Base.MCorr using
+  (Sys; FMap; _≈F_; idF; compF; I; A; ≈F-refl; ≈F-trans
+  ; ∘-resp-≈; sym-assoc-f; identityʳ-f)
 
 ------------------------------------------------------------------------
 -- Stage shift by d successor edges

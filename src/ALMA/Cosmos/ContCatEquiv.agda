@@ -16,9 +16,9 @@ module ALMA.Cosmos.ContCatEquiv where
 open import Agda.Primitive using (Level; _⊔_)
 open import Agda.Builtin.Equality using (refl)
 open import Agda.Builtin.Sigma using (_,_)
-open import Relation.Binary.Bundles using (Setoid)
 open import Data.Container.Core using (Container; shape)
 open import Data.Container.Morphism using (id; _∘_)
+open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Category.Core using (Category)
 open import Categories.Category.Construction.Functors using (Functors)
@@ -30,8 +30,9 @@ open import Categories.Functor using (_∘F_)
 open import Categories.Functor.Properties using ([_]-resp-≅)
 open import Categories.NaturalTransformation.Core using (NaturalTransformation)
 
-open import ALMA.Cosmos.ContCategory
-  using (_≈sr_; ≈sr-sym; ∘M-assoc; ∘M-identityʳ; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ; ContCat; module ≈sr-Reasoning)
+open import ALMA.Cosmos.ContCategory using
+  (_≈sr_; ≈sr-sym; ∘M-assoc; ∘M-identityʳ; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ
+  ; ContCat; module ≈sr-Reasoning)
 open import ALMA.Cosmos.ContFunctor using (ContEmbedding; ⟦_⟧)
 
 ------------------------------------------------------------------------

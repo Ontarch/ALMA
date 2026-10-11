@@ -28,17 +28,17 @@ open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Agda.Builtin.Equality using (refl)
 open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Level using (Lift; lift; lower)
-open import Relation.Binary.PropositionalEquality.Core using (cong)
-open import Relation.Binary.PropositionalEquality.Properties
-  renaming (setoid to discreteSetoid)
-open import Relation.Binary.Bundles using (Setoid)
-open import Function.Base using (_∘_)
-open import Function.Bundles using (Func; _⇔_; mk⇔)
 open import Data.Product.Base using (proj₁; proj₂)
 open import Data.Container.Core using (Container; Shape; Position; map; _⇒_)
 open import Data.Container.Morphism using (id) renaming (_∘_ to _∘Cont_)
 open import Data.Container.Relation.Binary.Equality.Setoid using (setoid)
 open import Data.Container.Relation.Binary.Pointwise as PW using (_,_; Pointwise)
+open import Function.Base using (_∘_)
+open import Function.Bundles using (Func; _⇔_; mk⇔)
+open import Relation.Binary.PropositionalEquality.Core using (cong)
+open import Relation.Binary.PropositionalEquality.Properties renaming
+  (setoid to discreteSetoid)
+open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Adjoint.Equivalence using (⊣Equivalence)
 open import Categories.Category.Core using (Category)
@@ -48,10 +48,10 @@ open import Categories.Category.Instance.Setoids using (Setoids)
 open import Categories.Category.Construction.Functors using (Functors)
 open import Categories.Functor.Core using (Functor)
 open import Categories.Functor.Properties using (Faithful; Full; FullyFaithful)
-open import Categories.NaturalTransformation.Core
-  using (NaturalTransformation; ntHelper; _∘ᵥ_) renaming (id to idNT)
-open import Categories.NaturalTransformation.NaturalIsomorphism
-  using (_≃_; module ≃; module NaturalIsomorphism)
+open import Categories.NaturalTransformation.Core using
+  (NaturalTransformation; ntHelper; _∘ᵥ_) renaming (id to idNT)
+open import Categories.NaturalTransformation.NaturalIsomorphism using
+  (_≃_; module ≃; module NaturalIsomorphism)
 open import Categories.Morphism using (_≅_; Iso)
 
 open import ALMA.Cosmos.ContCategory using (_≈sr_; ContCat)

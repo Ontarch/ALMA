@@ -29,8 +29,8 @@ open import Data.Nat.Base using (ℕ; zero; suc)
 open import Data.Product.Base using (_×_; proj₁; proj₂)
 
 open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using (SysEq; EqOn; FiberAdjˢ; idAdjˢ; symAdjˢ; compAdjˢ; _≈Mˢ_)
+open import ALMA.Base.MCorrSetoid using
+  (SysEq; EqOn; FiberAdjˢ; idAdjˢ; symAdjˢ; compAdjˢ; _≈Mˢ_)
 
 open FiberAdjˢ
 

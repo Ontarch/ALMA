@@ -29,11 +29,11 @@ open import Categories.Category.Core using (Category)
 open import Categories.Functor.Core using (Functor)
 
 open import ALMA.Cosmos.ContCategory using (ContCat)
-open import ALMA.Base.MCorrSetoid using ( EqOn ; SysEq ; ≈Mˢ-sym ; ≈Mˢ-trans )
+open import ALMA.Base.MCorrSetoid using ( EqOn; SysEq; ≈Mˢ-sym; ≈Mˢ-trans)
 open import ALMA.Cosmos.M.Object as MO
-open MO
-  using (CosmosM ; Rooted ; step ; next ; nextOf; Coalgebra ; ana
-        ; unfold-coalgebra; ≈CosmosM ; ≈CosmosM-refl; ana-unfold ; ana-unfold˘)
+open MO using
+  (CosmosM; Rooted; step; next; nextOf; Coalgebra; ana; unfold-coalgebra
+  ; ≈CosmosM; ≈CosmosM-refl; ana-unfold; ana-unfold˘)
 
 ------------------------------------------------------------------------
 -- Bisimulation equivalence on CosmosM

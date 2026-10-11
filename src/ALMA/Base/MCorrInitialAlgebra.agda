@@ -41,9 +41,8 @@ open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Data.Product.Base using (_×_; proj₁; proj₂)
 
 open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using (SysEq; EqOn; FiberAdjˢ; idAdjˢ; symAdjˢ; compAdjˢ
-       ; _≈Mˢ_; ≈Mˢ-sym)
+open import ALMA.Base.MCorrSetoid using
+  (SysEq; EqOn; FiberAdjˢ; idAdjˢ; symAdjˢ; compAdjˢ; _≈Mˢ_; ≈Mˢ-sym)
 open FiberAdjˢ
 open _≈Mˢ_ public
 

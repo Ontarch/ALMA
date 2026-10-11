@@ -23,11 +23,10 @@ open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Product.Base using (_×_)
 open import Data.Empty using (⊥)
 open import Data.Nat using (ℕ; suc; _≤_)
-open import Data.Nat.Properties
-  using (≤-refl; <⇒≢; n<1+n; suc-injective; m≤n⇒m≤1+n; m≥n⇒m⊓n≡n; ⊓-comm)
+open import Data.Nat.Properties using
+  (≤-refl; <⇒≢; n<1+n; suc-injective; m≤n⇒m≤1+n; m≥n⇒m⊓n≡n; ⊓-comm)
 open import Data.Fin.Base using (Fin; zero; toℕ; inject₁; fromℕ)
-open import Data.Fin.Properties
-  using (toℕ<n; toℕ-inject₁; toℕ-fromℕ; toℕ-injective)
+open import Data.Fin.Properties using (toℕ<n; toℕ-inject₁; toℕ-fromℕ; toℕ-injective)
 open import Data.Unit.Polymorphic.Base using (tt)
 open import Relation.Binary.PropositionalEquality.Core using (cong; trans; sym)
 open import Relation.Nullary.Negation using (¬_)

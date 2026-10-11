@@ -28,8 +28,8 @@ open import Agda.Primitive using (Level; lzero; _⊔_)
 open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Nat using (ℕ; zero; suc; _≤_; _<_; z≤n; s≤s)
-open import Data.Nat.Properties
-  using (≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0; m≥n⇒m⊓n≡n)
+open import Data.Nat.Properties using
+  (≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0; m≥n⇒m⊓n≡n)
 open import Data.Fin.Base using (Fin; zero; suc; toℕ; inject₁)
 open import Data.Fin.Properties using (toℕ-injective; toℕ-inject₁; toℕ<n)
 open import Data.Sum.Base using (_⊎_; inj₁; inj₂)

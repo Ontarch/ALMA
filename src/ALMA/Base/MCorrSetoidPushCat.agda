@@ -54,8 +54,8 @@ open import Relation.Binary.Structures using (IsEquivalence)
 open import Categories.Category.Core using (Category)
 
 open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using (SysEq; EqOn; _≈Mˢ_; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
+open import ALMA.Base.MCorrSetoid using
+  (SysEq; EqOn; _≈Mˢ_; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
 open import ALMA.Base.MCorrSetoidPush using (PushSimˢ)
 open import ALMA.Base.MCorrSetoidPushComp using (R∘S; H∘G; push-comp)
 open import ALMA.Base.MCorrSetoidPushMap using (push-map)

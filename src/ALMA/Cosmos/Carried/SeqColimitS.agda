@@ -28,9 +28,9 @@ open import Agda.Builtin.Equality using (_≡_)
 open import Data.Nat.Base using (ℕ; zero; suc)
 
 open import ALMA.Base.MCorrSetoid using (SysEq)
-open import ALMA.Base.MCorrSetoidCat
-  using (FMapˢ; FMˢ; idFMˢ; compFMˢ; _≈FM_; ≈FM-refl; ≈FM-trans
-        ; ∘-resp-≈FM; sym-assocFM; identityʳFM)
+open import ALMA.Base.MCorrSetoidCat using
+  (FMapˢ; FMˢ; idFMˢ; compFMˢ; _≈FM_; ≈FM-refl; ≈FM-trans
+  ; ∘-resp-≈FM; sym-assocFM; identityʳFM)
 
 open SysEq
 

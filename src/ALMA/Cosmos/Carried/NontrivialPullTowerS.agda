@@ -23,27 +23,25 @@ module ALMA.Cosmos.Carried.NontrivialPullTowerS where
 
 open import Agda.Primitive using (Level; lzero; lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans; _≢_)
-open import Relation.Binary.Structures using (IsEquivalence)
+open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Data.Nat.Base using (ℕ; zero; suc)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
-open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Data.Empty.Polymorphic using (⊥; ⊥-elim)
 import Data.Empty
 open import Relation.Nullary.Negation using (¬_)
-
-open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using (SysEq; EqOn; propEqOn; idAdjˢ; _≈Mˢ_)
-open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ)
-open import ALMA.Cosmos.Carried.SameIndexCatS
-  using ( LabelSys; dsys; Idx⇒; idxi; compi; _≈i_
-        ; SameIndexCat; ≈i-refl; ≈i-sym; ≈i-trans; ∘-resp-≈i )
+open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans; _≢_)
+open import Relation.Binary.Structures using (IsEquivalence)
 
 open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
-open import ALMA.Cosmos.Carried.SeqColimitCat
-  using (Chain⇒; stop; step; ωCat)
+
+open import ALMA.Base.MCorr using (M)
+open import ALMA.Base.MCorrSetoid using (SysEq; EqOn; propEqOn; idAdjˢ; _≈Mˢ_)
+open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ)
+open import ALMA.Cosmos.Carried.SameIndexCatS using
+  (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_; SameIndexCat
+  ; ≈i-refl; ≈i-sym; ≈i-trans; ∘-resp-≈i)
+open import ALMA.Cosmos.Carried.SeqColimitCat using (Chain⇒; stop; step; ωCat)
 import ALMA.Cosmos.Carried.SeqColimitCat as SQC
 
 open SysEq

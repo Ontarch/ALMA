@@ -42,8 +42,7 @@ open import Data.Nat.Base using (ℕ; suc)
 open import Relation.Nullary.Negation using (¬_)
 
 open import ALMA.Base.MCorrSetoid using (SysEq)
-open import ALMA.Physics.CausalOrder
-  using (Acyclic; Antichain; _⇝⁺_; step; more)
+open import ALMA.Physics.CausalOrder using (Acyclic; Antichain; _⇝⁺_; step; more)
 
 ------------------------------------------------------------------------
 -- Strict order on layers

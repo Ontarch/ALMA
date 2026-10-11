@@ -29,11 +29,10 @@ module ALMA.Physics.Quantum.Stochastic where
 
 open import Data.Nat.Base as Nat using (ℕ)
 open import Data.Fin.Base using (Fin; zero; suc)
-open import Function.Base using (_∘_)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_)
 open import Data.Rational.Properties using
-  ( +-assoc; +-comm; +-identityˡ; +-identityʳ
-  ; *-comm; *-zeroʳ; *-identityʳ; *-distribˡ-+ )
+  (+-assoc; +-comm; +-identityˡ; +-identityʳ; *-comm; *-zeroʳ; *-identityʳ; *-distribˡ-+)
+open import Function.Base using (_∘_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 

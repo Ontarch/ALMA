@@ -27,24 +27,20 @@ module ALMA.Cosmos.Carried.ChainColimitPropS where
 
 open import Agda.Primitive using (Level; lzero; lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Relation.Binary.PropositionalEquality.Core
-  using (sym; trans; cong)
+open import Relation.Binary.PropositionalEquality.Core using (sym; trans; cong)
 open import Data.Nat.Base using (ℕ; zero; suc; _+_)
 open import Data.Nat.Properties using (+-comm)
 
 open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using (SysEq; EqOn; propEqOn; _≈Mˢ_)
+open import ALMA.Base.MCorrSetoid using (SysEq; EqOn; propEqOn; _≈Mˢ_)
 open SysEq
-open import ALMA.Cosmos.Carried.SameIndexCatS
-  using (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_
-        ; SameIndexCat; ≈i-refl; ≈i-sym; ≈i-trans; ∘-resp-≈i
-        ; pointwise-i)
+open import ALMA.Cosmos.Carried.SameIndexCatS using
+  (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_; SameIndexCat; ≈i-refl; ≈i-sym
+  ; ≈i-trans; ∘-resp-≈i; pointwise-i)
 
 open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
-open import ALMA.Cosmos.Carried.SeqColimitCat
-  using (Chain⇒; stop; step; ωCat; _∘ch_)
+open import ALMA.Cosmos.Carried.SeqColimitCat using (Chain⇒; stop; step; ωCat; _∘ch_)
 import ALMA.Cosmos.Carried.SeqColimitCat as SQC
 
 module _ (d : ℕ → ℕ) {ℓ : Level} where

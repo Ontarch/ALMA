@@ -25,18 +25,16 @@ module ALMA.Cosmos.Carried.FinColimit where
 open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Nat using (ℕ; zero; suc; _≤_)
-open import Data.Nat.Properties
-  using ( ≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0 )
+open import Data.Nat.Properties using
+  ( ≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0 )
 open import Data.Fin.Base using (Fin; zero; toℕ; inject₁)
-open import Data.Fin.Properties
-  using (toℕ-injective; toℕ-inject₁; toℕ<n)
+open import Data.Fin.Properties using (toℕ-injective; toℕ-inject₁; toℕ<n)
 open import Data.Sum.Base using (inj₁; inj₂)
-open import Relation.Binary.PropositionalEquality.Core
-  using (cong; sym; trans)
+open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans)
 
 open import ALMA.Cosmos.Carried.SeqColimit using (shift)
-open import ALMA.Cosmos.Carried.LimitSystem
-  using (n-at; natToFin; toℕ-natToFin; embFin; cl; cl-toℕ)
+open import ALMA.Cosmos.Carried.LimitSystem using
+  (n-at; natToFin; toℕ-natToFin; embFin; cl; cl-toℕ)
 
 ------------------------------------------------------------------------
 -- Pure Fin representatives, independent of the cone

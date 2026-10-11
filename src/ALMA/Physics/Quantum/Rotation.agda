@@ -28,11 +28,8 @@ module ALMA.Physics.Quantum.Rotation where
 
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_; _/_; _⊓_)
 open import Data.Rational.Properties using
-  ( +-assoc; +-comm; +-identityˡ; +-identityʳ
-  ; +-inverseˡ
-  ; *-assoc; *-comm; *-identityˡ
-  ; *-distribˡ-+; *-distribʳ-+
-  ; neg-distribˡ-*; neg-distribʳ-* )
+  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-comm
+  ; *-identityˡ; *-distribˡ-+; *-distribʳ-+; neg-distribˡ-*; neg-distribʳ-*)
 open import Data.Integer.Base using (ℤ; 1ℤ) renaming (_+_ to _ℤ+_)
 open import Data.Product.Base using (_×_; _,_)
 open import Relation.Binary.PropositionalEquality using

@@ -34,9 +34,9 @@ open import Categories.Functor.Core using (Functor)
 
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Base.MCorrSetoid using (EqOn; Morphˢ; propEqOn)
+open Morphˢ using (mapR)
 open import ALMA.Cosmos.M.Object as MO
 open import ALMA.Cosmos.M.Terminal using (≈CosmosM-sym; ≈CosmosM-trans)
-open Morphˢ using (mapR)
 open import ALMA.Cosmos.M.TowerSeparation as TS
 
 module _ {o h e s p : Level}

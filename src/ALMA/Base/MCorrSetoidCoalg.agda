@@ -39,8 +39,8 @@ open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans)
 open import Categories.Category.Core using (Category)
 
 open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using (SysEq; EqOn; _≈Mˢ_; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans; idAdjˢ)
+open import ALMA.Base.MCorrSetoid using
+  (SysEq; EqOn; _≈Mˢ_; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans; idAdjˢ)
 open _≈Mˢ_ public
 
 module _ {i a b ℓa ℓe : Level} (X : SysEq i a b ℓa ℓe) where

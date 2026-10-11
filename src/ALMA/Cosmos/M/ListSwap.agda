@@ -37,8 +37,7 @@ open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Fin.Base using (Fin; toℕ; splitAt; join; opposite)
   renaming (zero to fzero; suc to fsuc)
-open import Data.Fin.Properties
-  using (opposite-involutive; join-splitAt; splitAt-join)
+open import Data.Fin.Properties using (opposite-involutive; join-splitAt; splitAt-join)
 open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
 open import Data.Product.Base using (proj₁)
 open import Data.Product.Properties using (≡-dec)
@@ -49,16 +48,14 @@ open import Function.Base using (_∘_)
 open import Relation.Binary.Definitions using (Irrelevant)
 open import Relation.Binary.PropositionalEquality.Core using (cong; trans)
 open import Relation.Binary.PropositionalEquality.Properties using (module ≡-Reasoning)
-open import Relation.Nullary.Negation using (¬_)
 open ≡-Reasoning
-
-open import Categories.Functor.Core using (Functor)
-
-open Functor using (F₀)
+open import Relation.Nullary.Negation using (¬_)
 
 open import Categories.Category.Core using (Category)
 open import Categories.Category.Instance.One using (One)
-open import Categories.Functor using () renaming (id to idF)
+open import Categories.Functor using (id)
+open import Categories.Functor.Core using (Functor)
+open Functor using (F₀)
 
 open import ALMA.Cosmos.ContCategory using (ContCat; ≈sr-refl)
 open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)
@@ -286,7 +283,7 @@ private
 --
 -- 恒等索引函子的一般确定性数据
 
-swapGen : GenDet C₀ ListFC (idF {C = ShapeCat C₀ ListFC})
+swapGen : GenDet C₀ ListFC (id {C = ShapeCat C₀ ListFC})
 GenDet.σ   swapGen _ d = σlabel d
 GenDet.pb  swapGen v = v , refl
 GenDet.adj swapGen (tt , n) d (tt , m) = swapAdj {n = n} {m = m} d
@@ -302,7 +299,7 @@ GenDet.adj swapGen (tt , n) d (tt , m) = swapAdj {n = n} {m = m} d
 
 swapFMˢ : FMˢ (MO.sys C₀ ListFC (λ _ → propEqOn _))
               (MO.sys C₀ ListFC (λ _ → propEqOn _))
-swapFMˢ = genFMˢ C₀ ListFC (idF {C = ShapeCat C₀ ListFC}) swapGen
+swapFMˢ = genFMˢ C₀ ListFC (id {C = ShapeCat C₀ ListFC}) swapGen
 
 ------------------------------------------------------------------------
 -- Non-identity witness at shape 2

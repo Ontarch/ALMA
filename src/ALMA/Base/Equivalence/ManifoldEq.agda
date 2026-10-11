@@ -24,9 +24,9 @@ open import Data.Product.Base using (proj₁; proj₂; _×_)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Rational.Base using (ℚ; _+_; _-_; -_; _⊔_; _⊓_; _<_; 0ℚ; 1ℚ; *<*)
 open import Data.Integer.Base as ℤ using (-<+; +<+)
-open import Data.Rational.Properties
-  using (+-identityʳ; +-monoʳ-<; ≤-total; <-trans; <-irrefl; ≤-<-trans; <-≤-trans
-        ; p≤p⊔q; p≤q⊔p; p⊓q≤p; p⊓q≤q; p≤q⇒p⊓q≡p; p≥q⇒p⊓q≡q; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p)
+open import Data.Rational.Properties using
+  (+-identityʳ; +-monoʳ-<; ≤-total; <-trans; <-irrefl; ≤-<-trans; <-≤-trans
+  ; p≤p⊔q; p≤q⊔p; p⊓q≤p; p⊓q≤q; p≤q⇒p⊓q≡p; p≥q⇒p⊓q≡q; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p)
 open import Relation.Binary.PropositionalEquality.Core using (trans; sym; subst)
 open import Relation.Binary.Structures using (IsPreorder)
 open import Relation.Nullary using (¬_)

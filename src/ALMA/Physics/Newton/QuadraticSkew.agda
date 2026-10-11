@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
--- Algebraic Newtonian mechanics: skew-symmetry and right linearity.
+-- Algebraic Newtonian mechanics: skew-symmetry and right linearity
 --
 -- The quadratic Poisson bracket is skew-symmetric:
 --   {g, f} = - {f, g}.
@@ -8,7 +8,7 @@
 --   {f, g + h} = {f, g} + {f, h},
 --   {f, r g}   = r {f, g}.
 --
--- 代数版牛顿力学：反对称与右线性。
+-- 代数版牛顿力学：反对称与右线性
 --
 -- 二次 Poisson 括号反对称：
 --   {g, f} = - {f, g}。
@@ -21,21 +21,25 @@
 
 module ALMA.Physics.Newton.QuadraticSkew where
 
-open import Data.Rational using (ℚ; 0ℚ; _+_; _*_; -_)
+open import Data.Rational using (0ℚ; _+_; _*_; -_)
 open import Data.Rational.Properties using
-  ( +-comm; +-assoc; +-identityˡ; +-identityʳ; +-inverseˡ
-  ; *-comm; *-assoc
-  ; neg-distrib-+; neg-distribʳ-* )
+  (+-comm; +-assoc; +-identityˡ; +-identityʳ; +-inverseˡ; *-comm
+  ; *-assoc; neg-distrib-+; neg-distribʳ-*)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; sym; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Newton.Quadratic as Q using
   (Obs; obs; bracket; add; scale; neg; twoℚ; fourℚ)
-open import ALMA.Physics.Newton.QuadraticBilinear using
-  (bracket-addˡ; bracket-scaleˡ)
+open import ALMA.Physics.Newton.QuadraticBilinear using (bracket-addˡ; bracket-scaleˡ)
+
+------------------------------------------------------------------------
+-- Auxiliary rearrangement lemmas
+--
+-- 辅助重排引理
 
 private
   -- Assemble six field equalities into an equality of observables.
+  --
   -- 由六个字段等式组装为观测量相等。
   mkObs : ∀ {lc la lb ld le lf rc ra rb rd re rf}
         → lc ≡ rc → la ≡ ra → lb ≡ rb
@@ -57,6 +61,7 @@ private
     obs _ _ _ _ _ _ ∎
 
   -- Flip the last two factors of a left-associated triple product.
+  --
   -- 翻转左结合三元乘积的后两个因子。
   flip3 : ∀ s x y → (s * x) * y ≡ (s * y) * x
   flip3 s x y = let open ≡-Reasoning in begin
@@ -69,6 +74,7 @@ private
     (s * y) * x ∎
 
   -- Rotate the first two of four summands to the end.
+  --
   -- 将四个加项的前两个移到末尾。
   rot4 : ∀ X Y U V → ((X + Y) + U) + V ≡ ((U + V) + X) + Y
   rot4 X Y U V = let open ≡-Reasoning in begin
@@ -81,6 +87,7 @@ private
     ((U + V) + X) + Y ∎
 
   -- Reverse the order of four summands.
+  --
   -- 反转四个加项的次序。
   rev4 : ∀ X Y U V → ((X + Y) + U) + V ≡ ((V + U) + Y) + X
   rev4 X Y U V = let open ≡-Reasoning in begin
@@ -95,6 +102,7 @@ private
     ((V + U) + Y) + X ∎
 
   -- Double negation: - (- x) = x.
+  --
   -- 双重否定：- (- x) = x。
   neg-involutive : ∀ x → - (- x) ≡ x
   neg-involutive x = let open ≡-Reasoning in begin
@@ -112,6 +120,7 @@ private
 
   -- Fold the distributed negation of a two-term signed sum:
   -- -(x + - y) = - x + y.
+  --
   -- 折叠两项带符号和的展开取负：-(x + - y) = - x + y。
   foldNeg : ∀ x y → - (x + - y) ≡ - x + y
   foldNeg x y = let open ≡-Reasoning in begin
@@ -124,6 +133,7 @@ private
   -- Negation of a four-term signed sum, with the last two summands
   -- written - c and - d:
   --   - (((a + b) + - c) + - d) = ((- a + - b) + c) + d.
+  --
   -- 四项带符号和取负，后两项写成 - c、- d：
   --   - (((a + b) + - c) + - d) = ((- a + - b) + c) + d。
   neg4 : ∀ a b c d →
@@ -147,17 +157,17 @@ private
 
 ------------------------------------------------------------------------
 -- Skew-symmetry
+--
 -- 反对称
-------------------------------------------------------------------------
 
 -- {g, f} = - {f, g}.
--- {g, f} = - {f, g}。
 bracket-skew : ∀ f g → bracket g f ≡ neg (bracket f g)
 bracket-skew (obs _ a b d e f) (obs _ a' b' d' e' f') =
   mkObs c-c q-c p-c d-c e-c f-c
   where
   -- Two-term coefficients: flip the factors of both products, then the
   -- positive and negative summands exchange by commutativity.
+  --
   -- 两项系数：翻转两个乘积的因子，正、负加项再由交换律换位。
   c-c = let open ≡-Reasoning in begin
       a' * b + - (b' * a)
@@ -205,6 +215,7 @@ bracket-skew (obs _ a b d e f) (obs _ a' b' d' e' f') =
 
   -- Four-term coefficients: flip every product in place, then rotate the
   -- signed summands into the negated order.
+  --
   -- 四项系数：原地翻转每个乘积，再将带符号加项旋转为取负后的次序。
   q-c = let open ≡-Reasoning in begin
       ((a' * e + twoℚ * d' * b) + - (e' * a)) + - (twoℚ * b' * d)
@@ -260,18 +271,16 @@ bracket-skew (obs _ a b d e f) (obs _ a' b' d' e' f') =
 
 ------------------------------------------------------------------------
 -- Negation distributes over addition and scaling of observables
+--
 -- 取负对观测量加法与数乘的分配
-------------------------------------------------------------------------
 
 -- - (f + g) = - f + - g.
--- - (f + g) = - f + - g。
 neg-add : ∀ f g → neg (add f g) ≡ add (neg f) (neg g)
 neg-add (obs c a b d e f) (obs c' a' b' d' e' f') =
   mkObs (neg-distrib-+ c c') (neg-distrib-+ a a') (neg-distrib-+ b b')
         (neg-distrib-+ d d') (neg-distrib-+ e e') (neg-distrib-+ f f')
 
 -- - (r f) = r (- f).
--- - (r f) = r (- f)。
 neg-scale : ∀ r f → neg (scale r f) ≡ scale r (neg f)
 neg-scale r (obs c a b d e f) =
   mkObs (neg-distribʳ-* r c) (neg-distribʳ-* r a) (neg-distribʳ-* r b)
@@ -279,11 +288,10 @@ neg-scale r (obs c a b d e f) =
 
 ------------------------------------------------------------------------
 -- Additive and scalar linearity in the second argument
+--
 -- 第二参数的加法与数乘线性
-------------------------------------------------------------------------
 
 -- {f, g + h} = {f, g} + {f, h}.
--- {f, g + h} = {f, g} + {f, h}。
 bracket-addʳ : ∀ f g h →
                bracket f (add g h) ≡ add (bracket f g) (bracket f h)
 bracket-addʳ f g h = let open ≡-Reasoning in begin
@@ -298,7 +306,6 @@ bracket-addʳ f g h = let open ≡-Reasoning in begin
     add (bracket f g) (bracket f h) ∎
 
 -- {f, r g} = r {f, g}.
--- {f, r g} = r {f, g}。
 bracket-scaleʳ : ∀ r f g →
                  bracket f (scale r g) ≡ scale r (bracket f g)
 bracket-scaleʳ r f g = let open ≡-Reasoning in begin

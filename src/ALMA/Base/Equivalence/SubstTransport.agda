@@ -24,11 +24,10 @@ module ALMA.Base.Equivalence.SubstTransport where
 open import Agda.Primitive using (Level; _⊔_)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Product.Base using (_×_; _,_; proj₁; proj₂)
-open import Relation.Binary.PropositionalEquality.Core
-  using (sym; trans; cong; subst)
+open import Relation.Binary.PropositionalEquality.Core using (sym; trans; cong; subst)
 open import Relation.Binary.Structures using (IsEquivalence)
-open import Relation.Binary.PropositionalEquality.Properties
-  using (subst-subst; subst-subst-sym; subst-sym-subst; module ≡-Reasoning)
+open import Relation.Binary.PropositionalEquality.Properties using
+  (subst-subst; subst-subst-sym; subst-sym-subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import ALMA.Base.Equivalence.Core using (_⊣_)

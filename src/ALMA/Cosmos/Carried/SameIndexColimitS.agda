@@ -47,15 +47,14 @@ module ALMA.Cosmos.Carried.SameIndexColimitS where
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
 open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Data.Nat.Base using (ℕ; suc)
-
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Bundles using (Setoid)
-open import Relation.Binary.Construct.Closure.Equivalence as EqClosure
-  using (EqClosure; setoid; return; gfold)
+open import Relation.Binary.Construct.Closure.Equivalence as EqClosure using
+  (EqClosure; setoid; return; gfold)
 
 open import ALMA.Base.MCorrSetoid using (EqOn)
-open import ALMA.Cosmos.Carried.SameIndexCatS
-  using (LabelSys; Idx⇒; compi; _≈i_; pointwise-i)
+open import ALMA.Cosmos.Carried.SameIndexCatS using
+  (LabelSys; Idx⇒; compi; _≈i_; pointwise-i)
 
 ------------------------------------------------------------------------
 -- The ω shape

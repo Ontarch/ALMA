@@ -24,14 +24,14 @@
 module ALMA.Cosmos.ContCategoryLemmas where
 
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans)
 open import Data.Container.Core using (Container; shape; position; _⇒_)
+open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans)
 
 open import Categories.Category.Core using (Category)
 open import Categories.Functor.Core using (Functor)
 
-open import ALMA.Cosmos.ContCategory
-  using (_≈sr_; ≈sr-sym; ≈sr-trans; ∘M-assoc; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ; ContCat)
+open import ALMA.Cosmos.ContCategory using
+  (_≈sr_; ≈sr-sym; ≈sr-trans; ∘M-assoc; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ; ContCat)
 
 ------------------------------------------------------------------------
 -- Shape-level extraction and laws

@@ -39,17 +39,16 @@ module ALMA.Physics.Quantum.AmplitudeComp where
 
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_; _/_) 
 open import Data.Rational.Properties using
-  ( +-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; +-inverseʳ
-  ; *-assoc; *-comm; *-identityˡ
-  ; *-distribˡ-+; *-distribʳ-+
-  ; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-* )
+  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; +-inverseʳ
+  ; *-assoc; *-comm; *-identityˡ; *-distribˡ-+; *-distribʳ-+
+  ; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*)
 open import Data.Integer.Base using (ℤ; 1ℤ) renaming (_+_ to _ℤ+_)
 open import Data.Product.Base using (_×_; _,_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.Quantum.Gaussian
-  using (ℂ; re; im; conj; norm²; _+ᶜ_; _*ᶜ_; norm²-mul; norm²-conj)
+open import ALMA.Physics.Quantum.Gaussian using
+  (ℂ; re; im; conj; norm²; _+ᶜ_; _*ᶜ_; norm²-mul; norm²-conj)
 
 -- Additive inverse on ℚ[i], componentwise.
 --

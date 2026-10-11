@@ -24,9 +24,8 @@ open import Categories.Category.Core using (Category)
 open import Categories.Category.Equivalence using (StrongEquivalence)
 open import Categories.Functor.Core using (Functor)
 open import Categories.Functor using (id; _∘F_)
-open import Categories.Functor.Properties
-  using (FullyFaithful; Full; Faithful; EssentiallySurjective
-        ; EssSurj×Full×Faithful⇒Invertible)
+open import Categories.Functor.Properties using
+  (FullyFaithful; Full; Faithful; EssentiallySurjective; EssSurj×Full×Faithful⇒Invertible)
 open import Categories.NaturalTransformation.Core using (ntHelper)
 open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism)
 open import Categories.Morphism using (_≅_; Iso)

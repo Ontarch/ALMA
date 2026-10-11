@@ -30,8 +30,8 @@ module ALMA.Cosmos.Carried.FinPushColimitCat where
 open import Agda.Primitive using (lzero; lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Nat.Base using (ℕ; zero; suc; _≤_; _<_; z≤n)
-open import Data.Nat.Properties
-  using (≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0)
+open import Data.Nat.Properties using
+  (≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0)
 open import Data.Fin.Base using (Fin; inject₁; toℕ)
 open import Data.Fin.Properties using (toℕ-injective; toℕ-inject₁; toℕ<n)
 open import Data.Sum.Base using (inj₁; inj₂)

@@ -19,8 +19,7 @@
 module ALMA.Base.Equivalence.Properties where
 
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Relation.Binary.PropositionalEquality.Core
-  using (trans; sym; cong; subst)
+open import Relation.Binary.PropositionalEquality.Core using (trans; sym; cong; subst)
 open import Relation.Binary.Structures using (IsEquivalence; IsPreorder)
 
 open import ALMA.Base.IndexedMType using (Mᵢ)

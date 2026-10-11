@@ -34,9 +34,9 @@ open import Categories.Category.Core using (Category)
 open import Categories.Functor.Core using (Functor)
 
 open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using (EqOn; SysEq; propEqOn; FiberAdjˢ; symAdjˢ; compAdjˢ; Morphˢ
-        ; _≈Mˢ_; here-eq; below-eq; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
+open import ALMA.Base.MCorrSetoid using
+  (EqOn; SysEq; propEqOn; FiberAdjˢ; symAdjˢ; compAdjˢ; Morphˢ
+  ; _≈Mˢ_; here-eq; below-eq; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
 open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ)
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)

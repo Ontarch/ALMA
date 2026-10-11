@@ -19,11 +19,11 @@ module ALMA.Cosmos.ContCategory where
 
 open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Agda.Builtin.Equality using (_≡_; refl)
+open import Data.Container.Core using (Container; Shape; Position; _⇒_)
+open import Data.Container.Morphism using (id; _∘_)
 open import Relation.Binary.PropositionalEquality.Core using (cong; subst)
 open import Relation.Binary.PropositionalEquality.Properties using (module ≡-Reasoning)
 open ≡-Reasoning
-open import Data.Container.Core using (Container; Shape; Position; _⇒_)
-open import Data.Container.Morphism using (id; _∘_)
 
 open import Categories.Category.Core using (Category)
 

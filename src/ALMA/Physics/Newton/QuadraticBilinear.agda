@@ -1,11 +1,11 @@
 ------------------------------------------------------------------------
--- Left ℚ-bilinearity of the quadratic Poisson bracket.
+-- Left ℚ-bilinearity of the quadratic Poisson bracket
 --
 --   {f + g, h} = {f,h} + {g,h},   {r f, g} = r {f,g}.
 --
 -- Right-linearity follows from antisymmetry in the next slice.
 --
--- 二次 Poisson 括号的左 ℚ-双线性。
+-- 二次 Poisson 括号的左 ℚ-双线性
 --
 --   {f + g, h} = {f,h} + {g,h}，  {r f, g} = r {f,g}。
 --
@@ -16,22 +16,20 @@
 
 module ALMA.Physics.Newton.QuadraticBilinear where
 
-open import ALMA.Physics.Newton.Quadratic as Q
-  using (Obs; obs; bracket; add; scale; twoℚ; fourℚ)
-
-open import Data.Rational using (ℚ; _+_; _*_; -_)
+open import Data.Rational using (_+_; _*_; -_)
 open import Data.Rational.Properties using
-  ( +-assoc; +-comm
-  ; *-assoc; *-comm
-  ; *-distribˡ-+; *-distribʳ-+
-  ; neg-distrib-+; neg-distribʳ-* )
+  (+-assoc; +-comm; *-assoc; *-comm; *-distribˡ-+; *-distribʳ-+
+  ; neg-distrib-+; neg-distribʳ-*)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; sym; trans; cong; cong₂; module ≡-Reasoning)
+
+open import ALMA.Physics.Newton.Quadratic as Q using
+  (Obs; obs; bracket; add; scale; twoℚ; fourℚ)
 
 ------------------------------------------------------------------------
 -- Additive rearrangement
+--
 -- 加法重排
-------------------------------------------------------------------------
 
 private
   -- (x + y) + (u + v) = (x + u) + (y + v).
@@ -51,11 +49,15 @@ private
 
   -- Regroup two interleaved pairs:
   --   (x₁ + y₁) + (x₂ + y₂) = (x₁ + x₂) + (y₁ + y₂).
+  --
+  -- 重排两对交错项。
   pairs2 : ∀ x₁ x₂ y₁ y₂ →
            (x₁ + y₁) + (x₂ + y₂) ≡ (x₁ + x₂) + (y₁ + y₂)
   pairs2 x₁ x₂ y₁ y₂ = swap4 x₁ y₁ x₂ y₂
 
   -- Regroup four interleaved pairs into two left-associated groups.
+  --
+  -- 把四对交错项重排为两个左结合组。
   pairs4 : ∀ x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ →
           (((x₁ + y₁) + (x₂ + y₂)) + ((x₃ + y₃) + (x₄ + y₄)))
           ≡ ((((x₁ + x₂) + x₃) + x₄) + (((y₁ + y₂) + y₃) + y₄))
@@ -78,6 +80,7 @@ private
   splitL s u v = *-distribˡ-+ s u v
 
 -- Assemble six field equalities into an equality of records.
+--
 -- 由六个字段等式组装为记录相等。
 private
   mk : ∀ {lc la lb ld le lf rc ra rb rd re rf}
@@ -101,8 +104,8 @@ private
 
 ------------------------------------------------------------------------
 -- Additive linearity in the first argument
+--
 -- 第一参数的加法线性
-------------------------------------------------------------------------
 
 bracket-addˡ : ∀ f g h →
                bracket (add f g) h ≡ add (bracket f h) (bracket g h)
@@ -110,6 +113,8 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
              (obs _ A B D E F) = mk c-c q-c p-c d-c e-c f-c
   where
   -- f- and g-parts of every monomial (signs included).
+  --
+  -- 每个单项式的 f 部与 g 部（含符号）。
   x₁ = a * E;           y₁ = a' * E
   x₂ = twoℚ * d * B;    y₂ = twoℚ * d' * B
   x₃ = - (e * A);       y₃ = - (e' * A)
@@ -139,6 +144,8 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     (c₁ + - (b * A)) + (c₁' + - (b' * A)) ∎
 
   -- Split a scalar-prefixed summand s*((u+v))*z into s*u*z + s*v*z.
+  --
+  -- 把形如 s*((u+v))*z 的加项拆成 s*u*z + s*v*z。
   splitSZ : ∀ s z u v →
             (s * (u + v)) * z ≡ (s * u) * z + (s * v) * z
   splitSZ s z u v = let open ≡-Reasoning in begin
@@ -149,6 +156,8 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     (s * u) * z + (s * v) * z ∎
 
   -- Split a negated summand -((u+v)*z) into -(u*z) + -(v*z).
+  --
+  -- 把 -((u+v)*z) 拆成 -(u*z) + -(v*z)。
   splitNeg : ∀ z u v →
              - ((u + v) * z) ≡ - (u * z) + - (v * z)
   splitNeg z u v = let open ≡-Reasoning in begin
@@ -250,8 +259,8 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
 
 ------------------------------------------------------------------------
 -- Scalar linearity in the first argument
+--
 -- 第一参数的数乘线性
-------------------------------------------------------------------------
 
 private
   -- s*(r*x) = r*(s*x).
@@ -287,6 +296,8 @@ private
   factor2 {r} x y = sym (*-distribˡ-+ r x (- y))
 
   -- Factor r from four left-associated signed summands.
+  --
+  -- 从四个左结合的带符号加项中提出 r。
   factor4 : ∀ {r} x y z w →
             (((r * x + r * y) + r * (- z)) + r * (- w))
             ≡ r * (((x + y) + - z) + - w)
@@ -316,6 +327,8 @@ bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
     r * (a * B + - (b * A)) ∎
 
   -- Transform one negated, scalar-prefixed summand to r*(-target).
+  --
+  -- 把一个带负号、带数乘前缀的加项变形为 r*(-target)。
   front-negS : ∀ s z x →
                - ((s * (r * x)) * z) ≡ r * (- ((s * x) * z))
   front-negS s z x = let open ≡-Reasoning in begin

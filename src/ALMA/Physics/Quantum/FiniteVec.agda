@@ -21,20 +21,18 @@ module ALMA.Physics.Quantum.FiniteVec where
 open import Data.Nat.Base using (ℕ; zero; suc)
 open import Data.Fin.Base using (Fin; zero; suc)
 open import Data.Product.Base using (_×_; _,_)
-open import Function.Base using (_∘_)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _≤_; -_)
 open import Data.Rational.Base using (mkℚ; ∣_∣; NonNegative; nonNegative)
 open import Data.Integer.Base using (+[1+_]; -[1+_]; +0)
 open import Data.Rational.Properties using
-  ( +-assoc; +-identityˡ; +-identityʳ; +-inverseʳ; +-mono-≤
-  ; neg-distribˡ-*; neg-distribʳ-*; *-zeroˡ; *-identityˡ
-  ; 0≤∣p∣; ∣-∣-nonNeg; *-monoʳ-≤-nonNeg
-  ; ≤-reflexive; module ≤-Reasoning )
+  (+-assoc; +-identityˡ; +-identityʳ; +-inverseʳ; +-mono-≤
+  ; neg-distribˡ-*; neg-distribʳ-*; *-zeroˡ; *-identityˡ; 0≤∣p∣
+  ; ∣-∣-nonNeg; *-monoʳ-≤-nonNeg; ≤-reflexive; module ≤-Reasoning)
+open import Function.Base using (_∘_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.Quantum.Gaussian using
-  (ℂ; _*ᶜ_; norm²; norm²-mul; Unit)
+open import ALMA.Physics.Quantum.Gaussian using (ℂ; _*ᶜ_; norm²; norm²-mul; Unit)
 
 ------------------------------------------------------------------------
 -- Rational squares are nonnegative

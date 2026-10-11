@@ -21,8 +21,8 @@ open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Nat using (ℕ; suc; _<_; _≤_)
 open import Data.Nat.Properties using (≤-pred; >⇒≢; m≤n⇒m<n∨m≡n)
 open import Data.Fin.Base using (Fin; inject₁; lower₁; toℕ)
-open import Data.Fin.Properties
-  using (toℕ<n; toℕ-inject₁; toℕ-inject₁-≢; lower₁-inject₁; lower₁-irrelevant)
+open import Data.Fin.Properties using
+  (toℕ<n; toℕ-inject₁; toℕ-inject₁-≢; lower₁-inject₁; lower₁-irrelevant)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans; _≢_)

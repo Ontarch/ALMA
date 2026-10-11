@@ -16,7 +16,7 @@
 -- 仍为 --safe / --cubical-compatible。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Cosmos.Carried.FinNatUIP where
 

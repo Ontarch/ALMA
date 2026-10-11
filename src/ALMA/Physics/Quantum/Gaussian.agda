@@ -36,12 +36,11 @@ module ALMA.Physics.Quantum.Gaussian where
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Product.Base using (_×_; _,_; proj₁; proj₂)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_)
-open import Data.Rational.Properties
-  using ( +-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; +-inverseʳ
-        ; *-assoc; *-comm; *-distribˡ-+; *-distribʳ-+
-        ; neg-distrib-+; neg-distribʳ-*; neg-distribˡ-* )
-open import Relation.Binary.PropositionalEquality
-  using (trans; sym; cong; cong₂; module ≡-Reasoning)
+open import Data.Rational.Properties using
+  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; +-inverseʳ; *-assoc
+  ; *-comm; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribʳ-*; neg-distribˡ-*)
+open import Relation.Binary.PropositionalEquality using
+  (trans; sym; cong; cong₂; module ≡-Reasoning)
 
 open ≡-Reasoning
 

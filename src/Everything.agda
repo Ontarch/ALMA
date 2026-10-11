@@ -28,6 +28,9 @@ import ALMA.Physics.Quantum.Rotation
 import ALMA.Physics.Quantum.AmplitudeComp
 import ALMA.Physics.Quantum.UnitaryInstrument
 import ALMA.Physics.Newton.Poisson
+import ALMA.Physics.Newton.Quadratic
+import ALMA.Physics.Newton.QuadraticBilinear
+import ALMA.Physics.Newton.QuadraticSkew
 import ALMA.Base.DetCat
 
 import ALMA.Base.Equivalence

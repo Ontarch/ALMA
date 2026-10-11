@@ -33,9 +33,7 @@ open import Data.Product.Base using (Σ; _,_; proj₁; proj₂)
 open import Data.Vec using (Vec; []; _∷_; lookup)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; -_)
 open import Data.Rational.Properties using
-  ( +-identityʳ; +-comm
-  ; +-identityˡ; +-inverseʳ; +-assoc
-  ; neg-distribˡ-*; neg-distribʳ-* )
+  (+-identityʳ; +-comm; +-identityˡ; +-inverseʳ; +-assoc; neg-distribˡ-*; neg-distribʳ-*)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 

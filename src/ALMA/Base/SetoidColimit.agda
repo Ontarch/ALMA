@@ -31,8 +31,8 @@ open import Agda.Builtin.Sigma using (Σ; _,_)
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Bundles using (Setoid)
 open import Function.Bundles using (Func; _⟨$⟩_)
-open import Relation.Binary.Construct.Closure.Equivalence as EqClosure
-  using (EqClosure; setoid; return; symmetric; gfold)
+open import Relation.Binary.Construct.Closure.Equivalence as EqClosure using
+  (EqClosure; setoid; return; symmetric; gfold)
 
 open Func using (cong)
 open Setoid using (Carrier; isEquivalence)

@@ -32,10 +32,9 @@ open import Data.Unit using (⊤; tt)
 open import Data.Container.Core using (Container; _▷_)
 import Data.W as DW
 
-open import ALMA.Base.MCorrSetoid
-  using (SysEq; EqOn; idAdjˢ; propEqOn)
-open import ALMA.Base.MCorrInitialAlgebra
-  using (Wˣ; sup; _≈Wˢ_; ≈W-refl; ≈W-sym; ≈W-trans)
+open import ALMA.Base.MCorrSetoid using (SysEq; EqOn; idAdjˢ; propEqOn)
+open import ALMA.Base.MCorrInitialAlgebra using
+  (Wˣ; sup; _≈Wˢ_; ≈W-refl; ≈W-sym; ≈W-trans)
 
 module _ {s p : Level} (S : Set s) (P : S → Set p) where
 

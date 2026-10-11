@@ -29,8 +29,8 @@ open import Function.Base using (id; _∘_)
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Structures using (IsEquivalence)
 open import Relation.Binary.PropositionalEquality.Core as Prop using (cong; sym; trans)
-open import Relation.Binary.PropositionalEquality.Properties
-  renaming (isEquivalence to ≡-isEquivalence)
+open import Relation.Binary.PropositionalEquality.Properties renaming
+  (isEquivalence to ≡-isEquivalence)
 open import Relation.Nullary.Negation using (¬_)
 
 open import ALMA.Base.MCorr using (M; FiberAdj; _⍮_)

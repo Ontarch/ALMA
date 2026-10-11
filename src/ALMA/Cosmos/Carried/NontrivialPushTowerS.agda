@@ -28,8 +28,8 @@ module ALMA.Cosmos.Carried.NontrivialPushTowerS where
 
 open import Agda.Primitive using (Level; lzero; lsuc)
 open import Agda.Builtin.Sigma using (Σ; _,_)
-open import Data.Product.Base using (proj₁; proj₂)
 open import Agda.Builtin.Equality using (_≡_; refl)
+open import Data.Product.Base using (proj₁; proj₂)
 open import Data.Nat.Base using (ℕ; zero; suc; _+_)
 open import Data.Nat.Properties using (+-comm)
 open import Data.Fin.Base using (Fin; zero; suc; inject₁; toℕ)
@@ -39,27 +39,22 @@ open import Data.Empty using (⊥)
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.PropositionalEquality.Core using (cong; trans; sym)
 
-open import ALMA.Base.MCorr using (M)
-open import ALMA.Base.MCorrSetoid
-  using ( SysEq; EqOn; propEqOn; _≈Mˢ_
-        ; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans; idAdjˢ )
-open import ALMA.Base.MCorrSetoidPush using (PushSimˢ)
-open import ALMA.Base.MCorrSetoidCat
-  using ( FMapˢ; FMˢ; compFMˢ; compFˢ; mapFˢ-comp
-        ; _≈FM_; relocateˢ; relocate-resp-≈Mˢ )
-open import ALMA.Cosmos.Carried.ColimitPolarity
-  using (no-FM-nonsurjective)
 open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
-open import ALMA.Cosmos.Carried.SeqColimitS
-  using (Chainˢ; Coconeˢ; Limitˢ)
-open import ALMA.Cosmos.Carried.SeqColimitCat
-  using (Chain⇒; ωCat; _∘ch_)
+
+open import ALMA.Base.MCorr using (M)
+open import ALMA.Base.MCorrSetoid using
+  (SysEq; EqOn; propEqOn; _≈Mˢ_; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans; idAdjˢ)
+open import ALMA.Base.MCorrSetoidPush using (PushSimˢ)
+open import ALMA.Base.MCorrSetoidCat using
+  (FMapˢ; FMˢ; compFMˢ; compFˢ; mapFˢ-comp; _≈FM_; relocateˢ; relocate-resp-≈Mˢ)
+open import ALMA.Cosmos.Carried.ColimitPolarity using (no-FM-nonsurjective)
+open import ALMA.Cosmos.Carried.SeqColimitS using (Chainˢ; Coconeˢ; Limitˢ)
+open import ALMA.Cosmos.Carried.SeqColimitCat using (Chain⇒; ωCat; _∘ch_)
 import ALMA.Cosmos.Carried.SeqColimitCat as SQC
-open import ALMA.Cosmos.Carried.SameIndexCatS
-  using ( LabelSys; dsys; Idx⇒; idxi; compi; _≈i_
-        ; ≈i-refl; ≈i-sym; ≈i-trans; ∘-resp-≈i
-        ; assoc-i; identityˡ-i; identityʳ-i; SameIndexCat )
+open import ALMA.Cosmos.Carried.SameIndexCatS using
+  (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_; ≈i-refl; ≈i-sym; ≈i-trans
+  ; ∘-resp-≈i; assoc-i; identityˡ-i; identityʳ-i; SameIndexCat)
 open import ALMA.Cosmos.Carried.LimitSystemS using (n-at)
 import ALMA.Cosmos.Carried.LimitSystemS as LS
 

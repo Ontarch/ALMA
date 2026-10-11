@@ -15,11 +15,10 @@ open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Product.Base using (proj₁; proj₂)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Function.Base using (id; _∘_)
-open import Relation.Binary.PropositionalEquality.Core
-  using (cong; sym; trans; subst)
+open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans; subst)
 open import Relation.Binary.Structures using (IsEquivalence)
-open import Relation.Binary.PropositionalEquality.Properties
-  using (subst-subst; subst-subst-sym; module ≡-Reasoning)
+open import Relation.Binary.PropositionalEquality.Properties using
+  (subst-subst; subst-subst-sym; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Categories.Category.Core using (Category)
