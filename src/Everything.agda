@@ -8,6 +8,7 @@ import ALMA.Base.MCorr  -- Carried correspondence kernel (zero subst / cast)
                         -- 携带式对应内核（零 subst / cast）
 import ALMA.Base.MCorrSetoid
 import ALMA.Base.MCorrSetoidCat
+import ALMA.Base.DetCat
 import ALMA.Base.MCorrSetoidCoalg
 import ALMA.Base.SetoidColimit
 import ALMA.Base.MCorrSetoidPush
@@ -18,6 +19,22 @@ import ALMA.Base.RelEquipment
 import ALMA.Base.MCorrTerminalSequence
 import ALMA.Base.MCorrInitialAlgebra
 import ALMA.Base.WContainerInstance
+
+import ALMA.Base.Equivalence
+import ALMA.Base.Equivalence.Core
+import ALMA.Base.Equivalence.SubstTransport
+import ALMA.Base.Equivalence.Properties
+import ALMA.Base.Equivalence.LayeredEqGenDepth
+import ALMA.Base.Equivalence.Map
+import ALMA.Base.Equivalence.ScaleInvariant
+import ALMA.Base.Equivalence.DiscreteEq
+import ALMA.Base.Equivalence.GroupInvariant
+import ALMA.Base.Equivalence.LinearDynamics
+import ALMA.Base.Equivalence.TopologicalEq
+import ALMA.Base.Equivalence.ManifoldEq
+import ALMA.Base.Equivalence.Lattice
+import ALMA.Base.Equivalence.StrongEquiv
+
 import ALMA.Physics.RationalKit
 import ALMA.Physics.CausalOrder
 import ALMA.Physics.CausalSlice
@@ -36,22 +53,6 @@ import ALMA.Physics.Newton.QuadraticBilinear
 import ALMA.Physics.Newton.QuadraticSkew
 import ALMA.Physics.Newton.QuadraticJacobi
 import ALMA.Physics.Newton.DegreeBoundary
-import ALMA.Base.DetCat
-
-import ALMA.Base.Equivalence
-import ALMA.Base.Equivalence.Core
-import ALMA.Base.Equivalence.SubstTransport
-import ALMA.Base.Equivalence.Properties
-import ALMA.Base.Equivalence.LayeredEqGenDepth
-import ALMA.Base.Equivalence.Map
-import ALMA.Base.Equivalence.ScaleInvariant
-import ALMA.Base.Equivalence.DiscreteEq
-import ALMA.Base.Equivalence.GroupInvariant
-import ALMA.Base.Equivalence.LinearDynamics
-import ALMA.Base.Equivalence.TopologicalEq
-import ALMA.Base.Equivalence.ManifoldEq
-import ALMA.Base.Equivalence.Lattice
-import ALMA.Base.Equivalence.StrongEquiv
 
 import ALMA.Cosmos
 import ALMA.Cosmos.ContCategory
