@@ -23,14 +23,13 @@ module ALMA.Physics.Newton.QuadraticSkew where
 
 open import Data.Rational using (_+_; _*_; -_)
 open import Data.Rational.Properties using (+-comm; *-comm; neg-distrib-+; neg-distribʳ-*)
-open import Relation.Binary.PropositionalEquality
-  using (_≡_; sym; cong; cong₂; module ≡-Reasoning)
+open import Relation.Binary.PropositionalEquality using
+  (_≡_; sym; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.Newton.Quadratic as Q
-  using (Obs; obs; bracket; add; scale; neg; twoℚ; fourℚ; mkObs)
+open import ALMA.Physics.Newton.Quadratic using
+  (Obs; obs; bracket; add; scale; neg; twoℚ; fourℚ; mkObs)
 open import ALMA.Physics.Newton.QuadraticBilinear using (bracket-addˡ; bracket-scaleˡ)
-open import ALMA.Physics.RationalKit as Kit
-  using (neg-involutive; foldNeg; neg4; rot4; rev4; flip3)
+open import ALMA.Physics.RationalKit using (foldNeg; neg4; rot4; rev4; flip3)
 
 ------------------------------------------------------------------------
 -- Skew-symmetry

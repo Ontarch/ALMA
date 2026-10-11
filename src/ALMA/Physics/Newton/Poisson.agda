@@ -36,9 +36,9 @@ open import Data.Rational.Properties using
   ; *-comm; *-zeroˡ; *-zeroʳ; *-identityˡ; *-distribˡ-+; *-distribʳ-+
   ; neg-distrib-+; neg-distribʳ-*)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; sym; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.RationalKit as Kit using (neg-involutive)
+open import ALMA.Physics.RationalKit using (neg-involutive)
 
 ------------------------------------------------------------------------
 -- Affine observables and the canonical bracket

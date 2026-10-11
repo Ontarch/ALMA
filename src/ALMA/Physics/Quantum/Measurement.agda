@@ -9,9 +9,9 @@
 --
 -- The structural side of a transition is a FiberAdjˢ, which carries
 -- only an equivalence between edge fibres. It has no scalar. The
--- AmplitudeFibre equipment adds the per-edge amplitude, and
--- fibre-gap shows that data is independent: the very same fibre
--- adjacency admits two amplitudes with distinct Born weights.
+-- AmplitudeFibre equipment adds the per-edge amplitude, and fibre-gap
+-- shows that data is independent: the very same fibre adjacency admits
+-- two amplitudes with distinct Born weights.
 --
 -- 测量即带权非确定边族
 --
@@ -35,7 +35,7 @@ open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _/_)
 open import Data.Rational.Properties using (*-zeroˡ; *-identityˡ; +-identityʳ)
 open import Data.Integer.Base using (1ℤ)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; _≢_; refl; sym; trans; cong; module ≡-Reasoning)
+  (_≡_; _≢_; sym; trans; cong; module ≡-Reasoning)
 open import Relation.Nullary.Negation.Core using (¬_)
 
 open import ALMA.Base.MCorrSetoid using (EqOn; FiberAdjˢ; idAdjˢ; propEqOn)
@@ -128,21 +128,18 @@ structural : FiberAdjˢ (propEqOn Edge) (propEqOn Edge)
 structural = idAdjˢ (propEqOn Edge)
 
 -- Two real amplitudes over that single edge, of unit and one-third
--- weight respectively.
+-- amplitude respectively.
 --
--- 该单条边上的两个实振幅，权重分别为 1 与 1/9。
+-- 该单条边上的两个实振幅，振幅分别为 1 与 1/3。
 a₁ a₂ : ℂ
 a₁ = (1ℚ , 0ℚ)
 a₂ = (⅓ , 0ℚ)
 
 -- The two fibres share the same eqOn (hence the same structural
--- adjacency above); only the amplitude differs
+-- adjacency above); only the amplitude differs. The amp functions do
+-- not inspect the (unique) edge, avoiding constructor-indexed splits.
 --
--- The amp functions do not inspect the (unique) edge, avoiding
--- constructor-indexed splits.
---
--- 两个纤维共用同一 eqOn（因而共用上面的同一结构伴随），仅振幅不同
---
+-- 两个纤维共用同一 eqOn（因而共用上面的同一结构伴随），仅振幅不同。
 -- amp 函数不检视（唯一的）边，避免按构造子索引拆分。
 fibre₁ : AmplitudeFibre Edge
 fibre₁ = record { eqOn = propEqOn Edge ; amp = λ _ → a₁ }
@@ -169,14 +166,12 @@ q₁≢q₂ : q₁ ≢ q₂
 q₁≢q₂ ()
 
 -- The gap: over the same singleton edge fibre and the same structural
--- adjacency, the two amplitude fibres assign unequal Born weights
---
--- The amplitude (hence the probability) is therefore data that
--- FiberAdjˢ neither carries nor can recover.
+-- adjacency, the two amplitude fibres assign unequal Born weights. The
+-- amplitude (hence the probability) is therefore data that FiberAdjˢ
+-- neither carries nor can recover.
 --
 -- 缺口：在同一条单结果边纤维、同一结构伴随上，两个振幅纤维给出不相等
--- 的 Born 权重
---
--- 故振幅（以及概率）是 FiberAdjˢ 既不携带、也无法恢复的数据。
+-- 的 Born 权重。故振幅（以及概率）是 FiberAdjˢ 既不携带、也无法恢复
+-- 的数据。
 fibre-gap : ¬ (norm² a₁ ≡ norm² a₂)
 fibre-gap eq = q₁≢q₂ (trans (trans (sym weight₁) eq) weight₂)

@@ -30,9 +30,9 @@ open import Data.Unit.Base using (⊤)
 open import Data.Rational.Tactic.RingSolver as RationalRing
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Reflection
-open import Tactic.RingSolver as RingSolver using (solve-macro)
+open import Tactic.RingSolver using (solve-macro)
 
-open import ALMA.Physics.Newton.Quadratic as Q using
+open import ALMA.Physics.Newton.Quadratic using
   (Obs; obs; bracket; add; neg; zero; qO; pO; twoℚ; mkObs)
 
 ------------------------------------------------------------------------

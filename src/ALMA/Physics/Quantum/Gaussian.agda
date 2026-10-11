@@ -40,8 +40,7 @@ open import Relation.Binary.PropositionalEquality using
   (trans; sym; cong; cong₂; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import ALMA.Physics.RationalKit as Kit using
-  (neg-neg-mul; sq+; sq-; sq-comm; cross-eq)
+open import ALMA.Physics.RationalKit using (neg-neg-mul; sq+; sq-; sq-comm; cross-eq)
 
 ------------------------------------------------------------------------
 -- Gaussian rationals in rectangular form

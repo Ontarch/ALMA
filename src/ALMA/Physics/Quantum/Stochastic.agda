@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
--- Classical weighted edge families: stochastic kernels and composition
+-- Stochastic kernels and composition
 --
 -- A Kernel m n maps each input to every outcome carrying a rational
 -- weight, with each column summing to one. Composition is the classical
@@ -13,7 +13,7 @@
 -- orthogonality of columns. That hypothesis is not assumed here; the
 -- classical law below needs no such assumption.
 --
--- 经典带权边族：随机核及其复合
+-- 随机核及其复合
 --
 -- Kernel m n 把每个输入送到所有结果并携带有理权重，每列权重和为一。
 -- 复合遵循经典（L1）规则：两步路径上权重相乘，对中间结果求和。仅用
@@ -34,10 +34,10 @@ open import Data.Rational.Properties using
   (+-identityˡ; *-comm; *-zeroʳ; *-identityʳ; *-distribˡ-+)
 open import Function.Base using (_∘_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; sym; cong; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.FiniteVec using (sumFin; sumFin-cong)
-open import ALMA.Physics.RationalKit as Kit using (+interchange)
+open import ALMA.Physics.RationalKit using (+interchange)
 
 ------------------------------------------------------------------------
 -- Finite-sum algebra over ℚ

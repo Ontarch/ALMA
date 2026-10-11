@@ -21,6 +21,8 @@ import ALMA.Base.WContainerInstance
 import ALMA.Physics.RationalKit
 import ALMA.Physics.CausalOrder
 import ALMA.Physics.CausalSlice
+import ALMA.Physics.Spacetime.LorentzForm
+import ALMA.Physics.Spacetime.LorentzGroup
 import ALMA.Physics.Quantum.Gaussian
 import ALMA.Physics.Quantum.FiniteVec
 import ALMA.Physics.Quantum.Measurement
@@ -33,6 +35,7 @@ import ALMA.Physics.Newton.Quadratic
 import ALMA.Physics.Newton.QuadraticBilinear
 import ALMA.Physics.Newton.QuadraticSkew
 import ALMA.Physics.Newton.QuadraticJacobi
+import ALMA.Physics.Newton.DegreeBoundary
 import ALMA.Base.DetCat
 
 import ALMA.Base.Equivalence

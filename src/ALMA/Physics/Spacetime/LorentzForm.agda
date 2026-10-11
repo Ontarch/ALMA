@@ -1,42 +1,14 @@
 ------------------------------------------------------------------------
 -- The Lorentz quadratic form on a four-dimensional rational vector space
 --
--- A four-vector is a record of four rational components (t, x, y, z).
--- The Lorentz bilinear form g has signature (+---):
---
---   g(v, w) = t·t' − x·x' − y·y' − z·z' ,
---
--- with associated quadratic form η(v) = g(v, v). The form is symmetric
--- and ℚ-bilinear: linearity in the first argument is discharged by the
--- rational ring solver, and linearity in the second argument follows
--- from symmetry. The standard basis has η(e₀) = 1 and η(e₁..₃) = −1,
--- which fixes the causal character (timelike / spacelike / null).
---
--- Nothing here is analytic: every quantity and proof is exact and
--- algebraic over ℚ. This is the single-point algebraic skeleton of a
--- Lorentzian spacetime, sitting at the same level as Newton.Quadratic.
---
 -- 四维有理向量空间上的洛伦兹二次型
---
--- 四向量是四个有理分量 (t, x, y, z) 的记录。洛伦兹双线性型 g 取号差
--- (+---)：
---
---   g(v, w) = t·t' − x·x' − y·y' − z·z' ，
---
--- 相应二次型为 η(v) = g(v, v)。该型对称且 ℚ-双线性：第一参数的线性
--- 由有理数环求解器直接给出，第二参数的线性由对称性推出。标准基满足
--- η(e₀) = 1、η(e₁..₃) = −1，由此确定因果性质（类时 / 类空 / 类光）。
---
--- 此处不含任何分析，所有量与证明皆为 ℚ 上精确、代数的内容。这是洛伦
--- 兹时空的单点代数骨架，与 Newton.Quadratic 同层。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Physics.Spacetime.LorentzForm where
 
-open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; _<_)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; _<_; -_)
 open import Data.Rational.Tactic.RingSolver using (solve)
 open import Data.List using (_∷_; [])
 open import Relation.Binary.PropositionalEquality using
@@ -70,8 +42,8 @@ scale4 s v = mk4 (s * t v) (s * x v) (s * y v) (s * z v)
 --
 -- 洛伦兹双线性型与二次型
 --
--- 分量级形式 g4 在线性引理中被内联，使环求解器只看到裸环表达式，而不
--- 会把被应用的函数误当作常量。
+-- 分量级形式 g4 在线性引理中被内联，使环求解器只看到裸环表达式，而
+-- 不会把被应用的函数误当作常量。
 
 g4 : ℚ → ℚ → ℚ → ℚ → ℚ → ℚ → ℚ → ℚ → ℚ
 g4 a b c d e f g h = a * e - b * f - c * g - d * h
@@ -85,7 +57,14 @@ g v w = g4 (t v) (x v) (y v) (z v) (t w) (x w) (y w) (z w)
 ------------------------------------------------------------------------
 -- Symmetry and bilinearity
 --
+-- Records the three structural laws: symmetry g-sym, first-argument
+-- linearity g-addˡ / g-scaleˡ, and second-argument linearity g-addʳ /
+-- g-scaleʳ obtained from symmetry.
+--
 -- 对称性与双线性
+--
+-- 记录三条结构律：对称性 g-sym、第一参数线性 g-addˡ / g-scaleˡ，
+-- 以及由对称性导出的第二参数线性 g-addʳ / g-scaleʳ。
 
 g-sym′ : ∀ a b c d e f k l →
   (a * e - b * f - c * k - d * l)
@@ -98,6 +77,7 @@ g-sym v w =
   g-sym′ (t v) (x v) (y v) (z v) (t w) (x w) (y w) (z w)
 
 -- Linearity in the first argument.
+--
 -- 第一参数的线性。
 g-addˡ′ : ∀ i j k l a b c d e f g h →
   ((i + a) * e - (j + b) * f - (k + c) * g - (l + d) * h)
@@ -122,6 +102,7 @@ g-scaleˡ s v w =
   g-scaleˡ′ s (t v) (x v) (y v) (z v) (t w) (x w) (y w) (z w)
 
 -- Linearity in the second argument, obtained from symmetry.
+--
 -- 第二参数的线性，由对称性推出。
 g-addʳ : ∀ v u w → g v (add4 u w) ≡ g v u + g v w
 g-addʳ v u w =
@@ -148,7 +129,14 @@ g-scaleʳ s v w =
 ------------------------------------------------------------------------
 -- The standard basis
 --
+-- Defines the four basis vectors and their self- and cross-evaluations
+-- under g and η, which instantiate the signature recorded in the module
+-- header.
+--
 -- 标准基
+--
+-- 定义四个基向量及其在 g、η 下的自身与交叉求值，把模块头记录的号差
+-- 实例化。
 
 e₀ e₁ e₂ e₃ : FourVec
 e₀ = mk4 1ℚ 0ℚ 0ℚ 0ℚ
@@ -180,12 +168,14 @@ g-e₀₁ = refl
 ------------------------------------------------------------------------
 -- Causal character
 --
--- Under (+---) a vector is timelike when η(v) > 0, spacelike when
--- η(v) < 0 and null (lightlike) when η(v) = 0.
+-- Defines the three classes of vectors in the (+---) convention:
+-- timelike when η(v) > 0, spacelike when η(v) < 0, and null when
+-- η(v) = 0.
 --
 -- 因果性质
 --
--- 在 (+---) 下，η(v) > 0 为类时，η(v) < 0 为类空，η(v) = 0 为类光。
+-- 在 (+---) 约定下定义三类向量：η(v) > 0 为类时，η(v) < 0 为类空，
+-- η(v) = 0 为类光。
 
 Timelike : FourVec → Set
 Timelike v = 0ℚ < η v

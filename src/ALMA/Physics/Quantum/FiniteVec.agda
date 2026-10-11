@@ -29,10 +29,10 @@ open import Data.Rational.Properties using
   ; *-monoʳ-≤-nonNeg; ≤-reflexive; module ≤-Reasoning)
 open import Function.Base using (_∘_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; sym; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.Gaussian using (ℂ; _*ᶜ_; norm²; norm²-mul; Unit)
-open import ALMA.Physics.RationalKit as Kit using (neg-neg-square)
+open import ALMA.Physics.RationalKit using (neg-neg-square)
 
 ------------------------------------------------------------------------
 -- Rational squares are nonnegative

@@ -1,21 +1,22 @@
 ------------------------------------------------------------------------
--- Nontrivial rational unitary: norm conservation under a real rotation
+-- Nontrivial rational unitary
 --
--- A 2×2 real rotation [[c, -s], [s, c]] with c² + s² = 1 mixes the two
--- complex coordinates of a two-level state. The total squared norm is
--- conserved: the cross terms from the two rows cancel pairwise because
--- c*s = s*c, and the diagonal terms carry the factor c² + s² = 1.
+-- Norm conservation under a real rotation. A 2×2 real rotation
+-- [[c, -s], [s, c]] with c² + s² = 1 mixes the two complex coordinates
+-- of a two-level state. The total squared norm is conserved: the cross
+-- terms from the two rows cancel pairwise because c*s = s*c, and the
+-- diagonal terms carry the factor c² + s² = 1.
 --
 -- The orthogonality c² + s² = 1 is a carried hypothesis, not a logical
 -- necessity: it is exactly the extra column-orthogonality that L2
 -- amplitude dynamics require (contrast the L1 kernel law in
 -- Stochastic). The concrete 3/5–4/5 pair realises it over ℚ.
 --
--- 非平凡有理幺正：实旋转下的范数守恒
+-- 非平凡有理幺正
 --
--- 2×2 实旋转 [[c,-s],[s,c]]（c²+s²=1）混合二能级态的两个复坐标。总
--- 平方范数守恒：两行展开的交叉项因 c*s=s*c 成对抵消，对角项带上因子
--- c²+s²=1。
+-- 实旋转下的范数守恒。2×2 实旋转 [[c,-s],[s,c]]（c²+s²=1）混合二能
+-- 级态的两个复坐标。总平方范数守恒：两行展开的交叉项因 c*s=s*c 成对
+-- 抵消，对角项带上因子 c²+s²=1。
 --
 -- 正交条件 c²+s²=1 是携带假设而非逻辑必然：它正是 L2 振幅动力学所需
 -- 的额外列正交（对照 Stochastic 的 L1 核定律）。具体的 3/5–4/5 在 ℚ
@@ -32,7 +33,7 @@ open import Data.Rational.Properties using
 open import Data.Integer.Base using (ℤ; 1ℤ) renaming (_+_ to _ℤ+_)
 open import Data.Product.Base using (_×_; _,_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; sym; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.Gaussian using (ℂ; re; im; norm²)
 open import ALMA.Physics.RationalKit as Kit using
@@ -81,6 +82,8 @@ private
     Q  = t + t
 
   -- (c*a)² + (s*a)² = (c² + s²)*a².
+  --
+  -- (c*a)² + (s*a)² = (c² + s²)*a²。
   factor-left : ∀ c s a →
     (c * a) * (c * a) + (s * a) * (s * a) ≡ (c * c + s * s) * (a * a)
   factor-left c s a = let open ≡-Reasoning in begin
@@ -91,6 +94,8 @@ private
     (c * c + s * s) * (a * a) ∎
 
   -- (s*d)² + (c*d)² = (c² + s²)*d².
+  --
+  -- (s*d)² + (c*d)² = (c² + s²)*d²。
   factor-right : ∀ c s d →
     (s * d) * (s * d) + (c * d) * (c * d) ≡ (c * c + s * s) * (d * d)
   factor-right c s d = let open ≡-Reasoning in begin
@@ -119,7 +124,8 @@ private
   -- a real 2-vector. Cross terms cancel; c² + s² = 1 closes the
   -- diagonals.
   --
-  -- 实核心：实旋转保持实 2-向量的平方欧氏范数；交叉项抵消，c²+s²=1收口。
+  -- 实核心：实旋转保持实 2-向量的平方欧氏范数；交叉项抵消，
+  -- c²+s²=1 收口。
   rot-real : ∀ c s a d → c * c + s * s ≡ 1ℚ →
     (c * a - s * d) * (c * a - s * d) +
     (s * a + c * d) * (s * a + c * d) ≡ a * a + d * d
@@ -157,9 +163,9 @@ rot1 c s z w = (s * re z + c * re w , s * im z + c * im w)
 rot : ℚ → ℚ → ℂ → ℂ → ℂ × ℂ
 rot c s z w = (rot0 c s z w , rot1 c s z w)
 
--- Complex conservation: the total squared norm of the two coordinates is
--- unchanged. Each component (real/imaginary) is a real rotated 2-vector,
--- so rot-real applies twice and the four squares regroup.
+-- Complex conservation: the total squared norm of the two coordinates
+-- is unchanged. Each component (real/imaginary) is a real rotated
+-- 2-vector, so rot-real applies twice and the four squares regroup.
 --
 -- 复守恒：两坐标总平方范数不变。实部、虚部分别是被旋转的实 2-向量，
 -- 故 rot-real 各用一次，四个平方重新归组。

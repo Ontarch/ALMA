@@ -2,24 +2,22 @@
 -- A complex 2×2 unitary as a finite measurement instrument
 --
 -- AmplitudeComp proves that U = [[u, v], [-conj v, conj u]], carried
--- with |u|² + |v|² = 1, conserves total norm on every input pair. Here
--- the same matrix is equipped with the Instrument structure of
--- Measurement: each basis-input column has Born weights summing to one.
---
--- The matrix is held as a Vec of certified-normalised columns and all
--- Fin indexing goes through the polymorphic Vec lookup, so no concrete
--- Fin literal is ever pattern-matched (which Cubical Agda rejects).
--- unitary2-normalized is the same conservation on an arbitrary
--- normalised input pair, interference included.
+-- with |u|² + |v|² = 1, conserves total norm on every input pair.
+-- Here the same matrix is equipped with the Instrument structure of
+-- Measurement: each basis-input column has Born weights summing to
+-- one. The matrix is held as a Vec of certified-normalised columns,
+-- and all Fin indexing goes through the polymorphic Vec lookup, so no
+-- concrete Fin literal is ever pattern-matched (which Cubical Agda
+-- rejects). unitary2-normalized is the same conservation on an
+-- arbitrary normalised input pair, interference included.
 --
 -- 复 2×2 幺正作为有限测量仪器
 --
--- AmplitudeComp 已证 U=[[u,v],[-conj v,conj u]] 在 |u|²+|v|²=1 下对任意
--- 输入对保持总范数。此处把同一矩阵装备为 Measurement 的 Instrument：
--- 每个基输入列的 Born 权重和为一。
---
--- 矩阵存为一列列“携带归一证明”的 Vec，所有 Fin 索引经多态 Vec lookup
--- 完成，绝不模式匹配具体 Fin 字面量（Cubical Agda 不支持）。
+-- AmplitudeComp 已证 U=[[u,v],[-conj v,conj u]] 在 |u|²+|v|²=1 下对
+-- 任意输入对保持总范数。此处把同一矩阵装备为 Measurement 的
+-- Instrument：每个基输入列的 Born 权重和为一。矩阵存为一列列
+-- “携带归一证明”的 Vec，所有 Fin 索引经多态 Vec lookup 完成，
+-- 绝不模式匹配具体 Fin 字面量（Cubical Agda 不支持）。
 -- unitary2-normalized 是同一守恒在任意归一输入对上的形式，含干涉。
 ------------------------------------------------------------------------
 
@@ -30,11 +28,10 @@ module ALMA.Physics.Quantum.UnitaryInstrument where
 open import Data.Fin.Base using (Fin)
 open import Data.Product.Base using (Σ; _,_; proj₁; proj₂)
 open import Data.Vec using (Vec; []; _∷_; lookup)
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; -_)
-open import Data.Rational.Properties using
-  (+-identityʳ; +-comm; neg-distribˡ-*; neg-distribʳ-*)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_)
+open import Data.Rational.Properties using (+-identityʳ; +-comm)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; trans; cong; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.Gaussian using
   (ℂ; conj; norm²; norm²-conj; _+ᶜ_; _*ᶜ_)
@@ -42,7 +39,6 @@ open import ALMA.Physics.Quantum.FiniteVec using (sumFin)
 open import ALMA.Physics.Quantum.Measurement using (Instrument)
 open import ALMA.Physics.Quantum.AmplitudeComp using
   (-ᶜ_; unitary2-pres; u₃₄₅; v₃₄₅; norm²-neg; pythagoras-345)
-open import ALMA.Physics.RationalKit as Kit using (neg-involutive)
 
 private
   -- |-conj z|² = |z|²: conjugation then sign both preserve norm.
@@ -80,14 +76,11 @@ private
 CertCol : Set
 CertCol = Σ (Vec ℂ 2) λ col → sumNorm col ≡ 1ℚ
 
--- U = [[u, v], [-conj v, conj u]], stored column-wise
+-- U = [[u, v], [-conj v, conj u]], stored column-wise. Each column is
+-- paired with its normalisation proof derived from |u|² + |v|² = 1.
 --
--- Each column is paired with its normalisation proof derived from
--- |u|² + |v|² = 1.
---
--- U=[[u,v],[-conj v,conj u]]，按列存放
---
--- 每列配对其由 |u|²+|v|²=1 导出的归一证明。
+-- U=[[u,v],[-conj v,conj u]]，按列存放。每列配对其由 |u|²+|v|²=1
+-- 导出的归一证明。
 unitaryInstrument : (u v : ℂ) →
                     norm² u + norm² v ≡ 1ℚ → Instrument 2 2
 unitaryInstrument u v h = record { amp = amp ; norm = norm }
@@ -145,19 +138,15 @@ unitaryInstrument u v h = record { amp = amp ; norm = norm }
 ------------------------------------------------------------------------
 -- Conservation on an arbitrary normalised input pair
 --
--- 任意归一输入对上的守恒
-
 -- A normalised input pair (|α|² + |β|² = 1) is sent to a normalised
--- output pair
+-- output pair. Unlike the basis-column facts this runs over a
+-- superposition, so the cancelled terms are the interference
+-- cross-terms handled by cross-opposite.
 --
--- Unlike the basis-column facts this runs over a superposition, so the
--- cancelled terms are the interference cross-terms handled by
--- cross-opposite.
+-- 任意归一输入对上的守恒
 --
--- 归一输入对（|α|²+|β|²=1）映到归一输出对
---
--- 与基列事实不同，它作用于叠加态，被消去的正是 cross-opposite 处理的
--- 干涉交叉项。
+-- 归一输入对（|α|²+|β|²=1）映到归一输出对。与基列事实不同，它作用
+-- 于叠加态，被消去的正是 cross-opposite 处理的干涉交叉项。
 unitary2-normalized : ∀ (u v α β : ℂ) →
                       norm² u + norm² v ≡ 1ℚ →
                       norm² α + norm² β ≡ 1ℚ →
@@ -176,8 +165,8 @@ unitary2-normalized u v α β h hn =
 --
 -- u = 3/5、v = (4/5)i。
 
--- The concrete 3/5–4/5 unitary is a finite instrument with every column
--- of Born weights summing to one.
+-- The concrete 3/5–4/5 unitary is a finite instrument with every
+-- column of Born weights summing to one.
 --
 -- 具体的 3/5–4/5 幺正是一个有限仪器，每列 Born 权重和为一。
 unitaryInstrument-345 : Instrument 2 2

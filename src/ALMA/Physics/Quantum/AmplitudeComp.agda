@@ -46,10 +46,10 @@ open import Data.Product.Base using (_,_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
 
-open import ALMA.Physics.Quantum.Gaussian
-  using (ℂ; re; conj; norm²; _+ᶜ_; _*ᶜ_; norm²-mul; norm²-conj)
-open import ALMA.Physics.RationalKit as Kit
-  using (neg-involutive; neg-neg-mul; sq+; +interchange; flat4; sub-+-assoc; *ʳ-sub; *ˡ-sub)
+open import ALMA.Physics.Quantum.Gaussian using
+  (ℂ; re; conj; norm²; _+ᶜ_; _*ᶜ_; norm²-mul; norm²-conj)
+open import ALMA.Physics.RationalKit using
+  (neg-involutive; neg-neg-mul; sq+; +interchange; flat4; sub-+-assoc; *ʳ-sub; *ˡ-sub)
 
 -- Additive inverse on ℚ[i], componentwise.
 --

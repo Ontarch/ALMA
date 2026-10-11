@@ -30,7 +30,7 @@ module ALMA.Physics.Newton.Quadratic where
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; -_)
 open import Relation.Binary.PropositionalEquality using (_≡_; cong; module ≡-Reasoning)
 
-open import ALMA.Physics.RationalKit as Kit using (norm1; norm-tail)
+open import ALMA.Physics.RationalKit using (norm1; norm-tail)
 
 ------------------------------------------------------------------------
 -- Quadratic observables
