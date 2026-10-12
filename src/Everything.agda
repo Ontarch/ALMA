@@ -38,8 +38,11 @@ import ALMA.Base.Equivalence.StrongEquiv
 import ALMA.Physics.RationalKit
 import ALMA.Physics.CausalOrder
 import ALMA.Physics.CausalSlice
+import ALMA.Physics.CausalSet
+import ALMA.Physics.CausalSetOrder
 import ALMA.Physics.Spacetime.LorentzForm
 import ALMA.Physics.Spacetime.LorentzGroup
+import ALMA.Physics.Spacetime.Clifford
 import ALMA.Physics.Quantum.Gaussian
 import ALMA.Physics.Quantum.FiniteVec
 import ALMA.Physics.Quantum.Measurement

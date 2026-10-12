@@ -3,57 +3,32 @@
 --
 -- A blade is a subset of the four orthonormal generators, represented
 -- directly by four booleans; there are sixteen blades, which are the
--- rational basis of Cl(3, 1). The generators obey the Clifford relation
---
---   eᵢ·eⱼ + eⱼ·eᵢ = 2·g(eᵢ, eⱼ) .
---
--- Left multiplication of a blade P by a generator eᵢ is computed
--- algebraically:
---
---   · if i ∉ P, eᵢ·P is the blade P ∪ {i}, with sign (−1) raised to the
---     number of generators in P strictly before i;
---   · if i ∈ P, eᵢ·P contracts to P \\ {i}, with the same positional
---     sign multiplied by η(i) = eᵢ² (1 for e₀, −1 for e₁..₃).
---
--- The main theorem clifford-rel checks, for all sixteen pairs (i, j),
--- that the two products coincide as blades and their coefficients sum to
--- 2·g(eᵢ, eⱼ). The grade of a blade is the number of generators it
--- contains, giving the ℤ-grading skeleton.
---
--- The label Basis is a flat four-element enumeration rather than Fin 4,
--- so that no clause relies on injectivity of suc; this keeps the whole
--- development cubical-compatible with zero warnings. Everything is
--- exact and algebraic over ℚ.
+-- rational basis of Cl(3, 1). The generators obey the Clifford
+-- relation eᵢ·eⱼ + eⱼ·eᵢ = 2·g(eᵢ, eⱼ). Left multiplication of a blade
+-- P by a generator eᵢ is computed algebraically: if i ∉ P, eᵢ·P is the
+-- blade P ∪ {i}, with sign (−1) raised to the number of generators in
+-- P strictly before i; if i ∈ P, eᵢ·P contracts to P \\ {i}, with the
+-- same positional sign multiplied by η(i) = eᵢ². The main theorem
+-- clifford-rel checks, for all sixteen pairs (i, j), that the two
+-- products coincide as blades and their coefficients sum to
+-- 2·g(eᵢ, eⱼ).
 --
 -- 正交基上的克利福德代数 Cl(3, 1)
 --
--- Blade（刃）是四个正交生成元的子集，直接用四个布尔值表示；共有十六个
--- blade，构成 Cl(3, 1) 的有理基。生成元满足克利福德关系
---
---   eᵢ·eⱼ + eⱼ·eᵢ = 2·g(eᵢ, eⱼ) 。
---
--- 生成元 eᵢ 左乘 blade P 的代数计算：
---
---   · 若 i ∉ P，eᵢ·P 为 blade P ∪ {i}，符号为 (−1) 的「P 中严格先于 i
---     的生成元个数」次方；
---   · 若 i ∈ P，eᵢ·P 收缩为 P \\ {i}，位置符号再乘 η(i) = eᵢ²（e₀ 为 1，
---     e₁..₃ 为 −1）。
---
--- 主定理 clifford-rel 对全部十六对 (i, j) 验证：两个乘积作为 blade 相
--- 同，且系数之和为 2·g(eᵢ, eⱼ)。blade 的阶数（grade）即其所含生成元个
--- 数，给出 ℤ-分级骨架。
---
--- 标签 Basis 采用四元素的扁平枚举而非 Fin 4，使任何子句都不依赖 suc 的
--- 单射性，从而在 cubical-compatible 下保持零警告。全部内容皆为 ℚ 上精
--- 确、代数的。
+-- Blade（刃）是四个正交生成元的子集，直接用四个布尔值表示；共有
+-- 十六个 blade，构成 Cl(3, 1) 的有理基。生成元满足克利福德关系
+-- eᵢ·eⱼ + eⱼ·eᵢ = 2·g(eᵢ, eⱼ)。生成元 eᵢ 左乘 blade P 的代数计算：
+-- 若 i ∉ P，eᵢ·P 为 blade P ∪ {i}，符号为 (−1) 的「P 中严格先于 i
+-- 的生成元个数」次方；若 i ∈ P，eᵢ·P 收缩为 P \\ {i}，位置符号再乘
+-- η(i) = eᵢ²。主定理 clifford-rel 对全部十六对 (i, j) 验证：两个乘
+-- 积作为 blade 相同，且系数之和为 2·g(eᵢ, eⱼ)。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Physics.Spacetime.Clifford where
 
-open import Data.Nat using (ℕ; zero; suc)
-  renaming (_+_ to _+ℕ_)
+open import Data.Nat using (ℕ; zero; suc) renaming (_+_ to _+ℕ_)
 open import Data.Bool using (Bool; true; false)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_)
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
