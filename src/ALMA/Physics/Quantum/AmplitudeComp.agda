@@ -1,26 +1,25 @@
 ------------------------------------------------------------------------
--- L2 amplitude composition: a complex unitary conserves total norm
+-- L2 amplitude composition
 --
--- Composing two amplitude instruments sums amplitudes (not weights), so
--- interference appears. The primitive recombination is a 2×2 unitary
--- with *complex* entries
+-- A complex unitary conserves total norm. Composing two amplitude
+-- instruments sums amplitudes (not weights), so interference appears.
+-- The primitive recombination is a 2×2 unitary with complex entries
 --
 --     U = [[ u, v ], [ -conj v, conj u ]],      |u|² + |v|² = 1,
 --
--- acting on a two-level state (α, β). This module proves, over ℚ[i],
+-- acting on a two-level state (α, β). The module proves, over ℚ[i],
 --
 --     |uα + vβ|² + |(-conj v)α + (conj u)β|² = |α|² + |β|².
 --
 -- The diagonal terms carry the factor |u|² + |v|² = 1; the two
 -- interference (cross) terms are exact opposites and cancel by the
--- commutative-ring and conjugation laws alone -- no 8-variable
--- expansion. Orthogonality is again a carried hypothesis. A
--- rational-complex instance u = 3/5, v = (4/5)i closes by refl.
+-- commutative-ring and conjugation laws alone, with no 8-variable
+-- expansion. Orthogonality is again a carried hypothesis.
 --
--- L2 振幅复合：复幺正保持总范数
+-- L2 振幅复合
 --
--- 复合两个振幅仪器是对振幅（而非权重）求和，故出现干涉。其基本重组是
--- 带复元素的 2×2 幺正
+-- 复幺正保持总范数。复合两个振幅仪器是对振幅（而非权重）求和，故
+-- 出现干涉。其基本重组是带复元素的 2×2 幺正
 --
 --     U = [[ u, v ], [ -conj v, conj u ]]，     |u|² + |v|² = 1，
 --
@@ -28,16 +27,15 @@
 --
 --     |uα + vβ|² + |(-conj v)α + (conj u)β|² = |α|² + |β|²。
 --
--- 对角项带上因子 |u|²+|v|²=1；两个干涉（交叉）项互为相反数，仅凭交换环
--- 与共轭律相消——无需 8 变量展开。正交仍是携带假设。有理复实例
--- u=3/5、v=(4/5)i 由 refl 收口。
+-- 对角项带上因子 |u|² + |v|² = 1；两个干涉（交叉）项互为相反数，仅凭
+-- 交换环与共轭律相消——无需 8 变量展开。正交仍是携带假设。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Physics.Quantum.AmplitudeComp where
 
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_; _/_) 
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_; _/_)
 open import Data.Rational.Properties using
   (+-assoc; +-comm; +-identityʳ; +-inverseʳ; *-assoc; *-comm; *-identityˡ
   ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*)
@@ -68,9 +66,9 @@ open import ALMA.Physics.RationalKit using
 -- perm4 与 gather-t 是为下面复数乘法表量身定做的四项形状，故留在本地。
 
 private
-  -- Rotate the last three addends: a+b+c+d = a+c+d+b.
+  -- Rotate the last three addends: a + b + c + d = a + c + d + b.
   --
-  -- 末三项轮换：a+b+c+d = a+c+d+b。
+  -- 末三项轮换：a + b + c + d = a + c + d + b。
   perm4 : ∀ a b c d → a + (b + (c + d)) ≡ a + (c + (d + b))
   perm4 a b c d = let open ≡-Reasoning in begin
     a + (b + (c + d))
@@ -209,7 +207,7 @@ private
   -- Conjugation is an involution and preserves products: ℚ[i] is
   -- commutative, so conj(xy) = conj x · conj y.
   --
-  -- 共轭为对合且保持乘积：ℚ[i] 交换，故 conj(xy)=conj x·conj y。
+  -- 共轭为对合且保持乘积：ℚ[i] 交换，故 conj(xy) = conj x · conj y。
   conj-invol : ∀ z → conj (conj z) ≡ z
   conj-invol (a , b) = cong (a ,_) (neg-involutive b)
 
@@ -290,6 +288,7 @@ norm²-neg (a , b) =
 --
 -- |x + y|² = |x|² + |y|² + 2·Re(conj x · y)。
 -- 干涉项：Hermite 内积实部的两倍。
+
 cross : ℂ → ℂ → ℚ
 cross x y = re (conj x *ᶜ y) + re (conj x *ᶜ y)
 
@@ -426,13 +425,13 @@ private
 ------------------------------------------------------------------------
 -- Main theorem
 --
--- A complex 2×2 unitary conserves total norm.
--- U = [[u, v], [-conj v, conj u]], with carried |u|² + |v|² = 1.
+-- A complex 2×2 unitary conserves total norm. U = [[u, v], [-conj v,
+-- conj u]], with carried |u|² + |v|² = 1.
 --
 -- 主定理
 --
--- 复 2×2 幺正保持总范数。
--- U = [[u, v], [-conj v, conj u]]，携带 |u|² + |v|² = 1。
+-- 复 2×2 幺正保持总范数。U = [[u, v], [-conj v, conj u]]，携带
+-- |u|² + |v|² = 1。
 unitary2-pres : ∀ (u v α β : ℂ) →
                 norm² u + norm² v ≡ 1ℚ →
                 norm² (u *ᶜ α +ᶜ v *ᶜ β)

@@ -2,41 +2,20 @@
 -- The Lorentz group O(V, g) as g-preserving transformations
 --
 -- A transformation of the rational four-vector space is Lorentz when
--- it preserves the Lorentz bilinear form:
---
---   IsLorentz A ⇔ ∀ v w → g(A v, A w) ≡ g(v, w) .
---
--- Such transformations form the monoid skeleton of O(3,1). The boost
--- along x is parametrised directly by its matrix entries (a, b)
--- subject to a² − b² = 1, which avoids the factor γ = 1/√(1−v²) that
--- is not rational; the ring solver first establishes
---
---   g(boost v, boost w) = (a² − b²)·g(v, w) ,
---
--- and the constraint makes the boost Lorentz. A rational example is
--- (a, b) = (5/4, 3/4).
+-- it preserves the Lorentz bilinear form. Such transformations form
+-- the monoid skeleton of O(3,1).
 --
 -- 以保持 g 的变换刻画洛伦兹群 O(V, g)
 --
--- 有理四向量空间上的变换为洛伦兹变换，当且仅当它保持洛伦兹双线性型：
---
---   IsLorentz A ⇔ ∀ v w → g(A v, A w) ≡ g(v, w) 。
---
--- 此类变换构成 O(3,1) 的幺半群骨架。沿 x 方向的推动直接以矩阵元
--- (a, b) 参数化，并要求 a² − b² = 1，从而避开非有理的因子
--- γ = 1/√(1−v²)；环求解器首先建立
---
---   g(boost v, boost w) = (a² − b²)·g(v, w) ，
---
--- 再由约束使该推动成为洛伦兹变换。一个有理例为 (a, b) = (5/4, 3/4)。
+-- 有理四向量空间上的变换为洛伦兹变换，当且仅当它保持洛伦兹双线性型。
+-- 此类变换构成 O(3,1) 的幺半群骨架。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Physics.Spacetime.LorentzGroup where
 
-open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; _/_; -_)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; _/_; -_)
 open import Data.Rational.Tactic.RingSolver using (solve)
 open import Data.Rational.Properties using (*-identityˡ)
 open import Data.Integer using (+_)
@@ -51,11 +30,15 @@ open FourVec using (t; x; y; z)
 ------------------------------------------------------------------------
 -- The g-preservation predicate
 --
--- Defines the predicate whose monoid closure is established below.
+-- IsLorentz A holds when A preserves g:
+--
+--   IsLorentz A ⇔ ∀ v w → g(A v, A w) ≡ g(v, w) .
 --
 -- 保持 g 的谓词
 --
--- 定义下面将要建立幺半群封闭性的谓词。
+-- IsLorentz A 表示 A 保持 g：
+--
+--   IsLorentz A ⇔ ∀ v w → g(A v, A w) ≡ g(v, w) 。
 
 IsLorentz : (FourVec → FourVec) → Set
 IsLorentz A = ∀ v w → g (A v) (A w) ≡ g v w
@@ -63,11 +46,11 @@ IsLorentz A = ∀ v w → g (A v) (A w) ≡ g v w
 ------------------------------------------------------------------------
 -- Identity and composition
 --
--- Establishes that IsLorentz is closed under identity and composition.
+-- IsLorentz is closed under identity and composition.
 --
 -- 恒等与合成
 --
--- 建立 IsLorentz 在恒等与合成下的封闭性。
+-- IsLorentz 在恒等与合成下封闭。
 
 id4 : FourVec → FourVec
 id4 v = v
@@ -83,12 +66,16 @@ comp-lorentz A B pA pB v w =
 ------------------------------------------------------------------------
 -- The x-boost
 --
--- Evaluates g on a pair of boosted vectors, inlined so the ring solver
--- sees only ring expressions.
+-- The boost is parametrised directly by its matrix entries (a, b),
+-- subject to a² − b² = 1. This avoids the factor γ = 1/√(1−v²) that is
+-- not rational. The evaluation of g on a pair of boosted vectors is
+-- inlined so the ring solver sees only ring expressions.
 --
 -- x-推动
 --
--- 计算一对推动后向量的 g 值，内联以便环求解器只看到环表达式。
+-- 推动直接以矩阵元 (a, b) 参数化，并要求 a² − b² = 1。这避开了非有理
+-- 的因子 γ = 1/√(1−v²)。一对推动后向量的 g 值被内联，以便环求解器
+-- 只看到环表达式。
 
 boost : ℚ → ℚ → FourVec → FourVec
 boost a b v =
@@ -126,13 +113,13 @@ boost-lorentz a b eq v w =
 ------------------------------------------------------------------------
 -- The inverse boost
 --
--- Shows that the boost with entries (a, −b) is Lorentz whenever the
--- forward boost is, so it acts as the group inverse.
+-- The boost with entries (a, −b) is Lorentz whenever the forward boost
+-- is, so it acts as the group inverse.
 --
 -- 逆推动
 --
--- 证明矩阵元为 (a, −b) 的推动在前向推动为洛伦兹时也为洛伦兹，从而
--- 充当群逆元。
+-- 矩阵元为 (a, −b) 的推动在前向推动为洛伦兹时也为洛伦兹，从而充当
+-- 群逆元。
 
 -- (−b)² = b².
 --
@@ -149,11 +136,11 @@ boost-inv-lorentz a b eq =
 ------------------------------------------------------------------------
 -- Rational example
 --
--- Instantiates the boost at (a, b) = (5/4, 3/4).
+-- The boost at (a, b) = (5/4, 3/4).
 --
 -- 有理例
 --
--- 在 (a, b) = (5/4, 3/4) 处实例化推动。
+-- 在 (a, b) = (5/4, 3/4) 处的推动。
 
 fifth : ℚ
 fifth = + 5 / 4

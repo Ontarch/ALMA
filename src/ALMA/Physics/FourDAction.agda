@@ -1,78 +1,42 @@
 ------------------------------------------------------------------------
--- Four-dimensional Benincasa–Dowker action: the integer chain core
+-- Four-dimensional Benincasa–Dowker action
 --
--- In four spacetime dimensions the discrete scalar curvature at an
--- event x is
+-- The integer chain core of the four-dimensional Benincasa–Dowker
+-- action, computed purely from the causal order. The physical
+-- calibration factors are external and are not formalized here.
 --
---   R(x) = (4 / √6) · (1 / l²) · [ 1 − N₀(x) + 9 N₁(x)
---                                   − 16 N₂(x) + 8 N₃(x) ] ,
+-- 四维 Benincasa–Dowker 作用量
 --
--- and the action, summing over a finite causal set C with n events, is
---
---   S(C) / ℏ = (4 / √6) · (l / l_p)² · [ n − N₀ + 9 N₁
---                                          − 16 N₂ + 8 N₃ ] .
---
--- The k-abundance N_k is the number of strictly ordered pairs (x, y)
--- whose inclusive order interval has cardinality exactly k + 2:
---
---   N_k = |{ (x, y) : x ≺ y, |I[x, y]| = k + 2 }| .
---
--- The bracketed expression is an exact integer computed purely from
--- the causal order; this module delivers that integer core as bd4. The
--- overall physical factor (4 / √6)(l / l_p)² contains the irrational
--- √6 and is not formalized over ℚ: it is an external calibration, as is
--- the factor 1/l² in R(x). No ℝ and no analysis enter the core.
---
--- The four-point diamond is checked: N₀ = 4, N₁ = 0, N₂ = 1, N₃ = 0,
--- and bd4 = −16. The diamond is a 1+1 poset rather than a four-dim
--- sprinkling, so a non-zero four-dimensional action is the expected
--- result; the theorem validates the exact counting and weighting, not a
--- physical zero.
---
--- 四维 Benincasa–Dowker 作用量：整数链核
---
--- 四维时空下，事件 x 处的离散标量曲率为
---
---   R(x) = (4 / √6) · (1 / l²) · [ 1 − N₀(x) + 9 N₁(x)
---                                   − 16 N₂(x) + 8 N₃(x) ] ，
---
--- 对含 n 事件的有限因果集 C 求和，作用量为
---
---   S(C) / ℏ = (4 / √6) · (l / l_p)² · [ n − N₀ + 9 N₁
---                                          − 16 N₂ + 8 N₃ ] 。
---
--- k-丰度 N_k 是包含序区间基数恰为 k + 2 的严格可比对 (x, y) 数：
---
---   N_k = |{ (x, y)：x ≺ y，|I[x, y]| = k + 2 }| 。
---
--- 方括号内为纯由因果序计算的精确整数；本模块将该整数核交付为 bd4。整
--- 体物理因子 (4 / √6)(l / l_p)² 含无理数 √6，不在 ℚ 上形式化，它是外部
--- 标定，R(x) 中的 1/l² 亦然。核内无需 ℝ、无需分析。
---
--- 四点菱形检验：N₀ = 4，N₁ = 0，N₂ = 1，N₃ = 0，bd4 = −16。菱形是
--- 1+1 偏序而非四维 sprinkling，故四维作用量非零是预期结果；定理验证的是
--- 精确计数与加权，而非物理零值。
+-- 四维 Benincasa–Dowker 作用量的整数链核，纯由因果序计算。物理标定
+-- 因子为外部因素，不在此形式化。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Physics.FourDAction where
 
-open import Data.Nat using (ℕ; zero; suc)
-  renaming (_+_ to _+ℕ_; _≡ᵇ_ to _≡ℕᵇ_)
+open import Data.Nat using (ℕ) renaming (_+_ to _+ℕ_; _≡ᵇ_ to _≡ℕᵇ_)
 open import Data.Fin using (Fin)
 open import Data.Bool using (Bool; true; false; if_then_else_)
 open import Data.Integer using (ℤ; _+_; _-_; _*_; +_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import ALMA.Physics.CausalSet using (diamond; boolFilter; sumOver)
-open ALMA.Physics.CausalSet.Core
-  using (events; interval-volume)
+open ALMA.Physics.CausalSet.Core using (events; interval-volume)
 
 ------------------------------------------------------------------------
--- k-abundance: strictly ordered pairs with inclusive volume k + 2
+-- k-abundance
 --
--- k-丰度：包含体积为 k + 2 的严格可比对
+-- N_k counts strictly ordered pairs (x, y) whose inclusive order
+-- interval has cardinality exactly k + 2:
+--
+--   N_k = |{ (x, y) : x ≺ y, |I[x, y]| = k + 2 }| .
+--
+-- k-丰度
+--
+-- N_k 计数包含区间基数恰为 k + 2 的严格可比对 (x, y)：
+--
+--   N_k = |{ (x, y)：x ≺ y，|I[x, y]| = k + 2 }| 。
 
 abundance : ∀ n (o : Fin n → Fin n → Bool) → ℕ → ℕ
 abundance n o k =
@@ -90,9 +54,33 @@ N3 : ∀ n (o : Fin n → Fin n → Bool) → ℕ
 N3 n o = abundance n o 3
 
 ------------------------------------------------------------------------
--- Integer four-dimensional BD core: n − N0 + 9 N1 − 16 N2 + 8 N3
+-- Integer four-dimensional BD core
 --
--- 四维 BD 整数核：n − N0 + 9 N1 − 16 N2 + 8 N3
+-- The discrete scalar curvature at an event x and the action over a
+-- finite causal set C with n events are
+--
+--   R(x) = (4 / √6) · (1 / l²) · [ 1 − N₀(x) + 9 N₁(x)
+--                                   − 16 N₂(x) + 8 N₃(x) ] ,
+--
+--   S(C) / ℏ = (4 / √6) · (l / l_p)² · [ n − N₀ + 9 N₁
+--                                          − 16 N₂ + 8 N₃ ] .
+--
+-- Only the bracketed integer is formalized here. The factors (4 / √6),
+-- (1 / l²) and (l / l_p)² contain the irrational √6 and are external
+-- calibrations; no ℝ and no analysis enter the core.
+--
+-- 四维 BD 整数核
+--
+-- 事件 x 处的离散标量曲率与含 n 事件的有限因果集 C 上的作用量为
+--
+--   R(x) = (4 / √6) · (1 / l²) · [ 1 − N₀(x) + 9 N₁(x)
+--                                   − 16 N₂(x) + 8 N₃(x) ] ，
+--
+--   S(C) / ℏ = (4 / √6) · (l / l_p)² · [ n − N₀ + 9 N₁
+--                                          − 16 N₂ + 8 N₃ ] 。
+--
+-- 此处仅形式化方括号内的整数。因子 (4 / √6)、(1 / l²) 与 (l / l_p)²
+-- 含无理数 √6，为外部标定；核内无需 ℝ、无需分析。
 
 bd4 : ∀ n (o : Fin n → Fin n → Bool) → ℤ
 bd4 n o =
@@ -105,7 +93,15 @@ bd4 n o =
 ------------------------------------------------------------------------
 -- Diamond reference
 --
+-- The four-point diamond is a 1+1 poset rather than a four-dimensional
+-- sprinkling, so a non-zero four-dimensional action is the expected
+-- outcome. The lemmas below validate the exact counting and weighting,
+-- not a physical zero.
+--
 -- 菱形参考
+--
+-- 四点菱形是 1+1 偏序而非四维 sprinkling，故四维作用量非零是预期
+-- 结果。下列引理验证精确计数与加权，而非物理零值。
 
 diamond-N0 : N0 4 diamond ≡ 4
 diamond-N0 = refl

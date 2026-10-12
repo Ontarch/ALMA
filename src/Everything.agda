@@ -40,6 +40,9 @@ import ALMA.Physics.CausalOrder
 import ALMA.Physics.CausalSlice
 import ALMA.Physics.CausalSet
 import ALMA.Physics.CausalSetOrder
+import ALMA.Physics.CausalCurvature
+import ALMA.Physics.EinsteinAction
+import ALMA.Physics.FourDAction
 import ALMA.Physics.Spacetime.LorentzForm
 import ALMA.Physics.Spacetime.LorentzGroup
 import ALMA.Physics.Spacetime.Clifford

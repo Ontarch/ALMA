@@ -1,33 +1,18 @@
 ------------------------------------------------------------------------
 -- Constant-time slices are spacelike hypersurfaces
 --
--- CausalOrder reads time and space off the edge family. This module
--- turns the "cognitive section = spatial slice" remark into a theorem:
--- equip the indices with a strict causal grading L whose edges raise the
--- layer by exactly one, with each event occupying a unique layer, and a
--- positive path strictly raises the layer (raise); two events on the
--- same layer cannot positively precede one another, so every layer L n
--- is an Antichain -- a spacelike slice; and the same grading entails
--- Acyclic, i.e. the time arrow and the spatial slices arise from one
--- carried structure.
---
--- The layer and its strict order are inductive data, so the argument
--- never transports across a level equality: a raised path builds the
--- L m witness and the contradiction uses carried layer disjointness.
--- The tree-depth dual is Tr n in MCorrTerminalSequence and is not
--- rebuilt.
+-- A strict causal grading turns the "cognitive section = spatial
+-- slice" remark into a theorem: if every edge raises the layer by
+-- exactly one and every event occupies a unique layer, then each layer
+-- is an Antichain, and the same grading entails Acyclic. The time
+-- arrow and the spatial slices therefore arise from one carried
+-- structure.
 --
 -- 等时截面即类空超曲面
 --
--- CausalOrder 从边族读出时间与空间。本模块把“认知截面 = 空间切片”落成
--- 定理：为索引配备严格因果分层 L，每条边恰把层推进一，且每事件占据唯一
--- 层，则正路径严格抬高层（raise）；同层两事件不能互相正在先，故每层
--- L n 是反链——类空切片；同一分层蕴含 Acyclic，即时间箭头与空间切片出自
--- 同一个携带结构。
---
--- 层与其严格序是归纳数据，论证从不在层等式上 transport：抬升路径直接构造
--- L m 见证，矛盾使用携带的层不相容。树深度的对偶是 MCorrTerminalSequence
--- 的 Tr n，此处不重建。
+-- 严格因果分层把“认知截面 = 空间切片”落成定理：若每条边恰把层推进
+-- 一、每事件占据唯一层，则每层是反链，且同一分层蕴含 Acyclic。时间
+-- 箭头与空间切片因此出自同一个携带结构。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -46,11 +31,11 @@ open import ALMA.Physics.CausalOrder using (Acyclic; Antichain; _⇝⁺_; step; 
 ------------------------------------------------------------------------
 -- Strict order on layers
 --
--- Inductively (no arithmetic equality).
+-- Inductively, with no arithmetic equality.
 --
 -- 层上的严格序
 --
--- 归纳给出（无算术等式）。
+-- 归纳给出，不使用算术等式。
 
 data _<ℕ_ : ℕ → ℕ → Set where
   <suc  : ∀ {n} → n <ℕ suc n

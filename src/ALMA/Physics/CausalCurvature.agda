@@ -2,83 +2,42 @@
 -- Curvature as the deviation of causal chain counts
 --
 -- In a causal set the metric is not a field: curvature is detected by
--- how the chain content of an Alexandrov interval departs from the flat
--- reference. This module uses the minimal flat diamond as the reference:
--- a smallest 1+1 interval has two spacelike interior events, so it has
---
---   three-chain count  between 3 x y = 2 ,
---   interval volume    interval-volume x y = 4 .
---
--- The curvature signals are the integer deviations
---
---   dev3 x y = between 3 x y − 2 ,
---   devV x y = interval-volume x y − 4 .
---
--- Three finite reference intervals are checked:
---
---   · the flat four-point diamond      : dev3 = 0, devV = 0;
---   · a five-event interval with three
---     spacelike interior events        : dev3 = +1, devV = +1
---                                        (extra interior content);
---   · a three-event pure chain with one
---     interior event                   : dev3 = −1, devV = −1
---                                        (missing interior content).
---
--- Thus a non-zero curvature signal is shown to emerge from the causal
--- order, with the flat interval as the zero-curvature baseline. The
--- sign convention here is combinatorial: more interior chains than the
--- flat reference give a positive deviation, fewer give a negative one;
--- the dimension-specific physical calibration (the factor converting
--- these counts to a scalar curvature) is the coefficient argument of
--- CausalSet.curvatureAt and is not fixed here.
+-- how the chain content of an Alexandrov interval departs from a flat
+-- reference. This module uses the minimal flat diamond as the reference
+-- and checks three finite intervals against it.
 --
 -- 曲率即因果链计数的偏差
 --
--- 因果集中度规不是字段：曲率通过 Alexandrov 区间的链含量相对平坦参考的偏
--- 差来检测。本模块以最小平坦菱形为参考：最小的 1+1 区间有两个类空内部事
--- 件，故
---
---   三链数  between 3 x y = 2 ，
---   区间体积 interval-volume x y = 4 。
---
--- 曲率信号为整数偏差
---
---   dev3 x y = between 3 x y − 2 ，
---   devV x y = interval-volume x y − 4 。
---
--- 检验三个有限参考区间：
---
---   · 平坦四点菱形：dev3 = 0，devV = 0；
---   · 含三个类空内部事件的五事件区间：dev3 = +1，devV = +1
---     （内部内容偏多）；
---   · 含一个内部事件的三事件纯链：dev3 = −1，devV = −1
---     （内部内容偏少）。
---
--- 由此展示非零曲率信号从因果序涌现，平坦区间为零曲率基线。此处符号约定是
--- 组合性的：内部链比平坦参考多则偏差为正，少则为负；维度相关的物理标定
--- （把这些计数换算为标量曲率的因子）是 CausalSet.curvatureAt 的系数参数，
--- 不在此固定。
+-- 因果集中度规不是字段：曲率通过 Alexandrov 区间的链含量相对平坦参考
+-- 的偏差来检测。本模块以最小平坦菱形为参考，并对三个有限区间作检验。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Physics.CausalCurvature where
 
-open import Data.Nat using (ℕ; zero; suc)
-  renaming (_≡ᵇ_ to _≡ℕᵇ_)
+open import Data.Nat using (ℕ; zero; suc) renaming (_≡ᵇ_ to _≡ℕᵇ_)
 open import Data.Fin using (Fin; toℕ)
 open import Data.Bool using (Bool; _∧_; _∨_)
 open import Data.Integer using (ℤ; _+_; _-_; _*_; +_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import ALMA.Physics.CausalSet using (diamond)
-open ALMA.Physics.CausalSet.Core
-  using (between; interval-volume)
-
+open ALMA.Physics.CausalSet.Core using (between; interval-volume)
 ------------------------------------------------------------------------
 -- Flat reference values for the minimal diamond
 --
+-- A smallest 1+1 interval has two spacelike interior events, so it has
+--
+--   three-chain count  between 3 x y = 2 ,
+--   interval volume    interval-volume x y = 4 .
+--
 -- 最小菱形的平坦参考值
+--
+-- 最小的 1+1 区间有两个类空内部事件，故
+--
+--   三链数  between 3 x y = 2 ，
+--   区间体积 interval-volume x y = 4 。
 
 flat-between3 : ℕ
 flat-between3 = 2
@@ -89,7 +48,25 @@ flat-volume = 4
 ------------------------------------------------------------------------
 -- Integer curvature deviations
 --
+-- The curvature signals are the integer deviations
+--
+--   dev3 x y = between 3 x y − 2 ,
+--   devV x y = interval-volume x y − 4 .
+--
+-- The sign convention is combinatorial: more interior chains than the
+-- flat reference give a positive deviation, fewer give a negative one.
+-- The dimension-specific physical calibration is the coefficient
+-- argument of CausalSet.curvatureAt and is not fixed here.
+--
 -- 整数曲率偏差
+--
+-- 曲率信号为整数偏差
+--
+--   dev3 x y = between 3 x y − 2 ，
+--   devV x y = interval-volume x y − 4 。
+--
+-- 符号约定是组合性的：内部链比平坦参考多则偏差为正，少则为负。维度
+-- 相关的物理标定是 CausalSet.curvatureAt 的系数参数，不在此固定。
 
 dev3 : ∀ n (o : Fin n → Fin n → Bool) → Fin n → Fin n → ℤ
 dev3 n o x y = + (between n o 3 x y) - + flat-between3
