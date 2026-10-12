@@ -66,6 +66,8 @@ agda -i src src/Everything.agda
 
 **Prototype/** — The initial, fully self-contained and hand-unfolded prototype. It traces the trajectory from a one-to-one mapping of philosophical concepts to their convergence into a single coinductive record, where the resulting "subst hell" motivated all subsequent refactoring. Frozen for archival purposes as the first Agda formalisation of the paper's philosophical ideas.
 
+**Physics/** — Derived mathematical physics: a shared rational toolkit, the causal order and slice reading, and the combinatorial GR skeleton (finite causal sets, chain curvature, the Einstein action and its discrete variation, and the four-dimensional Benincasa–Dowker integer core), with the Newton, Quantum, and Spacetime layers (Lorentz quadratic form, Lorentz group, Clifford algebra Cl(3,1)). Every construction is exact and algebraic over ℚ or ℕ: curvature and the field equations emerge from the causal order with no ℝ and no analysis.
+
 **Base/** —— 基础结构：索引余归纳骨架 Mᵢ 与两轴退化格 Equivalence/。它起源于 SecondPass/ 中余极限泛性质唯一性证明受阻时的回溯：所有等价关系共享这一骨架。
 
 **Cosmos/** —— 当前活跃主线。彻底转向携带式 M 架构，以边族索引取代 (B , next) 表示，把容器结构、内禀范畴、态射对形状的变换、余代数展开与动态自我指涉全部携带为数据。
@@ -75,6 +77,8 @@ agda -i src src/Everything.agda
 **InitialPass/** —— 吸纳社区反馈后的结构重组：将单体原型拆分为独立模块。冻结存档。
 
 **Prototype/** —— 完全自包含、手工展开的初始原型。它记录了从哲学概念的一对一映射到收敛为单一余归纳记录的演进轨迹；正是由此引发的"subst hell" 问题推动了后续全部重构。作为论文哲学思想在 Agda 中的首次形式化呈现，已冻结存档。
+
+**Physics/** —— 派生的数学物理：共享的有理工具集、因果序与切片读法，以及组合 GR 骨架（有限因果集、链曲率、爱因斯坦作用量及其离散变分、四维 Benincasa–Dowker 整数核），并含 Newton、Quantum 与 Spacetime 各层（洛伦兹二次型、洛伦兹群、克利福德代数 Cl(3,1)）。全部构造皆为 ℚ 或 ℕ 上精确、代数的：曲率与场方程从因果序涌现，无需 ℝ、无需分析。
 
 ## Contributing / 贡献指南
 
