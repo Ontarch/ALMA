@@ -2,7 +2,7 @@
 
 [![build](https://img.shields.io/github/actions/workflow/status/Ontarch/ALMA/build.yml?branch=main&label=build&logo=github&logoColor=white)](https://github.com/Ontarch/ALMA/actions/workflows/build.yml)
 [![Docs Status](https://github.com/Ontarch/ALMA/actions/workflows/docs.yml/badge.svg)](https://github.com/Ontarch/ALMA/actions/workflows/docs.yml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21511879.svg)](https://doi.org/10.5281/zenodo.21511879)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21511878.svg)](https://doi.org/10.5281/zenodo.21511878)
 
 ## Introduction / 简介
 
