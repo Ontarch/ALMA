@@ -22,8 +22,8 @@ open import Data.List using (List; _∷_; [])
 open import Data.Integer using (ℤ; _+_; _-_; _*_; +_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
-open import ALMA.Physics.CausalSet using (diamond; sumOver)
-open ALMA.Physics.CausalSet.Core using (chains; between; events)
+open import ALMA.Physics.CausalSet using (diamond; sumOver; module Core)
+open Core using (chains; between; events)
 open import ALMA.Physics.CausalCurvature using (curved5; curved3)
 
 ------------------------------------------------------------------------

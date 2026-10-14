@@ -91,6 +91,20 @@ open import ALMA.Base.Equivalence.TopologicalEq public
 open import ALMA.Base.Equivalence.ManifoldEq public
 
 ------------------------------------------------------------------------
+-- Quantum decoration of DiscreteEq
+--
+-- QuantumLayer adds a scalar amplitude to each related pair of a
+-- DiscreteEq layer, together with the conservation predicate that
+-- qualifies the decoration.
+--
+-- DiscreteEq 的量子装饰
+--
+-- QuantumLayer 在 DiscreteEq 层的每对相关状态上添加标量振幅，并
+-- 携带使装饰成为量子角的守恒谓词。
+
+open import ALMA.Base.Equivalence.QuantumLayer public
+
+------------------------------------------------------------------------
 -- Lattice structure
 --
 -- Projections and joint projection.

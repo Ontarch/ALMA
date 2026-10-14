@@ -1,0 +1,244 @@
+------------------------------------------------------------------------
+-- Coinductive reals as a nested interval chain
+--
+-- The standard coinductive real: a nested chain of rational intervals.
+-- Each node carries the current interval (l, u) with l < u and a chosen
+-- subinterval (the next node) whose length is at most half. The real is
+-- the intersection over the nested chain.
+--
+-- This corrects the point-centre neighbourhood tree (Neighborhood.agda):
+-- a real chooses nested intervals (deterministic corecursive step),
+-- whereas the E-M tree with caller-supplied branches cannot be totalised
+-- along a single fast path. The nesting is carried data, not a branch.
+--
+-- 余归纳实数作为嵌套区间链
+--
+-- 标准余归纳实数：有理区间的嵌套链。每个节点携带当前区间 (l, u)，
+-- l < u，并选择一个长度至多减半的子区间（下一节点）。实数即嵌套链
+-- 的交集。
+--
+-- 这修正了点中心邻域树（Neighborhood.agda）：实数选择嵌套区间
+-- （确定性余归纳步骤），而调用者携带分支的 E-M 树无法沿单条快速
+-- 路径良定义。嵌套是携带数据，不是分支。
+------------------------------------------------------------------------
+
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
+
+module ALMA.Base.Real.Interval where
+
+open import Data.Nat using (ℕ; suc; _^_)
+open import Data.Integer using (+_; -[1+_]; +[1+_]; +0)
+open import Data.Integer.Properties as ℤ using (neg-involutive)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; Positive; NonZero)
+open import Data.Rational.Base using (mkℚ; 1/_; _÷_; _-_; toℚᵘ) renaming (-_ to neg)
+open import Data.Nat.Coprimality using (1-coprimeTo; ¬0-coprimeTo-2+) renaming (sym to coprime-sym)
+open import Data.Rational.Properties using
+  (mkℚ+-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; toℚᵘ-injective; ≤-reflexive
+  ; ≤-refl; ≤-trans; <⇒≤; <-trans; +-mono-<; +-mono-≤; +-mono-<-≤; +-identityʳ
+  ; +-identityˡ; +-inverseʳ; +-assoc; +-comm; neg-distrib-+; *-inverseˡ
+  ; *-inverseʳ; *-assoc; *-comm; *-distribʳ-+; *-identityˡ; neg-antimono-≤)
+open import Data.Nat.Properties using (m^n≢0)
+open import Data.Rational.Unnormalised.Properties as ℚᵘP using (neg-involutive)
+open import Data.Product using (Σ; _,_; _×_)
+open import Relation.Binary.PropositionalEquality using
+  (_≡_; refl; trans; sym; cong; cong₂; subst)
+open import Relation.Nullary.Negation using (contradiction)
+
+open import ALMA.Base.Real using (embed; 2ℚ; 2*embed; halve; reciprocal-cong; 2ℚ≡1+1)
+
+-- Positive witness for the dyadic denominator.
+--
+-- 二进分母的正性见证。
+pos-pow : ∀ k → Positive (embed (2 ^ suc k))
+pos-pow k =
+  mkℚ+-pos (2 ^ suc k) 1
+    {{m^n≢0 2 (suc k)}}
+    {c = coprime-sym (1-coprimeTo (2 ^ suc k))}
+
+-- Summable dyadic tolerance δ k = 1 / 2^(k+1).
+--
+-- 可求和二进容差 δ k = 1 / 2^(k+1)。
+δ : ℕ → ℚ
+δ k =
+  Data.Rational.Base.1/_ (embed (2 ^ suc k))
+    {{pos⇒nonZero (embed (2 ^ suc k)) {{pos-pow k}}}}
+
+-- δ k is positive.
+--
+-- δ k 为正。
+δ-pos : ∀ k → 0ℚ < δ k
+δ-pos k =
+  positive⁻¹ (δ k)
+    {{1/pos⇒pos (embed (2 ^ suc k)) {{pos-pow k}}}}
+
+-- Coinductive nested-interval real.
+--
+-- 余归纳嵌套区间实数。
+mutual
+  record RealI : Set where
+    coinductive
+    field
+      l : ℚ
+      u : ℚ
+      lo : l < u
+      next : RealI
+      nest : Nest l u next
+
+  Nest : (l u : ℚ) (next : RealI) → Set
+  Nest l u next =
+    l ≤ RealI.l next ×
+    RealI.u next ≤ u ×
+    RealI.u next - RealI.l next ≤ (u - l) ÷ embed 2
+
+-- 2 δ(suc k) ≡ δ k, via the halving lemma with m = embed (2^(k+1)).
+--
+-- 2 δ(suc k) ≡ δ k，经 m = embed (2^(k+1)) 的减半引理。
+δ-half : ∀ k → δ (suc k) + δ (suc k) ≡ δ k
+δ-half k =
+  let m = embed (2 ^ suc k)
+      nm = pos⇒nonZero m {{pos-pow k}}
+      e : 2ℚ * m ≡ embed (2 ^ suc (suc k))
+      e = 2*embed (2 ^ suc k)
+      n2m = subst NonZero (sym e)
+              (pos⇒nonZero (embed (2 ^ suc (suc k))) {{pos-pow (suc k)}})
+      nd = pos⇒nonZero (embed (2 ^ suc (suc k))) {{pos-pow (suc k)}}
+      t = Data.Rational.Base.1/_ (2ℚ * m) {{n2m}}
+      one/m = Data.Rational.Base.1/_ m {{nm}}
+      t≡δ : t ≡ δ (suc k)
+      t≡δ = reciprocal-cong (2ℚ * m) (embed (2 ^ suc (suc k)))
+              {{n2m}} {{nd}} e
+      h = halve m {{nm}} {{n2m}}
+      tt : t + t ≡ δ (suc k) + δ (suc k)
+      tt = cong₂ _+_ t≡δ t≡δ
+      step = trans (sym tt) h
+      rhs : one/m ≡ δ k
+      rhs = reciprocal-cong m (embed (2 ^ suc k)) {{nm}} {{nm}} refl
+  in trans step rhs
+
+-- -δ k < δ k, from δ k positive.
+--
+-- -δ k < δ k，由 δ k 为正推出。
+negδ<δ : ∀ k → neg (δ k) < δ k
+negδ<δ k =
+  let p : 0ℚ < δ k
+      p = δ-pos k
+      a : 0ℚ + neg (δ k) < δ k + neg (δ k)
+      a = +-mono-<-≤ p (≤-refl { neg (δ k)})
+      b : 0ℚ + neg (δ k) < 0ℚ
+      b = subst (λ z → 0ℚ + neg (δ k) < z) (+-inverseʳ (δ k)) a
+      n : neg (δ k) < 0ℚ
+      n = subst (λ z → z < 0ℚ) (+-identityˡ (neg (δ k))) b
+  in <-trans n p
+
+-- δ (suc k) ≤ δ k, from δ-half and positivity.
+--
+-- δ (suc k) ≤ δ k，由 δ-half 与正性推出。
+δs≤δ : ∀ k → δ (suc k) ≤ δ k
+δs≤δ k =
+  let d = δ (suc k)
+      d0 : d + 0ℚ ≤ d + d
+      d0 = +-mono-≤ (≤-refl {d}) (<⇒≤ (δ-pos (suc k)))
+      sum : d ≤ d + d
+      sum = subst (λ z → z ≤ d + d) (+-identityʳ d) d0
+  in ≤-trans sum (≤-reflexive (δ-half k))
+
+-- Double negation of the additive inverse is identity.
+--
+-- 加法逆元的双重取负为恒等。
+neg-invol : ∀ x → neg (neg x) ≡ x
+neg-invol (mkℚ -[1+ n ] d c) = refl
+neg-invol (mkℚ +[1+ n ] d c) = refl
+neg-invol (mkℚ +0 d c) =
+  let s : neg (mkℚ +0 d c) ≡ mkℚ +0 d c
+      s = refl
+  in trans (cong neg s) s
+
+-- Shift cancellation: (a + c) - (b + c) ≡ a - b.
+--
+-- 平移消去：(a + c) - (b + c) ≡ a - b。
+sub-cancel : (a b c : ℚ) → (a + c) - (b + c) ≡ a + neg b
+sub-cancel a b c =
+  let step1 : (a + c) + neg (b + c) ≡ (a + c) + (neg b + neg c)
+      step1 = cong (λ z → (a + c) + z) (neg-distrib-+ b c)
+      step2 : (a + c) + (neg b + neg c) ≡ a + (neg b + (c + neg c))
+      step2 = reorder
+      step3 : a + (neg b + (c + neg c)) ≡ a + (neg b + 0ℚ)
+      step3 = cong (λ z → a + z) (cong (λ z → neg b + z) (+-inverseʳ c))
+      step4 : a + (neg b + 0ℚ) ≡ a + neg b
+      step4 = cong (λ z → a + z) (+-identityʳ (neg b))
+  in trans step1 (trans step2 (trans step3 step4))
+  where
+  reorder : (a + c) + (neg b + neg c) ≡ a + (neg b + (c + neg c))
+  reorder =
+    trans (+-assoc a c (neg b + neg c))
+    (cong (λ z → a + z)
+      (trans (sym (+-assoc c (neg b) (neg c)))
+      (trans (cong (λ z → z + neg c) (+-comm c (neg b)))
+             (+-assoc (neg b) c (neg c)))))
+
+-- Double halving: (x + x) ÷ embed 2 ≡ x.
+--
+-- 双重减半：(x + x) ÷ embed 2 ≡ x。
+double-half : (x : ℚ) → (x + x) ÷ embed 2 ≡ x
+double-half x =
+  let n2 = pos⇒nonZero (embed 2) {{pos-pow 0}}
+      half = Data.Rational.Base.1/_ (embed 2) {{n2}}
+      2x : embed 2 * x ≡ x + x
+      2x =
+        trans (cong (λ z → z * x) 2ℚ≡1+1)
+        (trans (*-distribʳ-+ x 1ℚ 1ℚ)
+               (cong (λ z → z + z) (*-identityˡ x)))
+      inv : embed 2 * half ≡ 1ℚ
+      inv = *-inverseʳ (embed 2) {{n2}}
+      main : (embed 2 * x) * half ≡ x
+      main =
+        trans (*-assoc (embed 2) x half)
+        (trans (cong (λ z → embed 2 * z) (*-comm x half))
+        (trans (sym (*-assoc (embed 2) half x))
+        (trans (cong (λ z → z * x) inv)
+               (*-identityˡ x))))
+      lhs : (x + x) ÷ embed 2 ≡ (embed 2 * x) * half
+      lhs =
+        trans (cong (λ z → z * half) (sym 2x))
+              refl
+  in trans lhs main
+
+-- Canonical dyadic nested intervals around a rational centre q.
+--
+-- 有理中心 q 周围的典范二进嵌套区间。
+dyadic : (q : ℚ) (k : ℕ) → RealI
+dyadic q k .RealI.l = neg (δ k) + q
+dyadic q k .RealI.u = δ k + q
+dyadic q k .RealI.lo = +-mono-<-≤ (negδ<δ k) (≤-refl {q})
+dyadic q k .RealI.next = dyadic q (suc k)
+dyadic q k .RealI.nest =
+  let δₖ = δ k
+      dₖ = δ (suc k)
+      n1 : neg δₖ ≤ neg dₖ
+      n1 = neg-antimono-≤ (δs≤δ k)
+      nest1 : neg δₖ + q ≤ neg dₖ + q
+      nest1 = +-mono-≤ n1 (≤-refl {q})
+      nest2 : dₖ + q ≤ δₖ + q
+      nest2 = +-mono-≤ (δs≤δ k) (≤-refl {q})
+      lhs : (dₖ + q) - (neg dₖ + q) ≡ dₖ + dₖ
+      lhs =
+        trans (sub-cancel dₖ (neg dₖ) q)
+              (cong (λ z → dₖ + z) (neg-invol dₖ))
+      rhs : ((δₖ + q) - (neg δₖ + q)) ÷ embed 2 ≡ δₖ
+      rhs =
+        trans (cong (λ z → z ÷ embed 2) (sub-cancel δₖ (neg δₖ) q))
+        (trans (cong (λ z → (δₖ + z) ÷ embed 2) (neg-invol δₖ))
+               (double-half δₖ))
+      nest3 : (dₖ + q) - (neg dₖ + q) ≤
+                ((δₖ + q) - (neg δₖ + q)) ÷ embed 2
+      nest3 =
+        ≤-trans (≤-reflexive lhs)
+        (≤-trans (≤-reflexive (δ-half k))
+                 (≤-reflexive (sym rhs)))
+  in nest1 , nest2 , nest3
+
+-- Embed a rational as a coinductive interval real.
+--
+-- 把有理数嵌入为余归纳区间实数。
+embedℚ : ℚ → RealI
+embedℚ q = dyadic q 0

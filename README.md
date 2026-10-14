@@ -56,9 +56,9 @@ agda -i src src/Everything.agda
 
 ## Architecture / 架构
 
-**Base/** — Foundational structures: the indexed coinductive skeleton Mᵢ and the two-axis degeneracy lattice Equivalence/. It originated when the uniqueness proof of the colimit's universal property in SecondPass/ was blocked; tracing the cause revealed that all equivalence relations share this single skeleton.
+**Base/** — Foundational structures: the indexed coinductive skeleton Mᵢ and the two-axis degeneracy lattice Equivalence/, together with constructive Cauchy reals and interval arithmetic supplying a rational continuum Real/. Equivalence originated when the uniqueness proof of the colimit's universal property in SecondPass/ was blocked; tracing the cause revealed that all equivalence relations share this single skeleton. Real/ originated from the needs of physical instances.
 
-**Physics/** — Derived mathematical physics: a shared rational toolkit, the causal order and slice reading, and the combinatorial GR skeleton (finite causal sets, chain curvature, the Einstein action and its discrete variation, and the four-dimensional Benincasa–Dowker integer core), with the Newton, Quantum, and Spacetime layers (Lorentz quadratic form, Lorentz group, Clifford algebra Cl(3,1)). Every construction is exact and algebraic over ℚ or ℕ: curvature and the field equations emerge from the causal order with no ℝ and no analysis.
+**Physics/** — Derived mathematical physics: a shared rational toolkit, the causal order and slice reading, and the combinatorial GR skeleton (finite causal sets, chain curvature, the Einstein action and its discrete variation, and the four-dimensional Benincasa–Dowker integer core), with the Newton, Quantum, and Spacetime layers (Lorentz quadratic form, Lorentz group, Clifford algebra Cl(3,1)). Every construction is exact and algebraic over ℚ or ℕ: curvature and the field equations emerge from the causal order. The next step in formalisation calls for ℝ, which the standard library does not provide; existing mathematical libraries treat ℝ in a way that depends on the univalence axiom, conflicting with this project's ontological commitments. Hence Real/ is being built in-house.
 
 **Cosmos/** — The active main line. It turns decisively to the carried M architecture, replacing the (B , next) presentation by edge-family indexing and carrying container structure, the intrinsic category, the action of morphisms on shapes, coalgebraic unfolding, and dynamic self-reference as data.
 
@@ -68,9 +68,9 @@ agda -i src src/Everything.agda
 
 **Prototype/** — The initial, fully self-contained and hand-unfolded prototype. It traces the trajectory from a one-to-one mapping of philosophical concepts to their convergence into a single coinductive record, where the resulting "subst hell" motivated all subsequent refactoring. Frozen for archival purposes as the first Agda formalisation of the paper's philosophical ideas.
 
-**Base/** —— 基础结构：索引余归纳骨架 Mᵢ 与两轴退化格 Equivalence/。它起源于 SecondPass/ 中余极限泛性质唯一性证明受阻时的回溯：所有等价关系共享这一骨架。
+**Base/** —— 基础结构：索引余归纳骨架 Mᵢ 与两轴退化格 Equivalence/，以及构造性柯西实数与区间算术所提供的有理连续统 Real/。Equivalence 起源于 SecondPass/ 中余极限泛性质唯一性证明受阻时的回溯：发现所有等价关系共享这一骨架。Real/ 起源于物理实例的需求。
 
-**Physics/** —— 派生的数学物理：共享的有理工具集、因果序与切片读法，以及组合 GR 骨架（有限因果集、链曲率、爱因斯坦作用量及其离散变分、四维 Benincasa–Dowker 整数核），并含 Newton、Quantum 与 Spacetime 各层（洛伦兹二次型、洛伦兹群、克利福德代数 Cl(3,1)）。全部构造皆为 ℚ 或 ℕ 上精确、代数的：曲率与场方程从因果序涌现，无需 ℝ、无需分析。
+**Physics/** —— 派生的数学物理：共享的有理工具集、因果序与切片读法，以及组合 GR 骨架（有限因果集、链曲率、爱因斯坦作用量及其离散变分、四维 Benincasa–Dowker 整数核），并含 Newton、Quantum 与 Spacetime 各层（洛伦兹二次型、洛伦兹群、克利福德代数 Cl(3,1)）。全部构造皆为 ℚ 或 ℕ 上精确、代数的：曲率与场方程从因果序涌现。下一步形式化需要 ℝ，而标准库不提供；现有数学库对 ℝ 的处理又依赖单价性公理，与本项目的本体论承诺冲突，故自行构造 Real/。
 
 **Cosmos/** —— 当前活跃主线。彻底转向携带式 M 架构，以边族索引取代 (B , next) 表示，把容器结构、内禀范畴、态射对形状的变换、余代数展开与动态自我指涉全部携带为数据。
 

@@ -32,8 +32,22 @@ import ALMA.Base.Equivalence.GroupInvariant
 import ALMA.Base.Equivalence.LinearDynamics
 import ALMA.Base.Equivalence.TopologicalEq
 import ALMA.Base.Equivalence.ManifoldEq
+import ALMA.Base.Equivalence.QuantumLayer
 import ALMA.Base.Equivalence.Lattice
 import ALMA.Base.Equivalence.StrongEquiv
+
+import ALMA.Base.Real
+import ALMA.Base.Real.Sequence
+import ALMA.Base.Real.Neighborhood
+import ALMA.Base.Real.IntervalEquiv
+import ALMA.Base.Real.Interval
+import ALMA.Base.Real.Interval.Rational
+import ALMA.Base.Real.Interval.Order
+import ALMA.Base.Real.Interval.Bounded
+import ALMA.Base.Real.Interval.Arith
+import ALMA.Base.Real.Interval.Equiv
+import ALMA.Base.Real.Interval.Mul
+import ALMA.Base.Real.Interval.Abs
 
 import ALMA.Physics.RationalKit
 import ALMA.Physics.CausalOrder
@@ -43,9 +57,11 @@ import ALMA.Physics.CausalSetOrder
 import ALMA.Physics.CausalCurvature
 import ALMA.Physics.EinsteinAction
 import ALMA.Physics.FourDAction
+
 import ALMA.Physics.Spacetime.LorentzForm
 import ALMA.Physics.Spacetime.LorentzGroup
 import ALMA.Physics.Spacetime.Clifford
+
 import ALMA.Physics.Quantum.Gaussian
 import ALMA.Physics.Quantum.FiniteVec
 import ALMA.Physics.Quantum.Measurement
@@ -53,12 +69,16 @@ import ALMA.Physics.Quantum.Stochastic
 import ALMA.Physics.Quantum.Rotation
 import ALMA.Physics.Quantum.AmplitudeComp
 import ALMA.Physics.Quantum.UnitaryInstrument
+
 import ALMA.Physics.Newton.Poisson
 import ALMA.Physics.Newton.Quadratic
 import ALMA.Physics.Newton.QuadraticBilinear
 import ALMA.Physics.Newton.QuadraticSkew
 import ALMA.Physics.Newton.QuadraticJacobi
 import ALMA.Physics.Newton.DegreeBoundary
+
+import ALMA.Physics.LatticeCoherence
+import ALMA.Physics.Lattice
 
 import ALMA.Cosmos
 import ALMA.Cosmos.ContCategory

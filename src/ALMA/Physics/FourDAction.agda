@@ -21,8 +21,8 @@ open import Data.Bool using (Bool; true; false; if_then_else_)
 open import Data.Integer using (ℤ; _+_; _-_; _*_; +_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
-open import ALMA.Physics.CausalSet using (diamond; boolFilter; sumOver)
-open ALMA.Physics.CausalSet.Core using (events; interval-volume)
+open import ALMA.Physics.CausalSet using (diamond; boolFilter; sumOver; module Core)
+open Core using (events; interval-volume)
 
 ------------------------------------------------------------------------
 -- k-abundance
