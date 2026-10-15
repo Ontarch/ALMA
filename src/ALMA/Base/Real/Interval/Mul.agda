@@ -46,7 +46,7 @@ open import ALMA.Base.Real.IntervalEquiv using (bounded-diff; mono-half)
 open import ALMA.Base.Real.Interval.Rational using
   (pos-diff; sub-add; negsub; min; max; min≤ˡ; min≤ʳ; ≤maxˡ; ≤maxʳ; max≤; ≤min
   ; max-mono; max-le; max-ge; mag; mag-≤; r≤|r|; cong-plus)
-open import ALMA.Base.Real.Interval.Order using (embed2-nz)
+open import ALMA.Base.Real.Interval.Kit using (embed2-nz; add-self)
 
 ------------------------------------------------------------------------
 -- Basic lemmas
@@ -731,16 +731,9 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
                        (mono-half (proj₂ (proj₂ (RealI.nest y)))))
               (≤-reflexive (*-assoc wY h h))
 
-    two-mul : ∀ W → W + W ≡ 2ℚ * W
-    two-mul W =
-      trans (cong (λ z → z + W) (sym (*-identityˡ W)))
-      (trans (cong (λ z → 1ℚ * W + z) (sym (*-identityˡ W)))
-      (trans (sym (*-distribʳ-+ W 1ℚ 1ℚ))
-             (cong (λ z → z * W) (sym 2ℚ≡1+1))))
-
     double-h : ∀ W → (W + W) * (h * h) ≡ W * h
     double-h W =
-      trans (cong (λ z → z * (h * h)) (two-mul W))
+      trans (cong (λ z → z * (h * h)) (add-self W))
       (trans (*-assoc 2ℚ W (h * h))
       (trans (cong (λ z → 2ℚ * z) (sym (*-assoc W h h)))
       (trans (cong (λ z → 2ℚ * (z * h)) (*-comm W h))

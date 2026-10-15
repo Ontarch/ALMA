@@ -38,18 +38,7 @@ open import Relation.Binary.PropositionalEquality using
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 
-------------------------------------------------------------------------
--- Involution of negation
---
--- 取负对合
-
-neg-invol : ∀ x → neg (neg x) ≡ x
-neg-invol (mkℚ -[1+ n ] d c) = refl
-neg-invol (mkℚ +[1+ n ] d c) = refl
-neg-invol (mkℚ +0 d c) =
-  let s : neg (mkℚ +0 d c) ≡ mkℚ +0 d c
-      s = refl
-  in trans (cong neg s) s
+open import ALMA.Base.Real.Interval using (neg-invol)
 
 ------------------------------------------------------------------------
 -- Order reflection

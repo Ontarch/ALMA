@@ -25,7 +25,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_; cong; sym; subst
 open import ALMA.Base.Real using (embed)
 open import ALMA.Base.Real.Interval using (RealI; dyadic)
 open import ALMA.Base.Real.Interval.Rational using (sub-add; neg-sub)
-open import ALMA.Base.Real.Interval.Order using (embed2-nz)
+open import ALMA.Base.Real.Interval.Kit using (embed2-nz)
 
 ------------------------------------------------------------------------
 -- Division distributes over addition

@@ -45,6 +45,7 @@ open import ALMA.Base.Real.Interval using (RealI; pos-pow)
 open import ALMA.Base.Real.IntervalEquiv using
   (node; width; width-n; recipPow2; bound-w; embed-mono-<; n<2^n; suc∸1; 0<2^n; pos-2^t)
 open import ALMA.Base.Real.Interval.Rational using (¬<⇒≥; pos-diff)
+open import ALMA.Base.Real.Interval.Kit using (embed2-nz)
 
 ------------------------------------------------------------------------
 -- Bounds of the n-th node
@@ -56,10 +57,6 @@ l r n = RealI.l (node r n)
 
 u : RealI → ℕ → ℚ
 u r n = RealI.u (node r n)
-
-instance
-  embed2-nz : NonZero (embed 2)
-  embed2-nz = pos⇒nonZero (embed 2) {{pos-pow 0}}
 
 ------------------------------------------------------------------------
 -- Strict order
