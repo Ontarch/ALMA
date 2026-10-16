@@ -16,26 +16,25 @@
 
 module ALMA.Base.Real where
 
-open import Agda.Primitive using (Level; lsuc; lzero)
+open import Agda.Primitive using (lzero)
 open import Data.Integer using (+_) renaming (_*_ to _ℤ*_)
 open import Data.Integer.Properties using (+◃n≡+n)
-open import Data.Nat using (ℕ; _≥_; _≤_; z≤n; s≤s; _⊔_; suc) renaming (_*_ to _ℕ*_)
+open import Data.Nat using (ℕ; _≥_; _⊔_; suc) renaming (_*_ to _ℕ*_)
 open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; ≤-trans; *-suc)
 open import Data.Nat.Coprimality using (1-coprimeTo) renaming (sym to coprime-sym)
-open import Data.Product using (Σ; _,_; _,′_; _×_)
+open import Data.Product using (Σ; _,_; _×_)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; ∣_∣; _<_; _>_; _≤_; NonZero; Positive)
-open import Data.Rational.Base using (_/_; 1/_; mkℚ)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; ∣_∣; _<_; NonZero; Positive)
+open import Data.Rational.Base using (1/_; mkℚ)
 open import Data.Rational.Properties using
-  (∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; 0≤∣p∣; 0≤p⇒∣p∣≡p; +-inverseʳ; ≤-refl
-  ; ≤-reflexive; neg-distrib-+; +-comm; +-assoc; positive⁻¹; normalize-pos
-  ; normalize-coprime; /-cong; +-inverseˡ; +-identityˡ; +-identityʳ; ≤-<-trans
-  ; <-≤-trans; <-trans; +-monoˡ-≤; +-monoʳ-≤; +-mono-<; *-inverseˡ; *-inverseʳ
-  ; *-assoc; *-comm; *-identityˡ; *-identityʳ; *-distribʳ-+; pos⇒nonZero; mkℚ+-pos)
+  (0≤p⇒∣p∣≡p; +-inverseʳ; ≤-refl; ≤-reflexive; +-assoc; positive⁻¹; pos⇒nonZero 
+  ; normalize-coprime; /-cong; +-inverseˡ; +-identityʳ; ≤-<-trans; +-mono-<; *-inverseʳ
+  ; *-assoc; *-comm; *-identityˡ; *-identityʳ; *-distribʳ-+; mkℚ+-pos)
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Structures using (IsEquivalence)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; trans; subst; sym)
+  (_≡_; refl; cong; trans; subst; sym; module ≡-Reasoning)
+open ≡-Reasoning
 
 ------------------------------------------------------------------------
 -- Precision level
@@ -43,13 +42,13 @@ open import Relation.Binary.PropositionalEquality using
 -- ε k = 1 / (k + 1). The k-th Cauchy level demands approximation
 -- within 1/(k+1).
 --
--- 精度层
---
--- ε k = 1 / (k + 1)。第 k 层柯西条件要求逼近到 1/(k+1) 以内。
-
 -- Embedding ℕ → ℚ as the normalised fraction n/1, built directly
 -- with the raw constructor so the reciprocal 1/(suc n) reduces
 -- definitionally (no gcd decision term).
+--
+-- 精度层
+--
+-- ε k = 1 / (k + 1)。第 k 层柯西条件要求逼近到 1/(k+1) 以内。
 --
 -- 将 ℕ 嵌入 ℚ 为规范化分数 n/1，直接用底层构造器构造，
 -- 使倒数 1/(suc n) 可定义性归约（无 gcd 判定项）。
@@ -177,15 +176,17 @@ _≈_ x y = ∀ k → Σ ℕ (λ N → ∀ n → n ≥ N → _s≈_ (f x n) (f y
 -- 中间项 b 与 -b 相消。
 
 telescope : ∀ a b c → (a + (- b)) + (b + (- c)) ≡ a + (- c)
-telescope a b c =
-  trans
-    (sym (+-assoc (a + (- b)) b (- c)))
-    (cong (λ v → v + (- c))
-      (trans
-        (+-assoc a (- b) b)
-        (trans
-          (cong (λ v → a + v) (+-inverseˡ b))
-          (+-identityʳ a))))
+telescope a b c = begin
+  (a + (- b)) + (b + (- c))
+    ≡⟨ sym (+-assoc (a + (- b)) b (- c)) ⟩
+  ((a + (- b)) + b) + (- c)
+    ≡⟨ cong (λ v → v + (- c)) (+-assoc a (- b) b) ⟩
+  (a + ((- b) + b)) + (- c)
+    ≡⟨ cong (λ v → v + (- c)) (cong (λ v → a + v) (+-inverseˡ b)) ⟩
+  (a + 0ℚ) + (- c)
+    ≡⟨ cong (λ v → v + (- c)) (+-identityʳ a) ⟩
+  a + (- c)
+  ∎
 
 ------------------------------------------------------------------------
 -- Halving lemma
@@ -204,31 +205,56 @@ halve m =
   let t : ℚ
       t = 1/ (2ℚ * m)
       tt≡2t : t + t ≡ 2ℚ * t
-      tt≡2t =
-        trans (cong (λ v → v + t) (sym (*-identityˡ t)))
-        (trans (cong (λ v → (1ℚ * t) + v) (sym (*-identityˡ t)))
-        (trans (sym (*-distribʳ-+ t 1ℚ 1ℚ))
-               (cong (λ v → v * t) (sym 2ℚ≡1+1))))
+      tt≡2t = begin
+        t + t
+          ≡⟨ cong (λ v → v + t) (sym (*-identityˡ t)) ⟩
+        1ℚ * t + t
+          ≡⟨ cong (λ v → (1ℚ * t) + v) (sym (*-identityˡ t)) ⟩
+        1ℚ * t + 1ℚ * t
+          ≡⟨ sym (*-distribʳ-+ t 1ℚ 1ℚ) ⟩
+        (1ℚ + 1ℚ) * t
+          ≡⟨ cong (λ v → v * t) (sym 2ℚ≡1+1) ⟩
+        2ℚ * t
+        ∎
       2tm : (2ℚ * t) * m ≡ 1ℚ
-      2tm =
-        trans (*-assoc 2ℚ t m)
-        (trans (cong (2ℚ *_) (*-comm t m))
-        (trans (sym (*-assoc 2ℚ m t))
-               (*-inverseʳ (2ℚ * m))))
+      2tm = begin
+        (2ℚ * t) * m
+          ≡⟨ *-assoc 2ℚ t m ⟩
+        2ℚ * (t * m)
+          ≡⟨ cong (2ℚ *_) (*-comm t m) ⟩
+        2ℚ * (m * t)
+          ≡⟨ sym (*-assoc 2ℚ m t) ⟩
+        (2ℚ * m) * t
+          ≡⟨ *-inverseʳ (2ℚ * m) ⟩
+        1ℚ
+        ∎
       2t≡1/m : 2ℚ * t ≡ 1/ m
-      2t≡1/m =
-        trans (sym (*-identityʳ (2ℚ * t)))
-        (trans (cong (λ v → (2ℚ * t) * v) (sym (*-inverseʳ m)))
-        (trans (sym (*-assoc (2ℚ * t) m (1/ m)))
-        (trans (cong (λ v → v * (1/ m)) 2tm)
-               (*-identityˡ (1/ m)))))
-  in trans tt≡2t 2t≡1/m
+      2t≡1/m = begin
+        2ℚ * t
+          ≡⟨ sym (*-identityʳ (2ℚ * t)) ⟩
+        (2ℚ * t) * 1ℚ
+          ≡⟨ cong (λ v → (2ℚ * t) * v) (sym (*-inverseʳ m)) ⟩
+        (2ℚ * t) * (m * (1/ m))
+          ≡⟨ sym (*-assoc (2ℚ * t) m (1/ m)) ⟩
+        ((2ℚ * t) * m) * (1/ m)
+          ≡⟨ cong (λ v → v * (1/ m)) 2tm ⟩
+        1ℚ * (1/ m)
+          ≡⟨ *-identityˡ (1/ m) ⟩
+        1/ m
+        ∎
+  in begin
+    t + t
+      ≡⟨ tt≡2t ⟩
+    2ℚ * t
+      ≡⟨ 2t≡1/m ⟩
+    1/ m
+    ∎
 
 -- Reciprocal respects propositional equality.
 --
 -- 倒数保持命题相等。
 reciprocal-cong : ∀ a b → .{{na : NonZero a}} → .{{nb : NonZero b}} →
-                  a ≡ b → Data.Rational.Base.1/_ a ≡ Data.Rational.Base.1/_ b
+                  a ≡ b → 1/_ a ≡ 1/_ b
 reciprocal-cong a .a {{na}} {{na₁}} refl = refl
 
 ------------------------------------------------------------------------
@@ -254,20 +280,39 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
   let m = embed (suc k)
       b = embed (suc (suc (2 ℕ* k)))
       e2m : 2ℚ * m ≡ b
-      e2m = trans (2*embed (suc k)) (cong embed (sym (den-2 k)))
+      e2m = begin
+        2ℚ * m
+          ≡⟨ 2*embed (suc k) ⟩
+        embed (2 ℕ* suc k)
+          ≡⟨ cong embed (sym (den-2 k)) ⟩
+        b
+        ∎
       instance
         n2m : NonZero (2ℚ * m)
         n2m = subst NonZero (sym e2m) (pos⇒nonZero b)
       t : ℚ
       t = 1/ (2ℚ * m)
       l1 : t ≡ ε (suc (2 ℕ* k))
-      l1 = trans (reciprocal-cong (2ℚ * m) b e2m)
-                  (sym (1/embed (suc (2 ℕ* k))))
+      l1 = begin
+        t
+          ≡⟨ reciprocal-cong (2ℚ * m) b e2m ⟩
+        1/ b
+          ≡⟨ sym (1/embed (suc (2 ℕ* k))) ⟩
+        ε (suc (2 ℕ* k))
+        ∎
       l2 : 1/ m ≡ ε k
       l2 = 1/embed k
       h : t + t ≡ 1/ m
       h = halve m
-  in trans (cong (λ r → r + r) (sym l1)) (subst (λ r → t + t ≡ r) l2 h)
+  in begin
+    ε (suc (2 ℕ* k)) + ε (suc (2 ℕ* k))
+      ≡⟨ cong (λ r → r + r) (sym l1) ⟩
+    t + t
+      ≡⟨ subst (λ r → t + t ≡ r) l2 h ⟩
+    1/ m
+      ≡⟨ l2 ⟩
+    ε k
+    ∎
 
 ------------------------------------------------------------------------
 -- Reflexivity
@@ -282,10 +327,7 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
 
 ≈-refl : ∀ {x} → x ≈ x
 ≈-refl {x} k = μ x k , λ n n≥N →
-  -- f x n + (- f x n) = 0 by +-inverseʳ, and 0 < ε k.
-  -- By ≤-<-trans: (f x n + (- f x n)) ≤ 0 < ε k.
-  let open Data.Rational.Properties using (+-inverseʳ)
-      eq : f x n + (- f x n) ≡ 0ℚ
+  let eq : f x n + (- f x n) ≡ 0ℚ
       eq = +-inverseʳ (f x n)
       d1 : (f x n + (- f x n)) < ε k
       d1 = ≤-<-trans (≤-reflexive eq) (0<ε k)
@@ -311,24 +353,31 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
     in (d2 , d1)
 
 ------------------------------------------------------------------------
+-- One-direction triangle step
+--
+-- 单向三角步
+
+trans-one-dir : ∀ (a b c : ℚ) {k : ℕ}
+  → (a + (- b)) < ε (suc (2 ℕ* k))
+  → (b + (- c)) < ε (suc (2 ℕ* k))
+  → (a + (- c)) < ε k
+trans-one-dir a b c {k} d1 d2 =
+  let half  = 2 ℕ* k
+      c'    = ε (suc half)
+      cc    : c' + c' ≡ ε k
+      cc    = ε-half k
+      bound : (a + (- b)) + (b + (- c)) < c' + c'
+      bound = +-mono-< d1 d2
+      bound' : (a + (- b)) + (b + (- c)) < ε k
+      bound' = subst (λ r → (a + (- b)) + (b + (- c)) < r) cc bound
+      sum   : (a + (- b)) + (b + (- c)) ≡ a + (- c)
+      sum   = telescope a b c
+  in subst (λ r → r < ε k) sum bound'
+
+------------------------------------------------------------------------
 -- Transitivity
 --
--- For level k, apply x≈y and y≈z at the finer level suc(2*k).
--- By the triangle inequality on signed differences:
---   (f x n - f z n) = (f x n - f y n) + (f y n - f z n)
---   < ε(suc(2*k)) + ε(suc(2*k))
---   = 2 / (2*k + 2)
---   = 1 / (k + 1)
---   = ε k.
--- And the symmetric direction similarly.
---
 -- 传递性
---
--- 对精度 k，在更细的 suc(2*k) 层应用 x≈y 与 y≈z。由有符号差分的
--- 三角不等式：
---   (f x n - f z n) = (f x n - f y n) + (f y n - f z n)
---   < 2/(2k+2) = 1/(k+1) = ε k。
--- 对称方向同理。
 
 ≈-trans : ∀ {x y z} → x ≈ y → y ≈ z → x ≈ z
 ≈-trans {x} {y} {z} x≈y y≈z k =
@@ -337,33 +386,12 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
       N2 , w2 = y≈z (suc half)
       N = N1 ⊔ N2
   in N , λ n n≥N →
-    let n≥N1 : n ≥ N1
-        n≥N1 = ≤-trans (m≤m⊔n N1 N2) n≥N
-        n≥N2 : n ≥ N2
+    let n≥N1 = ≤-trans (m≤m⊔n N1 N2) n≥N
         n≥N2 = ≤-trans (m≤n⊔m N1 N2) n≥N
         (d11 , d12) = w1 n n≥N1
         (d21 , d22) = w2 n n≥N2
-        c = ε (suc half)
-        m = embed (suc k)
-        fwd-bound : (f x n + (- f y n)) + (f y n + (- f z n)) < c + c
-        fwd-bound = +-mono-< d11 d21
-        fwd-sum : (f x n + (- f y n)) + (f y n + (- f z n)) ≡ f x n + (- f z n)
-        fwd-sum = telescope (f x n) (f y n) (f z n)
-        cc : c + c ≡ ε k
-        cc = ε-half k
-        fwd<εk : (f x n + (- f y n)) + (f y n + (- f z n)) < ε k
-        fwd<εk = subst (λ r → (f x n + (- f y n)) + (f y n + (- f z n)) < r) cc fwd-bound
-        forward : (f x n + (- f z n)) < ε k
-        forward = subst (λ r → r < ε k) fwd-sum fwd<εk
-        bwd-bound : (f z n + (- f y n)) + (f y n + (- f x n)) < c + c
-        bwd-bound = +-mono-< d22 d12
-        bwd-sum : (f z n + (- f y n)) + (f y n + (- f x n)) ≡ f z n + (- f x n)
-        bwd-sum = telescope (f z n) (f y n) (f x n)
-        bwd<εk : (f z n + (- f y n)) + (f y n + (- f x n)) < ε k
-        bwd<εk = subst (λ r → (f z n + (- f y n)) + (f y n + (- f x n)) < r) cc bwd-bound
-        backward : (f z n + (- f x n)) < ε k
-        backward = subst (λ r → r < ε k) bwd-sum bwd<εk
-    in (forward , backward)
+    in trans-one-dir (f x n) (f y n) (f z n) d11 d21
+     , trans-one-dir (f z n) (f y n) (f x n) d22 d12
 
 ------------------------------------------------------------------------
 -- Setoid instance
@@ -391,12 +419,14 @@ const : ℚ → CauchySeq
 const q = record
   { f      = λ n → q
   ; μ      = λ k → 0
-  ; cauchy = λ k n m n≥μ m≥μ →
-      -- |q - q| = 0 and 0 < ε k, hence |q - q| < ε k.
-      --
-      -- |q - q| = 0 且 0 < ε k，故 |q - q| < ε k。
+  ; cauchy = λ k _ _ _ _ →
       let eq0 : ∣ q - q ∣ ≡ 0ℚ
-          eq0 = trans (cong ∣_∣ (+-inverseʳ q))
-                      (0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ}))
+          eq0 = begin
+            ∣ q - q ∣
+              ≡⟨ cong ∣_∣ (+-inverseʳ q) ⟩
+            ∣ 0ℚ ∣
+              ≡⟨ 0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ}) ⟩
+            0ℚ
+            ∎
       in subst (λ z → z < ε k) (sym eq0) (0<ε k)
   }

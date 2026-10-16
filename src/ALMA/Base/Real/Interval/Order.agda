@@ -20,23 +20,24 @@
 
 module ALMA.Base.Real.Interval.Order where
 
-open import Data.Nat using (ℕ; zero; suc; _⊔_; _∸_; _^_)
+open import Data.Nat using (ℕ; zero; suc; _∸_; _^_)
   renaming (_≤_ to _≤ℕ_; _<_ to _<ℕ_; _+_ to _+ℕ_)
-open import Data.Nat.Properties using (m≤m⊔n; m∸n+n≡m; +-suc; ⊔-comm; m≤m+n)
+open import Data.Nat.Properties using (m∸n+n≡m; +-suc; m≤m+n)
   renaming (+-comm to +-commℕ; +-identityʳ to +-identityʳℕ)
 open import Data.Rational using
-  (ℚ; 0ℚ; _+_; _-_; _*_; _<_ ; _≤_; NonZero; Positive; NonNegative)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_ ; _≤_; NonZero; Positive; NonNegative)
 open import Data.Rational.Base using (1/_; positive)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Rational.Properties using
-  (+-mono-≤; neg-antimono-≤; +-assoc; *-assoc; *-comm; *-inverseˡ; *-inverseʳ
+  (+-mono-≤; neg-antimono-≤; +-assoc; *-assoc; *-comm; *-inverseʳ; *-inverseˡ
   ; *-identityˡ; *-identityʳ; *-zeroˡ; *-monoʳ-≤-nonNeg; *-monoˡ-<-pos; ≤-reflexive
   ; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; pos⇒nonZero; pos⇒nonNeg; 1/pos⇒pos; <-cmp)
   renaming (<-trans to <-transℚ ; <-irrefl to <-irreflℚ)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; trans; subst)
+  (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
+open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (Tri; tri<; tri≈; tri>)
 
@@ -45,7 +46,6 @@ open import ALMA.Base.Real.Interval using (RealI; pos-pow)
 open import ALMA.Base.Real.IntervalEquiv using
   (node; width; width-n; recipPow2; bound-w; embed-mono-<; n<2^n; suc∸1; 0<2^n; pos-2^t)
 open import ALMA.Base.Real.Interval.Rational using (¬<⇒≥; pos-diff)
-open import ALMA.Base.Real.Interval.Kit using (embed2-nz)
 
 ------------------------------------------------------------------------
 -- Bounds of the n-th node
@@ -111,13 +111,25 @@ u-down r n (suc d) =
 l-mono' : (r : RealI) {n m : ℕ} → n ≤ℕ m → l r n ≤ l r m
 l-mono' r {n} {m} n≤m =
   subst (λ k → l r n ≤ l r k)
-        (trans (+-commℕ n (m ∸ n)) (m∸n+n≡m n≤m))
+        (begin
+           n +ℕ (m ∸ n)
+             ≡⟨ +-commℕ n (m ∸ n) ⟩
+           (m ∸ n) +ℕ n
+             ≡⟨ m∸n+n≡m n≤m ⟩
+           m
+             ∎)
         (l-up r n (m ∸ n))
 
 u-mono' : (r : RealI) {n m : ℕ} → n ≤ℕ m → u r m ≤ u r n
 u-mono' r {n} {m} n≤m =
   subst (λ k → u r k ≤ u r n)
-        (trans (+-commℕ n (m ∸ n)) (m∸n+n≡m n≤m))
+        (begin
+           n +ℕ (m ∸ n)
+             ≡⟨ +-commℕ n (m ∸ n) ⟩
+           (m ∸ n) +ℕ n
+             ≡⟨ m∸n+n≡m n≤m ⟩
+           m
+             ∎)
         (u-down r n (m ∸ n))
 
 ------------------------------------------------------------------------
@@ -131,9 +143,9 @@ u-mono' r {n} {m} n≤m =
 
 <-trans : ∀ {x y z} → x <ℝ y → y <ℝ z → x <ℝ z
 <-trans {x} {y} {z} (n , uxn<lyn) (m , uym<lzm) =
-  let k   = n ⊔ m
-      n≤k = m≤m⊔n n m
-      m≤k = subst (λ j → m ≤ℕ j) (⊔-comm m n) (m≤m⊔n m n)
+  let k   = n +ℕ m
+      n≤k = m≤m+n n m
+      m≤k = subst (λ j → m ≤ℕ j) (+-commℕ m n) (m≤m+n m n)
 
       uxk≤uxn : u x k ≤ u x n
       uxk≤uxn = u-mono' x n≤k
@@ -173,7 +185,7 @@ u-mono' r {n} {m} n≤m =
 --
 -- 由 x < z 可判定 x < y 或 y < z。设 d = l z n − u x n > 0 为分离
 -- 层级的间隙。经 bound-w 选取 N 使 y 在 N 处的宽度低于 d；于是在
--- 层级 m = n + N 两择一穷尽：若二者皆不成立，则 y 在 m 处的宽度将
+-- 层级 m = n + N 两括一穷尽：若二者皆不成立，则 y 在 m 处的宽度将
 -- 不低于 d，与 width-ym < d 矛盾。
 
 <-cotrans : ∀ {x y z} → x <ℝ z → (x <ℝ y) ⊎ (y <ℝ z)
@@ -243,10 +255,15 @@ u-mono' r {n} {m} n≤m =
     inv2N-pos = 1/pos⇒pos (embed (2 ^ N)) {{eN-pos}}
 
     w0≡q·d : w0 ≡ q * d
-    w0≡q·d = sym (
-      trans (*-assoc w0 invd d)
-      (trans (cong (λ z → w0 * z) (*-inverseˡ d {{d-nz}}))
-             (*-identityʳ w0)))
+    w0≡q·d = sym (begin
+      q * d
+        ≡⟨ *-assoc w0 invd d ⟩
+      w0 * (invd * d)
+        ≡⟨ cong (w0 *_) (*-inverseˡ d {{d-nz}}) ⟩
+      w0 * 1ℚ
+        ≡⟨ *-identityʳ w0 ⟩
+      w0
+        ∎)
 
     w0<e2N·d : w0 < embed (2 ^ N) * d
     w0<e2N·d =
@@ -255,12 +272,19 @@ u-mono' r {n} {m} n≤m =
         (*-monoˡ-<-pos d ⦃ d-pos ⦄ q<embed2N)
 
     cancel : (embed (2 ^ N) * d) * inv2N ≡ d
-    cancel =
-      trans (*-assoc (embed (2 ^ N)) d inv2N)
-      (trans (cong (λ z → embed (2 ^ N) * z) (*-comm d inv2N))
-      (trans (sym (*-assoc (embed (2 ^ N)) inv2N d))
-      (trans (cong (λ z → z * d) (*-inverseʳ (embed (2 ^ N)) {{eN-nz}}))
-             (*-identityˡ d))))
+    cancel = begin
+      (embed (2 ^ N) * d) * inv2N
+        ≡⟨ *-assoc (embed (2 ^ N)) d inv2N ⟩
+      embed (2 ^ N) * (d * inv2N)
+        ≡⟨ cong (embed (2 ^ N) *_) (*-comm d inv2N) ⟩
+      embed (2 ^ N) * (inv2N * d)
+        ≡⟨ sym (*-assoc (embed (2 ^ N)) inv2N d) ⟩
+      (embed (2 ^ N) * inv2N) * d
+        ≡⟨ cong (_* d) (*-inverseʳ (embed (2 ^ N)) {{eN-nz}}) ⟩
+      1ℚ * d
+        ≡⟨ *-identityˡ d ⟩
+      d
+        ∎
 
     w0·inv2N<d : w0 * inv2N < d
     w0·inv2N<d =

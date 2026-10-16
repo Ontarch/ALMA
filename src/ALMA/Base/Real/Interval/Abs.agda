@@ -25,7 +25,8 @@ open import Data.Rational.Properties using
   (neg-antimono-≤; neg-antimono-<; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-total
   ; <-cmp; +-mono-≤; +-comm; +-identityʳ; +-inverseʳ; <-≤-trans; ≤-antisym)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; cong; sym; trans; subst)
+  (_≡_; cong; sym; trans; subst; module ≡-Reasoning)
+open ≡-Reasoning
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 
 open import ALMA.Base.Real using (embed)
@@ -58,20 +59,32 @@ absHi l u = max u (neg l)
 
 lo-pos : ∀ {l u : ℚ} → 0ℚ ≤ l → 0ℚ ≤ u → absLo l u ≡ l
 lo-pos {l} {u} 0≤l 0≤u =
-  trans (max-ge {a = max l (neg u)} {b = 0ℚ}
-                (≤-trans 0≤l (≤maxˡ l (neg u))))
-        (max-ge {a = l} {b = neg u}
-                (≤-trans (neg-antimono-≤ 0≤u) 0≤l))
+  begin
+    absLo l u
+  ≡⟨ max-ge {a = max l (neg u)} {b = 0ℚ}
+            (≤-trans 0≤l (≤maxˡ l (neg u))) ⟩
+    max l (neg u)
+  ≡⟨ max-ge {a = l} {b = neg u}
+            (≤-trans (neg-antimono-≤ 0≤u) 0≤l) ⟩
+    l
+  ∎
 
 hi-pos : ∀ {l u : ℚ} → 0ℚ ≤ l → 0ℚ ≤ u → absHi l u ≡ u
-hi-pos {l} {u} 0≤l 0≤u =
-  max-ge {a = u} {b = neg l} (≤-trans (neg-antimono-≤ 0≤l) 0≤u)
+hi-pos {l} {u} 0≤l 0≤u = begin
+    absHi l u
+  ≡⟨ max-ge {a = u} {b = neg l} (≤-trans (neg-antimono-≤ 0≤l) 0≤u) ⟩
+    u
+  ∎
 
 lo-neg : ∀ {l u : ℚ} → l ≤ u → u ≤ 0ℚ → absLo l u ≡ neg u
-lo-neg {l} {u} l≤u u≤0 =
-  trans (max-ge {a = max l (neg u)} {b = 0ℚ}
-                (≤-trans 0≤-u (≤maxʳ l (neg u))))
-        (max-le {a = l} {b = neg u} l≤-u)
+lo-neg {l} {u} l≤u u≤0 = begin
+    absLo l u
+  ≡⟨ max-ge {a = max l (neg u)} {b = 0ℚ}
+            (≤-trans 0≤-u (≤maxʳ l (neg u))) ⟩
+    max l (neg u)
+  ≡⟨ max-le {a = l} {b = neg u} l≤-u ⟩
+    neg u
+  ∎
   where
     0≤-u : 0ℚ ≤ neg u
     0≤-u = neg-antimono-≤ u≤0
@@ -83,8 +96,11 @@ lo-neg {l} {u} l≤u u≤0 =
     l≤-u = ≤-trans l≤0 0≤-u
 
 hi-neg : ∀ {l u : ℚ} → l ≤ u → u ≤ 0ℚ → absHi l u ≡ neg l
-hi-neg {l} {u} l≤u u≤0 =
-  max-le {a = u} {b = neg l} (≤-trans u≤0 0≤-l)
+hi-neg {l} {u} l≤u u≤0 = begin
+    absHi l u
+  ≡⟨ max-le {a = u} {b = neg l} (≤-trans u≤0 0≤-l) ⟩
+    neg l
+  ∎
   where
     l≤0 : l ≤ 0ℚ
     l≤0 = ≤-trans l≤u u≤0
@@ -93,9 +109,12 @@ hi-neg {l} {u} l≤u u≤0 =
     0≤-l = neg-antimono-≤ l≤0
 
 lo-mid : ∀ {l u : ℚ} → l ≤ 0ℚ → 0ℚ ≤ u → absLo l u ≡ 0ℚ
-lo-mid {l} {u} l≤0 0≤u =
-  max-le {a = max l (neg u)} {b = 0ℚ}
-         (max≤ {a = l} {b = neg u} {c = 0ℚ} l≤0 (neg-antimono-≤ 0≤u))
+lo-mid {l} {u} l≤0 0≤u = begin
+    absLo l u
+  ≡⟨ max-le {a = max l (neg u)} {b = 0ℚ}
+             (max≤ {a = l} {b = neg u} {c = 0ℚ} l≤0 (neg-antimono-≤ 0≤u)) ⟩
+    0ℚ
+  ∎
 
 ------------------------------------------------------------------------
 -- The two width inequalities
@@ -114,13 +133,24 @@ lo-mid {l} {u} l≤0 0≤u =
 abs-width≤ : ∀ {l u : ℚ} → l ≤ u → absHi l u - absLo l u ≤ u - l
 abs-width≤ {l} {u} l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
 ... | inj₂ 0≤l | _ =
-      ≤-reflexive (cong-minus (hi-pos 0≤l 0≤u) (lo-pos 0≤l 0≤u))
+      ≤-reflexive
+        (begin
+           absHi l u - absLo l u
+         ≡⟨ cong-minus (hi-pos 0≤l 0≤u) (lo-pos 0≤l 0≤u) ⟩
+           u - l
+         ∎)
   where
     0≤u : 0ℚ ≤ u
     0≤u = ≤-trans 0≤l l≤u
 ... | inj₁ l≤0 | inj₁ u≤0 =
-      ≤-reflexive (trans (cong-minus (hi-neg l≤u u≤0) (lo-neg l≤u u≤0))
-                         (neg-sub l u))
+      ≤-reflexive
+        (begin
+           absHi l u - absLo l u
+         ≡⟨ cong-minus (hi-neg l≤u u≤0) (lo-neg l≤u u≤0) ⟩
+           neg l - neg u
+         ≡⟨ neg-sub l u ⟩
+           u - l
+         ∎)
 ... | inj₁ l≤0 | inj₂ 0≤u =
       ≤-trans (≤-reflexive step)
               (max≤ {a = u} {b = neg l} {c = u - l} h1 h2)
@@ -138,7 +168,13 @@ abs-width≤ {l} {u} l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
                       (+-mono-≤ (≤-refl {neg l}) 0≤u))
 
     step : absHi l u - absLo l u ≡ max u (neg l)
-    step = trans (cong (λ z → absHi l u - z) (lo-mid l≤0 0≤u)) (+-identityʳ (max u (neg l)))
+    step = begin
+        absHi l u - absLo l u
+      ≡⟨ cong (λ z → absHi l u - z) (lo-mid l≤0 0≤u) ⟩
+        absHi l u - 0ℚ
+      ≡⟨ +-identityʳ (max u (neg l)) ⟩
+        max u (neg l)
+      ∎
 
 abs-width≥ : ∀ {l u : ℚ} → l ≤ u →
   u - l ≤ (absHi l u - absLo l u) + (absHi l u - absLo l u)
@@ -152,7 +188,11 @@ abs-width≥ {l} {u} l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
     0≤u = ≤-trans 0≤l l≤u
 
     A≡ : absHi l u - absLo l u ≡ u - l
-    A≡ = cong-minus (hi-pos 0≤l 0≤u) (lo-pos 0≤l 0≤u)
+    A≡ = begin
+        absHi l u - absLo l u
+      ≡⟨ cong-minus (hi-pos 0≤l 0≤u) (lo-pos 0≤l 0≤u) ⟩
+        u - l
+      ∎
 
     0≤w : 0ℚ ≤ u - l
     0≤w = subst (λ z → z ≤ u + neg l) (+-inverseʳ l)
@@ -163,7 +203,13 @@ abs-width≥ {l} {u} l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
                    (+-mono-≤ (≤-refl {u - l}) 0≤w))
   where
     A≡ : absHi l u - absLo l u ≡ u - l
-    A≡ = trans (cong-minus (hi-neg l≤u u≤0) (lo-neg l≤u u≤0)) (neg-sub l u)
+    A≡ = begin
+        absHi l u - absLo l u
+      ≡⟨ cong-minus (hi-neg l≤u u≤0) (lo-neg l≤u u≤0) ⟩
+        neg l - neg u
+      ≡⟨ neg-sub l u ⟩
+        u - l
+      ∎
 
     0≤w : 0ℚ ≤ u - l
     0≤w = subst (λ z → z ≤ u + neg l) (+-inverseʳ l)
@@ -173,7 +219,13 @@ abs-width≥ {l} {u} l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
             (+-mono-≤ (≤maxˡ u (neg l)) (≤maxʳ u (neg l)))
   where
     A≡ : absHi l u - absLo l u ≡ max u (neg l)
-    A≡ = trans (cong (λ z → absHi l u - z) (lo-mid l≤0 0≤u)) (+-identityʳ (max u (neg l)))
+    A≡ = begin
+        absHi l u - absLo l u
+      ≡⟨ cong (λ z → absHi l u - z) (lo-mid l≤0 0≤u) ⟩
+        absHi l u - 0ℚ
+      ≡⟨ +-identityʳ (max u (neg l)) ⟩
+        max u (neg l)
+      ∎
 
 ------------------------------------------------------------------------
 -- Strictness: l < u ⟹ absLo l u < absHi l u

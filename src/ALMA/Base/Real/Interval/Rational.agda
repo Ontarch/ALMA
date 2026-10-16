@@ -17,24 +17,23 @@
 module ALMA.Base.Real.Interval.Rational where
 
 open import Data.Empty using (⊥-elim)
-open import Data.Integer using
-  (-[1+_]; +[1+_]; +0; +_; +<+) renaming (_*_ to _*ℤ_; _<_ to _<ℤ_)
+open import Data.Integer using (+_; +<+) renaming (_*_ to _*ℤ_; _<_ to _<ℤ_)
 import Data.Integer.Properties as ℤP
-open import Data.Nat using (ℕ; zero; suc; z≤n; s≤s; _^_; _∸_)
-open import Data.Nat using () renaming
-  (_+_ to _+ℕ_; _*_ to _*ℕ_; _≤_ to _≤ℕ_; _<_ to _<ℕ_)
+open import Data.Nat using
+  (ℕ; zero; suc; z≤n; s≤s; _^_; _∸_) renaming (_+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<ℕ_)
 import Data.Nat.Properties as ℕP
-open import Data.Rational using (ℚ; 0ℚ; _+_; _-_; _<_; _≤_; ∣_∣; fromℚᵘ; toℚᵘ)
-open import Data.Rational.Base using (mkℚ) renaming (-_ to neg)
+open import Data.Rational using
+  (ℚ; 0ℚ; _+_; _-_; _<_; _≤_; ∣_∣; fromℚᵘ; toℚᵘ) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (+-assoc; +-comm; +-inverseʳ; neg-distrib-+; +-mono-<-≤; ≤-refl; ≤-reflexive
-  ; <⇒≤; <-cmp; ≤-trans; ≤-antisym; neg-antimono-≤; 0≤∣p∣; ∣-p∣≡∣p∣
-  ; ∣p∣≡p∨∣p∣≡-p; 0≤p⇒∣p∣≡p; toℚᵘ-cancel-<; toℚᵘ-fromℚᵘ)
+  ; <⇒≤; <-cmp; ≤-trans; ≤-antisym; neg-antimono-≤; 0≤∣p∣
+  ; ∣-p∣≡∣p∣; ∣p∣≡p∨∣p∣≡-p; 0≤p⇒∣p∣≡p; toℚᵘ-cancel-<; toℚᵘ-fromℚᵘ)
 open import Data.Rational.Unnormalised.Base as ℚᵘ using (ℚᵘ; mkℚᵘ; *≡*; *<*)
 open import Data.Rational.Unnormalised.Properties as ℚᵘP using (<-respʳ-≃; <-respˡ-≃)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
+open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 
@@ -84,67 +83,74 @@ pos-diff a b a<b =
 
 rearrange : ∀ a b c d
   → (a + b) + (neg c + neg d) ≡ (a + neg c) + (b + neg d)
-rearrange a b c d =
-  begin
-    (a + b) + (neg c + neg d)
-  ≡⟨ sym (+-assoc (a + b) (neg c) (neg d)) ⟩
-    ((a + b) + neg c) + neg d
-  ≡⟨ cong (λ z → z + neg d) (+-assoc a b (neg c)) ⟩
-    (a + (b + neg c)) + neg d
-  ≡⟨ cong (λ z → (a + z) + neg d) (+-comm b (neg c)) ⟩
-    (a + (neg c + b)) + neg d
-  ≡⟨ cong (λ z → z + neg d) (sym (+-assoc a (neg c) b)) ⟩
-    ((a + neg c) + b) + neg d
-  ≡⟨ +-assoc (a + neg c) b (neg d) ⟩
-    (a + neg c) + (b + neg d)
+rearrange a b c d = begin
+  (a + b) + (neg c + neg d)
+    ≡⟨ sym (+-assoc (a + b) (neg c) (neg d)) ⟩
+  ((a + b) + neg c) + neg d
+    ≡⟨ cong (λ z → z + neg d) (+-assoc a b (neg c)) ⟩
+  (a + (b + neg c)) + neg d
+    ≡⟨ cong (λ z → (a + z) + neg d) (+-comm b (neg c)) ⟩
+  (a + (neg c + b)) + neg d
+    ≡⟨ cong (λ z → z + neg d) (sym (+-assoc a (neg c) b)) ⟩
+  ((a + neg c) + b) + neg d
+    ≡⟨ +-assoc (a + neg c) b (neg d) ⟩
+  (a + neg c) + (b + neg d)
   ∎
-  where open ≡-Reasoning
 
 sub-add : (a b c d : ℚ) → (a + b) - (c + d) ≡ (a - c) + (b - d)
-sub-add a b c d =
-  trans
-    (cong (λ z → (a + b) + z) (neg-distrib-+ c d))
-    (rearrange a b c d)
+sub-add a b c d = begin
+  (a + b) - (c + d)
+    ≡⟨ cong (λ z → (a + b) + z) (neg-distrib-+ c d) ⟩
+  (a + b) + (neg c + neg d)
+    ≡⟨ rearrange a b c d ⟩
+  (a - c) + (b - d)
+  ∎
 
 negsub : ∀ x y → neg (x - y) ≡ y - x
-negsub x y =
-  begin
-    neg (x - y)
-  ≡⟨ refl ⟩
-    neg (x + neg y)
-  ≡⟨ neg-distrib-+ x (neg y) ⟩
-    neg x + neg (neg y)
-  ≡⟨ cong (λ z → neg x + z) (neg-invol y) ⟩
-    neg x + y
-  ≡⟨ +-comm (neg x) y ⟩
-    y + neg x
-  ≡⟨ refl ⟩
-    y - x
+negsub x y = begin
+  neg (x - y)
+    ≡⟨ refl ⟩
+  neg (x + neg y)
+    ≡⟨ neg-distrib-+ x (neg y) ⟩
+  neg x + neg (neg y)
+    ≡⟨ cong (λ z → neg x + z) (neg-invol y) ⟩
+  neg x + y
+    ≡⟨ +-comm (neg x) y ⟩
+  y + neg x
+    ≡⟨ refl ⟩
+  y - x
   ∎
-  where open ≡-Reasoning
 
 neg-sub : ∀ a b → neg a - neg b ≡ b - a
-neg-sub a b =
-  begin
-    neg a - neg b
-  ≡⟨ refl ⟩
-    neg a + neg (neg b)
-  ≡⟨ cong (λ z → neg a + z) (neg-invol b) ⟩
-    neg a + b
-  ≡⟨ +-comm (neg a) b ⟩
-    b + neg a
-  ≡⟨ refl ⟩
-    b - a
+neg-sub a b = begin
+  neg a - neg b
+    ≡⟨ refl ⟩
+  neg a + neg (neg b)
+    ≡⟨ cong (λ z → neg a + z) (neg-invol b) ⟩
+  neg a + b
+    ≡⟨ +-comm (neg a) b ⟩
+  b + neg a
+    ≡⟨ refl ⟩
+  b - a
   ∎
-  where open ≡-Reasoning
 
 cong-plus : ∀ {a a' b b' : ℚ} → a ≡ a' → b ≡ b' → a + b ≡ a' + b'
-cong-plus {a} {a'} {b} {b'} e1 e2 =
-  trans (cong (λ z → z + b) e1) (cong (λ z → a' + z) e2)
+cong-plus {a} {a'} {b} {b'} e1 e2 = begin
+  a + b
+    ≡⟨ cong (λ z → z + b) e1 ⟩
+  a' + b
+    ≡⟨ cong (λ z → a' + z) e2 ⟩
+  a' + b'
+  ∎
 
 cong-minus : ∀ {a a' b b' : ℚ} → a ≡ a' → b ≡ b' → a - b ≡ a' - b'
-cong-minus {a} {a'} {b} {b'} e1 e2 =
-  trans (cong (λ z → z - b) e1) (cong (λ z → a' - z) e2)
+cong-minus {a} {a'} {b} {b'} e1 e2 = begin
+  a - b
+    ≡⟨ cong (λ z → z - b) e1 ⟩
+  a' - b
+    ≡⟨ cong (λ z → a' - z) e2 ⟩
+  a' - b'
+  ∎
 
 ------------------------------------------------------------------------
 -- Minimum and maximum
@@ -332,13 +338,17 @@ mag-≤ {l} {u} {x} l≤x x≤u with ∣p∣≡p∨∣p∣≡-p x
 --
 -- 当 n > 0 时，suc (n ∸ 1) ≡ n。
 suc∸1 : {n : ℕ} → 0 <ℕ n → suc (n ∸ 1) ≡ n
-suc∸1 {n} 0<n =
-  trans (ℕP.+-comm 1 (n ∸ 1))
-        (ℕP.m∸n+n≡m 0<n)
+suc∸1 {n} 0<n = begin
+  suc (n ∸ 1)
+    ≡⟨ refl ⟩
+  1 +ℕ (n ∸ 1)
+    ≡⟨ ℕP.+-comm 1 (n ∸ 1) ⟩
+  (n ∸ 1) +ℕ 1
+    ≡⟨ ℕP.m∸n+n≡m 0<n ⟩
+  n
+  ∎
 
 -- 0 < (suc d) * 2^t.
---
--- 0 < (suc d) * 2^t。
 0<sucd*2^t : (d t : ℕ) → 0 <ℕ suc d *ℕ 2 ^ t
 0<sucd*2^t d t = ℕP.≤-trans (0<2^t t) (ℕP.m≤n*m (2 ^ t) (suc d))
 
@@ -405,3 +415,58 @@ comb-strict N d k t h =
                      (toℚᵘ (fromℚᵘ (rawR k)))
          p2 = ℚᵘP.<-respʳ-≃ (flip-≃ eqR) p1
      in p2)
+
+------------------------------------------------------------------------
+-- min/max rearrangement and negation interaction
+--
+-- 极值重排与取负交互
+
+min-swap : ∀ a b → min a b ≡ min b a
+min-swap a b = ≤-antisym
+  (≤min (min≤ʳ a b) (min≤ˡ a b))
+  (≤min (min≤ʳ b a) (min≤ˡ b a))
+
+max-swap : ∀ a b → max a b ≡ max b a
+max-swap a b = ≤-antisym
+  (max≤ (≤maxʳ b a) (≤maxˡ b a))
+  (max≤ (≤maxʳ a b) (≤maxˡ a b))
+
+min-min-swap : ∀ a b c d →
+  min (min a b) (min c d) ≡ min (min c d) (min a b)
+min-min-swap a b c d = min-swap (min a b) (min c d)
+
+max-max-swap : ∀ a b c d →
+  max (max a b) (max c d) ≡ max (max c d) (max a b)
+max-max-swap a b c d = max-swap (max a b) (max c d)
+
+min-neg : ∀ a b → min (neg a) (neg b) ≡ neg (max a b)
+min-neg a b = ≤-antisym upper lower
+  where
+    lower : neg (max a b) ≤ min (neg a) (neg b)
+    lower = ≤min (neg-antimono-≤ (≤maxˡ a b))
+                 (neg-antimono-≤ (≤maxʳ a b))
+
+    upper : min (neg a) (neg b) ≤ neg (max a b)
+    upper with max-eq a b
+    ... | inj₁ max≡a =
+          subst (λ z → min (neg a) (neg b) ≤ neg z) (sym max≡a)
+                (min≤ˡ (neg a) (neg b))
+    ... | inj₂ max≡b =
+          subst (λ z → min (neg a) (neg b) ≤ neg z) (sym max≡b)
+                (min≤ʳ (neg a) (neg b))
+
+max-neg : ∀ a b → max (neg a) (neg b) ≡ neg (min a b)
+max-neg a b = ≤-antisym upper lower
+  where
+    upper : max (neg a) (neg b) ≤ neg (min a b)
+    upper = max≤ (neg-antimono-≤ (min≤ˡ a b))
+                 (neg-antimono-≤ (min≤ʳ a b))
+
+    lower : neg (min a b) ≤ max (neg a) (neg b)
+    lower with min-eq a b
+    ... | inj₁ min≡a =
+          subst (λ z → neg z ≤ max (neg a) (neg b)) (sym min≡a)
+                (≤maxˡ (neg a) (neg b))
+    ... | inj₂ min≡b =
+          subst (λ z → neg z ≤ max (neg a) (neg b)) (sym min≡b)
+                (≤maxʳ (neg a) (neg b))

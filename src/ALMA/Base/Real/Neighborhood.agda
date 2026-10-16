@@ -38,23 +38,17 @@
 module ALMA.Base.Real.Neighborhood where
 
 open import Data.Nat using (ℕ; suc; _^_)
-open import Data.Integer using (+_)
 open import Data.Rational using (ℚ; 0ℚ; ∣_∣; _-_; _<_; Positive)
-open import Data.Rational.Base using (mkℚ; 1/_)
+open import Data.Rational.Base using (1/_)
 open import Data.Nat.Coprimality using (1-coprimeTo) renaming (sym to coprime-sym)
 open import Data.Rational.Properties using (mkℚ+-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos)
 open import Data.Product using (Σ; _,_; _×_)
 open import Data.Unit.Polymorphic using (⊤; tt)
 open import Data.Nat.Properties using (m^n≢0)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import ALMA.Base.MCorr using (M; here; below)
-
--- Raw ℕ embedding so the reciprocal reduces definitionally.
---
--- 底层 ℕ 嵌入，使倒数定义性归约。
-embed : ℕ → ℚ
-embed n = mkℚ (+ n) 0 (coprime-sym (1-coprimeTo n))
+open import ALMA.Base.Real using (embed)
 
 -- Positive witness for the dyadic denominator.
 --
@@ -69,8 +63,7 @@ pos-pow k =
 --
 -- 可求和二进容差 δ k = 1 / 2^(k+1)。
 δ : ℕ → ℚ
-δ k =
-  Data.Rational.Base.1/_ (embed (2 ^ suc k))
+δ k = 1/_ (embed (2 ^ suc k))
     {{pos⇒nonZero (embed (2 ^ suc k)) {{pos-pow k}}}}
 
 -- δ k is positive.

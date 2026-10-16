@@ -1,11 +1,17 @@
 ------------------------------------------------------------------------
--- Order laws for RealI
+-- Order laws on intervals
 --
--- Basic order-theoretic facts about _<ℝ_ and _≈ℝ_ on RealI.
+-- Basic order-theoretic facts about _<ℝ_ and _≈ℝ_ on RealI: an ε and
+-- a width below any positive rational, decrease of width with depth,
+-- the upper bound u ≤ centre + width, compatibility of order with
+-- approximate equality, and monotonicity of order under addition,
+-- negation, and subtraction.
 --
--- RealI 的序律
+-- 区间序律
 --
--- RealI 上 _<ℝ_ 与 _≈ℝ_ 的基本序论事实。
+-- RealI 上 _<ℝ_ 与 _≈ℝ_ 的基本序论事实：任意正有理数下方有 ε 与
+-- 宽度，宽度随深度递减，上界 u ≤ centre + width，序与近似相等的
+-- 相容性，以及序在加法、否定与减法下的单调性。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -18,7 +24,6 @@ open import Data.Nat.Properties using
   (m≤m⊔n; m≤n⊔m; m∸n+n≡m) renaming (≤-trans to ≤ℕ-trans; +-suc to +-sucℕ
   ; +-comm to +-commℕ; +-identityʳ to +-identityʳℕ)
 open import Data.Product using (Σ; _,_; _×_; proj₁; proj₂)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣; Positive; NonZero; positive)
 open import Data.Rational.Base using (1/_) renaming (-_ to neg)
@@ -28,13 +33,12 @@ open import Data.Rational.Properties using
   ; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; pos⇒nonNeg; *-inverseʳ; *-inverseˡ
   ; *-comm; *-assoc; *-identityʳ; *-identityˡ; *-zeroˡ; *-zeroʳ; *-distribˡ-+
   ; +-inverseʳ; +-inverseˡ; +-identityʳ; +-identityˡ; +-comm; +-assoc
-  ; neg-distrib-+; neg-antimono-≤; neg-antimono-<; ∣-p∣≡∣p∣; 0≤∣p∣
-  ;∣p∣≡p∨∣p∣≡-p; *-cancelˡ-<-nonNeg)
+  ; neg-distrib-+; neg-antimono-≤; neg-antimono-<; ∣-p∣≡∣p∣; *-cancelˡ-<-nonNeg)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; trans; subst)
-open import Relation.Binary.PropositionalEquality.Properties using (module ≡-Reasoning)
+  (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
+open ≡-Reasoning
 
-open import ALMA.Base.Real using (embed; ε; 0<ε; embed-suc-pos)
+open import ALMA.Base.Real using (embed; ε; embed-suc-pos)
 open import ALMA.Base.Real.Interval using (RealI; neg-invol)
 open import ALMA.Base.Real.IntervalEquiv using
   (node; l; u; centre; width; width-n; width-1step; centre-l; centre-u; u-mono
@@ -42,9 +46,8 @@ open import ALMA.Base.Real.IntervalEquiv using
 open import ALMA.Base.Real.Interval.Equiv using (_≈ℝ_)
 open import ALMA.Base.Real.Interval.Order using (_<ℝ_)
 open import ALMA.Base.Real.Interval.Kit using
-  (half; 0<half; 0≤half; half≤1; two-half; half+half≡1; 0<recipPow2; embed-suc∸1)
-open import ALMA.Base.Real.Interval.Node using
-  (0≤width-n; l-hom; u-hom; l-neg; u-neg)
+  (half; 0<half; half≤1; two-half; half+half≡1; 0<recipPow2; embed-suc∸1)
+open import ALMA.Base.Real.Interval.Node using (l-hom; u-hom; l-neg; u-neg)
 open import ALMA.Base.Real.Interval.Mul using (le-shift)
 open import ALMA.Base.Real.Interval.Arith using (_+ℝ_; _-ℝ_; negℝ)
 open import ALMA.Base.Real.Interval.Rational using (r≤|r|)
@@ -196,8 +199,15 @@ width-below r b 0<b = M , result
     step1 = *-monoˡ-<-pos b {{b-pos}} q<2^m
 
     lhs≡ : (w0 * inv-b) * b ≡ w0
-    lhs≡ = trans (*-assoc w0 inv-b b)
-                (trans (cong (w0 *_) 1b-inv-b) (*-identityʳ w0))
+    lhs≡ = begin
+      (w0 * inv-b) * b
+        ≡⟨ *-assoc w0 inv-b b ⟩
+      w0 * (inv-b * b)
+        ≡⟨ cong (w0 *_) 1b-inv-b ⟩
+      w0 * 1ℚ
+        ≡⟨ *-identityʳ w0 ⟩
+      w0
+        ∎
 
     w0<em-b : w0 < embed (2 ^ M) * b
     w0<em-b = subst (λ z → z < embed (2 ^ M) * b) lhs≡ step1
@@ -220,16 +230,28 @@ width-below r b 0<b = M , result
     s-nz = pos⇒nonZero s {{embed-suc-pos}}
 
     E*em-inv≡1 : embed (2 ^ M) * em-inv ≡ 1ℚ
-    E*em-inv≡1 =
-      trans (cong (λ t → t * em-inv) (sym s≡E))
-            (*-inverseʳ s {{s-nz}})
+    E*em-inv≡1 = begin
+      embed (2 ^ M) * em-inv
+        ≡⟨ cong (λ t → t * em-inv) (sym s≡E) ⟩
+      s * em-inv
+        ≡⟨ *-inverseʳ s {{s-nz}} ⟩
+      1ℚ
+        ∎
 
     rhs≡ : (embed (2 ^ M) * b) * em-inv ≡ b
-    rhs≡ = trans (*-assoc (embed (2 ^ M)) b em-inv)
-                (trans (cong (embed (2 ^ M) *_) (*-comm b em-inv))
-                (trans (sym (*-assoc (embed (2 ^ M)) em-inv b))
-                (trans (cong (_* b) E*em-inv≡1)
-                       (*-identityˡ b))))
+    rhs≡ = begin
+      (embed (2 ^ M) * b) * em-inv
+        ≡⟨ *-assoc (embed (2 ^ M)) b em-inv ⟩
+      embed (2 ^ M) * (b * em-inv)
+        ≡⟨ cong (embed (2 ^ M) *_) (*-comm b em-inv) ⟩
+      embed (2 ^ M) * (em-inv * b)
+        ≡⟨ sym (*-assoc (embed (2 ^ M)) em-inv b) ⟩
+      (embed (2 ^ M) * em-inv) * b
+        ≡⟨ cong (_* b) E*em-inv≡1 ⟩
+      1ℚ * b
+        ≡⟨ *-identityˡ b ⟩
+      b
+        ∎
 
     w0-em-inv<b : w0 * em-inv < b
     w0-em-inv<b = subst (λ z → w0 * em-inv < z) rhs≡ step2
@@ -264,7 +286,13 @@ width-mono-ge r n (suc k) =
 width-dec : (r : RealI) {n m : ℕ} → n ≤ℕ m → width r m ≤ width r n
 width-dec r {n} {m} n≤m =
   subst (λ j → width r j ≤ width r n)
-        (trans (+-commℕ n (m ∸ n)) (m∸n+n≡m n≤m))
+        (begin
+           n +ℕ (m ∸ n)
+             ≡⟨ +-commℕ n (m ∸ n) ⟩
+           (m ∸ n) +ℕ n
+             ≡⟨ m∸n+n≡m n≤m ⟩
+           m
+             ∎)
         (width-mono-ge r n (m ∸ n))
 
 ------------------------------------------------------------------------
@@ -297,7 +325,7 @@ u≤c+w r k =
            (centre-l r k))
   where
     sub-cancel-2 : ∀ a b → a - (a - b) ≡ b
-    sub-cancel-2 a b = let open ≡-Reasoning in begin
+    sub-cancel-2 a b = begin
       a - (a - b)
       ≡⟨⟩
       a + neg (a + neg b)
@@ -325,23 +353,39 @@ half+half²<1 : half + half * half < 1ℚ
 half+half²<1 =
   let
     step1 : half + half * half ≡ half * (1ℚ + half)
-    step1 =
-      trans (cong (λ z → z + half * half) (sym (*-identityʳ half)))
-            (sym (*-distribˡ-+ half 1ℚ half))
+    step1 = begin
+      half + half * half
+        ≡⟨ cong (λ z → z + half * half) (sym (*-identityʳ half)) ⟩
+      half * 1ℚ + half * half
+        ≡⟨ sym (*-distribˡ-+ half 1ℚ half) ⟩
+      half * (1ℚ + half)
+        ∎
     step2 : half * (1ℚ + half) < half * (1ℚ + 1ℚ)
     step2 = *-monoʳ-<-pos half {{positive 0<half}}
                     (+-monoˡ-< 1ℚ half<1)
     step3 : half * (1ℚ + 1ℚ) ≡ 1ℚ
-    step3 =
-      trans (sym (*-distribˡ-+ half 1ℚ 1ℚ)) half+half≡1
+    step3 = begin
+      half * (1ℚ + 1ℚ)
+        ≡⟨ sym (*-distribˡ-+ half 1ℚ 1ℚ) ⟩
+      half * 1ℚ + half * 1ℚ
+        ≡⟨ cong₂ _+_ (*-identityʳ half) (*-identityʳ half) ⟩
+      half + half
+        ≡⟨ half+half≡1 ⟩
+      1ℚ
+        ∎
   in subst (λ z → half + half * half < z) step3
        (subst (λ z → z < half * (1ℚ + 1ℚ)) (sym step1) step2)
 
 3d/4<d : (d : ℚ) → 0ℚ < d → d * half + (d * half) * half < d
 3d/4<d d 0<d =
   subst (λ z → z < d)
-    (trans (*-distribˡ-+ d half (half * half))
-           (cong (d * half +_) (sym (*-assoc d half half))))
+    (begin
+      d * (half + half * half)
+        ≡⟨ *-distribˡ-+ d half (half * half) ⟩
+      d * half + d * (half * half)
+        ≡⟨ cong (d * half +_) (sym (*-assoc d half half)) ⟩
+      d * half + (d * half) * half
+        ∎)
     (subst (λ z → d * (half + half * half) < z) (*-identityʳ d)
            (*-monoʳ-<-pos d {{positive 0<d}} half+half²<1))
 
@@ -408,7 +452,7 @@ half+half²<1 =
     m≥N = ≤ℕ-trans (m≤n⊔m n N) m≥nN
 
     neg-diff : centre y m - centre x m ≡ neg (centre x m - centre y m)
-    neg-diff = let open ≡-Reasoning in begin
+    neg-diff = begin
       centre y m - centre x m
       ≡⟨⟩
       centre y m + neg (centre x m)
@@ -422,7 +466,13 @@ half+half²<1 =
       neg (centre x m - centre y m) ∎
 
     swp : ∣ centre y m - centre x m ∣ ≡ ∣ centre x m - centre y m ∣
-    swp = trans (cong ∣_∣ neg-diff) (∣-p∣≡∣p∣ _)
+    swp = begin
+      ∣ centre y m - centre x m ∣
+        ≡⟨ cong ∣_∣ neg-diff ⟩
+      ∣ neg (centre x m - centre y m) ∣
+        ≡⟨ ∣-p∣≡∣p∣ (centre x m - centre y m) ⟩
+      ∣ centre x m - centre y m ∣
+        ∎
 
     cy-cx<b : ∣ centre y m - centre x m ∣ < b
     cy-cx<b =
@@ -448,7 +498,7 @@ half+half²<1 =
         a = +-mono-≤ uy≤cy+wy (neg-antimono-≤ cx≤uxm)
         b' : (centre y m + width y m) - centre x m
                ≡ width y m + (centre y m - centre x m)
-        b' = let open ≡-Reasoning in begin
+        b' = begin
           (centre y m + width y m) - centre x m
           ≡⟨⟩
           (centre y m + width y m) + neg (centre x m)
@@ -491,13 +541,26 @@ half+half²<1 =
     raw = +-monoˡ-< (u x m) uy-ux<d
 
     lhs≡ : (u y m - u x m) + u x m ≡ u y m
-    lhs≡ = trans (+-assoc (u y m) (neg (u x m)) (u x m))
-             (trans (cong (u y m +_) (+-inverseˡ (u x m)))
-                    (+-identityʳ (u y m)))
+    lhs≡ = begin
+      (u y m - u x m) + u x m
+        ≡⟨ +-assoc (u y m) (neg (u x m)) (u x m) ⟩
+      u y m + (neg (u x m) + u x m)
+        ≡⟨ cong (u y m +_) (+-inverseˡ (u x m)) ⟩
+      u y m + 0ℚ
+        ≡⟨ +-identityʳ (u y m) ⟩
+      u y m
+        ∎
 
     rhs≡ : (l z n - u x n) + u x m ≡ l z n + (u x m - u x n)
-    rhs≡ = trans (+-assoc (l z n) (neg (u x n)) (u x m))
-                 (cong (l z n +_) (+-comm (neg (u x n)) (u x m)))
+    rhs≡ = begin
+      (l z n - u x n) + u x m
+        ≡⟨ +-assoc (l z n) (neg (u x n)) (u x m) ⟩
+      l z n + (neg (u x n) + u x m)
+        ≡⟨ cong (l z n +_) (+-comm (neg (u x n)) (u x m)) ⟩
+      l z n + (u x m + neg (u x n))
+        ≡⟨⟩
+      l z n + (u x m - u x n)
+        ∎
 
     a< : u y m < l z n + (u x m - u x n)
     a< = subst (λ w → w < l z n + (u x m - u x n)) lhs≡
@@ -540,20 +603,38 @@ half+half²<1 =
     lyn≤lyk = l-mono y k≥n
 
     ux+g≡ly : u x n + g ≡ l y n
-    ux+g≡ly =
-      trans (sym (+-assoc (u x n) (l y n) (neg (u x n))))
-      (trans (cong (λ z → z + neg (u x n)) (+-comm (u x n) (l y n)))
-      (trans (+-assoc (l y n) (u x n) (neg (u x n)))
-      (trans (cong (l y n +_) (+-inverseʳ (u x n)))
-             (+-identityʳ (l y n)))))
+    ux+g≡ly = begin
+      u x n + g
+        ≡⟨⟩
+      u x n + (l y n + neg (u x n))
+        ≡⟨ sym (+-assoc (u x n) (l y n) (neg (u x n))) ⟩
+      (u x n + l y n) + neg (u x n)
+        ≡⟨ cong (λ z → z + neg (u x n)) (+-comm (u x n) (l y n)) ⟩
+      (l y n + u x n) + neg (u x n)
+        ≡⟨ +-assoc (l y n) (u x n) (neg (u x n)) ⟩
+      l y n + (u x n + neg (u x n))
+        ≡⟨ cong (l y n +_) (+-inverseʳ (u x n)) ⟩
+      l y n + 0ℚ
+        ≡⟨ +-identityʳ (l y n) ⟩
+      l y n
+        ∎
 
     l+w≡u : l z k + width z k ≡ u z k
-    l+w≡u =
-      trans (sym (+-assoc (l z k) (u z k) (neg (l z k))))
-      (trans (cong (λ w → w + neg (l z k)) (+-comm (l z k) (u z k)))
-      (trans (+-assoc (u z k) (l z k) (neg (l z k)))
-      (trans (cong (u z k +_) (+-inverseʳ (l z k)))
-             (+-identityʳ (u z k)))))
+    l+w≡u = begin
+      l z k + width z k
+        ≡⟨⟩
+      l z k + (u z k + neg (l z k))
+        ≡⟨ sym (+-assoc (l z k) (u z k) (neg (l z k))) ⟩
+      (l z k + u z k) + neg (l z k)
+        ≡⟨ cong (λ w → w + neg (l z k)) (+-comm (l z k) (u z k)) ⟩
+      (u z k + l z k) + neg (l z k)
+        ≡⟨ +-assoc (u z k) (l z k) (neg (l z k)) ⟩
+      u z k + (l z k + neg (l z k))
+        ≡⟨ cong (u z k +_) (+-inverseʳ (l z k)) ⟩
+      u z k + 0ℚ
+        ≡⟨ +-identityʳ (u z k) ⟩
+      u z k
+        ∎
 
     first : u x k + width z k ≤ u x n + width z k
     first = +-mono-≤ uxk≤uxn (≤-refl {width z k})
@@ -573,9 +654,13 @@ half+half²<1 =
 
     reorder : (u x k + width z k) + l z k
               ≡ u x k + (l z k + width z k)
-    reorder =
-      trans (+-assoc (u x k) (width z k) (l z k))
-            (cong (u x k +_) (+-comm (width z k) (l z k)))
+    reorder = begin
+      (u x k + width z k) + l z k
+        ≡⟨ +-assoc (u x k) (width z k) (l z k) ⟩
+      u x k + (width z k + l z k)
+        ≡⟨ cong (u x k +_) (+-comm (width z k) (l z k)) ⟩
+      u x k + (l z k + width z k)
+        ∎
 
     shifted : u x k + (l z k + width z k) < l y k + l z k
     shifted = subst (λ q → q < l y k + l z k) reorder added

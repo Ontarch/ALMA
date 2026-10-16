@@ -20,11 +20,13 @@ module ALMA.Base.Real.Interval.Equiv where
 
 open import Data.Nat using (ℕ; suc; _≥_; _⊔_; _*_)
 open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m) renaming (≤-trans to ≤-transℕ)
-open import Data.Rational using (0ℚ; _+_; _-_; _<_; _≤_; ∣_∣)
 open import Data.Product using (Σ; _,_)
+open import Data.Rational using (0ℚ; _+_; _-_; _<_; _≤_; ∣_∣; -_)
 open import Data.Rational.Properties using
-  (+-mono-<; +-inverseʳ; 0≤p⇒∣p∣≡p; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; ≤-refl; ≤-<-trans)
-open import Relation.Binary.PropositionalEquality using (_≡_; cong; sym; trans; subst)
+  (+-mono-<; +-inverseʳ; 0≤p⇒∣p∣≡p; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; ≤-refl
+  ; ≤-<-trans; <-≤-trans; module ≤-Reasoning)
+open ≤-Reasoning
+open import Relation.Binary.PropositionalEquality using (_≡_; cong; sym)
 open import Relation.Binary.Structures using (IsEquivalence)
 
 open import ALMA.Base.Real using (ε; 0<ε; ε-half; telescope)
@@ -35,13 +37,7 @@ open import ALMA.Base.Real.Interval.Rational using (negsub)
 ------------------------------------------------------------------------
 -- Real equivalence
 --
--- Two interval sequences are equivalent when, for every tolerance ε k,
--- there is a threshold N beyond which the centres stay within ε k.
---
 -- 实数等价
---
--- 两个区间序列等价，当且仅当对每个容差 ε k，存在阈值 N，超过后中点
--- 始终落在 ε k 内。
 
 infix 4 _≈ℝ_
 
@@ -52,56 +48,43 @@ x ≈ℝ y = ∀ k → Σ ℕ (λ N → ∀ n → n ≥ N →
 ------------------------------------------------------------------------
 -- Reflexivity
 --
--- The difference of a centre with itself is zero, and zero lies below
--- every ε k.
---
 -- 自反
---
--- 中点与自身之差为零，而零小于每个 ε k。
 
 ≈ℝ-refl : ∀ {x} → x ≈ℝ x
 ≈ℝ-refl {x} k = 0 , λ n _ →
-  let eq0 : centre x n - centre x n ≡ 0ℚ
-      eq0 = +-inverseʳ (centre x n)
-      abs0 : ∣ centre x n - centre x n ∣ ≡ 0ℚ
-      abs0 = trans (cong ∣_∣ eq0) (0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ}))
-  in subst (λ z → z < ε k) (sym abs0) (0<ε k)
+  ≤-<-trans
+    (begin
+       ∣ centre x n - centre x n ∣
+         ≡⟨ cong ∣_∣ (+-inverseʳ (centre x n)) ⟩
+       ∣ 0ℚ ∣
+         ≡⟨ 0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ}) ⟩
+       0ℚ
+     ∎)
+    (0<ε k)
 
 ------------------------------------------------------------------------
 -- Symmetry
 --
--- Swap the two centres and rewrite the absolute value via
--- ∣−(p − q)∣ = ∣p − q∣.
---
 -- 对称
---
--- 交换两个中点，并用 ∣−(p − q)∣ = ∣p − q∣ 重写绝对值。
 
 ≈ℝ-sym : ∀ {x y} → x ≈ℝ y → y ≈ℝ x
 ≈ℝ-sym {x} {y} p k =
   let N , h = p k
   in N , λ n n≥N →
-    let d = h n n≥N
-        abs-eq : ∣ centre y n - centre x n ∣
-               ≡ ∣ centre x n - centre y n ∣
-        abs-eq =
-          trans (cong ∣_∣ (sym (negsub (centre x n) (centre y n))))
-                (∣-p∣≡∣p∣ (centre x n - centre y n))
-    in subst (λ z → z < ε k) (sym abs-eq) d
+    ≤-<-trans
+      (begin
+         ∣ centre y n - centre x n ∣
+           ≡⟨ cong ∣_∣ (sym (negsub (centre x n) (centre y n))) ⟩
+         ∣ -(centre x n - centre y n) ∣
+           ≡⟨ ∣-p∣≡∣p∣ (centre x n - centre y n) ⟩
+         ∣ centre x n - centre y n ∣
+       ∎)
+      (h n n≥N)
 
 ------------------------------------------------------------------------
 -- Transitivity
 --
--- Split the target tolerance as ε k = ε (2k) + ε (2k), obtain thresholds
--- for both hypotheses at ε (2k), take their maximum, and combine the two
--- bounds via the triangle inequality after rewriting the sum of
--- differences to the difference of the outer centres.
---
 -- 传递
---
--- 把目标容差拆为 ε k = ε (2k) + ε (2k)，对两个假设分别在 ε (2k) 处
--- 取得阈值，取二者最大值，再用三角不等式合并两个界，并先把两个差
--- 之和重写为外侧中点之差。
 
 ≈ℝ-trans : ∀ {x y z} → x ≈ℝ y → y ≈ℝ z → x ≈ℝ z
 ≈ℝ-trans {x} {y} {z} p q k =
@@ -123,21 +106,24 @@ x ≈ℝ y = ∀ k → Σ ℕ (λ N → ∀ n → n ≥ N →
         sum-eq : a + b ≡ centre x n - centre z n
         sum-eq = telescope (centre x n) (centre y n) (centre z n)
 
-        tri : ∣ a + b ∣ ≤ ∣ a ∣ + ∣ b ∣
-        tri = ∣p+q∣≤∣p∣+∣q∣ a b
-
-        sum< : ∣ a ∣ + ∣ b ∣ < c + c
-        sum< = +-mono-< d1 d2
-
         abs-sum< : ∣ a + b ∣ < c + c
-        abs-sum< = ≤-<-trans tri sum<
+        abs-sum< = ≤-<-trans (∣p+q∣≤∣p∣+∣q∣ a b) (+-mono-< d1 d2)
 
         cc : c + c ≡ ε k
         cc = ε-half k
-
-        result : ∣ a + b ∣ < ε k
-        result = subst (λ r → ∣ a + b ∣ < r) cc abs-sum<
-    in subst (λ r → ∣ r ∣ < ε k) sum-eq result
+    in <-≤-trans
+         (≤-<-trans
+           (begin
+              ∣ centre x n - centre z n ∣
+                ≡⟨ cong ∣_∣ (sym sum-eq) ⟩
+              ∣ a + b ∣
+            ∎)
+           abs-sum<)
+         (begin
+            c + c
+              ≡⟨ cc ⟩
+            ε k
+          ∎)
 
 ------------------------------------------------------------------------
 -- Equivalence relation

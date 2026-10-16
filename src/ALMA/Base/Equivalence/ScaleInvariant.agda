@@ -18,7 +18,9 @@ module ALMA.Base.Equivalence.ScaleInvariant where
 open import Agda.Primitive using (Level; _⊔_; lzero)
 open import Agda.Builtin.Equality using (_≡_)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
-open import Relation.Binary.PropositionalEquality.Core using (sym; cong; trans)
+open import Relation.Binary.PropositionalEquality.Core using (sym; cong)
+open import Relation.Binary.PropositionalEquality using (module ≡-Reasoning)
+open ≡-Reasoning
 
 open import ALMA.Base.IndexedMType using (fst; snd)
 open import ALMA.Base.Equivalence.Core using (LayeredEq)
@@ -66,7 +68,13 @@ module ScaleInvariance
   fixed-point-preserved
     : ∀ x → IsFixedPoint x → ∀ ob → IsFixedPoint (step x ob)
   fixed-point-preserved x fp ob p =
-    trans (sym (comm x ob p)) (cong (λ z → step z ob) (fp p))
+    begin
+      scale (step x ob) p
+    ≡⟨ sym (comm x ob p) ⟩
+      step (scale x p) ob
+    ≡⟨ cong (λ z → step z ob) (fp p) ⟩
+      step x ob
+    ∎
 
   fixed-point-invariant
     : ∀ x → IsFixedPoint x → ScaleInvariant step x x

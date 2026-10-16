@@ -20,12 +20,13 @@ open import Data.Rational.Base using (_÷_; 1/_) renaming (-_ to neg)
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Rational.Properties using
   (+-mono-<; +-mono-≤; neg-antimono-<; neg-antimono-≤; *-distribʳ-+; ≤-reflexive; ≤-trans)
-open import Relation.Binary.PropositionalEquality using (_≡_; cong; sym; subst)
+open import Relation.Binary.PropositionalEquality using
+  (_≡_; cong; sym; subst; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import ALMA.Base.Real using (embed)
 open import ALMA.Base.Real.Interval using (RealI; dyadic)
 open import ALMA.Base.Real.Interval.Rational using (sub-add; neg-sub)
-open import ALMA.Base.Real.Interval.Kit using (embed2-nz)
 
 ------------------------------------------------------------------------
 -- Division distributes over addition
@@ -37,7 +38,11 @@ open import ALMA.Base.Real.Interval.Kit using (embed2-nz)
 -- 需要 embed 2 的 NonZero 实例。
 
 div-add : (a b : ℚ) → (a + b) ÷ embed 2 ≡ (a ÷ embed 2) + (b ÷ embed 2)
-div-add a b = *-distribʳ-+ (1/ embed 2) a b
+div-add a b = begin
+    (a + b) ÷ embed 2
+  ≡⟨ *-distribʳ-+ (1/ embed 2) a b ⟩
+    (a ÷ embed 2) + (b ÷ embed 2)
+  ∎
 
 ------------------------------------------------------------------------
 -- Zero and one
@@ -95,11 +100,19 @@ RealI.nest (x +ℝ y) = nest1 , nest2 , nest3
         step1 = +-mono-≤ step-x step-y
 
         step2 : (wx ÷ embed 2) + (wy ÷ embed 2) ≡ (wx + wy) ÷ embed 2
-        step2 = sym (div-add wx wy)
+        step2 = begin
+            (wx ÷ embed 2) + (wy ÷ embed 2)
+          ≡⟨ sym (div-add wx wy) ⟩
+            (wx + wy) ÷ embed 2
+          ∎
 
         r-eq : (wx + wy) ÷ embed 2
              ≡ ((ux + uy) - (lx + ly)) ÷ embed 2
-        r-eq = cong (λ z → z ÷ embed 2) (sym (sub-add ux uy lx ly))
+        r-eq = begin
+            (wx + wy) ÷ embed 2
+          ≡⟨ cong (λ z → z ÷ embed 2) (sym (sub-add ux uy lx ly)) ⟩
+            ((ux + uy) - (lx + ly)) ÷ embed 2
+          ∎
 
         T : ℚ
         T = ((ux + uy) - (lx + ly)) ÷ embed 2
@@ -108,7 +121,11 @@ RealI.nest (x +ℝ y) = nest1 , nest2 , nest3
         core = ≤-trans step1 (≤-trans (≤-reflexive step2) (≤-reflexive r-eq))
 
         l-eq : wx' + wy' ≡ (ux' + uy') - (lx' + ly')
-        l-eq = sym (sub-add ux' uy' lx' ly')
+        l-eq = begin
+            wx' + wy'
+          ≡⟨ sym (sub-add ux' uy' lx' ly') ⟩
+            (ux' + uy') - (lx' + ly')
+          ∎
       in
         subst (λ z → z ≤ T) l-eq core
 
@@ -147,7 +164,11 @@ RealI.nest (negℝ x) = nest1 , nest2 , nest3
         inner = proj₂ (proj₂ (RealI.nest x))
 
         target-eq : (neg a - neg b) ÷ embed 2 ≡ (b - a) ÷ embed 2
-        target-eq = cong (λ z → z ÷ embed 2) w-eq
+        target-eq = begin
+            (neg a - neg b) ÷ embed 2
+          ≡⟨ cong (λ z → z ÷ embed 2) w-eq ⟩
+            (b - a) ÷ embed 2
+          ∎
       in
         ≤-trans
           (≤-reflexive w'-eq)

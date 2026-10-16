@@ -23,14 +23,15 @@ import Data.Integer.Properties as ℤP
 open import Data.Product using (_,_; Σ; proj₁; proj₂)
 open import Data.Rational.Base using (1/_; *≤*; positive)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣; NonNegative; nonNegative; NonZero)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _≤_; _<_; ∣_∣; NonNegative; nonNegative; NonZero)
 open import Data.Rational.Properties using
   (+-inverseʳ; *-identityˡ; *-identityʳ; *-assoc; *-comm; *-inverseʳ; *-distribʳ-+
   ; *-distribˡ-+; ≤-refl; ≤-reflexive; ≤-trans; 0≤p⇒∣p∣≡p; pos⇒nonZero; positive⁻¹
   ; 1/pos⇒pos; pos*pos⇒pos; <-≤-trans; ≤-<-trans; <⇒≤; *-monoˡ-≤-nonNeg
   ; *-monoʳ-≤-nonNeg; *-cancelˡ-≤-pos; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; trans; sym; subst)
+  (_≡_; refl; cong; trans; sym; subst; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import ALMA.Base.Real using (embed; 2ℚ; 2ℚ≡1+1; ε; 0<ε; embed-suc-pos; telescope)
 open import ALMA.Base.Real.Interval using (RealI; pos-pow)
@@ -65,10 +66,22 @@ half = Data.Rational.Base.1/_ (embed 2) {{embed2-nz}}
 ≈ℝ-of-eq x y h k = 0 , λ n _ →
   let
     eq0 : centre x n - centre y n ≡ 0ℚ
-    eq0 = trans (cong (λ w → w - centre y n) (h n))
-                (+-inverseʳ (centre y n))
+    eq0 = begin
+      centre x n - centre y n
+        ≡⟨ cong (λ w → w - centre y n) (h n) ⟩
+      centre y n - centre y n
+        ≡⟨ +-inverseʳ (centre y n) ⟩
+      0ℚ
+      ∎
+
     abs0 : ∣ centre x n - centre y n ∣ ≡ 0ℚ
-    abs0 = trans (cong ∣_∣ eq0) (0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ}))
+    abs0 = begin
+      ∣ centre x n - centre y n ∣
+        ≡⟨ cong ∣_∣ eq0 ⟩
+      ∣ 0ℚ ∣
+        ≡⟨ 0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ}) ⟩
+      0ℚ
+      ∎
   in subst (λ z → z < ε k) (sym abs0) (0<ε k)
 
 ------------------------------------------------------------------------
@@ -88,7 +101,11 @@ embed-mono-≤ {n} {m} n≤m =
 -- recipPow2 基础
 
 embed-suc∸1 : ∀ k → embed (suc (2 ^ k ∸ 1)) ≡ embed (2 ^ k)
-embed-suc∸1 k = cong embed (suc∸1 (0<2^n k))
+embed-suc∸1 k = begin
+  embed (suc (2 ^ k ∸ 1))
+    ≡⟨ cong embed (suc∸1 (0<2^n k)) ⟩
+  embed (2 ^ k)
+  ∎
 
 0<recipPow2 : ∀ n → 0ℚ < recipPow2 n
 0<recipPow2 n =
@@ -121,17 +138,31 @@ recip-antitone {a} {b} 0<a a≤b =
 
     ab·b⁻¹≡a : (a * b) * (1/_ (b) {{pos⇒nonZero b {{positive 0<b}}}}) ≡ a
     ab·b⁻¹≡a =
-      trans (*-assoc a b (1/_ (b) {{pos⇒nonZero b {{positive 0<b}}}}))
-      (trans (cong (a *_) (*-inverseʳ b {{pos⇒nonZero b {{positive 0<b}}}}))
-             (*-identityʳ a))
+      begin
+        (a * b) * (1/_ (b) {{pos⇒nonZero b {{positive 0<b}}}})
+          ≡⟨ *-assoc a b (1/_ (b) {{pos⇒nonZero b {{positive 0<b}}}}) ⟩
+        a * (b * (1/_ (b) {{pos⇒nonZero b {{positive 0<b}}}}))
+          ≡⟨ cong (a *_) (*-inverseʳ b {{pos⇒nonZero b {{positive 0<b}}}}) ⟩
+        a * 1ℚ
+          ≡⟨ *-identityʳ a ⟩
+        a
+      ∎
 
     ab·a⁻¹≡b : (a * b) * (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}}) ≡ b
     ab·a⁻¹≡b =
-      trans (*-assoc a b (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}}))
-      (trans (cong (a *_) (*-comm b (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}})))
-      (trans (sym (*-assoc a (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}}) b))
-      (trans (cong (_* b) (*-inverseʳ a {{pos⇒nonZero a {{positive 0<a}}}}))
-             (*-identityˡ b))))
+      begin
+        (a * b) * (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}})
+          ≡⟨ *-assoc a b (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}}) ⟩
+        a * (b * (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}}))
+          ≡⟨ cong (a *_) (*-comm b (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}})) ⟩
+        a * ((1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}}) * b)
+          ≡⟨ sym (*-assoc a (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}}) b) ⟩
+        (a * (1/_ (a) {{pos⇒nonZero a {{positive 0<a}}}})) * b
+          ≡⟨ cong (_* b) (*-inverseʳ a {{pos⇒nonZero a {{positive 0<a}}}}) ⟩
+        1ℚ * b
+          ≡⟨ *-identityˡ b ⟩
+        b
+      ∎
 
 recipPow2-mono : ∀ {n m : ℕ} → n ≤ℕ m → recipPow2 m ≤ recipPow2 n
 recipPow2-mono {n} {m} n≤m =
@@ -152,14 +183,28 @@ recipPow2-mono {n} {m} n≤m =
 
 n+n≡2n : ∀ n → n +ℕ n ≡ 2 ℕ* n
 n+n≡2n n =
-  sym (trans (*-commℕ 2 n)
-             (trans (*-suc n 1) (cong (n +ℕ_) (*-identityʳℕ n))))
+  sym (begin
+    2 ℕ* n
+      ≡⟨ *-commℕ 2 n ⟩
+    n ℕ* 2
+      ≡⟨ *-suc n 1 ⟩
+    n +ℕ (n ℕ* 1)
+      ≡⟨ cong (n +ℕ_) (*-identityʳℕ n) ⟩
+    n +ℕ n
+  ∎)
 
 n≤2n : ∀ n → n ≤ℕ 2 ℕ* n
 n≤2n n = ≤-transℕ (m≤m+n n n) (≤-reflexiveℕ (n+n≡2n n))
 
 2*2n≡4n : ∀ n → 2 ℕ* (2 ℕ* n) ≡ 4 ℕ* n
-2*2n≡4n n = trans (sym (*-assocℕ 2 2 n)) refl
+2*2n≡4n n =
+  begin
+    2 ℕ* (2 ℕ* n)
+      ≡⟨ sym (*-assocℕ 2 2 n) ⟩
+    (2 ℕ* 2) ℕ* n
+      ≡⟨ refl ⟩
+    4 ℕ* n
+  ∎
 
 2n≤4n : ∀ n → 2 ℕ* n ≤ℕ 4 ℕ* n
 2n≤4n n = ≤-transℕ (n≤2n (2 ℕ* n)) (≤-reflexiveℕ (2*2n≡4n n))
@@ -220,7 +265,13 @@ recipPow2-bound C 0≤C k =
 -- 绝对值与三角不等式工具
 
 abs-swap : ∀ a b → ∣ a - b ∣ ≡ ∣ b - a ∣
-abs-swap a b = trans (cong ∣_∣ (sym (negsub b a))) (∣-p∣≡∣p∣ (b - a))
+abs-swap a b = begin
+  ∣ a - b ∣
+    ≡⟨ cong ∣_∣ (sym (negsub b a)) ⟩
+  ∣ - (b - a) ∣
+    ≡⟨ ∣-p∣≡∣p∣ (b - a) ⟩
+  ∣ b - a ∣
+  ∎
 
 tri-diff : ∀ a b c → ∣ a - c ∣ ≤ ∣ a - b ∣ + ∣ b - c ∣
 tri-diff a b c =
@@ -234,21 +285,46 @@ tri-diff a b c =
 
 add-self : ∀ W → W + W ≡ 2ℚ * W
 add-self W =
-  trans (cong (λ z → z + W) (sym (*-identityˡ W)))
-  (trans (cong (λ z → 1ℚ * W + z) (sym (*-identityˡ W)))
-  (trans (sym (*-distribʳ-+ W 1ℚ 1ℚ))
-          (cong (λ z → z * W) (sym 2ℚ≡1+1))))
+  begin
+    W + W
+      ≡⟨ cong (λ z → z + W) (sym (*-identityˡ W)) ⟩
+    1ℚ * W + W
+      ≡⟨ cong (λ z → 1ℚ * W + z) (sym (*-identityˡ W)) ⟩
+    1ℚ * W + 1ℚ * W
+      ≡⟨ sym (*-distribʳ-+ W 1ℚ 1ℚ) ⟩
+    (1ℚ + 1ℚ) * W
+      ≡⟨ cong (λ z → z * W) (sym 2ℚ≡1+1) ⟩
+    2ℚ * W
+  ∎
 
 2ℚ*half≡1 : 2ℚ * half ≡ 1ℚ
-2ℚ*half≡1 = *-inverseʳ (embed 2) {{embed2-nz}}
+2ℚ*half≡1 = begin
+  2ℚ * half
+    ≡⟨ *-inverseʳ (embed 2) {{embed2-nz}} ⟩
+  1ℚ
+  ∎
 
 half+half≡1 : half + half ≡ 1ℚ
-half+half≡1 = trans (add-self half) 2ℚ*half≡1
+half+half≡1 =
+  begin
+    half + half
+      ≡⟨ add-self half ⟩
+    2ℚ * half
+      ≡⟨ 2ℚ*half≡1 ⟩
+    1ℚ
+  ∎
 
 two-half : ∀ X → X * half + X * half ≡ X
 two-half X =
-  trans (sym (*-distribˡ-+ X half half))
-        (trans (cong (X *_) half+half≡1) (*-identityʳ X))
+  begin
+    X * half + X * half
+      ≡⟨ sym (*-distribˡ-+ X half half) ⟩
+    X * (half + half)
+      ≡⟨ cong (X *_) half+half≡1 ⟩
+    X * 1ℚ
+      ≡⟨ *-identityʳ X ⟩
+    X
+  ∎
 
 0<half : 0ℚ < half
 0<half = positive⁻¹ half {{1/pos⇒pos (embed 2) {{embed-suc-pos}}}}

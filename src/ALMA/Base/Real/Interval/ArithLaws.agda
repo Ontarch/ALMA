@@ -18,9 +18,11 @@
 module ALMA.Base.Real.Interval.ArithLaws where
 
 open import Data.Rational using (_+_) renaming (-_ to neg)
+open import Data.Rational.Base using (0ℚ)
 open import Data.Rational.Properties using
   (+-identityˡ; +-identityʳ; +-inverseˡ; +-inverseʳ; +-assoc; +-comm)
-open import Relation.Binary.PropositionalEquality using (_≡_; cong; trans; sym)
+open import Relation.Binary.PropositionalEquality using (_≡_; cong; sym; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import ALMA.Base.Real.IntervalEquiv using (centre)
 open import ALMA.Base.Real.Interval using (RealI; neg-invol)
@@ -43,13 +45,31 @@ open import ALMA.Base.Real.Interval.Node using (centre-add; centre-neg; centre-0
     cz = centre z n
 
     lhs : centre ((x +ℝ y) +ℝ z) n ≡ (cx + cy) + cz
-    lhs = trans (centre-add (x +ℝ y) z n)
-                (cong (λ w → w + cz) (centre-add x y n))
+    lhs = begin
+        centre ((x +ℝ y) +ℝ z) n
+      ≡⟨ centre-add (x +ℝ y) z n ⟩
+        centre (x +ℝ y) n + cz
+      ≡⟨ cong (λ w → w + cz) (centre-add x y n) ⟩
+        (cx + cy) + cz
+      ∎
 
     rhs : centre (x +ℝ (y +ℝ z)) n ≡ cx + (cy + cz)
-    rhs = trans (centre-add x (y +ℝ z) n)
-                (cong (λ w → cx + w) (centre-add y z n))
-  in trans lhs (trans (+-assoc cx cy cz) (sym rhs))
+    rhs = begin
+        centre (x +ℝ (y +ℝ z)) n
+      ≡⟨ centre-add x (y +ℝ z) n ⟩
+        cx + centre (y +ℝ z) n
+      ≡⟨ cong (λ w → cx + w) (centre-add y z n) ⟩
+        cx + (cy + cz)
+      ∎
+  in begin
+      centre ((x +ℝ y) +ℝ z) n
+    ≡⟨ lhs ⟩
+      (cx + cy) + cz
+    ≡⟨ +-assoc cx cy cz ⟩
+      cx + (cy + cz)
+    ≡⟨ sym rhs ⟩
+      centre (x +ℝ (y +ℝ z)) n
+    ∎
 
 ------------------------------------------------------------------------
 -- Commutativity
@@ -58,9 +78,15 @@ open import ALMA.Base.Real.Interval.Node using (centre-add; centre-neg; centre-0
 
 +ℝ-comm : (x y : RealI) → x +ℝ y ≈ℝ y +ℝ x
 +ℝ-comm x y = ≈ℝ-of-eq _ _ λ n →
-  trans (centre-add x y n)
-  (trans (+-comm (centre x n) (centre y n))
-         (sym (centre-add y x n)))
+  begin
+    centre (x +ℝ y) n
+  ≡⟨ centre-add x y n ⟩
+    centre x n + centre y n
+  ≡⟨ +-comm (centre x n) (centre y n) ⟩
+    centre y n + centre x n
+  ≡⟨ sym (centre-add y x n) ⟩
+    centre (y +ℝ x) n
+  ∎
 
 ------------------------------------------------------------------------
 -- Identities
@@ -69,15 +95,27 @@ open import ALMA.Base.Real.Interval.Node using (centre-add; centre-neg; centre-0
 
 +ℝ-identityˡ : (x : RealI) → 0ℝ +ℝ x ≈ℝ x
 +ℝ-identityˡ x = ≈ℝ-of-eq _ _ λ n →
-  trans (centre-add 0ℝ x n)
-  (trans (cong (λ w → w + centre x n) (centre-0ℝ n))
-         (+-identityˡ (centre x n)))
+  begin
+    centre (0ℝ +ℝ x) n
+  ≡⟨ centre-add 0ℝ x n ⟩
+    centre 0ℝ n + centre x n
+  ≡⟨ cong (λ w → w + centre x n) (centre-0ℝ n) ⟩
+    0ℚ + centre x n
+  ≡⟨ +-identityˡ (centre x n) ⟩
+    centre x n
+  ∎
 
 +ℝ-identityʳ : (x : RealI) → x +ℝ 0ℝ ≈ℝ x
 +ℝ-identityʳ x = ≈ℝ-of-eq _ _ λ n →
-  trans (centre-add x 0ℝ n)
-  (trans (cong (λ w → centre x n + w) (centre-0ℝ n))
-         (+-identityʳ (centre x n)))
+  begin
+    centre (x +ℝ 0ℝ) n
+  ≡⟨ centre-add x 0ℝ n ⟩
+    centre x n + centre 0ℝ n
+  ≡⟨ cong (λ w → centre x n + w) (centre-0ℝ n) ⟩
+    centre x n + 0ℚ
+  ≡⟨ +-identityʳ (centre x n) ⟩
+    centre x n
+  ∎
 
 ------------------------------------------------------------------------
 -- Inverses
@@ -86,17 +124,31 @@ open import ALMA.Base.Real.Interval.Node using (centre-add; centre-neg; centre-0
 
 +ℝ-inverseˡ : (x : RealI) → x +ℝ negℝ x ≈ℝ 0ℝ
 +ℝ-inverseˡ x = ≈ℝ-of-eq _ _ λ n →
-  trans (centre-add x (negℝ x) n)
-  (trans (cong (λ w → centre x n + w) (centre-neg x n))
-  (trans (+-inverseʳ (centre x n))
-         (sym (centre-0ℝ n))))
+  begin
+    centre (x +ℝ negℝ x) n
+  ≡⟨ centre-add x (negℝ x) n ⟩
+    centre x n + centre (negℝ x) n
+  ≡⟨ cong (λ w → centre x n + w) (centre-neg x n) ⟩
+    centre x n + neg (centre x n)
+  ≡⟨ +-inverseʳ (centre x n) ⟩
+    0ℚ
+  ≡⟨ sym (centre-0ℝ n) ⟩
+    centre 0ℝ n
+  ∎
 
 +ℝ-inverseʳ : (x : RealI) → negℝ x +ℝ x ≈ℝ 0ℝ
 +ℝ-inverseʳ x = ≈ℝ-of-eq _ _ λ n →
-  trans (centre-add (negℝ x) x n)
-  (trans (cong (λ w → w + centre x n) (centre-neg x n))
-  (trans (+-inverseˡ (centre x n))
-         (sym (centre-0ℝ n))))
+  begin
+    centre (negℝ x +ℝ x) n
+  ≡⟨ centre-add (negℝ x) x n ⟩
+    centre (negℝ x) n + centre x n
+  ≡⟨ cong (λ w → w + centre x n) (centre-neg x n) ⟩
+    neg (centre x n) + centre x n
+  ≡⟨ +-inverseˡ (centre x n) ⟩
+    0ℚ
+  ≡⟨ sym (centre-0ℝ n) ⟩
+    centre 0ℝ n
+  ∎
 
 ------------------------------------------------------------------------
 -- Negation involution
@@ -105,15 +157,27 @@ open import ALMA.Base.Real.Interval.Node using (centre-add; centre-neg; centre-0
 
 negℝ-negℝ : (x : RealI) → negℝ (negℝ x) ≈ℝ x
 negℝ-negℝ x = ≈ℝ-of-eq _ _ λ n →
-  trans (centre-neg (negℝ x) n)
-  (trans (cong neg (centre-neg x n))
-         (neg-invol (centre x n)))
+  begin
+    centre (negℝ (negℝ x)) n
+  ≡⟨ centre-neg (negℝ x) n ⟩
+    neg (centre (negℝ x) n)
+  ≡⟨ cong neg (centre-neg x n) ⟩
+    neg (neg (centre x n))
+  ≡⟨ neg-invol (centre x n) ⟩
+    centre x n
+  ∎
 
 negℝ-0ℝ : negℝ 0ℝ ≈ℝ 0ℝ
 negℝ-0ℝ = ≈ℝ-of-eq _ _ λ n →
-  trans (centre-neg 0ℝ n)
-  (trans (cong neg (centre-0ℝ n))
-         (sym (centre-0ℝ n)))
+  begin
+    centre (negℝ 0ℝ) n
+  ≡⟨ centre-neg 0ℝ n ⟩
+    neg (centre 0ℝ n)
+  ≡⟨ cong neg (centre-0ℝ n) ⟩
+    neg 0ℚ
+  ≡⟨ sym (centre-0ℝ n) ⟩
+    centre 0ℝ n
+  ∎
 
 ------------------------------------------------------------------------
 -- Derived laws
@@ -132,19 +196,47 @@ x-ℝx x = +ℝ-inverseˡ x
     ncy = neg cy
 
     lhs : centre ((x -ℝ y) +ℝ z) n ≡ (cx + ncy) + cz
-    lhs = trans (centre-add (x -ℝ y) z n)
-          (cong (λ w → w + cz)
-            (trans (centre-add x (negℝ y) n)
-                   (cong (λ w → cx + w) (centre-neg y n))))
+    lhs = begin
+        centre ((x -ℝ y) +ℝ z) n
+      ≡⟨ centre-add (x -ℝ y) z n ⟩
+        centre (x -ℝ y) n + cz
+      ≡⟨ cong (λ w → w + cz) (begin
+            centre (x -ℝ y) n
+          ≡⟨ centre-add x (negℝ y) n ⟩
+            cx + centre (negℝ y) n
+          ≡⟨ cong (λ w → cx + w) (centre-neg y n) ⟩
+            cx + ncy
+          ∎) ⟩
+        (cx + ncy) + cz
+      ∎
 
     rhs : centre ((x +ℝ z) -ℝ y) n ≡ (cx + cz) + ncy
-    rhs = trans (centre-add (x +ℝ z) (negℝ y) n)
-          (trans (cong (λ w → w + centre (negℝ y) n) (centre-add x z n))
-                 (cong (λ w → (cx + cz) + w) (centre-neg y n)))
+    rhs = begin
+        centre ((x +ℝ z) -ℝ y) n
+      ≡⟨ centre-add (x +ℝ z) (negℝ y) n ⟩
+        centre (x +ℝ z) n + centre (negℝ y) n
+      ≡⟨ cong (λ w → w + centre (negℝ y) n) (centre-add x z n) ⟩
+        (cx + cz) + centre (negℝ y) n
+      ≡⟨ cong (λ w → (cx + cz) + w) (centre-neg y n) ⟩
+        (cx + cz) + ncy
+      ∎
 
     key : (cx + ncy) + cz ≡ (cx + cz) + ncy
-    key =
-      trans (+-assoc cx ncy cz)
-      (trans (cong (cx +_) (+-comm ncy cz))
-             (sym (+-assoc cx cz ncy)))
-  in trans lhs (trans key (sym rhs))
+    key = begin
+        (cx + ncy) + cz
+      ≡⟨ +-assoc cx ncy cz ⟩
+        cx + (ncy + cz)
+      ≡⟨ cong (cx +_) (+-comm ncy cz) ⟩
+        cx + (cz + ncy)
+      ≡⟨ sym (+-assoc cx cz ncy) ⟩
+        (cx + cz) + ncy
+      ∎
+  in begin
+      centre ((x -ℝ y) +ℝ z) n
+    ≡⟨ lhs ⟩
+      (cx + ncy) + cz
+    ≡⟨ key ⟩
+      (cx + cz) + ncy
+    ≡⟨ sym rhs ⟩
+      centre ((x +ℝ z) -ℝ y) n
+    ∎

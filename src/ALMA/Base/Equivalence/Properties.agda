@@ -19,6 +19,8 @@
 module ALMA.Base.Equivalence.Properties where
 
 open import Agda.Builtin.Equality using (_≡_; refl)
+open import Relation.Binary.PropositionalEquality using (module ≡-Reasoning)
+open ≡-Reasoning
 open import Relation.Binary.PropositionalEquality.Core using (trans; sym; cong; subst)
 open import Relation.Binary.Structures using (IsEquivalence; IsPreorder)
 
@@ -46,7 +48,12 @@ module LayeredEqGen-Properties
     → ∀ x → LayeredEqGen Obs step layer obs-map x x
   le-refl layer-refl obs-refl x .Mᵢ.fst = layer-refl x
   le-refl layer-refl obs-refl x .Mᵢ.snd s
-    rewrite obs-refl x s = le-refl layer-refl obs-refl (step x s)
+    rewrite (begin
+      obs-map x x (layer-refl x) s
+    ≡⟨ obs-refl x s ⟩
+      s
+    ∎)
+    = le-refl layer-refl obs-refl (step x s)
 
   -- Coherence: obs-map along layer-sym cancels the reverse obs-map.
   --
@@ -62,7 +69,11 @@ module LayeredEqGen-Properties
   le-sym layer-sym obs-sym {x} {y} p .Mᵢ.snd s =
     le-sym layer-sym obs-sym
       (subst (λ T → LayeredEqGen Obs step layer obs-map (step x s') T)
-             (cong (step y) (obs-sym {x} {y} l s))
+             (begin
+                step y (obs-map x y l s')
+              ≡⟨ cong (step y) (obs-sym {x} {y} l s) ⟩
+                step y s
+              ∎)
              (p .Mᵢ.snd s'))
     where
       l  = p .Mᵢ.fst
@@ -85,7 +96,11 @@ module LayeredEqGen-Properties
     le-trans layer-trans obs-trans
       (p .Mᵢ.snd s)
       (subst (λ T → LayeredEqGen Obs step layer obs-map (step y s_y) T)
-             (cong (step z) (obs-trans l_xy l_yz s))
+             (begin
+                step z (obs-map y z l_yz (obs-map x y l_xy s))
+              ≡⟨ cong (step z) (obs-trans l_xy l_yz s) ⟩
+                step z (obs-map x z (layer-trans l_xy l_yz) s)
+              ∎)
              (q .Mᵢ.snd s_y))
     where
       l_xy = p .Mᵢ.fst

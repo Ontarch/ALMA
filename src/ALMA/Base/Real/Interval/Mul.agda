@@ -27,16 +27,17 @@ open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Rational.Properties using
-  (+-mono-≤; +-mono-≤-<; +-assoc; +-comm; +-identityʳ; +-identityˡ
-  ; +-inverseʳ; +-inverseˡ; *-assoc; *-comm; *-distribʳ-+; *-distribˡ-+
-  ; neg-distribˡ-*; neg-distribʳ-*; ≤-refl; ≤-reflexive; ≤-trans; ≤-antisym; ≤-total
-  ; <⇒≤; ≤-<-trans; <-≤-trans; *-monoˡ-<-pos; *-monoʳ-<-pos; *-monoʳ-≤-nonNeg
-  ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonPos; *-monoˡ-≤-nonPos; pos*pos⇒pos; positive⁻¹
-  ; <-cmp; *-identityˡ; *-identityʳ; *-inverseʳ; *-inverseˡ; *-zeroˡ; *-zeroʳ
-  ; ∣p*q∣≡∣p∣*∣q∣; ∣p∣≡p∨∣p∣≡-p; ∣-p∣≡∣p∣; 0≤∣p∣; 0≤p⇒∣p∣≡p; 1/pos⇒pos)
+  (+-mono-≤; +-mono-≤-<; +-assoc; +-comm; +-identityʳ; +-identityˡ; +-inverseʳ
+  ; +-inverseˡ; *-assoc; *-comm; *-distribʳ-+; *-distribˡ-+; neg-distribˡ-*
+  ; neg-distribʳ-*; ≤-refl; ≤-reflexive; ≤-trans; ≤-antisym; ≤-total; <⇒≤
+  ; ≤-<-trans; <-≤-trans; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonPos
+  ; *-monoˡ-≤-nonPos; pos*pos⇒pos; positive⁻¹; <-cmp; *-identityˡ; *-identityʳ
+  ; *-inverseʳ; *-inverseˡ; *-zeroˡ; *-zeroʳ; ∣p*q∣≡∣p∣*∣q∣; ∣p∣≡p∨∣p∣≡-p
+  ; ∣-p∣≡∣p∣; 0≤∣p∣; 0≤p⇒∣p∣≡p; 1/pos⇒pos)
   renaming (<-trans to <-transℚ ; <-irrefl to <-irreflℚ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
+open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (Tri; tri<; tri≈; tri>)
 
@@ -46,7 +47,7 @@ open import ALMA.Base.Real.IntervalEquiv using (bounded-diff; mono-half)
 open import ALMA.Base.Real.Interval.Rational using
   (pos-diff; sub-add; negsub; min; max; min≤ˡ; min≤ʳ; ≤maxˡ; ≤maxʳ; max≤; ≤min
   ; max-mono; max-le; max-ge; mag; mag-≤; r≤|r|; cong-plus)
-open import ALMA.Base.Real.Interval.Kit using (embed2-nz; add-self)
+open import ALMA.Base.Real.Interval.Kit using (add-self)
 
 ------------------------------------------------------------------------
 -- Basic lemmas
@@ -75,16 +76,30 @@ le-addʳ {x} {y} {z} x≤y 0≤z =
                      (+-mono-≤ (≤-refl {y}) 0≤z))
 
 cancelʳ : ∀ x y → (x - y) + y ≡ x
-cancelʳ x y =
-  trans (+-assoc x (neg y) y)
-        (trans (cong (λ z → x + z) (+-inverseˡ y)) (+-identityʳ x))
+cancelʳ x y = begin
+  (x - y) + y
+    ≡⟨ +-assoc x (neg y) y ⟩
+  x + (neg y + y)
+    ≡⟨ cong (x +_) (+-inverseˡ y) ⟩
+  x + 0ℚ
+    ≡⟨ +-identityʳ x ⟩
+  x
+  ∎
 
 cancel-z : ∀ z y → (z + y) - z ≡ y
-cancel-z z y =
-  trans (+-assoc z y (neg z))
-  (trans (cong (λ w → z + w) (+-comm y (neg z)))
-  (trans (sym (+-assoc z (neg z) y))
-  (trans (cong (λ w → w + y) (+-inverseʳ z)) (+-identityˡ y))))
+cancel-z z y = begin
+  (z + y) - z
+    ≡⟨ +-assoc z y (neg z) ⟩
+  z + (y + neg z)
+    ≡⟨ cong (z +_) (+-comm y (neg z)) ⟩
+  z + (neg z + y)
+    ≡⟨ sym (+-assoc z (neg z) y) ⟩
+  (z + neg z) + y
+    ≡⟨ cong (_+ y) (+-inverseʳ z) ⟩
+  0ℚ + y
+    ≡⟨ +-identityˡ y ⟩
+  y
+  ∎
 
 le-shift : ∀ {x y z : ℚ} → x - y ≤ z → x ≤ z + y
 le-shift {x} {y} {z} h =
@@ -127,7 +142,6 @@ split-prod a a' b b' =
        a * b + neg (a' * b')
      ∎)
   where
-    open ≡-Reasoning
 
     s1 : a * (b - b') ≡ a * b + neg (a * b')
     s1 =
@@ -135,7 +149,7 @@ split-prod a a' b b' =
         a * (b - b')
       ≡⟨ *-distribˡ-+ a b (neg b') ⟩
         a * b + a * neg b'
-      ≡⟨ cong (λ z → a * b + z) (sym (neg-distribʳ-* a b')) ⟩
+      ≡⟨ cong (a * b +_) (sym (neg-distribʳ-* a b')) ⟩
         a * b + neg (a * b')
       ∎
 
@@ -145,7 +159,7 @@ split-prod a a' b b' =
         (a - a') * b'
       ≡⟨ *-distribʳ-+ b' a (neg a') ⟩
         a * b' + (neg a') * b'
-      ≡⟨ cong (λ z → a * b' + z) (sym (neg-distribˡ-* a' b')) ⟩
+      ≡⟨ cong (a * b' +_) (sym (neg-distribˡ-* a' b')) ⟩
         a * b' + neg (a' * b')
       ∎
 
@@ -393,39 +407,65 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
   --
   -- 角差的两写法。
   c1-c2≡ : c1 - c2 ≡ lx * (ly - uy)
-  c1-c2≡ =
-    trans (cong (λ z → lx * ly + z) (neg-distribʳ-* lx uy))
-          (sym (*-distribˡ-+ lx ly (neg uy)))
+  c1-c2≡ = begin
+    c1 - c2
+      ≡⟨ cong (lx * ly +_) (neg-distribʳ-* lx uy) ⟩
+    lx * ly + lx * neg uy
+      ≡⟨ sym (*-distribˡ-+ lx ly (neg uy)) ⟩
+    lx * (ly - uy)
+    ∎
 
   c3-c4≡ : c3 - c4 ≡ ux * (ly - uy)
-  c3-c4≡ =
-    trans (cong (λ z → ux * ly + z) (neg-distribʳ-* ux uy))
-          (sym (*-distribˡ-+ ux ly (neg uy)))
+  c3-c4≡ = begin
+    c3 - c4
+      ≡⟨ cong (ux * ly +_) (neg-distribʳ-* ux uy) ⟩
+    ux * ly + ux * neg uy
+      ≡⟨ sym (*-distribˡ-+ ux ly (neg uy)) ⟩
+    ux * (ly - uy)
+    ∎
 
   c1-c3≡ : c1 - c3 ≡ (lx - ux) * ly
-  c1-c3≡ =
-    trans (cong (λ z → lx * ly + z) (neg-distribˡ-* ux ly))
-          (sym (*-distribʳ-+ ly lx (neg ux)))
+  c1-c3≡ = begin
+    c1 - c3
+      ≡⟨ cong (lx * ly +_) (neg-distribˡ-* ux ly) ⟩
+    lx * ly + (neg ux) * ly
+      ≡⟨ sym (*-distribʳ-+ ly lx (neg ux)) ⟩
+    (lx - ux) * ly
+    ∎
 
   c2-c4≡ : c2 - c4 ≡ (lx - ux) * uy
-  c2-c4≡ =
-    trans (cong (λ z → lx * uy + z) (neg-distribˡ-* ux uy))
-          (sym (*-distribʳ-+ uy lx (neg ux)))
+  c2-c4≡ = begin
+    c2 - c4
+      ≡⟨ cong (lx * uy +_) (neg-distribˡ-* ux uy) ⟩
+    lx * uy + (neg ux) * uy
+      ≡⟨ sym (*-distribʳ-+ uy lx (neg ux)) ⟩
+    (lx - ux) * uy
+    ∎
 
   -- Absolute-value normalisation.
   --
   -- 绝对值化归。
   abs-lo-hi : ∣ ly - uy ∣ ≡ uy - ly
-  abs-lo-hi =
-    trans (cong ∣_∣ (sym (negsub uy ly)))
-          (trans (∣-p∣≡∣p∣ (uy - ly))
-                 (0≤p⇒∣p∣≡p {uy - ly} (0≤diff ly≤uy)))
+  abs-lo-hi = begin
+    ∣ ly - uy ∣
+      ≡⟨ cong ∣_∣ (sym (negsub uy ly)) ⟩
+    ∣ neg (uy - ly) ∣
+      ≡⟨ ∣-p∣≡∣p∣ (uy - ly) ⟩
+    ∣ uy - ly ∣
+      ≡⟨ 0≤p⇒∣p∣≡p {uy - ly} (0≤diff ly≤uy) ⟩
+    uy - ly
+    ∎
 
   abs-hi-lo : ∣ lx - ux ∣ ≡ ux - lx
-  abs-hi-lo =
-    trans (cong ∣_∣ (sym (negsub ux lx)))
-          (trans (∣-p∣≡∣p∣ (ux - lx))
-                 (0≤p⇒∣p∣≡p {ux - lx} (0≤diff lx≤ux)))
+  abs-hi-lo = begin
+    ∣ lx - ux ∣
+      ≡⟨ cong ∣_∣ (sym (negsub ux lx)) ⟩
+    ∣ neg (ux - lx) ∣
+      ≡⟨ ∣-p∣≡∣p∣ (ux - lx) ⟩
+    ∣ ux - lx ∣
+      ≡⟨ 0≤p⇒∣p∣≡p {ux - lx} (0≤diff lx≤ux) ⟩
+    ux - lx
+    ∎
 
   -- Lower bound: U_X · w_Y ≤ hi4 − lo4.
   --
@@ -485,7 +525,6 @@ RealI.u (x *ℝ y) =
       (max (RealI.u x * RealI.l y) (RealI.u x * RealI.u y))
 RealI.lo (x *ℝ y) = lo<hi
   where
-    open ≡-Reasoning
 
     lx = RealI.l x; ux = RealI.u x
     ly = RealI.l y; uy = RealI.u y
@@ -510,7 +549,7 @@ RealI.lo (x *ℝ y) = lo<hi
         ux * uy - ux * ly
       ≡⟨ refl ⟩
         ux * uy + neg (ux * ly)
-      ≡⟨ cong (λ z → ux * uy + z) (neg-distribʳ-* ux ly) ⟩
+      ≡⟨ cong (ux * uy +_) (neg-distribʳ-* ux ly) ⟩
         ux * uy + ux * neg ly
       ≡⟨ sym (*-distribˡ-+ ux uy (neg ly)) ⟩
         ux * (uy + neg ly)
@@ -526,11 +565,11 @@ RealI.lo (x *ℝ y) = lo<hi
         (c1 - c2) + (c4 - c3)
       ≡⟨ cong₂ _+_ c1-c2≡ c4-c3≡ ⟩
         (lx * (ly - uy)) + (ux * (uy - ly))
-      ≡⟨ cong (λ z → z + ux * (uy - ly)) step1 ⟩
+      ≡⟨ cong (_+ ux * (uy - ly)) step1 ⟩
         ((neg lx) * (uy - ly)) + (ux * (uy - ly))
       ≡⟨ sym (*-distribʳ-+ (uy - ly) (neg lx) ux) ⟩
         ((neg lx) + ux) * (uy - ly)
-      ≡⟨ cong (λ z → z * (uy - ly)) (+-comm (neg lx) ux) ⟩
+      ≡⟨ cong (_* (uy - ly)) (+-comm (neg lx) ux) ⟩
         (ux - lx) * (uy - ly)
       ∎
 
@@ -567,11 +606,11 @@ RealI.lo (x *ℝ y) = lo<hi
             (c2 + c3) + ((c1 + c4) + neg (c2 + c3))
           ≡⟨ sym (+-assoc (c2 + c3) (c1 + c4) (neg (c2 + c3))) ⟩
             ((c2 + c3) + (c1 + c4)) + neg (c2 + c3)
-          ≡⟨ cong (λ z → z + neg (c2 + c3)) (+-comm (c2 + c3) (c1 + c4)) ⟩
+          ≡⟨ cong (_+ neg (c2 + c3)) (+-comm (c2 + c3) (c1 + c4)) ⟩
             ((c1 + c4) + (c2 + c3)) + neg (c2 + c3)
           ≡⟨ +-assoc (c1 + c4) (c2 + c3) (neg (c2 + c3)) ⟩
             (c1 + c4) + ((c2 + c3) + neg (c2 + c3))
-          ≡⟨ cong (λ z → (c1 + c4) + z) (+-inverseʳ (c2 + c3)) ⟩
+          ≡⟨ cong ((c1 + c4) +_) (+-inverseʳ (c2 + c3)) ⟩
             (c1 + c4) + 0ℚ
           ≡⟨ +-identityʳ (c1 + c4) ⟩
             c1 + c4
@@ -607,8 +646,8 @@ RealI.lo (x *ℝ y) = lo<hi
         c3≡c4 = ≤-antisym c3≤c4 c4≤c3
 
         eq-sum : c1 + c4 ≡ c2 + c3
-        eq-sum = trans (cong (λ z → z + c4) c1≡c2)
-                       (cong (λ z → c2 + z) (sym c3≡c4))
+        eq-sum = trans (cong (_+ c4) c1≡c2)
+                       (cong (c2 +_) (sym c3≡c4))
 
         bad : c2 + c3 < c2 + c3
         bad = subst (λ z → c2 + c3 < z) eq-sum sum-gt
@@ -732,15 +771,25 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
               (≤-reflexive (*-assoc wY h h))
 
     double-h : ∀ W → (W + W) * (h * h) ≡ W * h
-    double-h W =
-      trans (cong (λ z → z * (h * h)) (add-self W))
-      (trans (*-assoc 2ℚ W (h * h))
-      (trans (cong (λ z → 2ℚ * z) (sym (*-assoc W h h)))
-      (trans (cong (λ z → 2ℚ * (z * h)) (*-comm W h))
-      (trans (cong (λ z → 2ℚ * z) (*-assoc h W h))
-      (trans (sym (*-assoc 2ℚ h (W * h)))
-      (trans (cong (λ z → z * (W * h)) (*-inverseʳ (embed 2)))
-             (*-identityˡ (W * h))))))))
+    double-h W = begin
+      (W + W) * (h * h)
+        ≡⟨ cong (_* (h * h)) (add-self W) ⟩
+      (2ℚ * W) * (h * h)
+        ≡⟨ *-assoc 2ℚ W (h * h) ⟩
+      2ℚ * (W * (h * h))
+        ≡⟨ cong (2ℚ *_) (sym (*-assoc W h h)) ⟩
+      2ℚ * ((W * h) * h)
+        ≡⟨ cong (λ z → 2ℚ * (z * h)) (*-comm W h) ⟩
+      2ℚ * ((h * W) * h)
+        ≡⟨ cong (2ℚ *_) (*-assoc h W h) ⟩
+      2ℚ * (h * (W * h))
+        ≡⟨ sym (*-assoc 2ℚ h (W * h)) ⟩
+      (2ℚ * h) * (W * h)
+        ≡⟨ cong (_* (W * h)) (*-inverseʳ (embed 2)) ⟩
+      1ℚ * (W * h)
+        ≡⟨ *-identityˡ (W * h) ⟩
+      W * h
+      ∎
 
     B' : ℚ
     B' = U' * wY' + Uy' * wX'
@@ -760,9 +809,13 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
 
     g3 : U * (wY * (h * h)) + Uy * (wX * (h * h))
        ≡ (U * wY + Uy * wX) * (h * h)
-    g3 = sym (trans (*-distribʳ-+ (h * h) (U * wY) (Uy * wX))
-                    (cong-plus (*-assoc U wY (h * h))
-                               (*-assoc Uy wX (h * h))))
+    g3 = sym (begin
+      (U * wY + Uy * wX) * (h * h)
+        ≡⟨ *-distribʳ-+ (h * h) (U * wY) (Uy * wX) ⟩
+      (U * wY) * (h * h) + (Uy * wX) * (h * h)
+        ≡⟨ cong-plus (*-assoc U wY (h * h)) (*-assoc Uy wX (h * h)) ⟩
+      U * (wY * (h * h)) + Uy * (wX * (h * h))
+      ∎)
 
     g4 : (U * wY + Uy * wX) * (h * h)
        ≤ ((S.hi4 - S.lo4) + (S.hi4 - S.lo4)) * (h * h)

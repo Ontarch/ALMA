@@ -26,11 +26,12 @@ open import Data.Rational.Properties using
   ; *-comm; *-distribʳ-+; neg-distrib-+; neg-distribˡ-*; ≤-refl; ≤-reflexive
   ; ≤-trans; <⇒≤; +-mono-≤; *-inverseʳ; *-monoˡ-≤-nonNeg)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; trans; sym; subst)
+  (_≡_; refl; cong; cong₂; sym; subst; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import ALMA.Base.Real.IntervalEquiv using
   (node; l; u; centre; width; width-n; 0<width; recipPow2)
-open import ALMA.Base.Real using (embed; 2ℚ≡1+1)
+open import ALMA.Base.Real using (embed; 2ℚ; 2ℚ≡1+1)
 open import ALMA.Base.Real.Interval using (RealI; dyadic; δ)
 open import ALMA.Base.Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; div-add)
 open import ALMA.Base.Real.Interval.Mul using (_*ℝ_)
@@ -82,15 +83,17 @@ centre-add x y n =
   let
     lx = l x n; ux = u x n
     ly = l y n; uy = u y n
-    step1 : centre (x +ℝ y) n ≡ ((lx + ly) + (ux + uy)) * half
-    step1 = cong₂ (λ a b → (a + b) * half) (l-hom x y n) (u-hom x y n)
-    step2 : ((lx + ly) + (ux + uy)) * half
-          ≡ ((lx + ux) + (ly + uy)) * half
-    step2 = cong (_* half) (+interchange lx ly ux uy)
-    step3 : ((lx + ux) + (ly + uy)) * half
-          ≡ ((lx + ux) * half) + ((ly + uy) * half)
-    step3 = div-add (lx + ux) (ly + uy)
-  in trans step1 (trans step2 step3)
+  in begin
+    centre (x +ℝ y) n
+      ≡⟨ cong₂ (λ a b → (a + b) * half) (l-hom x y n) (u-hom x y n) ⟩
+    ((lx + ly) + (ux + uy)) * half
+      ≡⟨ cong (_* half) (+interchange lx ly ux uy) ⟩
+    ((lx + ux) + (ly + uy)) * half
+      ≡⟨ div-add (lx + ux) (ly + uy) ⟩
+    ((lx + ux) * half) + ((ly + uy) * half)
+      ≡⟨ refl ⟩
+    centre x n + centre y n
+      ∎
 
 ------------------------------------------------------------------------
 -- node commutes with negℝ
@@ -113,15 +116,19 @@ centre-neg x n =
   let
     lx = l x n
     ux = u x n
-    step1 : centre (negℝ x) n ≡ (neg ux + neg lx) * half
-    step1 = cong₂ (λ a b → (a + b) * half) (l-neg x n) (u-neg x n)
-    step2 : (neg ux + neg lx) * half ≡ (neg lx + neg ux) * half
-    step2 = cong (_* half) (+-comm (neg ux) (neg lx))
-    step3 : (neg lx + neg ux) * half ≡ neg (lx + ux) * half
-    step3 = cong (_* half) (sym (neg-distrib-+ lx ux))
-    step4 : neg (lx + ux) * half ≡ neg ((lx + ux) * half)
-    step4 = sym (neg-distribˡ-* (lx + ux) half)
-  in trans step1 (trans step2 (trans step3 step4))
+  in begin
+    centre (negℝ x) n
+      ≡⟨ cong₂ (λ a b → (a + b) * half) (l-neg x n) (u-neg x n) ⟩
+    (neg ux + neg lx) * half
+      ≡⟨ cong (_* half) (+-comm (neg ux) (neg lx)) ⟩
+    (neg lx + neg ux) * half
+      ≡⟨ cong (_* half) (sym (neg-distrib-+ lx ux)) ⟩
+    neg (lx + ux) * half
+      ≡⟨ sym (neg-distribˡ-* (lx + ux) half) ⟩
+    neg ((lx + ux) * half)
+      ≡⟨ refl ⟩
+    neg (centre x n)
+      ∎
 
 ------------------------------------------------------------------------
 -- centre of 0ℝ and 1ℝ
@@ -133,36 +140,51 @@ centre-0ℝ n =
   let
     dn = δ n
     l0 : l 0ℝ n ≡ neg dn
-    l0 = trans (l-dyadic 0ℚ n) (+-identityʳ (neg dn))
+    l0 = begin
+      l 0ℝ n
+        ≡⟨ l-dyadic 0ℚ n ⟩
+      neg dn + 0ℚ
+        ≡⟨ +-identityʳ (neg dn) ⟩
+      neg dn
+        ∎
     u0 : u 0ℝ n ≡ dn
-    u0 = trans (u-dyadic 0ℚ n) (+-identityʳ dn)
-    step1 : centre 0ℝ n ≡ (neg dn + dn) * half
-    step1 = cong₂ (λ a b → (a + b) * half) l0 u0
-    step2 : (neg dn + dn) * half ≡ 0ℚ * half
-    step2 = cong (_* half) (+-inverseˡ dn)
-    step3 : 0ℚ * half ≡ 0ℚ
-    step3 = *-zeroˡ half
-  in trans step1 (trans step2 step3)
+    u0 = begin
+      u 0ℝ n
+        ≡⟨ u-dyadic 0ℚ n ⟩
+      dn + 0ℚ
+        ≡⟨ +-identityʳ dn ⟩
+      dn
+        ∎
+  in begin
+    centre 0ℝ n
+      ≡⟨ cong₂ (λ a b → (a + b) * half) l0 u0 ⟩
+    (neg dn + dn) * half
+      ≡⟨ cong (_* half) (+-inverseˡ dn) ⟩
+    0ℚ * half
+      ≡⟨ *-zeroˡ half ⟩
+    0ℚ
+      ∎
 
 centre-1ℝ : (n : ℕ) → centre 1ℝ n ≡ 1ℚ
 centre-1ℝ n =
   let
     dn = δ n
-    step1 : centre 1ℝ n ≡ ((neg dn + 1ℚ) + (dn + 1ℚ)) * half
-    step1 = cong₂ (λ a b → (a + b) * half)
-                  (l-dyadic 1ℚ n) (u-dyadic 1ℚ n)
-    step2 : ((neg dn + 1ℚ) + (dn + 1ℚ)) * half
-          ≡ ((neg dn + dn) + (1ℚ + 1ℚ)) * half
-    step2 = cong (_* half) (+interchange (neg dn) 1ℚ dn 1ℚ)
-    step3 : ((neg dn + dn) + (1ℚ + 1ℚ)) * half
-          ≡ (0ℚ + (1ℚ + 1ℚ)) * half
-    step3 = cong (λ z → (z + (1ℚ + 1ℚ)) * half) (+-inverseˡ dn)
-    step4 : (0ℚ + (1ℚ + 1ℚ)) * half ≡ (1ℚ + 1ℚ) * half
-    step4 = cong (_* half) (+-identityˡ (1ℚ + 1ℚ))
-    step5 : (1ℚ + 1ℚ) * half ≡ 1ℚ
-    step5 = trans (cong (_* half) (sym 2ℚ≡1+1))
-                  (*-inverseʳ (embed 2) {{embed2-nz}})
-  in trans step1 (trans step2 (trans step3 (trans step4 step5)))
+  in begin
+    centre 1ℝ n
+      ≡⟨ cong₂ (λ a b → (a + b) * half)
+               (l-dyadic 1ℚ n) (u-dyadic 1ℚ n) ⟩
+    ((neg dn + 1ℚ) + (dn + 1ℚ)) * half
+      ≡⟨ cong (_* half) (+interchange (neg dn) 1ℚ dn 1ℚ) ⟩
+    ((neg dn + dn) + (1ℚ + 1ℚ)) * half
+      ≡⟨ cong (λ z → (z + (1ℚ + 1ℚ)) * half) (+-inverseˡ dn) ⟩
+    (0ℚ + (1ℚ + 1ℚ)) * half
+      ≡⟨ cong (_* half) (+-identityˡ (1ℚ + 1ℚ)) ⟩
+    (1ℚ + 1ℚ) * half
+      ≡⟨ cong (_* half) (sym 2ℚ≡1+1) ⟩
+    2ℚ * half
+      ≡⟨ *-inverseʳ (embed 2) {{embed2-nz}} ⟩
+    1ℚ
+      ∎
 
 ------------------------------------------------------------------------
 -- node commutes with *ℝ
@@ -178,12 +200,15 @@ node-*ℝ : (x y : RealI) (n : ℕ) →
 node-*ℝ x y zero    = refl
 node-*ℝ x y (suc n) =
   let
-    step : node (x *ℝ y) (suc n)
-        ≡ node x (suc (suc (2 ℕ* n))) *ℝ node y (suc (suc (2 ℕ* n)))
-    step = cong RealI.next (node-*ℝ x y n)
     eq : suc (suc (2 ℕ* n)) ≡ 2 ℕ* suc n
     eq = sym (*-suc 2 n)
-  in trans step (cong₂ (λ a b → node x a *ℝ node y b) eq eq)
+  in begin
+    node (x *ℝ y) (suc n)
+      ≡⟨ cong RealI.next (node-*ℝ x y n) ⟩
+    node x (suc (suc (2 ℕ* n))) *ℝ node y (suc (suc (2 ℕ* n)))
+      ≡⟨ cong₂ (λ a b → node x a *ℝ node y b) eq eq ⟩
+    node x (2 ℕ* suc n) *ℝ node y (2 ℕ* suc n)
+      ∎
 
 ------------------------------------------------------------------------
 -- Private algebraic helpers
@@ -191,13 +216,23 @@ node-*ℝ x y (suc n) =
 -- 私有代数助手
 
 mul-pair : ∀ a b h → (a * h) * (b * h) ≡ (a * b) * (h * h)
-mul-pair a b h =
-  trans (*-assoc a h (b * h))
-  (trans (cong (a *_)
-                (trans (sym (*-assoc h b h))
-                (trans (cong (_* h) (*-comm h b))
-                      (*-assoc b h h))))
-          (sym (*-assoc a b (h * h))))
+mul-pair a b h = begin
+  (a * h) * (b * h)
+    ≡⟨ *-assoc a h (b * h) ⟩
+  a * (h * (b * h))
+    ≡⟨ cong (a *_) (begin
+          h * (b * h)
+            ≡⟨ sym (*-assoc h b h) ⟩
+          (h * b) * h
+            ≡⟨ cong (_* h) (*-comm h b) ⟩
+          (b * h) * h
+            ≡⟨ *-assoc b h h ⟩
+          b * (h * h)
+            ∎) ⟩
+  a * (b * (h * h))
+    ≡⟨ sym (*-assoc a b (h * h)) ⟩
+  (a * b) * (h * h)
+    ∎
 
 mul-nonNeg : ∀ {p q : ℚ} → 0ℚ ≤ p → 0ℚ ≤ q → 0ℚ ≤ p * q
 mul-nonNeg {p} {q} 0≤p 0≤q =
@@ -235,9 +270,15 @@ prod-rec {a} {a'} {b} {b'} {r} 0≤r r≤1 ha hb 0≤a 0≤b 0≤a' 0≤b' =
 -- 宽度估计
 
 width-+ : (x y : RealI) (n : ℕ) → width (x +ℝ y) n ≡ width x n + width y n
-width-+ x y n =
-  trans (cong₂ _-_ (u-hom x y n) (l-hom x y n))
-        (sub-add (u x n) (u y n) (l x n) (l y n))
+width-+ x y n = begin
+  width (x +ℝ y) n
+    ≡⟨ cong₂ _-_ (u-hom x y n) (l-hom x y n) ⟩
+  (u x n + u y n) - (l x n + l y n)
+    ≡⟨ sub-add (u x n) (u y n) (l x n) (l y n) ⟩
+  (u x n - l x n) + (u y n - l y n)
+    ≡⟨ refl ⟩
+  width x n + width y n
+    ∎
 
 width-rec : (x : RealI) (n : ℕ) → width x (2 ℕ* n) ≤ width x 0 * recipPow2 n
 width-rec x n =
@@ -262,13 +303,10 @@ width-sum-rec x y n =
 width-prod : (x y : RealI) (n : ℕ) →
   width x (2 ℕ* n) * width y (2 ℕ* n)
     ≤ (width x 0 * width y 0) * recipPow2 n
-width-prod x y n =
-  ≤-trans (*-mono-≤-nonNeg (0≤width-n x (2 ℕ* n)) (width-rec x n)
-                           (0≤width-n y (2 ℕ* n)) (width-rec y n))
-  (≤-trans (≤-reflexive (mul-pair (width x 0) (width y 0) (recipPow2 n)))
-           (*-monoˡ-≤-nonNeg (width x 0 * width y 0)
-             {{nonNegative (mul-nonNeg (0≤width-n x 0) (0≤width-n y 0))}}
-             (rr≤r (0≤recipPow2 n) (recipPow2≤1 n))))
+width-prod x y n = prod-rec (0≤recipPow2 n) (recipPow2≤1 n)
+  (width-rec x n) (width-rec y n)
+  (0≤width-n x (2 ℕ* n)) (0≤width-n y (2 ℕ* n))
+  (0≤width-n x 0) (0≤width-n y 0)
 
 width-x-sum : (x y z : RealI) (n : ℕ) →
   width x (2 ℕ* n) * width (y +ℝ z) (2 ℕ* n)

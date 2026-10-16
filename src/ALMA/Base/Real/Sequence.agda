@@ -36,7 +36,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; trans; sym; cong; cong₂; subst)
 
 open import ALMA.Base.MCorr using (M; here; below)
-open import ALMA.Base.Real using (CauchySeq; _≈_; _s≈_; ε; 0<ε; ≈-refl)
+open import ALMA.Base.Real using (CauchySeq; ε)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
 
 ------------------------------------------------------------------------
@@ -63,7 +63,7 @@ SeqTree = M A E
 
 mkTree : (i : ℕ) (f : ℕ → ℚ) → SeqTree i
 mkTree i f .here      = f i
-mkTree i f .below y e = mkTree y f
+mkTree i f .below y _ = mkTree y f
 
 ------------------------------------------------------------------------
 -- Extract the i-th term from a tree rooted at r

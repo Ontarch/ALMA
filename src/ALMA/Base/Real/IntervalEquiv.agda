@@ -25,36 +25,31 @@
 
 module ALMA.Base.Real.IntervalEquiv where
 
-open import Data.Bool.Base using (true; false)
-open import Data.Integer using (+_; -[1+_]; +[1+_]; +0; +≤+; +<+)
+open import Data.Integer using (+_; -[1+_]; +[1+_]; +0; +<+)
 import Data.Integer.Properties
-open import Data.Nat using (ℕ; zero; suc; _≥_; _^_; _⊔_; z≤n; _∸_; s≤s)
+open import Data.Nat using
+  (ℕ; zero; suc; _≥_; _^_; z≤n; _∸_; s≤s)
   renaming (_+_ to _+N_; _≤_ to _≤N_; _<_ to _<N_; _*_ to _ℕ*_)
-open import Data.Nat.Properties using (m^n≢0; m≤m⊔n; m≤n⊔m; *-comm)
+open import Data.Nat.Properties using (*-comm; *-suc)
 import Data.Nat.Properties as ℕP
-open import Data.Nat.Coprimality using (1-coprimeTo; Coprime) renaming (sym to coprime-sym)
-open import Data.Product using (Σ; _,_; _×_; proj₁; proj₂)
+open import Data.Nat.Coprimality using (Coprime)
+open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _<_; _>_; _≤_; _+_; _-_; _*_; ∣_∣; NonZero; Positive; NonNegative; nonPositive)
+  (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; ∣_∣; NonZero; Positive; nonNegative; NonNegative)
 open import Data.Rational.Base using (mkℚ; 1/_; _÷_) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (≤-reflexive; ≤-refl; ≤-trans; <⇒≤; <-trans; ≤-<-trans; <-≤-trans; +-mono-≤
-  ; +-mono-<; +-mono-<-≤; +-identityʳ; +-identityˡ; +-inverseʳ; +-inverseˡ; +-assoc
-  ; +-comm; *-inverseʳ; *-inverseˡ; *-assoc; *-comm; *-distribʳ-+; *-identityˡ
-  ; *-identityʳ; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; pos⇒nonNeg; *-monoʳ-≤-nonNeg
-  ; *-monoˡ-≤-nonNeg; pos*pos⇒pos; *-cancelˡ-≤-pos; ≤-antisym; neg-antimono-≤
-  ; neg-distrib-+; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; 0≤∣p∣; _≤?_)
+  (≤-reflexive; ≤-refl; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; +-mono-<-≤; +-inverseʳ
+  ; *-inverseʳ; *-inverseˡ; *-assoc; *-identityˡ; *-identityʳ; pos⇒nonZero
+  ; 1/pos⇒pos; pos⇒nonNeg; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg
+  ; pos*pos⇒pos; *-cancelˡ-≤-pos; ≤-antisym; neg-antimono-≤; neg-distrib-+)
 open import Data.Rational.Unnormalised.Base as ℚᵘ using (ℚᵘ; mkℚᵘ; *≡*)
-open import Data.Rational.Unnormalised.Properties as ℚᵘP using
-  (<-respʳ-≃; <-respˡ-≃; module ≃-Reasoning)
+open import Data.Rational.Unnormalised.Properties as ℚᵘP using (<-respʳ-≃; <-respˡ-≃)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; trans; sym; cong; cong₂; subst)
-open import Relation.Nullary using (¬_)
-open import Relation.Nullary.Decidable using (isYes; yes; no)
+  (_≡_; refl; trans; sym; cong; cong₂; subst; module ≡-Reasoning)
 
-open import ALMA.Base.Real using (CauchySeq; ε; embed; 2ℚ; 2ℚ≡1+1; 0<ε; 2*embed; embed-suc-pos)
-open import ALMA.Base.Real.Interval using (RealI; Nest; δ; pos-pow)
+open import ALMA.Base.Real using (CauchySeq; ε; embed; 2ℚ≡1+1; 2*embed; embed-suc-pos)
+open import ALMA.Base.Real.Interval using (RealI; pos-pow)
 
 -- Iterate the nested-interval successor.
 --
@@ -115,25 +110,44 @@ recip-prod≤ : (a b : ℚ) → (pa : Positive a) → (pb : Positive b) →
   ≤ Data.Rational.Base.1/_ (a * b)
       {{pos⇒nonZero (a * b) {{Data.Rational.Properties.pos*pos⇒pos a {{pa}} b {{pb}}}}}}
 recip-prod≤ a b pa pb =
-  let i1 = Data.Rational.Base.1/_ a {{pos⇒nonZero a {{pa}}}}
+  let open ≡-Reasoning
+      i1 = Data.Rational.Base.1/_ a {{pos⇒nonZero a {{pa}}}}
       i2 = Data.Rational.Base.1/_ b {{pos⇒nonZero b {{pb}}}}
       abPos : Positive (a * b)
       abPos = Data.Rational.Properties.pos*pos⇒pos a {{pa}} b {{pb}}
       invab = Data.Rational.Base.1/_ (a * b) {{pos⇒nonZero (a * b) {{abPos}}}}
       ai1 : a * i1 ≡ 1ℚ
-      ai1 = trans (Data.Rational.Properties.*-comm a i1) (*-inverseˡ a {{pos⇒nonZero a {{pa}}}})
+      ai1 = begin
+        a * i1
+          ≡⟨ Data.Rational.Properties.*-comm a i1 ⟩
+        i1 * a
+          ≡⟨ *-inverseˡ a {{pos⇒nonZero a {{pa}}}} ⟩
+        1ℚ
+        ∎
       abi1 : (a * b) * i1 ≡ b
-      abi1 =
-        trans (*-assoc a b i1)
-        (trans (cong (λ z → a * z) (Data.Rational.Properties.*-comm b i1))
-        (trans (sym (*-assoc a i1 b))
-        (trans (cong (λ z → z * b) ai1)
-               (*-identityˡ b))))
+      abi1 = begin
+        (a * b) * i1
+          ≡⟨ *-assoc a b i1 ⟩
+        a * (b * i1)
+          ≡⟨ cong (a *_) (Data.Rational.Properties.*-comm b i1) ⟩
+        a * (i1 * b)
+          ≡⟨ sym (*-assoc a i1 b) ⟩
+        (a * i1) * b
+          ≡⟨ cong (_* b) ai1 ⟩
+        1ℚ * b
+          ≡⟨ *-identityˡ b ⟩
+        b
+        ∎
       abp : (a * b) * (i1 * i2) ≡ 1ℚ
-      abp =
-        trans (sym (*-assoc (a * b) i1 i2))
-        (trans (cong (λ z → z * i2) abi1)
-               (*-inverseʳ b {{pos⇒nonZero b {{pb}}}}))
+      abp = begin
+        (a * b) * (i1 * i2)
+          ≡⟨ sym (*-assoc (a * b) i1 i2) ⟩
+        ((a * b) * i1) * i2
+          ≡⟨ cong (_* i2) abi1 ⟩
+        b * i2
+          ≡⟨ *-inverseʳ b {{pos⇒nonZero b {{pb}}}} ⟩
+        1ℚ
+        ∎
       abq : (a * b) * invab ≡ 1ℚ
       abq = *-inverseʳ (a * b) {{pos⇒nonZero (a * b) {{abPos}}}}
       p≤q : (a * b) * (i1 * i2) ≤ (a * b) * invab
@@ -192,7 +206,8 @@ width-n : (r : RealI) (n : ℕ) →
 width-n r zero =
   ≤-reflexive (sym (*-identityʳ (width r 0)))
 width-n r (suc n) =
-  let w0 = width r 0
+  let open ≡-Reasoning
+      w0 = width r 0
       an = 2 ^ n Data.Nat.∸ 1
       a1 = 2 ^ 1 Data.Nat.∸ 1
       as = 2 ^ suc n Data.Nat.∸ 1
@@ -202,11 +217,11 @@ width-n r (suc n) =
       hn = recipPow2 n
       h1 = recipPow2 1
       hs = recipPow2 (suc n)
-      w0nn : Data.Rational.NonNegative w0
-      w0nn = Data.Rational.nonNegative
+      w0nn : NonNegative w0
+      w0nn = nonNegative
         (≤-trans (≤-reflexive (sym (+-inverseʳ (l r 0))))
                  (Data.Rational.Properties.+-mono-≤ (<⇒≤ (RealI.lo r)) (≤-refl)))
-      h1nn : Data.Rational.NonNegative h1
+      h1nn : NonNegative h1
       h1nn = pos⇒nonNeg h1 {{1/pos⇒pos B {{embed-suc-pos}}}}
       step1 : width r (suc n) ≤ width r n * h1
       step1 = width-1step r n
@@ -234,10 +249,17 @@ width-n r (suc n) =
             S≡ : S ≡ pow2 (suc n)
             S≡ = cong embed (suc∸1 (0<2^n (suc n)))
             prod≡S : prod ≡ S
-            prod≡S =
-              trans (cong (A *_) B≡)
-              (trans (cong (_* pow2 1) A≡)
-              (trans (denom-eq n) (sym S≡)))
+            prod≡S = begin
+              A * B
+                ≡⟨ cong (A *_) B≡ ⟩
+              A * pow2 1
+                ≡⟨ cong (_* pow2 1) A≡ ⟩
+              pow2 n * pow2 1
+                ≡⟨ denom-eq n ⟩
+              pow2 (suc n)
+                ≡⟨ sym S≡ ⟩
+              S
+                ∎
             ab2' : prod * hs ≡ 1ℚ
             ab2' = trans (cong (λ d → d * hs) prod≡S) ab2
             le : prod * invprod ≤ prod * hs
@@ -260,16 +282,23 @@ width-n r (suc n) =
 -- 中心落在区间内：l ≤ centre。
 centre-l : (r : RealI) (n : ℕ) → l r n ≤ centre r n
 centre-l r n =
-  let l′ = l r n; u′ = u r n
+  let open ≡-Reasoning
+      l′ = l r n; u′ = u r n
       half = Data.Rational.Base.1/_ (embed 2) {{pos⇒nonZero (embed 2) {{pos-pow 0}}}}
       2h : embed 2 * half ≡ 1ℚ
       2h = *-inverseʳ (embed 2) {{pos⇒nonZero (embed 2) {{pos-pow 0}}}}
       2l : embed 2 * l′ ≡ l′ + l′
-      2l =
-        trans (cong (λ z → z * l′) (sym 2ℚ≡1+1))
-        (trans (Data.Rational.Properties.*-distribʳ-+ l′ 1ℚ 1ℚ)
-        (trans (cong (λ z → z + 1ℚ * l′) (Data.Rational.Properties.*-identityˡ l′))
-               (cong (λ z → l′ + z) (Data.Rational.Properties.*-identityˡ l′))))
+      2l = begin
+        embed 2 * l′
+          ≡⟨ cong (λ z → z * l′) (sym 2ℚ≡1+1) ⟩
+        (1ℚ + 1ℚ) * l′
+          ≡⟨ Data.Rational.Properties.*-distribʳ-+ l′ 1ℚ 1ℚ ⟩
+        1ℚ * l′ + 1ℚ * l′
+          ≡⟨ cong (λ z → z + 1ℚ * l′) (Data.Rational.Properties.*-identityˡ l′) ⟩
+        l′ + 1ℚ * l′
+          ≡⟨ cong (λ z → l′ + z) (Data.Rational.Properties.*-identityˡ l′) ⟩
+        l′ + l′
+        ∎
       l≤u : l′ ≤ u′
       l≤u = <⇒≤ (RealI.lo (node r n))
       ineq : embed 2 * l′ ≤ l′ + u′
@@ -280,13 +309,20 @@ centre-l r n =
       mono = Data.Rational.Properties.*-monoʳ-≤-nonNeg half
                {{pos⇒nonNeg half {{1/pos⇒pos (embed 2) {{pos-pow 0}}}}}} ineq
       chain : (embed 2 * l′) * half ≡ l′
-      chain =
-        trans (Data.Rational.Properties.*-assoc (embed 2) l′ half)
-        (trans (cong (λ z → embed 2 * z)
-                     (Data.Rational.Properties.*-comm l′ half))
-        (trans (sym (Data.Rational.Properties.*-assoc (embed 2) half l′))
-        (trans (cong (λ z → z * l′) 2h)
-               (Data.Rational.Properties.*-identityˡ l′))))
+      chain = begin
+        (embed 2 * l′) * half
+          ≡⟨ Data.Rational.Properties.*-assoc (embed 2) l′ half ⟩
+        embed 2 * (l′ * half)
+          ≡⟨ cong (λ z → embed 2 * z)
+                   (Data.Rational.Properties.*-comm l′ half) ⟩
+        embed 2 * (half * l′)
+          ≡⟨ sym (Data.Rational.Properties.*-assoc (embed 2) half l′) ⟩
+        (embed 2 * half) * l′
+          ≡⟨ cong (λ z → z * l′) 2h ⟩
+        1ℚ * l′
+          ≡⟨ Data.Rational.Properties.*-identityˡ l′ ⟩
+        l′
+        ∎
       lhs : l′ ≡ (embed 2 * l′) * half
       lhs = sym chain
   in ≤-trans (≤-reflexive lhs) mono
@@ -296,16 +332,23 @@ centre-l r n =
 -- 中心落在区间内：centre ≤ u。
 centre-u : (r : RealI) (n : ℕ) → centre r n ≤ u r n
 centre-u r n =
-  let l′ = l r n; u′ = u r n
+  let open ≡-Reasoning
+      l′ = l r n; u′ = u r n
       half = Data.Rational.Base.1/_ (embed 2) {{pos⇒nonZero (embed 2) {{pos-pow 0}}}}
       2h : embed 2 * half ≡ 1ℚ
       2h = *-inverseʳ (embed 2) {{pos⇒nonZero (embed 2) {{pos-pow 0}}}}
       2u : embed 2 * u′ ≡ u′ + u′
-      2u =
-        trans (cong (λ z → z * u′) (sym 2ℚ≡1+1))
-        (trans (Data.Rational.Properties.*-distribʳ-+ u′ 1ℚ 1ℚ)
-        (trans (cong (λ z → z + 1ℚ * u′) (Data.Rational.Properties.*-identityˡ u′))
-               (cong (λ z → u′ + z) (Data.Rational.Properties.*-identityˡ u′))))
+      2u = begin
+        embed 2 * u′
+          ≡⟨ cong (λ z → z * u′) (sym 2ℚ≡1+1) ⟩
+        (1ℚ + 1ℚ) * u′
+          ≡⟨ Data.Rational.Properties.*-distribʳ-+ u′ 1ℚ 1ℚ ⟩
+        1ℚ * u′ + 1ℚ * u′
+          ≡⟨ cong (λ z → z + 1ℚ * u′) (Data.Rational.Properties.*-identityˡ u′) ⟩
+        u′ + 1ℚ * u′
+          ≡⟨ cong (λ z → u′ + z) (Data.Rational.Properties.*-identityˡ u′) ⟩
+        u′ + u′
+        ∎
       l≤u : l′ ≤ u′
       l≤u = <⇒≤ (RealI.lo (node r n))
       ineq : l′ + u′ ≤ embed 2 * u′
@@ -316,13 +359,20 @@ centre-u r n =
       mono = Data.Rational.Properties.*-monoʳ-≤-nonNeg half
                {{pos⇒nonNeg half {{1/pos⇒pos (embed 2) {{pos-pow 0}}}}}} ineq
       chain : (embed 2 * u′) * half ≡ u′
-      chain =
-        trans (Data.Rational.Properties.*-assoc (embed 2) u′ half)
-        (trans (cong (λ z → embed 2 * z)
-                     (Data.Rational.Properties.*-comm u′ half))
-        (trans (sym (Data.Rational.Properties.*-assoc (embed 2) half u′))
-        (trans (cong (λ z → z * u′) 2h)
-               (Data.Rational.Properties.*-identityˡ u′))))
+      chain = begin
+        (embed 2 * u′) * half
+          ≡⟨ Data.Rational.Properties.*-assoc (embed 2) u′ half ⟩
+        embed 2 * (u′ * half)
+          ≡⟨ cong (λ z → embed 2 * z)
+                   (Data.Rational.Properties.*-comm u′ half) ⟩
+        embed 2 * (half * u′)
+          ≡⟨ sym (Data.Rational.Properties.*-assoc (embed 2) half u′) ⟩
+        (embed 2 * half) * u′
+          ≡⟨ cong (λ z → z * u′) 2h ⟩
+        1ℚ * u′
+          ≡⟨ Data.Rational.Properties.*-identityˡ u′ ⟩
+        u′
+        ∎
       final : (l′ + u′) * half ≤ u′
       final = ≤-trans mono (≤-reflexive chain)
   in final
@@ -450,16 +500,29 @@ centre-diff≤ r t a b ta tb =
 -- 二的幂的自然数增长
 
 2m : ∀ m → 2 ℕ* m ≡ m +N m
-2m m =
-  trans (Data.Nat.Properties.*-comm 2 m)
-  (trans (Data.Nat.Properties.*-suc m 1)
-    (cong (λ z → m +N z) (Data.Nat.Properties.*-identityʳ m)))
+2m m = begin
+  2 ℕ* m
+    ≡⟨ *-comm 2 m ⟩
+  m ℕ* 2
+    ≡⟨ *-suc m 1 ⟩
+  m +N (m ℕ* 1)
+    ≡⟨ cong (m +N_) (Data.Nat.Properties.*-identityʳ m) ⟩
+  m +N m
+  ∎
+  where open ≡-Reasoning
 
 pp : ∀ n → 2 ^ suc n ≡ 2 ℕ* (2 ^ n)
 pp n = refl
 
 qq : ∀ n → 2 ^ n +N 2 ^ n ≡ 2 ^ suc n
-qq n = trans (sym (2m (2 ^ n))) (sym (pp n))
+qq n = begin
+  2 ^ n +N 2 ^ n
+    ≡⟨ sym (2m (2 ^ n)) ⟩
+  2 ℕ* (2 ^ n)
+    ≡⟨ sym (pp n) ⟩
+  2 ^ suc n
+  ∎
+  where open ≡-Reasoning
 
 pow≤ : ∀ n → 2 ^ n ≤N 2 ^ suc n
 pow≤ n =
@@ -661,13 +724,17 @@ fracL-strict M k t h =
          p2 = ℚᵘP.<-respʳ-≃ (flip-≃ eqR) p1
      in p2)
   where
-    open Data.Integer.Properties.≤-Reasoning
+    open ≡-Reasoning
     d : ℕ
     d = 2 ^ t Data.Nat.∸ 1
     d-eq : suc d ≡ 2 ^ t
-    d-eq =
-      trans (Data.Nat.Properties.+-comm 1 d)
-            (Data.Nat.Properties.m∸n+n≡m (0<2^n t))
+    d-eq = begin
+      suc d
+        ≡⟨ Data.Nat.Properties.+-comm 1 d ⟩
+      d +N 1
+        ≡⟨ Data.Nat.Properties.m∸n+n≡m (0<2^n t) ⟩
+      2 ^ t
+      ∎
     rawCross :
       (M ℕ* suc k) <N 2 ^ t →
       ((+ M) Data.Integer.* (+ suc k))

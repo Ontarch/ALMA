@@ -27,22 +27,20 @@
 module ALMA.Base.Real.Interval where
 
 open import Data.Nat using (ℕ; suc; _^_)
-open import Data.Integer using (+_; -[1+_]; +[1+_]; +0)
-open import Data.Integer.Properties as ℤ using (neg-involutive)
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; Positive; NonZero)
-open import Data.Rational.Base using (mkℚ; 1/_; _÷_; _-_; toℚᵘ) renaming (-_ to neg)
-open import Data.Nat.Coprimality using (1-coprimeTo; ¬0-coprimeTo-2+) renaming (sym to coprime-sym)
-open import Data.Rational.Properties using
-  (mkℚ+-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; toℚᵘ-injective; ≤-reflexive
-  ; ≤-refl; ≤-trans; <⇒≤; <-trans; +-mono-<; +-mono-≤; +-mono-<-≤; +-identityʳ
-  ; +-identityˡ; +-inverseʳ; +-assoc; +-comm; neg-distrib-+; *-inverseˡ
-  ; *-inverseʳ; *-assoc; *-comm; *-distribʳ-+; *-identityˡ; neg-antimono-≤)
+open import Data.Integer using (-[1+_]; +[1+_]; +0)
+open import Data.Nat.Coprimality using (1-coprimeTo) renaming (sym to coprime-sym)
 open import Data.Nat.Properties using (m^n≢0)
-open import Data.Rational.Unnormalised.Properties as ℚᵘP using (neg-involutive)
-open import Data.Product using (Σ; _,_; _×_)
+open import Data.Product using (_,_; _×_)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; Positive; NonZero)
+open import Data.Rational.Base using (mkℚ; 1/_; _÷_; _-_) renaming (-_ to neg)
+open import Data.Rational.Properties using
+  (mkℚ+-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; ≤-reflexive; ≤-refl; ≤-trans
+  ; <⇒≤; <-trans; +-mono-≤; +-mono-<-≤; +-identityʳ; +-identityˡ; +-inverseʳ
+  ; +-assoc; +-comm; neg-distrib-+; *-inverseʳ; *-assoc; *-comm; *-distribʳ-+
+  ; *-identityˡ; neg-antimono-≤)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; trans; sym; cong; cong₂; subst)
-open import Relation.Nullary.Negation using (contradiction)
+  (_≡_; refl; sym; cong; cong₂; subst; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import ALMA.Base.Real using (embed; 2ℚ; 2*embed; halve; reciprocal-cong; 2ℚ≡1+1)
 
@@ -110,10 +108,17 @@ mutual
       h = halve m {{nm}} {{n2m}}
       tt : t + t ≡ δ (suc k) + δ (suc k)
       tt = cong₂ _+_ t≡δ t≡δ
-      step = trans (sym tt) h
       rhs : one/m ≡ δ k
       rhs = reciprocal-cong m (embed (2 ^ suc k)) {{nm}} {{nm}} refl
-  in trans step rhs
+  in begin
+       δ (suc k) + δ (suc k)
+         ≡⟨ sym tt ⟩
+       t + t
+         ≡⟨ h ⟩
+       one/m
+         ≡⟨ rhs ⟩
+       δ k
+       ∎
 
 -- -δ k < δ k, from δ k positive.
 --
@@ -151,57 +156,88 @@ neg-invol (mkℚ +[1+ n ] d c) = refl
 neg-invol (mkℚ +0 d c) =
   let s : neg (mkℚ +0 d c) ≡ mkℚ +0 d c
       s = refl
-  in trans (cong neg s) s
+  in begin
+       neg (neg (mkℚ +0 d c))
+         ≡⟨ cong neg s ⟩
+       neg (mkℚ +0 d c)
+         ≡⟨ s ⟩
+       mkℚ +0 d c
+       ∎
 
 -- Shift cancellation: (a + c) - (b + c) ≡ a - b.
 --
 -- 平移消去：(a + c) - (b + c) ≡ a - b。
 sub-cancel : (a b c : ℚ) → (a + c) - (b + c) ≡ a + neg b
-sub-cancel a b c =
-  let step1 : (a + c) + neg (b + c) ≡ (a + c) + (neg b + neg c)
-      step1 = cong (λ z → (a + c) + z) (neg-distrib-+ b c)
-      step2 : (a + c) + (neg b + neg c) ≡ a + (neg b + (c + neg c))
-      step2 = reorder
-      step3 : a + (neg b + (c + neg c)) ≡ a + (neg b + 0ℚ)
-      step3 = cong (λ z → a + z) (cong (λ z → neg b + z) (+-inverseʳ c))
-      step4 : a + (neg b + 0ℚ) ≡ a + neg b
-      step4 = cong (λ z → a + z) (+-identityʳ (neg b))
-  in trans step1 (trans step2 (trans step3 step4))
+sub-cancel a b c = begin
+  (a + c) - (b + c)
+    ≡⟨ cong (λ z → (a + c) + z) (neg-distrib-+ b c) ⟩
+  (a + c) + (neg b + neg c)
+    ≡⟨ reorder ⟩
+  a + (neg b + (c + neg c))
+    ≡⟨ cong (λ z → a + z) (cong (λ z → neg b + z) (+-inverseʳ c)) ⟩
+  a + (neg b + 0ℚ)
+    ≡⟨ cong (λ z → a + z) (+-identityʳ (neg b)) ⟩
+  a + neg b
+  ∎
   where
   reorder : (a + c) + (neg b + neg c) ≡ a + (neg b + (c + neg c))
-  reorder =
-    trans (+-assoc a c (neg b + neg c))
-    (cong (λ z → a + z)
-      (trans (sym (+-assoc c (neg b) (neg c)))
-      (trans (cong (λ z → z + neg c) (+-comm c (neg b)))
-             (+-assoc (neg b) c (neg c)))))
+  reorder = begin
+    (a + c) + (neg b + neg c)
+      ≡⟨ +-assoc a c (neg b + neg c) ⟩
+    a + (c + (neg b + neg c))
+      ≡⟨ cong (λ z → a + z) (sym (+-assoc c (neg b) (neg c))) ⟩
+    a + ((c + neg b) + neg c)
+      ≡⟨ cong (λ z → a + (z + neg c)) (+-comm c (neg b)) ⟩
+    a + ((neg b + c) + neg c)
+      ≡⟨ cong (λ z → a + z) (+-assoc (neg b) c (neg c)) ⟩
+    a + (neg b + (c + neg c))
+    ∎
 
 -- Double halving: (x + x) ÷ embed 2 ≡ x.
 --
 -- 双重减半：(x + x) ÷ embed 2 ≡ x。
 double-half : (x : ℚ) → (x + x) ÷ embed 2 ≡ x
-double-half x =
-  let n2 = pos⇒nonZero (embed 2) {{pos-pow 0}}
-      half = Data.Rational.Base.1/_ (embed 2) {{n2}}
-      2x : embed 2 * x ≡ x + x
-      2x =
-        trans (cong (λ z → z * x) 2ℚ≡1+1)
-        (trans (*-distribʳ-+ x 1ℚ 1ℚ)
-               (cong (λ z → z + z) (*-identityˡ x)))
-      inv : embed 2 * half ≡ 1ℚ
-      inv = *-inverseʳ (embed 2) {{n2}}
-      main : (embed 2 * x) * half ≡ x
-      main =
-        trans (*-assoc (embed 2) x half)
-        (trans (cong (λ z → embed 2 * z) (*-comm x half))
-        (trans (sym (*-assoc (embed 2) half x))
-        (trans (cong (λ z → z * x) inv)
-               (*-identityˡ x))))
-      lhs : (x + x) ÷ embed 2 ≡ (embed 2 * x) * half
-      lhs =
-        trans (cong (λ z → z * half) (sym 2x))
-              refl
-  in trans lhs main
+double-half x = begin
+  (x + x) ÷ embed 2
+    ≡⟨ refl ⟩
+  (x + x) * half
+    ≡⟨ cong (λ z → z * half) (sym 2x) ⟩
+  (embed 2 * x) * half
+    ≡⟨ main ⟩
+  x
+  ∎
+  where
+  n2 = pos⇒nonZero (embed 2) {{pos-pow 0}}
+  half = Data.Rational.Base.1/_ (embed 2) {{n2}}
+
+  2x : embed 2 * x ≡ x + x
+  2x = begin
+    embed 2 * x
+      ≡⟨ cong (λ z → z * x) 2ℚ≡1+1 ⟩
+    (1ℚ + 1ℚ) * x
+      ≡⟨ *-distribʳ-+ x 1ℚ 1ℚ ⟩
+    1ℚ * x + 1ℚ * x
+      ≡⟨ cong (λ z → z + z) (*-identityˡ x) ⟩
+    x + x
+    ∎
+
+  inv : embed 2 * half ≡ 1ℚ
+  inv = *-inverseʳ (embed 2) {{n2}}
+
+  main : (embed 2 * x) * half ≡ x
+  main = begin
+    (embed 2 * x) * half
+      ≡⟨ *-assoc (embed 2) x half ⟩
+    embed 2 * (x * half)
+      ≡⟨ cong (λ z → embed 2 * z) (*-comm x half) ⟩
+    embed 2 * (half * x)
+      ≡⟨ sym (*-assoc (embed 2) half x) ⟩
+    (embed 2 * half) * x
+      ≡⟨ cong (λ z → z * x) inv ⟩
+    1ℚ * x
+      ≡⟨ *-identityˡ x ⟩
+    x
+    ∎
 
 -- Canonical dyadic nested intervals around a rational centre q.
 --
@@ -221,14 +257,23 @@ dyadic q k .RealI.nest =
       nest2 : dₖ + q ≤ δₖ + q
       nest2 = +-mono-≤ (δs≤δ k) (≤-refl {q})
       lhs : (dₖ + q) - (neg dₖ + q) ≡ dₖ + dₖ
-      lhs =
-        trans (sub-cancel dₖ (neg dₖ) q)
-              (cong (λ z → dₖ + z) (neg-invol dₖ))
+      lhs = begin
+        (dₖ + q) - (neg dₖ + q)
+          ≡⟨ sub-cancel dₖ (neg dₖ) q ⟩
+        dₖ + neg (neg dₖ)
+          ≡⟨ cong (λ z → dₖ + z) (neg-invol dₖ) ⟩
+        dₖ + dₖ
+        ∎
       rhs : ((δₖ + q) - (neg δₖ + q)) ÷ embed 2 ≡ δₖ
-      rhs =
-        trans (cong (λ z → z ÷ embed 2) (sub-cancel δₖ (neg δₖ) q))
-        (trans (cong (λ z → (δₖ + z) ÷ embed 2) (neg-invol δₖ))
-               (double-half δₖ))
+      rhs = begin
+        ((δₖ + q) - (neg δₖ + q)) ÷ embed 2
+          ≡⟨ cong (λ z → z ÷ embed 2) (sub-cancel δₖ (neg δₖ) q) ⟩
+        (δₖ + neg (neg δₖ)) ÷ embed 2
+          ≡⟨ cong (λ z → (δₖ + z) ÷ embed 2) (neg-invol δₖ) ⟩
+        (δₖ + δₖ) ÷ embed 2
+          ≡⟨ double-half δₖ ⟩
+        δₖ
+        ∎
       nest3 : (dₖ + q) - (neg dₖ + q) ≤
                 ((δₖ + q) - (neg δₖ + q)) ÷ embed 2
       nest3 =

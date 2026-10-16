@@ -15,18 +15,17 @@
 
 module ALMA.Base.Real.Interval.Bounded where
 
-open import Data.Nat using (ℕ; zero; suc; z≤n; s≤s)
+open import Data.Nat using (ℕ; z≤n; s≤s)
 open import Data.Integer using (+<+)
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _-_; ∣_∣; _≤_; _<_)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; ∣_∣; _≤_; _<_)
 open import Data.Rational.Base using (*<*) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-mono-≤; +-identityˡ; +-identityʳ; +-comm; ≤-refl; ≤-trans; ≤-reflexive; <⇒≤
-  ; 0≤∣p∣; ∣p∣≡p∨∣p∣≡-p; 0≤p⇒∣p∣≡p; ∣-p∣≡∣p∣; neg-antimono-≤; <-cmp)
+  (+-mono-≤; +-identityˡ; +-identityʳ; +-comm; ≤-refl; ≤-trans; ≤-reflexive
+  ; <⇒≤; 0≤∣p∣; ∣p∣≡p∨∣p∣≡-p; neg-antimono-≤; module ≤-Reasoning)
+open ≤-Reasoning
 open import Data.Product using (Σ; _,_; _×_)
 open import Data.Sum using (inj₁; inj₂)
-open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; trans; subst)
-open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
+open import Relation.Binary.PropositionalEquality using (_≡_; sym)
 
 open import ALMA.Base.Real.Interval using (RealI)
 open import ALMA.Base.Real.Interval.Order using (l; u; l-mono'; u-mono')
@@ -52,18 +51,34 @@ bounded x = M , 0≤M , inside
     0≤1 = <⇒≤ 0<1
 
     0≤M : 0ℚ ≤ M
-    0≤M = ≤-trans step1 step2
+    0≤M = begin
+      0ℚ
+        ≤⟨ step1 ⟩
+      A + B
+        ≤⟨ step2 ⟩
+      (A + B) + 1ℚ
+      ∎
       where
         A = ∣ RealI.l x ∣
         B = ∣ RealI.u x ∣
 
         step1 : 0ℚ ≤ A + B
-        step1 = subst (λ z → z ≤ A + B) (+-identityˡ 0ℚ)
-                      (+-mono-≤ (0≤∣p∣ (RealI.l x)) (0≤∣p∣ (RealI.u x)))
+        step1 = begin
+          0ℚ
+            ≤⟨ ≤-reflexive (sym (+-identityˡ 0ℚ)) ⟩
+          0ℚ + 0ℚ
+            ≤⟨ +-mono-≤ (0≤∣p∣ (RealI.l x)) (0≤∣p∣ (RealI.u x)) ⟩
+          A + B
+          ∎
 
         step2 : A + B ≤ (A + B) + 1ℚ
-        step2 = subst (λ z → z ≤ (A + B) + 1ℚ) (+-identityʳ (A + B))
-                      (+-mono-≤ (≤-refl {A + B}) 0≤1)
+        step2 = begin
+          A + B
+            ≤⟨ ≤-reflexive (sym (+-identityʳ (A + B))) ⟩
+          (A + B) + 0ℚ
+            ≤⟨ +-mono-≤ (≤-refl {A + B}) 0≤1 ⟩
+          (A + B) + 1ℚ
+          ∎
 
     l0≤ln : ∀ n → l x 0 ≤ l x n
     l0≤ln n = l-mono' x {n = 0} {m = n} z≤n
@@ -72,35 +87,65 @@ bounded x = M , 0≤M , inside
     un≤u0 n = u-mono' x {n = 0} {m = n} z≤n
 
     m≤m+nℚ : ∀ m n → 0ℚ ≤ n → m ≤ m + n
-    m≤m+nℚ m n 0≤n =
-      subst (λ z → z ≤ m + n) (+-identityʳ m)
-            (+-mono-≤ (≤-refl {m}) 0≤n)
+    m≤m+nℚ m n 0≤n = begin
+      m
+        ≤⟨ ≤-reflexive (sym (+-identityʳ m)) ⟩
+      m + 0ℚ
+        ≤⟨ +-mono-≤ (≤-refl {m}) 0≤n ⟩
+      m + n
+      ∎
 
     bound-M : ∣ RealI.l x ∣ + ∣ RealI.u x ∣ ≤ M
     bound-M = m≤m+nℚ (∣ RealI.l x ∣ + ∣ RealI.u x ∣) 1ℚ 0≤1
 
     inside : ∀ n a → l x n ≤ a → a ≤ u x n → ∣ a ∣ ≤ M
     inside n a lxn≤a a≤uxn with ∣p∣≡p∨∣p∣≡-p a
-    ... | inj₁ |a|≡a =
-      let
+    ... | inj₁ |a|≡a = begin
+      ∣ a ∣
+        ≤⟨ ≤-reflexive |a|≡a ⟩
+      a
+        ≤⟨ a≤sum ⟩
+      ∣ RealI.l x ∣ + ∣ RealI.u x ∣
+        ≤⟨ bound-M ⟩
+      M
+      ∎
+      where
         a≤ux0 : a ≤ u x 0
         a≤ux0 = ≤-trans a≤uxn (un≤u0 n)
 
         a≤sum : a ≤ ∣ RealI.l x ∣ + ∣ RealI.u x ∣
-        a≤sum =
-          ≤-trans a≤ux0
-          (≤-trans (r≤|r| (RealI.u x))
-          (≤-trans (m≤m+nℚ ∣ RealI.u x ∣ ∣ RealI.l x ∣ (0≤∣p∣ (RealI.l x)))
-                   (≤-reflexive (+-comm ∣ RealI.u x ∣ ∣ RealI.l x ∣))))
-      in subst (λ z → z ≤ M) (sym |a|≡a) (≤-trans a≤sum bound-M)
-    ... | inj₂ |a|≡-a =
-      let
+        a≤sum = begin
+          a
+            ≤⟨ a≤ux0 ⟩
+          u x 0
+            ≤⟨ r≤|r| (RealI.u x) ⟩
+          ∣ RealI.u x ∣
+            ≤⟨ m≤m+nℚ ∣ RealI.u x ∣ ∣ RealI.l x ∣ (0≤∣p∣ (RealI.l x)) ⟩
+          ∣ RealI.u x ∣ + ∣ RealI.l x ∣
+            ≤⟨ ≤-reflexive (+-comm ∣ RealI.u x ∣ ∣ RealI.l x ∣) ⟩
+          ∣ RealI.l x ∣ + ∣ RealI.u x ∣
+          ∎
+
+    ... | inj₂ |a|≡-a = begin
+      ∣ a ∣
+        ≤⟨ ≤-reflexive |a|≡-a ⟩
+      neg a
+        ≤⟨ -a≤sum ⟩
+      ∣ RealI.l x ∣ + ∣ RealI.u x ∣
+        ≤⟨ bound-M ⟩
+      M
+      ∎
+      where
         l0≤a : l x 0 ≤ a
         l0≤a = ≤-trans (l0≤ln n) lxn≤a
 
         -a≤sum : neg a ≤ ∣ RealI.l x ∣ + ∣ RealI.u x ∣
-        -a≤sum =
-          ≤-trans (neg-antimono-≤ l0≤a)
-          (≤-trans (-r≤|r| (RealI.l x))
-                   (m≤m+nℚ ∣ RealI.l x ∣ ∣ RealI.u x ∣ (0≤∣p∣ (RealI.u x))))
-      in subst (λ z → z ≤ M) (sym |a|≡-a) (≤-trans -a≤sum bound-M)
+        -a≤sum = begin
+          neg a
+            ≤⟨ neg-antimono-≤ l0≤a ⟩
+          neg (l x 0)
+            ≤⟨ -r≤|r| (RealI.l x) ⟩
+          ∣ RealI.l x ∣
+            ≤⟨ m≤m+nℚ ∣ RealI.l x ∣ ∣ RealI.u x ∣ (0≤∣p∣ (RealI.u x)) ⟩
+          ∣ RealI.l x ∣ + ∣ RealI.u x ∣
+          ∎

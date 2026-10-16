@@ -20,8 +20,9 @@
 
 module ALMA.Base.Real.Interval.MulLaws where
 
-open import Data.Nat using (ℕ; suc; s≤s; z≤n) renaming (_*_ to _ℕ*_)
+open import Data.Nat using (ℕ; suc) renaming (_*_ to _ℕ*_)
 import Data.Nat.Properties as ℕP
+open import Data.Product using (_,_; Σ; _×_; proj₁; proj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; ∣_∣; nonNegative)
 open import Data.Rational.Base using (_÷_) renaming (-_ to neg)
@@ -31,20 +32,20 @@ open import Data.Rational.Properties using
   ; neg-distribʳ-*; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; +-mono-≤; neg-antimono-≤
   ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣p∣≡p∨∣p∣≡-p
   ; 0≤∣p∣; ∣p*q∣≡∣p∣*∣q∣; 0≤p⇒∣p∣≡p)
-open import Data.Product using (_,_; Σ; _×_; proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; trans; sym; subst)
+  (_≡_; refl; cong; cong₂; trans; sym; subst; module ≡-Reasoning)
+open ≡-Reasoning
 
-open import ALMA.Base.Real using (embed; 2ℚ; 2ℚ≡1+1; telescope)
+open import ALMA.Base.Real using (embed; 2ℚ; telescope)
 open import ALMA.Base.Real.Interval using (RealI; neg-invol)
 open import ALMA.Base.Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_)
 open import ALMA.Base.Real.Interval.Mul using
-  (_*ℝ_; 0≤diff; nn; cancelʳ; sub-mono; le-addˡ; le-addʳ)
+  (_*ℝ_; 0≤diff; cancelʳ; sub-mono; le-addˡ; le-addʳ)
 import ALMA.Base.Real.Interval.Mul as MUL
 open import ALMA.Base.Real.Interval.Bounded using (bounded)
 open import ALMA.Base.Real.IntervalEquiv using
-  (node; centre; width; width-n; centre-l; centre-u; centre-diff; 0<width; recipPow2)
+  (node; centre; width; width-n; centre-l; centre-u; centre-diff; recipPow2)
 open import ALMA.Base.Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-trans)
 open import ALMA.Base.Real.Interval.Rational using
   (min; max; max-eq; min-eq; sub-add; negsub)
@@ -73,7 +74,13 @@ private
                        (neg-antimono-≤ h1))
 
   add-diff : ∀ a b → a + (b - a) ≡ b
-  add-diff a b = trans (+-comm a (b - a)) (cancelʳ b a)
+  add-diff a b = begin
+    a + (b - a)
+      ≡⟨ +-comm a (b - a) ⟩
+    (b - a) + a
+      ≡⟨ cancelʳ b a ⟩
+    b
+    ∎
 
   le-of-diff : ∀ {a b : ℚ} → 0ℚ ≤ b - a → a ≤ b
   le-of-diff {a} {b} 0≤ =
@@ -87,26 +94,44 @@ private
             (≤-reflexive (*-identityʳ half))
 
   double-sub : ∀ a c → (a + a) - (a + c) ≡ a - c
-  double-sub a c =
-    trans (sub-add a a a c)
-    (trans (cong (λ z → z + (a - c)) (+-inverseʳ a))
-           (+-identityˡ (a - c)))
+  double-sub a c = begin
+    (a + a) - (a + c)
+      ≡⟨ sub-add a a a c ⟩
+    (a - a) + (a - c)
+      ≡⟨ cong (λ z → z + (a - c)) (+-inverseʳ a) ⟩
+    0ℚ + (a - c)
+      ≡⟨ +-identityˡ (a - c) ⟩
+    a - c
+    ∎
 
   half-scale : ∀ a → a * half ≡ (a + a) * (half * half)
-  half-scale a =
-    sym (trans (cong (_* (half * half)) (add-self a))
-        (trans (*-assoc 2ℚ a (half * half))
-        (trans (cong (2ℚ *_) (sym (*-assoc a half half)))
-        (trans (cong (2ℚ *_) (*-comm (a * half) half))
-        (trans (sym (*-assoc 2ℚ half (a * half)))
-        (trans (cong (_* (a * half)) 2ℚ*half≡1)
-               (*-identityˡ (a * half))))))))
+  half-scale a = sym (begin
+    (a + a) * (half * half)
+      ≡⟨ cong (_* (half * half)) (add-self a) ⟩
+    (2ℚ * a) * (half * half)
+      ≡⟨ *-assoc 2ℚ a (half * half) ⟩
+    2ℚ * (a * (half * half))
+      ≡⟨ cong (2ℚ *_) (sym (*-assoc a half half)) ⟩
+    2ℚ * ((a * half) * half)
+      ≡⟨ cong (2ℚ *_) (*-comm (a * half) half) ⟩
+    2ℚ * (half * (a * half))
+      ≡⟨ sym (*-assoc 2ℚ half (a * half)) ⟩
+    (2ℚ * half) * (a * half)
+      ≡⟨ cong (_* (a * half)) 2ℚ*half≡1 ⟩
+    1ℚ * (a * half)
+      ≡⟨ *-identityˡ (a * half) ⟩
+    a * half
+    ∎)
 
   final-alg : ∀ S D E → S * half - (D + E) * (half * half)
                         ≡ ((S + S) - (D + E)) * (half * half)
-  final-alg S D E =
-    trans (cong (λ z → z - (D + E) * (half * half)) (half-scale S))
-          (sym (*ʳ-sub (S + S) (D + E) (half * half)))
+  final-alg S D E = begin
+    S * half - (D + E) * (half * half)
+      ≡⟨ cong (λ z → z - (D + E) * (half * half)) (half-scale S) ⟩
+    ((S + S) * (half * half)) - (D + E) * (half * half)
+      ≡⟨ sym (*ʳ-sub (S + S) (D + E) (half * half)) ⟩
+    ((S + S) - (D + E)) * (half * half)
+    ∎
 
 ------------------------------------------------------------------------
 -- Core lemma: centre of product vs product of centres
@@ -174,16 +199,27 @@ centre-*ℝ≈ x y n =
                  (cong RealI.u (node-*ℝ x y n))
 
     expand : (lx + ux) * (ly + uy) ≡ D + E
-    expand =
-      trans (*-distribʳ-+ (ly + uy) lx ux)
-      (trans (cong₂ _+_ (*-distribˡ-+ lx ly uy) (*-distribˡ-+ ux ly uy))
-      (trans (cong ((P1 + P2) +_) (+-comm P3 P4))
-             (+interchange P1 P2 P4 P3)))
+    expand = begin
+      (lx + ux) * (ly + uy)
+        ≡⟨ *-distribʳ-+ (ly + uy) lx ux ⟩
+      lx * (ly + uy) + ux * (ly + uy)
+        ≡⟨ cong₂ _+_ (*-distribˡ-+ lx ly uy) (*-distribˡ-+ ux ly uy) ⟩
+      (lx * ly + lx * uy) + (ux * ly + ux * uy)
+        ≡⟨ cong ((P1 + P2) +_) (+-comm P3 P4) ⟩
+      (P1 + P2) + (P4 + P3)
+        ≡⟨ +interchange P1 P2 P4 P3 ⟩
+      D + E
+      ∎
 
     c-cc : centre x (2 ℕ* n) * centre y (2 ℕ* n)
          ≡ (D + E) * (half * half)
-    c-cc = trans (mul-pair (lx + ux) (ly + uy) half)
-                 (cong (_* (half * half)) expand)
+    c-cc = begin
+      centre x (2 ℕ* n) * centre y (2 ℕ* n)
+        ≡⟨ mul-pair (lx + ux) (ly + uy) half ⟩
+      ((lx + ux) * (ly + uy)) * (half * half)
+        ≡⟨ cong (_* (half * half)) expand ⟩
+      (D + E) * (half * half)
+      ∎
 
     hi4-cases : hi4 ≡ P1 ⊎ hi4 ≡ P2 ⊎ hi4 ≡ P3 ⊎ hi4 ≡ P4
     hi4-cases = combine (max-eq (max P1 P2) (max P3 P4))
@@ -224,25 +260,45 @@ centre-*ℝ≈ x y n =
         combine (inj₂ e) = fromR e (min-eq P3 P4)
 
     c4-c3≡ : P4 - P3 ≡ ux * (uy - ly)
-    c4-c3≡ =
-      trans (sym (negsub P3 P4))
-      (trans (cong neg C.c3-c4≡)
-      (trans (neg-distribʳ-* ux (ly - uy))
-             (cong (ux *_) (negsub ly uy))))
+    c4-c3≡ = begin
+      P4 - P3
+        ≡⟨ sym (negsub P3 P4) ⟩
+      neg (P3 - P4)
+        ≡⟨ cong neg C.c3-c4≡ ⟩
+      neg (ux * (ly - uy))
+        ≡⟨ neg-distribʳ-* ux (ly - uy) ⟩
+      ux * neg (ly - uy)
+        ≡⟨ cong (ux *_) (negsub ly uy) ⟩
+      ux * (uy - ly)
+      ∎
 
     key : D - E ≡ w * w'
-    key =
-      trans (sub-add P1 P4 P2 P3)
-      (trans (cong₂ _+_ C.c1-c2≡ c4-c3≡)
-      (trans (cong (λ z → z + ux * (uy - ly)) neg-step)
-      (trans (sym (*-distribʳ-+ (uy - ly) (neg lx) ux))
-      (trans (cong (λ z → z * (uy - ly)) (+-comm (neg lx) ux)) refl))))
+    key = begin
+      D - E
+        ≡⟨ sub-add P1 P4 P2 P3 ⟩
+      (P1 - P2) + (P4 - P3)
+        ≡⟨ cong₂ _+_ C.c1-c2≡ c4-c3≡ ⟩
+      (lx * (ly - uy)) + (ux * (uy - ly))
+        ≡⟨ cong (λ z → z + ux * (uy - ly)) neg-step ⟩
+      ((neg lx) * (uy - ly)) + (ux * (uy - ly))
+        ≡⟨ sym (*-distribʳ-+ (uy - ly) (neg lx) ux) ⟩
+      ((neg lx) + ux) * (uy - ly)
+        ≡⟨ cong (λ z → z * (uy - ly)) (+-comm (neg lx) ux) ⟩
+      (ux + neg lx) * (uy - ly)
+        ≡⟨ refl ⟩
+      (ux - lx) * (uy - ly)
+      ∎
       where
         neg-step : lx * (ly - uy) ≡ (neg lx) * (uy - ly)
-        neg-step =
-          trans (cong (lx *_) (sym (negsub uy ly)))
-          (trans (sym (neg-distribʳ-* lx (uy - ly)))
-                 (neg-distribˡ-* lx (uy - ly)))
+        neg-step = begin
+          lx * (ly - uy)
+            ≡⟨ cong (lx *_) (sym (negsub uy ly)) ⟩
+          lx * neg (uy - ly)
+            ≡⟨ sym (neg-distribʳ-* lx (uy - ly)) ⟩
+          neg (lx * (uy - ly))
+            ≡⟨ neg-distribˡ-* lx (uy - ly) ⟩
+          (neg lx) * (uy - ly)
+          ∎
 
     E≤D : E ≤ D
     E≤D = le-of-diff (≤-trans (mul-nonNeg 0≤w 0≤w') (≤-reflexive (sym key)))
@@ -347,24 +403,36 @@ private
           (∣p+q∣≤∣p∣+∣q∣ (p - P) (q - Q))
 
   add3-eq : ∀ A B C r → A * r + (B * r + C * r) ≡ (A + (B + C)) * r
-  add3-eq A B C r =
-    trans (cong (A * r +_) (sym (*-distribʳ-+ r B C)))
-          (sym (*-distribʳ-+ r A (B + C)))
+  add3-eq A B C r = begin
+    A * r + (B * r + C * r)
+      ≡⟨ cong (A * r +_) (sym (*-distribʳ-+ r B C)) ⟩
+    A * r + (B + C) * r
+      ≡⟨ sym (*-distribʳ-+ r A (B + C)) ⟩
+    (A + (B + C)) * r
+    ∎
 
   mul-shift : ∀ {a b M : ℚ} → 0ℚ ≤ M → a ≤ b → M * a ≤ M * b
   mul-shift {a} {b} {M} 0≤M = *-monoˡ-≤-nonNeg M {{nonNegative 0≤M}}
 
   sub-distribˡ : ∀ a b c → a * (b - c) ≡ a * b - a * c
-  sub-distribˡ a b c =
-    trans (*-distribˡ-+ a b (neg c))
-          (cong (a * b +_) (sym (neg-distribʳ-* a c)))
+  sub-distribˡ a b c = begin
+    a * (b - c)
+      ≡⟨ *-distribˡ-+ a b (neg c) ⟩
+    a * b + a * neg c
+      ≡⟨ cong (a * b +_) (sym (neg-distribʳ-* a c)) ⟩
+    a * b + neg (a * c)
+    ∎
 
   telesc2 : ∀ p p' q q' → p * q - p' * q' ≡ q * (p - p') + p' * (q - q')
-  telesc2 p p' q q' =
-    sym (trans (cong₂ _+_ (sub-distribˡ q p p') (sub-distribˡ p' q q'))
-               (trans (cong (_+ (p' * q - p' * q'))
-                            (cong₂ _-_ (*-comm q p) (*-comm q p')))
-                      (telescope (p * q) (p' * q) (p' * q'))))
+  telesc2 p p' q q' = sym (begin
+    q * (p - p') + p' * (q - q')
+      ≡⟨ cong₂ _+_ (sub-distribˡ q p p') (sub-distribˡ p' q q') ⟩
+    (q * p - q * p') + (p' * q - p' * q')
+      ≡⟨ cong (_+ (p' * q - p' * q')) (cong₂ _-_ (*-comm q p) (*-comm q p')) ⟩
+    (p * q - p' * q) + (p' * q - p' * q')
+      ≡⟨ telescope (p * q) (p' * q) (p' * q') ⟩
+    p * q - p' * q'
+    ∎)
 
 ------------------------------------------------------------------------
 -- Commutativity
@@ -387,20 +455,30 @@ private
     swap-rewrite : ∀ n →
       ∣ centre x (2 ℕ* n) * centre y (2 ℕ* n) - centre (y *ℝ x) n ∣
       ≡ ∣ centre (y *ℝ x) n - centre y (2 ℕ* n) * centre x (2 ℕ* n) ∣
-    swap-rewrite n =
-      trans (abs-swap (centre x (2 ℕ* n) * centre y (2 ℕ* n))
-                      (centre (y *ℝ x) n))
-            (cong ∣_∣ (cong (centre (y *ℝ x) n -_)
-                            (*-comm (centre x (2 ℕ* n)) (centre y (2 ℕ* n)))))
+    swap-rewrite n = begin
+      ∣ centre x (2 ℕ* n) * centre y (2 ℕ* n) - centre (y *ℝ x) n ∣
+        ≡⟨ abs-swap (centre x (2 ℕ* n) * centre y (2 ℕ* n))
+                    (centre (y *ℝ x) n) ⟩
+      ∣ centre (y *ℝ x) n - centre x (2 ℕ* n) * centre y (2 ℕ* n) ∣
+        ≡⟨ cong ∣_∣ (cong (centre (y *ℝ x) n -_)
+                          (*-comm (centre x (2 ℕ* n)) (centre y (2 ℕ* n)))) ⟩
+      ∣ centre (y *ℝ x) n - centre y (2 ℕ* n) * centre x (2 ℕ* n) ∣
+      ∎
 
     sum-eq : ∀ n →
       (width x (2 ℕ* n) * width y (2 ℕ* n)) * half
       + (width y (2 ℕ* n) * width x (2 ℕ* n)) * half
       ≡ width x (2 ℕ* n) * width y (2 ℕ* n)
-    sum-eq n =
-      trans (cong (λ z → (width x (2 ℕ* n) * width y (2 ℕ* n)) * half + z * half)
-                  (*-comm (width y (2 ℕ* n)) (width x (2 ℕ* n))))
-            (two-half (width x (2 ℕ* n) * width y (2 ℕ* n)))
+    sum-eq n = begin
+      (width x (2 ℕ* n) * width y (2 ℕ* n)) * half
+        + (width y (2 ℕ* n) * width x (2 ℕ* n)) * half
+        ≡⟨ cong (λ z → (width x (2 ℕ* n) * width y (2 ℕ* n)) * half + z * half)
+                  (*-comm (width y (2 ℕ* n)) (width x (2 ℕ* n))) ⟩
+      (width x (2 ℕ* n) * width y (2 ℕ* n)) * half
+        + (width x (2 ℕ* n) * width y (2 ℕ* n)) * half
+        ≡⟨ two-half (width x (2 ℕ* n) * width y (2 ℕ* n)) ⟩
+      width x (2 ℕ* n) * width y (2 ℕ* n)
+      ∎
 
 ------------------------------------------------------------------------
 -- Zero laws
@@ -425,12 +503,18 @@ private
     zero-term : ∀ n →
       ∣ centre 0ℝ (2 ℕ* n) * centre x (2 ℕ* n) - 0ℚ ∣ ≤ 0ℚ
     zero-term n =
-      ≤-reflexive
-        (trans (cong (λ z → ∣ z * centre x (2 ℕ* n) - 0ℚ ∣)
-                     (centre-0ℝ (2 ℕ* n)))
-        (trans (cong (λ z → ∣ z - 0ℚ ∣) (*-zeroˡ (centre x (2 ℕ* n))))
-        (trans (cong ∣_∣ (+-inverseʳ 0ℚ))
-               (0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ})))))
+      ≤-reflexive (begin
+        ∣ centre 0ℝ (2 ℕ* n) * centre x (2 ℕ* n) - 0ℚ ∣
+          ≡⟨ cong (λ z → ∣ z * centre x (2 ℕ* n) - 0ℚ ∣)
+                    (centre-0ℝ (2 ℕ* n)) ⟩
+        ∣ 0ℚ * centre x (2 ℕ* n) - 0ℚ ∣
+          ≡⟨ cong (λ z → ∣ z - 0ℚ ∣) (*-zeroˡ (centre x (2 ℕ* n))) ⟩
+        ∣ 0ℚ - 0ℚ ∣
+          ≡⟨ cong ∣_∣ (+-inverseʳ 0ℚ) ⟩
+        ∣ 0ℚ ∣
+          ≡⟨ 0≤p⇒∣p∣≡p {0ℚ} (≤-refl {0ℚ}) ⟩
+        0ℚ
+        ∎)
 
 *ℝ-zeroʳ : (x : RealI) → x *ℝ 0ℝ ≈ℝ 0ℝ
 *ℝ-zeroʳ x = ≈ℝ-trans (*ℝ-comm x 0ℝ) (*ℝ-zeroˡ x)
@@ -779,17 +863,30 @@ private
                (≤-refl {tb n})))
       where
         rwY : cx2 n * (cy4 n * cz4 n) ≡ cy4 n * (cx2 n * cz4 n)
-        rwY = trans (cong (cx2 n *_) (*-comm (cy4 n) (cz4 n)))
-              (trans (sym (*-assoc (cx2 n) (cz4 n) (cy4 n)))
-                     (*-comm (cx2 n * cz4 n) (cy4 n)))
+        rwY = begin
+          cx2 n * (cy4 n * cz4 n)
+            ≡⟨ cong (cx2 n *_) (*-comm (cy4 n) (cz4 n)) ⟩
+          cx2 n * (cz4 n * cy4 n)
+            ≡⟨ sym (*-assoc (cx2 n) (cz4 n) (cy4 n)) ⟩
+          (cx2 n * cz4 n) * cy4 n
+            ≡⟨ *-comm (cx2 n * cz4 n) (cy4 n) ⟩
+          cy4 n * (cx2 n * cz4 n)
+          ∎
         eqX : cx4 n * cy4 n * cz2 n - cx2 n * (cy4 n * cz4 n)
                 ≡ cy4 n * (cx4 n * cz2 n - cx2 n * cz4 n)
-        eqX = trans (cong (λ w → w * cz2 n - cx2 n * (cy4 n * cz4 n))
-                          (*-comm (cx4 n) (cy4 n)))
-              (trans (cong (λ w → w - cx2 n * (cy4 n * cz4 n))
-                           (*-assoc (cy4 n) (cx4 n) (cz2 n)))
-              (trans (cong (cy4 n * (cx4 n * cz2 n) -_) rwY)
-                     (sym (sub-distribˡ (cy4 n) (cx4 n * cz2 n) (cx2 n * cz4 n)))))
+        eqX = begin
+          cx4 n * cy4 n * cz2 n - cx2 n * (cy4 n * cz4 n)
+            ≡⟨ cong (λ w → w * cz2 n - cx2 n * (cy4 n * cz4 n))
+                      (*-comm (cx4 n) (cy4 n)) ⟩
+          cy4 n * cx4 n * cz2 n - cx2 n * (cy4 n * cz4 n)
+            ≡⟨ cong (λ w → w - cx2 n * (cy4 n * cz4 n))
+                      (*-assoc (cy4 n) (cx4 n) (cz2 n)) ⟩
+          cy4 n * (cx4 n * cz2 n) - cx2 n * (cy4 n * cz4 n)
+            ≡⟨ cong (cy4 n * (cx4 n * cz2 n) -_) rwY ⟩
+          cy4 n * (cx4 n * cz2 n) - cy4 n * (cx2 n * cz4 n)
+            ≡⟨ sym (sub-distribˡ (cy4 n) (cx4 n * cz2 n) (cx2 n * cz4 n)) ⟩
+          cy4 n * (cx4 n * cz2 n - cx2 n * cz4 n)
+          ∎
         inner : ∣ cx4 n * cz2 n - cx2 n * cz4 n ∣
                   ≤ Mz * width x (2 ℕ* n) + Mx * width z (2 ℕ* n)
         inner = inner-step
