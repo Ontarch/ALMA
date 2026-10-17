@@ -1,37 +1,45 @@
+------------------------------------------------------------------------
+-- Reciprocal of a non-zero interval real
+--
+-- The product of an interval real and its reciprocal is approximately
+-- one, for positive interval reals; the non-zero case reduces to the
+-- positive case via negation.
+--
+-- 非零区间实数的倒数
+--
+-- 正区间实数与其倒数之积近似等于 1；非零情形经取负化归到正情形。
+------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Base.Real.Interval.Inverse where
 
-open import Data.Integer using
-  (+_) renaming (_*_ to _ℤ*_; _+_ to _ℤ+_)
+open import Data.Empty using (⊥; ⊥-elim)
+open import Data.Integer using (+_) renaming (_*_ to _ℤ*_; _+_ to _ℤ+_)
 open import Data.Integer.Properties using (+◃n≡+n)
-open import Data.Nat using (ℕ; zero; suc; _⊔_; _^_; s≤s; z≤n; _≥_; _∸_)
+open import Data.Nat using
+  (ℕ; zero; suc; _⊔_; _^_; s≤s; z≤n; _≥_; _∸_)
   renaming (_≤_ to _≤ℕ_; _+_ to _+ℕ_; _*_ to _ℕ*_; _<_ to _<ℕ_)
 open import Data.Nat.Coprimality using (1-coprimeTo) renaming (sym to coprime-sym)
 open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; ^-monoʳ-≤; *-suc; m≤m+n; m≤n+m; n≤1+n
-  ; +-suc; *-mono-≤; ^-distribʳ-*; ^-distribˡ-+-*)    -- ← 删掉 ≤-reflexive
-  renaming (≤-trans to ≤ℕ-trans; ≤-refl to ≤ℕ-refl
-  ; *-comm to *-commℕ; *-assoc to *-assocℕ
-  ; *-identityʳ to *-identityʳℕ)
+  (m≤m⊔n; m≤n⊔m; ^-monoʳ-≤; *-suc; m≤m+n; m≤n+m; n≤1+n; +-suc; *-mono-≤
+  ; ^-distribʳ-*; ^-distribˡ-+-*)
+  renaming (≤-trans to ≤ℕ-trans; ≤-refl to ≤ℕ-refl; *-comm to *-commℕ
+  ; *-assoc to *-assocℕ; *-identityʳ to *-identityʳℕ)
 import Data.Nat.Properties as ℕP
-open import Data.Empty using (⊥; ⊥-elim)
-open import Relation.Nullary using (¬_)
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _/_; _<_; _≤_; ∣_∣
-  ; NonZero; Positive; NonNegative; positive; nonNegative)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _/_; _<_; _≤_; ∣_∣; NonZero; Positive
+  ; NonNegative; positive; nonNegative)
 open import Data.Rational.Base using (1/_) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; <-trans; <-irrefl
-  ; +-mono-≤; *-comm; *-assoc; *-identityʳ; *-inverseʳ
-  ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; *-monoˡ-<-pos
-  ; pos*pos⇒pos; positive⁻¹
-  ; 1/pos⇒pos; pos⇒nonZero; pos⇒nonNeg; 0≤∣p∣; ∣p*q∣≡∣p∣*∣q∣
-  ; 0≤p⇒∣p∣≡p; *-distribʳ-+; neg-distribˡ-*
-  ; normalize-coprime; /-cong
+  ; +-mono-≤; *-comm; *-assoc; *-identityʳ; *-inverseʳ; *-monoˡ-≤-nonNeg
+  ; *-monoʳ-≤-nonNeg; *-monoˡ-<-pos; pos*pos⇒pos; positive⁻¹; 1/pos⇒pos
+  ; pos⇒nonZero; pos⇒nonNeg; 0≤∣p∣; ∣p*q∣≡∣p∣*∣q∣; 0≤p⇒∣p∣≡p
+  ; *-distribʳ-+; neg-distribˡ-*; normalize-coprime; /-cong
   ; nonNeg*nonNeg⇒nonNeg; nonNeg+nonNeg⇒nonNeg; nonNegative⁻¹)
+open import Relation.Nullary using (¬_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; sym; trans; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
@@ -43,8 +51,8 @@ open import ALMA.Base.Real.Interval.Arith using (0ℝ; 1ℝ)
 open import ALMA.Base.Real.Interval.Mul using (_*ℝ_)
 open import ALMA.Base.Real.Interval.Equiv using (_≈ℝ_)
 open import ALMA.Base.Real.IntervalEquiv using
-  (l; centre; width; centre-diff; 0<width; bound-w; recipPow2
-  ; n<2^n; embed-mono-<; suc∸1; realI→cauchy)
+  (l; centre; width; centre-diff; 0<width; bound-w; recipPow2; n<2^n
+  ; embed-mono-<; suc∸1; realI→cauchy)
 open import ALMA.Base.Real.Interval.Order using (_<ℝ_)
 open import ALMA.Base.Real.Interval.Kit using
   (half; 0≤half; n≤2n; *-mono-≤-nonNeg; 0≤recipPow2; embed-mono-≤
@@ -57,11 +65,19 @@ open import ALMA.Base.Real.Interval.Recip using
 open import ALMA.Base.Real.CauchyToInterval using (M; K; centre-cauchy→realI)
 
 ------------------------------------------------------------------------
+-- Embedding homomorphisms
+--
+-- Denominators are both 1; the unnormalised fractions of the sum and
+-- product are (m+n)/1 and (m*n)/1, normalised back to mkℚ (i.e. embed)
+-- via 1-coprimeTo and normalize-coprime. Numerator arithmetic:
+-- (+m)·1 + (+n)·1 ≡ +(m+n).
+--
 -- 嵌入同态
-
+--
 -- 分母均为 1；两数之和/积的未规范化分数为 (m+n)/1、(m*n)/1，
 -- 由 1-coprimeTo 与 normalize-coprime 收回到 mkℚ（即 embed）。
 -- 分子算术：(+m)·1 + (+n)·1 ≡ +(m+n)。
+
 num-add : ∀ m n → (+ m ℤ* + 1 ℤ+ + n ℤ* + 1) ≡ + (m +ℕ n)
 num-add m n = begin
   (+ m ℤ* + 1 ℤ+ + n ℤ* + 1)
@@ -84,6 +100,8 @@ embed-+-hom m n = begin
   embed m + embed n
   ∎
 
+-- Numerator arithmetic: (+m)·(+n) ≡ +(m*n).
+--
 -- 分子算术：(+m)·(+n) ≡ +(m*n)。
 num-mul : ∀ m n → (+ m ℤ* + n) ≡ + (m ℕ* n)
 num-mul m n = +◃n≡+n (m ℕ* n)
@@ -100,7 +118,14 @@ embed-*-hom m n = begin
   ∎
 
 ------------------------------------------------------------------------
--- M≥μK、K≥k
+-- Modulus comparison
+--
+-- The combined modulus M dominates the reciprocal modulus at K n,
+-- and K dominates the identity.
+--
+-- 模数比较
+--
+-- 合并模数 M 支配 K n 处的倒数模数，K 支配恒等。
 
 M≥μK : (x : CauchySeq) (n : ℕ) → M x n ≥ seq-μ x (K n)
 M≥μK x zero    = ≤ℕ-refl
@@ -110,6 +135,8 @@ K≥k : (k : ℕ) → K k ≥ k
 K≥k k = ≤ℕ-trans (ℕP.<⇒≤ (n<2^n k)) (^-monoʳ-≤ 2 (m≤n+m k 2))
 
 ------------------------------------------------------------------------
+-- Auxiliary lemmas
+--
 -- 辅助引理
 
 private
@@ -183,21 +210,26 @@ private
         ∎)
 
 ------------------------------------------------------------------------
--- 主定理
-
+-- Ordering lemma
+--
 -- n ≤ m follows from ¬(suc m ≤ n).
 --
+-- 序关系引理
+--
 -- 由 ¬(suc m ≤ n) 推出 n ≤ m。
+
 from-not : ∀ m n → ¬_ (suc m ≤ℕ n) → n ≤ℕ m
 from-not m n f = ℕP.≤-pred (ℕP.≰⇒> f)
 
 ------------------------------------------------------------------------
--- 顶层辅助引理：recip-modulus 与 pow 的下界
-------------------------------------------------------------------------
-
--- recip-modulus 的严格下界：
---   embed (suc k) < b² · embed (suc (recip-modulus b 0<b k))
+-- Strict lower bound for recip-modulus
 --
+-- embed (suc k) < b² · embed (suc (recip-modulus b 0<b k)).
+--
+-- recip-modulus 的严格下界
+--
+-- embed (suc k) < b² · embed (suc (recip-modulus b 0<b k))。
+
 recip-modulus-lower :
     (b : ℚ) (0<b : 0ℚ < b) (k : ℕ) →
     embed (suc k) < b * b * embed (suc (recip-modulus b 0<b k))
@@ -246,8 +278,9 @@ recip-modulus-lower b 0<b k = goal
       (≤-<-trans key1 key2)
       (≤-reflexive (*-comm (embed (suc Mm)) bsq))
 
--- 若 embed 2 * b * b ≤ embed N，则对所有 n ≥ N 也成立。
+-- If embed 2 * b * b ≤ embed N, then it holds for all n ≥ N.
 --
+-- 若 embed 2 * b * b ≤ embed N，则对所有 n ≥ N 也成立。
 embed-n≥2b² :
     (b : ℚ) (N : ℕ) →
     embed 2 * b * b ≤ embed N →
@@ -255,9 +288,11 @@ embed-n≥2b² :
 embed-n≥2b² b N base n n≥N =
   ≤-trans base (embed-mono-≤ n≥N)
 
+-- Under 2*b² ≤ embed N and N ≥ 4, for n ≥ N we have
+--   embed (2n) * b * b ≤ embed (4^n).
+--
 -- 在 2*b² ≤ embed N、N ≥ 4 的条件下，对 n ≥ N 有
 --   embed (2n) * b * b ≤ embed (4^n)。
---
 2n*b²≤4^n :
     (b : ℚ) (0<b : 0ℚ < b) (N : ℕ) →
     N ≥ 4 →
@@ -316,8 +351,9 @@ embed-n≥2b² b N base n n≥N =
     goal : e2n * b * b ≤ embed (4 ^ n)
     goal = subst (λ z → z ≤ embed (4 ^ n)) (sym assocg) goal'
 
--- recip-modulus 在 K(2n) 处的值不小于 2n。
+-- recip-modulus at K(2n) is at least 2n.
 --
+-- recip-modulus 在 K(2n) 处的值不小于 2n。
 recip-modulus-≥2n :
     (b : ℚ) (0<b : 0ℚ < b) (N : ℕ) →
     (∀ n → n ≥ N → embed (2 ℕ* n) * b * b ≤ embed (4 ^ n)) →
@@ -362,10 +398,13 @@ recip-modulus-≥2n b 0<b N h n n≥N = helper
     helper : 2 ℕ* n ≤ℕ Nm
     helper = from-not Nm (2 ℕ* n) absurd
 
+-- Closed-form bound on the centre error of multiplication:
+--   |centre (x *ℝ R) n - centre x (2n) * centre R (2n)|
+--     ≤ (width x 0 * width R 0 * half) * recipPow2 n.
+--
 -- 乘法中心误差的闭式界：
 --   |centre (x *ℝ R) n - centre x (2n) * centre R (2n)|
---     ≤ (width x 0 * width R 0 * half) * recipPow2 n
---
+--     ≤ (width x 0 * width R 0 * half) * recipPow2 n。
 term1 :
     (x R : RealI) (n : ℕ) →
     ∣ centre (x *ℝ R) n - centre x (2 ℕ* n) * centre R (2 ℕ* n) ∣
@@ -427,12 +466,17 @@ term1 x R n = ≤-trans (centre-*ℝ≈ x R n) step
           ∎
 
 ------------------------------------------------------------------------
--- 携带模数下界：realI→cauchy 的模数 μ k = suc (M * suc k)。
--- 初始宽度 w0 严格为正，故 bound-w 所得 M ≥ 1，从而 μ k ≥ k。
+-- Carried modulus lower bound
 --
--- Carried modulus lower bound: the modulus of realI→cauchy,
--- μ k = suc (M * suc k), dominates its own index.
-------------------------------------------------------------------------
+-- The modulus of realI→cauchy is μ k = suc (M * suc k). The initial
+-- width w0 is strictly positive, so bound-w yields M ≥ 1, hence
+-- μ k ≥ k.
+--
+-- 携带模数下界
+--
+-- realI→cauchy 的模数 μ k = suc (M * suc k)。初始宽度 w0 严格为正，
+-- 故 bound-w 所得 M ≥ 1，从而 μ k ≥ k。
+
 embed-pos→≥1 : ∀ m → 0ℚ < embed m → 1 ≤ℕ m
 embed-pos→≥1 zero   pr = ⊥-elim (<-irrefl refl pr)
 embed-pos→≥1 (suc m) _ = s≤s z≤n
@@ -457,12 +501,17 @@ embed-pos→≥1 (suc m) _ = s≤s z≤n
              (*-mono-≤ Mx≥1 (≤ℕ-refl {suc (suc k)}))
 
 ------------------------------------------------------------------------
--- 尾部收敛引擎：|中心差| ≤ C · recipPow2 n 仅需对 n ≥ N₀ 成立。
--- 有限前段不影响等价性（与 ≈ℝ-of-rec 相同，仅放宽为尾部）。
+-- Tail convergence engine
 --
--- Tail convergence engine: the geometric bound is only required
--- eventually, for n ≥ N₀.
-------------------------------------------------------------------------
+-- The geometric bound |centre difference| ≤ C · recipPow2 n is only
+-- required eventually, for n ≥ N₀. The finite prefix does not affect
+-- equivalence (same as ≈ℝ-of-rec, only relaxed to the tail).
+--
+-- 尾部收敛引擎
+--
+-- |中心差| ≤ C · recipPow2 n 仅需对 n ≥ N₀ 成立。有限前段不影响
+-- 等价性（与 ≈ℝ-of-rec 相同，仅放宽为尾部）。
+
 ≈ℝ-of-recN : (x y : RealI) (N₀ : ℕ) (C : ℚ) → 0ℚ ≤ C →
   (∀ n → n ≥ N₀ → ∣ centre x n - centre y n ∣ ≤ C * recipPow2 n) →
   x ≈ℝ y
@@ -475,8 +524,14 @@ embed-pos→≥1 (suc m) _ = s≤s z≤n
        in ≤-<-trans (h n n≥N₀) (w n n≥N₁)
 
 ------------------------------------------------------------------------
--- 主定理：正实数的倒数与自身相乘近似等于 1
-------------------------------------------------------------------------
+-- Main theorem
+--
+-- The product of a positive interval real and its reciprocal is
+-- approximately one.
+--
+-- 主定理
+--
+-- 正实数的倒数与自身相乘近似等于 1。
 
 *ℝ-inverse-pos : (x : RealI) (0<x : 0ℝ <ℝ x)
                → x *ℝ recipℝ x 0<x ≈ℝ 1ℝ
@@ -548,7 +603,6 @@ embed-pos→≥1 (suc m) _ = s≤s z≤n
     N≥N-b : N ≥ N-b
     N≥N-b = m≤n⊔m 4 N-b
 
-    -- 把顶层引理实例化到当前的 b、0<b、N。
     embed-2b²≤N : embed 2 * b * b ≤ embed N
     embed-2b²≤N =
       ≤-trans C-aux≤N-b
@@ -564,30 +618,31 @@ embed-pos→≥1 (suc m) _ = s≤s z≤n
       ∀ n → n ≥ N → recip-modulus b 0<b (K (2 ℕ* n)) ≥ 2 ℕ* n
     recip-modulus-≥2n-inst = recip-modulus-≥2n b 0<b N 2n-inst
 
-    -- 把 term1 实例化到 x、R、n。
     term1-inst :
       ∀ n →
       ∣ centre (x *ℝ R) n - centre x (2 ℕ* n) * centre R (2 ℕ* n) ∣
         ≤ (w0 * wR0 * half) * recipPow2 n
     term1-inst n = term1 x R n
 
-    ------------------------------------------------------------------------
-    -- 剩下的两段：j 的下界与 centre-R-close、term2、body
-    ------------------------------------------------------------------------
-
+    -- j n = N₀ + M cs (2n).
+    --
+    -- M cs (2n) is at least the modulus of cs at K(2n) (prefix max),
+    -- and the modulus of cs is μ-h (K(2n)) = seq-μ (realI→cauchy x) r,
+    -- where r = recip-modulus b 0<b (K(2n)). The carried modulus is
+    -- dominated by its index (μx-dom), so seq-μ ... r ≥ r; and
+    -- recip-modulus-≥2n gives r ≥ 2n. Hence M cs (2n) ≥ 2n, and
+    -- adding N₀ yields j n ≥ 2n.
+    --
+    -- j n = N₀ + M cs (2n)。
+    --
+    -- M cs (2n) 不小于 cs 在 K(2n) 处的模数（前缀最大），而 cs 的模数
+    -- 为 μ-h (K(2n)) = seq-μ (realI→cauchy x) r，其中
+    -- r = recip-modulus b 0<b (K(2n))。携带模数被其下标控制
+    -- （μx-dom），故 seq-μ ... r ≥ r；又由 recip-modulus-≥2n 有
+    -- r ≥ 2n。于是 M cs (2n) ≥ 2n，加上 N₀ 即得 j n ≥ 2n。
     j : ℕ → ℕ
     j n = PosCauchy.N₀ pc +ℕ M cs (2 ℕ* n)
 
-    -- j n = N₀ + M cs (2n)。
-    --
-    -- M cs (2n) 不小于 cs 在 K(2n) 处的模数（前缀最大），而 cs 的模数为
-    -- μ-h (K(2n)) = seq-μ (realI→cauchy x) r，其中
-    -- r = recip-modulus b 0<b (K(2n))。携带模数被其下标控制（μx-dom），
-    -- 故 seq-μ ... r ≥ r；又由 recip-modulus-≥2n 有 r ≥ 2n。
-    -- 于是 M cs (2n) ≥ 2n，加上 N₀ 即得 j n ≥ 2n。
-    --
-    -- M cs (2n) dominates the reciprocal modulus r ≥ 2n, and the
-    -- carried modulus dominates its index, hence M cs (2n) ≥ 2n.
     Mcs≥2n : ∀ n → n ≥ N → M cs (2 ℕ* n) ≥ 2 ℕ* n
     Mcs≥2n n n≥N =
       ≤ℕ-trans (≤ℕ-trans (recip-modulus-≥2n-inst n n≥N)
@@ -601,18 +656,13 @@ embed-pos→≥1 (suc m) _ = s≤s z≤n
       ≤ℕ-trans (Mcs≥2n n n≥N)
                (m≤n+m (M cs (2 ℕ* n)) (PosCauchy.N₀ pc))
 
-    -- R 第 2n 层的中心是 x 在 j n 处中心的倒数。
-    --
-    -- The centre of R at level 2n is the reciprocal of the centre of
-    -- x at level j n.
     jn≥N₀ : ∀ n → PosCauchy.N₀ pc ≤ℕ j n
     jn≥N₀ n = m≤m+n (PosCauchy.N₀ pc) (M cs (2 ℕ* n))
 
-    -- 第 2n 层中心（记为 c）与第 j n 层中心（记为 d）落在第 2n 层
-    -- 区间内，二者相差不超过 width x (2n)；且 d ≥ b。
+    -- The centre of R at level 2n is the reciprocal of the centre of
+    -- x at level j n.
     --
-    -- c · (1/d) − 1 = (c − d) · (1/d)，取绝对值并以 1/d ≤ 1/b
-    -- 收窄，即得误差不超过 (1/b) · width x (2n)。
+    -- R 第 2n 层的中心是 x 在 j n 处中心的倒数。
     centre-R-close : ∀ n → n ≥ N →
       ∣ centre R (2 ℕ* n) * centre x (2 ℕ* n) - 1ℚ ∣
         ≤ (1/ b) {{b-nz}} * width x (2 ℕ* n)
@@ -716,10 +766,12 @@ embed-pos→≥1 (suc m) _ = s≤s z≤n
               (≤-trans step2
                 (≤-reflexive (*-comm (width x (2 ℕ* n)) invb))))
 
+    -- Combine centre-R-close with the geometric width decay
+    -- width x (2n) ≤ w0 · recipPow2 n to obtain the closed-form bound
+    -- for the second error term.
+    --
     -- 由 centre-R-close 与几何宽度 width x (2n) ≤ w0 · recipPow2 n，
     -- 得到第二误差项的闭式界。
-    --
-    -- Combine centre-R-close with the geometric width decay.
     term2 : ∀ n → n ≥ N →
       ∣ centre x (2 ℕ* n) * centre R (2 ℕ* n) - 1ℚ ∣
         ≤ (w0 * invb) * recipPow2 n
@@ -750,13 +802,17 @@ embed-pos→≥1 (suc m) _ = s≤s z≤n
             (w0 * invb) * r
           ∎
 
+    -- Triangle inequality:
+    --   centre(x*R)n − 1 = [centre(x*R)n − c·Rc] + [c·Rc − 1],
+    -- where the first part is bounded by term1 with
+    -- (w0·wR0·half)·recipPow2 n, and the second by term2 with
+    -- (w0·invb)·recipPow2 n. Factoring out gives C · recipPow2 n.
+    --
     -- 三角不等式：
     --   centre(x*R)n − 1 = [centre(x*R)n − c·Rc] + [c·Rc − 1]，
     -- 第一段由 term1 界为 (w0·wR0·half)·recipPow2 n，
     -- 第二段由 term2 界为 (w0·invb)·recipPow2 n，
     -- 提公因子即得 C · recipPow2 n。
-    --
-    -- Triangle inequality combines the two error terms.
     body : ∀ n → n ≥ N →
       ∣ centre (x *ℝ R) n - centre 1ℝ n ∣ ≤ C * recipPow2 n
     body n n≥N =
