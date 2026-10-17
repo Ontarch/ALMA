@@ -18,7 +18,7 @@
 
 module ALMA.Physics.LatticeCoherence where
 
-open import Agda.Primitive using (lzero; lsuc)
+open import Agda.Primitive using (lzero)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Relation.Nullary.Negation.Core using (¬_)
 

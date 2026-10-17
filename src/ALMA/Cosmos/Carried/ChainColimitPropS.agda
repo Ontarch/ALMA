@@ -25,7 +25,7 @@
 
 module ALMA.Cosmos.Carried.ChainColimitPropS where
 
-open import Agda.Primitive using (Level; lzero; lsuc)
+open import Agda.Primitive using (Level; lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Relation.Binary.PropositionalEquality.Core using (sym; trans; cong)
 open import Data.Nat.Base using (ℕ; zero; suc; _+_)
@@ -40,7 +40,7 @@ open import ALMA.Cosmos.Carried.SameIndexCatS using
 
 open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
-open import ALMA.Cosmos.Carried.SeqColimitCat using (Chain⇒; stop; step; ωCat; _∘ch_)
+open import ALMA.Cosmos.Carried.SeqColimitCat using (Chain⇒; ωCat; _∘ch_)
 import ALMA.Cosmos.Carried.SeqColimitCat as SQC
 
 module _ (d : ℕ → ℕ) {ℓ : Level} where

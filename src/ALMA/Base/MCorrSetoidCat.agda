@@ -34,12 +34,11 @@ open import Categories.Category.Core using (Category)
 
 open import ALMA.Base.MCorr using (M)
 open import ALMA.Base.MCorrSetoid using
-  (SysEq; EqOn; FiberAdjˢ; Morphˢ; idAdjˢ; compAdjˢ; shapeᴿ; child
-  ; edge-adj; _≈Mˢ_; here-eq; below-eq; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
+  (SysEq; EqOn; FiberAdjˢ; Morphˢ; idAdjˢ; compAdjˢ; _≈Mˢ_; here-eq; below-eq
+  ; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
 
 open SysEq
 open FiberAdjˢ
-open Morphˢ
 
 ------------------------------------------------------------------------
 -- Deterministic carried morphism

@@ -18,7 +18,7 @@
 
 module ALMA.Physics.Quantum.FiniteVec where
 
-open import Data.Nat.Base using (ℕ; zero; suc)
+open import Data.Nat.Base using (zero; suc)
 open import Data.Fin.Base using (Fin; zero; suc)
 open import Data.Product.Base using (_,_)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _≤_)

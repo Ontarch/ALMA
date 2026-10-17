@@ -27,7 +27,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; sym; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Newton.Quadratic using
-  (Obs; obs; bracket; add; scale; neg; twoℚ; fourℚ; mkObs)
+  (obs; bracket; add; scale; neg; twoℚ; fourℚ; mkObs)
 open import ALMA.Physics.Newton.QuadraticBilinear using (bracket-addˡ; bracket-scaleˡ)
 open import ALMA.Physics.RationalKit using (foldNeg; neg4; rot4; rev4; flip3)
 

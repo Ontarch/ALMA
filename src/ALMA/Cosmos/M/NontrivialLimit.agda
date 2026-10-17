@@ -35,15 +35,16 @@ open import Categories.Functor.Core using (Functor)
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Base.MCorrSetoid using (EqOn; Morphˢ; propEqOn)
 open Morphˢ using (mapR)
-open import ALMA.Cosmos.M.Object as MO
+open import ALMA.Cosmos.M.Object using
+  (I; A; ana; CosmosM; unfold-coalgebra; Coalgebra; ana-unfold˘; CosmosM⇒; ≈CosmosM)
 open import ALMA.Cosmos.M.Terminal using (≈CosmosM-sym; ≈CosmosM-trans)
-open import ALMA.Cosmos.M.TowerSeparation as TS
+open import ALMA.Cosmos.M.TowerSeparation using (module TowerSeparation)
 
 module _ {o h e s p : Level}
          {C  : Category o h e}
          {FC : Functor C (ContCat s p)}
          {ℓd : Level}
-         (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
+         (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
        where
 
   private
@@ -58,18 +59,18 @@ module _ {o h e s p : Level}
   --
   -- 显式假设，不由终性导出。
 
-  AllBisim : (j : MO.I C FC) → Set (L ⊔ ℓd)
+  AllBisim : (j : I C FC) → Set (L ⊔ ℓd)
   AllBisim j =
-    ∀ (t u : MO.CosmosM C FC j) → MO.≈CosmosM C FC ≈CD t u
+    ∀ (t u : CosmosM C FC j) → ≈CosmosM C FC ≈CD t u
 
   Subterminal : Set (L ⊔ ℓd)
-  Subterminal = ∀ (j : MO.I C FC) → AllBisim j
+  Subterminal = ∀ (j : I C FC) → AllBisim j
 
-  no-distinguishing-pair : ∀ {j : MO.I C FC}
+  no-distinguishing-pair : ∀ {j : I C FC}
     → AllBisim j
-    → ¬ Σ (MO.CosmosM C FC j) λ t →
-        Σ (MO.CosmosM C FC j) λ u →
-          ¬ MO.≈CosmosM C FC ≈CD t u
+    → ¬ Σ (CosmosM C FC j) λ t →
+        Σ (CosmosM C FC j) λ u →
+          ¬ ≈CosmosM C FC ≈CD t u
   no-distinguishing-pair all (t , u , t≉u) = t≉u (all t u)
 
   ----------------------------------------------------------------------
@@ -83,38 +84,38 @@ module _ {o h e s p : Level}
   -- 携带映射沿 r : R i j 反射互模拟：j 处像互模拟则 i 处源互模拟。
 
   module _ {ℓr : Level}
-           (R : MO.I C FC → MO.I C FC → Set ℓr)
-           (φ : MO.CosmosM⇒ C FC ≈CD R)
+           (R : I C FC → I C FC → Set ℓr)
+           (φ : CosmosM⇒ C FC ≈CD R)
          where
 
-    ReflectsBisimAt : ∀ {i j : MO.I C FC} → R i j → Set (L ⊔ ℓd)
+    ReflectsBisimAt : ∀ {i j : I C FC} → R i j → Set (L ⊔ ℓd)
     ReflectsBisimAt {i = i} r =
-      ∀ (t u : MO.CosmosM C FC i)
-      → MO.≈CosmosM C FC ≈CD (mapR φ r t) (mapR φ r u)
-      → MO.≈CosmosM C FC ≈CD t u
+      ∀ (t u : CosmosM C FC i)
+      → ≈CosmosM C FC ≈CD (mapR φ r t) (mapR φ r u)
+      → ≈CosmosM C FC ≈CD t u
 
     -- Contrapositive: separation at the source survives the map.
     --
     -- 逆否：源处的分离在映射后保持。
-    separation-survives : ∀ {i j : MO.I C FC}
+    separation-survives : ∀ {i j : I C FC}
       → (r : R i j) → ReflectsBisimAt r
-      → (t u : MO.CosmosM C FC i)
-      → ¬ MO.≈CosmosM C FC ≈CD t u
-      → ¬ MO.≈CosmosM C FC ≈CD (mapR φ r t) (mapR φ r u)
+      → (t u : CosmosM C FC i)
+      → ¬ ≈CosmosM C FC ≈CD t u
+      → ¬ ≈CosmosM C FC ≈CD (mapR φ r t) (mapR φ r u)
     separation-survives r reflect t u t≉u eq =
       t≉u (reflect t u eq)
 
-    no-reflecting-into-total : ∀ {i j : MO.I C FC}
+    no-reflecting-into-total : ∀ {i j : I C FC}
       → (r : R i j) → AllBisim j → ReflectsBisimAt r
-      → (t u : MO.CosmosM C FC i)
-      → ¬ MO.≈CosmosM C FC ≈CD t u → ⊥
+      → (t u : CosmosM C FC i)
+      → ¬ ≈CosmosM C FC ≈CD t u → ⊥
     no-reflecting-into-total r all reflect t u t≉u =
       t≉u (reflect t u (all (mapR φ r t) (mapR φ r u)))
 
-    no-reflecting-into-subterminal : ∀ {i j : MO.I C FC}
+    no-reflecting-into-subterminal : ∀ {i j : I C FC}
       → (r : R i j) → Subterminal → ReflectsBisimAt r
-      → (t u : MO.CosmosM C FC i)
-      → ¬ MO.≈CosmosM C FC ≈CD t u → ⊥
+      → (t u : CosmosM C FC i)
+      → ¬ ≈CosmosM C FC ≈CD t u → ⊥
     no-reflecting-into-subterminal r sub reflect t u t≉u =
       no-reflecting-into-total r (sub _) reflect t u t≉u
 
@@ -124,37 +125,37 @@ module _ {o h e s p : Level}
   -- 终性是中介映射唯一性，非纤维全体性
 
   record TerminalMediator {u : Level}
-         (Xst : MO.I C FC → Set u)
-         (γ   : MO.Coalgebra C FC u Xst)
+         (Xst : I C FC → Set u)
+         (γ   : Coalgebra C FC u Xst)
        : Set (L ⊔ ℓd ⊔ u) where
     field
-      med      : ∀ (j : MO.I C FC) (x : Xst j) → MO.CosmosM C FC j
-      med-comm : ∀ (j : MO.I C FC) (x : Xst j)
-        → MO.≈CosmosM C FC ≈CD
-            (MO.ana C FC (MO.unfold-coalgebra C FC) j (med j x))
-            (MO.ana C FC γ j x)
+      med      : ∀ (j : I C FC) (x : Xst j) → CosmosM C FC j
+      med-comm : ∀ (j : I C FC) (x : Xst j)
+        → ≈CosmosM C FC ≈CD
+            (ana C FC (unfold-coalgebra C FC) j (med j x))
+            (ana C FC γ j x)
   open TerminalMediator public
 
   terminal-unique : ∀ {u : Level}
-      {Xst : MO.I C FC → Set u}
-      {γ   : MO.Coalgebra C FC u Xst}
+      {Xst : I C FC → Set u}
+      {γ   : Coalgebra C FC u Xst}
       (m   : TerminalMediator Xst γ)
-      (j   : MO.I C FC) (x : Xst j)
-    → MO.≈CosmosM C FC ≈CD (med m j x) (MO.ana C FC γ j x)
+      (j   : I C FC) (x : Xst j)
+    → ≈CosmosM C FC ≈CD (med m j x) (ana C FC γ j x)
   terminal-unique {γ = γ} m j x =
     ≈CosmosM-trans ≈CD
-      (MO.ana-unfold˘ C FC ≈CD (med m j x))
+      (ana-unfold˘ C FC ≈CD (med m j x))
       (med-comm m j x)
 
   -- Mediators of one coalgebra coincide pointwise.
   --
   -- 同一余代数的中介逐点重合。
   terminal-mediators-coincide : ∀ {u : Level}
-      {Xst : MO.I C FC → Set u}
-      {γ   : MO.Coalgebra C FC u Xst}
+      {Xst : I C FC → Set u}
+      {γ   : Coalgebra C FC u Xst}
       (m n : TerminalMediator Xst γ)
-      (j   : MO.I C FC) (x : Xst j)
-    → MO.≈CosmosM C FC ≈CD (med m j x) (med n j x)
+      (j   : I C FC) (x : Xst j)
+    → ≈CosmosM C FC ≈CD (med m j x) (med n j x)
   terminal-mediators-coincide {γ = γ} m n j x =
     ≈CosmosM-trans ≈CD
       (terminal-unique m j x)
@@ -167,11 +168,11 @@ module _ {o h e s p : Level}
 
 module TowerInstance (m : ℕ) where
 
-  open TS.TowerSeparation m
+  open TowerSeparation m
     using (Cn; TrivFC; i₁; treeId; treeC0; idN≉const0N)
 
   private
-    ≈CDn : (i : MO.I Cn TrivFC) → EqOn (MO.A Cn TrivFC i)
+    ≈CDn : (i : I Cn TrivFC) → EqOn (A Cn TrivFC i)
     ≈CDn _ = propEqOn _
 
   -- The terminal carrier fibre at i₁ is not total.
@@ -187,9 +188,9 @@ module TowerInstance (m : ℕ) where
   -- 不存在从 i₁ 指向全体纤维的反射携带映射。
   tower-no-reflection-into-total
     : ∀ {ℓr : Level}
-        (R : MO.I Cn TrivFC → MO.I Cn TrivFC → Set ℓr)
-        (φ : MO.CosmosM⇒ Cn TrivFC ≈CDn R)
-        (j : MO.I Cn TrivFC) (r : R i₁ j)
+        (R : I Cn TrivFC → I Cn TrivFC → Set ℓr)
+        (φ : CosmosM⇒ Cn TrivFC ≈CDn R)
+        (j : I Cn TrivFC) (r : R i₁ j)
     → AllBisim {C = Cn} {FC = TrivFC} ≈CDn j
     → ¬ ReflectsBisimAt {C = Cn} {FC = TrivFC} ≈CDn R φ r
   tower-no-reflection-into-total R φ j r all reflect =

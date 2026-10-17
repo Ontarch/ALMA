@@ -30,7 +30,6 @@ open import Data.Empty.Polymorphic using (⊥; ⊥-elim)
 import Data.Empty
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.PropositionalEquality.Core using (cong; sym; trans; _≢_)
-open import Relation.Binary.Structures using (IsEquivalence)
 
 open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
@@ -39,8 +38,7 @@ open import ALMA.Base.MCorr using (M)
 open import ALMA.Base.MCorrSetoid using (SysEq; EqOn; propEqOn; idAdjˢ; _≈Mˢ_)
 open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ)
 open import ALMA.Cosmos.Carried.SameIndexCatS using
-  (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_; SameIndexCat
-  ; ≈i-refl; ≈i-sym; ≈i-trans; ∘-resp-≈i)
+  (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_; SameIndexCat; ≈i-refl; ≈i-trans; ∘-resp-≈i)
 open import ALMA.Cosmos.Carried.SeqColimitCat using (Chain⇒; stop; step; ωCat)
 import ALMA.Cosmos.Carried.SeqColimitCat as SQC
 
@@ -279,10 +277,6 @@ module PullTower {ℓ : Level} (T : LabeledInverseTower ℓ) where
 
     reflc : ∀ {X Y : LabelSys ℓ} {f : Idx⇒ s X Y} → _≈i_ s f f
     reflc {f = f} = ≈i-refl s {ℓ = ℓ} f
-
-    symc : ∀ {X Y : LabelSys ℓ} {f g : Idx⇒ s X Y}
-         → _≈i_ s f g → _≈i_ s g f
-    symc {f = f} {g = g} p = ≈i-sym s {ℓ = ℓ} {f = f} {g = g} p
 
     transc : ∀ {X Y : LabelSys ℓ} {f g h : Idx⇒ s X Y}
            → _≈i_ s f g → _≈i_ s g h → _≈i_ s f h

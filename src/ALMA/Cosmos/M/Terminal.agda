@@ -30,10 +30,8 @@ open import Categories.Functor.Core using (Functor)
 
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Base.MCorrSetoid using ( EqOn; SysEq; ≈Mˢ-sym; ≈Mˢ-trans)
-open import ALMA.Cosmos.M.Object as MO
-open MO using
-  (CosmosM; Rooted; step; next; nextOf; Coalgebra; ana; unfold-coalgebra
-  ; ≈CosmosM; ≈CosmosM-refl; ana-unfold; ana-unfold˘)
+open import ALMA.Cosmos.M.Object using
+  (I; A; sys; CosmosM; ≈CosmosM; ≈CosmosM-refl)
 
 ------------------------------------------------------------------------
 -- Bisimulation equivalence on CosmosM
@@ -50,23 +48,23 @@ module _ {o h e s p : Level}
          {FC : Functor C (ContCat s p)} where
 
   ≈CosmosM-sym : ∀ {ℓd : Level}
-                   (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
-                   {i : MO.I C FC} {t s : MO.CosmosM C FC i}
-               → MO.≈CosmosM C FC ≈CD {i = i} t s
-               → MO.≈CosmosM C FC ≈CD {i = i} s t
+                   (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
+                   {i : I C FC} {t s : CosmosM C FC i}
+               → ≈CosmosM C FC ≈CD {i = i} t s
+               → ≈CosmosM C FC ≈CD {i = i} s t
   ≈CosmosM-sym ≈CD =
-    ≈Mˢ-sym (SysEq.≈A (MO.sys C FC ≈CD))
-            (SysEq.≈E (MO.sys C FC ≈CD))
+    ≈Mˢ-sym (SysEq.≈A (sys C FC ≈CD))
+            (SysEq.≈E (sys C FC ≈CD))
 
   ≈CosmosM-trans : ∀ {ℓd : Level}
-                     (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
-                     {i : MO.I C FC} {t m s : MO.CosmosM C FC i}
-                 → MO.≈CosmosM C FC ≈CD {i = i} t m
-                 → MO.≈CosmosM C FC ≈CD {i = i} m s
-                 → MO.≈CosmosM C FC ≈CD {i = i} t s
+                     (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
+                     {i : I C FC} {t m s : CosmosM C FC i}
+                 → ≈CosmosM C FC ≈CD {i = i} t m
+                 → ≈CosmosM C FC ≈CD {i = i} m s
+                 → ≈CosmosM C FC ≈CD {i = i} t s
   ≈CosmosM-trans ≈CD =
-    ≈Mˢ-trans (SysEq.≈A (MO.sys C FC ≈CD))
-              (SysEq.≈E (MO.sys C FC ≈CD))
+    ≈Mˢ-trans (SysEq.≈A (sys C FC ≈CD))
+              (SysEq.≈E (sys C FC ≈CD))
 
   ----------------------------------------------------------------------
   -- The bisimulation as a manifest EqOn on CosmosM i
@@ -78,13 +76,13 @@ module _ {o h e s p : Level}
   -- 无载体强制转换。
 
   ≈CosmosM-isEqOn : ∀ {ℓd : Level}
-                      (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
-                      {i : MO.I C FC}
-                    → EqOn (MO.CosmosM C FC i)
+                      (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
+                      {i : I C FC}
+                    → EqOn (CosmosM C FC i)
   ≈CosmosM-isEqOn ≈CD {i = i} = record
-    { _≈_ = MO.≈CosmosM C FC ≈CD {i = i}
+    { _≈_ = ≈CosmosM C FC ≈CD {i = i}
     ; isEquivalence = record
-      { refl  = λ {t} → MO.≈CosmosM-refl C FC ≈CD t
+      { refl  = λ {t} → ≈CosmosM-refl C FC ≈CD t
       ; sym   = ≈CosmosM-sym ≈CD
       ; trans = ≈CosmosM-trans ≈CD
       }

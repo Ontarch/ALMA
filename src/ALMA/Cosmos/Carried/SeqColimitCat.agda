@@ -26,7 +26,7 @@ module ALMA.Cosmos.Carried.SeqColimitCat where
 
 open import Agda.Primitive using (Level; lzero)
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Data.Nat.Base using (ℕ; zero; suc)
+open import Data.Nat.Base using (ℕ; suc)
 open import Relation.Binary.PropositionalEquality.Core using (sym; cong; trans)
 
 open import Categories.Category.Core using (Category)
@@ -195,8 +195,6 @@ module _ {i a b ℓa ℓe : Level} (ch : Chainˢ i a b ℓa ℓe) where
   private F = chainF ch
 
   open import Categories.Diagram.Cocone F
-  open import Categories.Category.Construction.Cocones F using (Cocones)
-  open import Categories.Object.Initial Cocones
   open import Categories.Diagram.Colimit F using (Colimit)
 
   -- Fold of the successor arrow is the one-step embedding up to id.

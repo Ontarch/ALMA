@@ -33,7 +33,6 @@ open import Data.Container.Core using (Container; Shape; Position; map; _⇒_)
 open import Data.Container.Morphism using (id) renaming (_∘_ to _∘Cont_)
 open import Data.Container.Relation.Binary.Equality.Setoid using (setoid)
 open import Data.Container.Relation.Binary.Pointwise as PW using (_,_; Pointwise)
-open import Function.Base using (_∘_)
 open import Function.Bundles using (Func; _⇔_; mk⇔)
 open import Relation.Binary.PropositionalEquality.Core using (cong)
 open import Relation.Binary.PropositionalEquality.Properties renaming

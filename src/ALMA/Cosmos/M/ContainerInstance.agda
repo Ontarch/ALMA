@@ -30,14 +30,14 @@ open import Data.Product.Base using (proj₁)
 open import Relation.Binary.PropositionalEquality.Core using (cong)
 
 open import Categories.Category.Core using (Category)
-open import Categories.Functor.Core using (Functor)
-open import Categories.Functor using () renaming (id to idF)
+open import Categories.Functor renaming (id to idF)
 
 open import ALMA.Base.MCorrSetoid using (EqOn; propEqOn; FiberAdjˢ; idAdjˢ; Stepˢ)
 open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ; idFMˢ)
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)
-open import ALMA.Cosmos.M.Object as MO
+open import ALMA.Cosmos.M.Object using
+  (I; E; sys; CosmosM; ≈CosmosM; CosmosData; CosmosM⇒; idCosmosM)
 
 module _ {o h e s p : Level}
          (C  : Category o h e)
@@ -47,11 +47,11 @@ module _ {o h e s p : Level}
   --
   -- 形状自函子在索引上的命题图。
   Graph : Functor (ShapeCat C FC) (ShapeCat C FC)
-        → MO.I C FC → MO.I C FC → Set (o ⊔ s)
+        → I C FC → I C FC → Set (o ⊔ s)
   Graph S i j = Functor.F₀ S i ≡ j
 
-  propLabel : (i : MO.I C FC)
-            → EqOn {ℓ = o ⊔ h ⊔ e ⊔ s ⊔ p} (MO.CosmosData C FC)
+  propLabel : (i : I C FC)
+            → EqOn {ℓ = o ⊔ h ⊔ e ⊔ s ⊔ p} (CosmosData C FC)
   propLabel _ = propEqOn _
 
   -- Carried type of the old deterministic _⇒ℱ[S]_.
@@ -59,7 +59,7 @@ module _ {o h e s p : Level}
   -- 旧确定性 _⇒ℱ[S]_ 的携带式类型。
   DetCosmosM⇒ : Functor (ShapeCat C FC) (ShapeCat C FC)
               → Set (o ⊔ h ⊔ e ⊔ s ⊔ p)
-  DetCosmosM⇒ S = MO.CosmosM⇒ C FC propLabel (Graph S)
+  DetCosmosM⇒ S = CosmosM⇒ C FC propLabel (Graph S)
 
   -- Graph id is definitionally the index path relation, so the carried
   -- morphism is idCosmosM: this recovers the old id⇒ℱ.
@@ -67,7 +67,7 @@ module _ {o h e s p : Level}
   -- Graph id 定义性地为索引路径关系，故携带态射为 idCosmosM：恢复
   -- 旧 id⇒ℱ。
   Det-id : DetCosmosM⇒ idF
-  Det-id = MO.idCosmosM C FC propLabel
+  Det-id = idCosmosM C FC propLabel
 
   ----------------------------------------------------------------------
   -- Carried construction data for a deterministic S-morphism
@@ -76,10 +76,10 @@ module _ {o h e s p : Level}
 
   private
     f₀ : (S : Functor (ShapeCat C FC) (ShapeCat C FC))
-       → MO.I C FC → MO.I C FC
+       → I C FC → I C FC
     f₀ S = Functor.F₀ S
 
-    sysP = MO.sys C FC propLabel
+    sysP = sys C FC propLabel
 
   record DetData (S : Functor (ShapeCat C FC) (ShapeCat C FC))
          : Set (o ⊔ h ⊔ e ⊔ s ⊔ p) where
@@ -90,22 +90,22 @@ module _ {o h e s p : Level}
       --
       -- 索引感知的标签映射：旧态射由两个 unfolding 与形状自然同构逐层
       -- 构造它，故必须见到源索引 x。
-      labelMap : (x : MO.I C FC) (d : MO.CosmosData C FC)
-               → MO.CosmosData C FC
+      labelMap : (x : I C FC) (d : CosmosData C FC)
+               → CosmosData C FC
       -- Coverage of S.₀: the deterministic analogue of FMap.childF.
       --
       -- S.₀ 的覆盖：FMap.childF 的确定性对应物。
-      pullback : (d : MO.CosmosData C FC) (v : MO.I C FC)
-               → Σ (MO.I C FC) λ x' → f₀ S x' ≡ v
+      pullback : (d : CosmosData C FC) (v : I C FC)
+               → Σ (I C FC) λ x' → f₀ S x' ≡ v
       -- fro is the old onPos; to/η/ε are the carried replacements for
       -- pts-compat / onActP.
       --
       -- fro 即旧 onPos；to/η/ε 是 pts-compat / onActP 的携带式替代。
-      edgeAdj  : (x : MO.I C FC) (d : MO.CosmosData C FC)
-                 (v : MO.I C FC)
-                 (pb : Σ (MO.I C FC) λ x' → f₀ S x' ≡ v)
-               → FiberAdjˢ (propEqOn (MO.E C FC (f₀ S x) (labelMap x d) v))
-                            (propEqOn (MO.E C FC x d (proj₁ pb)))
+      edgeAdj  : (x : I C FC) (d : CosmosData C FC)
+                 (v : I C FC)
+                 (pb : Σ (I C FC) λ x' → f₀ S x' ≡ v)
+               → FiberAdjˢ (propEqOn (E C FC (f₀ S x) (labelMap x d) v))
+                            (propEqOn (E C FC x d (proj₁ pb)))
   open DetData public
 
   -- One deterministic step: matching refl pins the target index to
@@ -117,7 +117,7 @@ module _ {o h e s p : Level}
   private
     detStep : (S : Functor (ShapeCat C FC) (ShapeCat C FC))
               (dd : DetData S)
-            → ∀ {x y : MO.I C FC} (r : Graph S x y)
+            → ∀ {x y : I C FC} (r : Graph S x y)
             → Stepˢ sysP sysP (Graph S) r
     detStep S dd {x = x₀} {y = .(f₀ S x₀)} refl = record
       { shapeᴿ = labelMap dd x₀
@@ -143,7 +143,7 @@ module _ {o h e s p : Level}
   DetData.labelMap detData-id _ d = d
   DetData.pullback detData-id _ v = v , refl
   DetData.edgeAdj  detData-id x d v₀ (v , refl) =
-    idAdjˢ (propEqOn (MO.E C FC x d v))
+    idAdjˢ (propEqOn (E C FC x d v))
 
   ----------------------------------------------------------------------
   -- Pointwise assembly of FMapˢ from DetData
@@ -184,9 +184,9 @@ module _ {o h e s p : Level}
 
   mkDetFMˢ : (S : Functor (ShapeCat C FC) (ShapeCat C FC))
              (dd : DetData S)
-           → ( ∀ {x : MO.I C FC} {t s : MO.CosmosM C FC x}
-             → MO.≈CosmosM C FC propLabel t s
-             → MO.≈CosmosM C FC propLabel
+           → ( ∀ {x : I C FC} {t s : CosmosM C FC x}
+             → ≈CosmosM C FC propLabel t s
+             → ≈CosmosM C FC propLabel
                  (FMapˢ.mapFˢ (detFMapˢ S dd) x t)
                  (FMapˢ.mapFˢ (detFMapˢ S dd) x s) )
            → FMˢ sysP sysP

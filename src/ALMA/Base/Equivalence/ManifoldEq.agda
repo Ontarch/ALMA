@@ -19,11 +19,11 @@ module ALMA.Base.Equivalence.ManifoldEq where
 open import Agda.Primitive using (lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Agda.Builtin.Sigma using (Σ; _,_)
-open import Data.Nat.Base as ℕ using (z<s)
+open import Data.Nat.Base using (z<s)
 open import Data.Product.Base using (proj₁; proj₂; _×_)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Rational.Base using (ℚ; _+_; _-_; -_; _⊔_; _⊓_; _<_; 0ℚ; 1ℚ; *<*)
-open import Data.Integer.Base as ℤ using (-<+; +<+)
+open import Data.Integer.Base using (-<+; +<+)
 open import Data.Rational.Properties using
   (+-identityʳ; +-monoʳ-<; ≤-total; <-trans; <-irrefl; ≤-<-trans; <-≤-trans
   ; p≤p⊔q; p≤q⊔p; p⊓q≤p; p⊓q≤q; p≤q⇒p⊓q≡p; p≥q⇒p⊓q≡q; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p)
@@ -184,10 +184,10 @@ module ManifoldEq {a} {X : Set a} (𝕄 : ManifoldStructure X) where
 
 private
   -1<0 : (- 1ℚ) < 0ℚ
-  -1<0 = *<* ℤ.-<+
+  -1<0 = *<* -<+
 
   0<1 : 0ℚ < 1ℚ
-  0<1 = *<* (ℤ.+<+ ℕ.z<s)
+  0<1 = *<* (+<+ z<s)
 
   y-1<y : ∀ y → y - 1ℚ < y
   y-1<y y = subst (λ z → y - 1ℚ < z) (+-identityʳ y) (+-monoʳ-< y -1<0)

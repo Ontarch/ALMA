@@ -23,13 +23,12 @@
 module ALMA.Cosmos.Carried.FinPushColimitS where
 
 open import Agda.Primitive using (lzero)
-open import Agda.Builtin.Sigma using (Σ; _,_)
+open import Agda.Builtin.Sigma using (_,_)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Data.Nat.Base using (ℕ; suc)
 open import Data.Fin.Base using (Fin; inject₁; toℕ)
 open import Data.Fin.Properties using (toℕ-inject₁)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
-open import Data.Product.Base using (_×_)
 open import Relation.Binary.PropositionalEquality.Core using (cong; trans; sym)
 
 open import ALMA.Base.MCorr using (M)

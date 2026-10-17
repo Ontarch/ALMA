@@ -35,14 +35,14 @@ open import Data.Rational.Properties using
   ; +-inverseʳ; +-inverseˡ; +-identityʳ; +-identityˡ; +-comm; +-assoc
   ; neg-distrib-+; neg-antimono-≤; neg-antimono-<; ∣-p∣≡∣p∣; *-cancelˡ-<-nonNeg)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; cong₂; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import ALMA.Base.Real using (embed; ε; embed-suc-pos)
 open import ALMA.Base.Real.Interval using (RealI; neg-invol)
 open import ALMA.Base.Real.IntervalEquiv using
   (node; l; u; centre; width; width-n; width-1step; centre-l; centre-u; u-mono
-  ; l-mono; recipPow2; bound-w; n<2^n; 0<2^n; embed-mono-<; 0<width)
+  ; l-mono; recipPow2; bound-w; n<2^n; embed-mono-<; 0<width)
 open import ALMA.Base.Real.Interval.Equiv using (_≈ℝ_)
 open import ALMA.Base.Real.Interval.Order using (_<ℝ_)
 open import ALMA.Base.Real.Interval.Kit using
@@ -134,9 +134,6 @@ width-below r b 0<b = M , result
     0<w0 : 0ℚ < w0
     0<w0 = 0<width r
 
-    0≤w0 : 0ℚ ≤ w0
-    0≤w0 = <⇒≤ 0<w0
-
     b-pos : Positive b
     b-pos = positive 0<b
 
@@ -176,12 +173,6 @@ width-below r b 0<b = M , result
 
     q<2^m : q < embed (2 ^ M)
     q<2^m = ≤-<-trans q≤M M<2^m'
-
-    em-pos : Positive (embed (2 ^ M))
-    em-pos = positive (embed-mono-< (0<2^n M))
-
-    em-nz : NonZero (embed (2 ^ M))
-    em-nz = pos⇒nonZero (embed (2 ^ M)) {{em-pos}}
 
     em-inv : ℚ
     em-inv = recipPow2 M

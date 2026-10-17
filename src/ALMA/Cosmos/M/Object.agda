@@ -36,8 +36,8 @@ open import Categories.Functor.Core using (Functor)
 
 open import ALMA.Base.MCorr using (M; _⍮_)
 open import ALMA.Base.MCorrSetoid using
-  (EqOn; SysEq; propEqOn; FiberAdjˢ; idAdjˢ; _≈Mˢ_; here-eq; below-eq
-  ; ≈Mˢ-refl; Morphˢ; compMˢ; idMˢ)
+  (EqOn; SysEq; propEqOn; idAdjˢ; _≈Mˢ_; here-eq; below-eq; ≈Mˢ-refl; Morphˢ
+  ; compMˢ; idMˢ)
 import ALMA.Base.MCorrSetoidCoalg as GCP
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Cosmos.ContCategoryLemmas using (ShapeOf; PosOf)

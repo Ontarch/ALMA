@@ -20,12 +20,12 @@ module ALMA.Base.Real.Interval.Abs where
 open import Data.Rational using (ℚ; 0ℚ; _+_; _-_; _≤_; _<_)
 open import Data.Rational.Base using (_÷_) renaming (-_ to neg)
 open import Data.Product using (_,_; proj₁; proj₂)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Data.Sum using (inj₁; inj₂)
 open import Data.Rational.Properties using
   (neg-antimono-≤; neg-antimono-<; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-total
   ; <-cmp; +-mono-≤; +-comm; +-identityʳ; +-inverseʳ; <-≤-trans; ≤-antisym)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; cong; sym; trans; subst; module ≡-Reasoning)
+  (_≡_; cong; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 

@@ -17,7 +17,7 @@ module ALMA.Physics.FourDAction where
 
 open import Data.Nat using (ℕ) renaming (_+_ to _+ℕ_; _≡ᵇ_ to _≡ℕᵇ_)
 open import Data.Fin using (Fin)
-open import Data.Bool using (Bool; true; false; if_then_else_)
+open import Data.Bool using (Bool; if_then_else_)
 open import Data.Integer using (ℤ; _+_; _-_; _*_; +_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 

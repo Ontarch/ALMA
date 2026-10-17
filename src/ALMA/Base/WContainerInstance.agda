@@ -25,7 +25,7 @@
 module ALMA.Base.WContainerInstance where
 
 open import Agda.Primitive using (Level; lzero; _⊔_)
-open import Agda.Builtin.Equality using (_≡_; refl)
+open import Agda.Builtin.Equality using (refl)
 open import Agda.Builtin.Sigma using (_,_)
 
 open import Data.Unit using (⊤; tt)

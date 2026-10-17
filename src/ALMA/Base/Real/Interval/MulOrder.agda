@@ -22,15 +22,15 @@ open import Data.Nat using
 open import Data.Nat.Properties using
   (m≤m⊔n; m≤n⊔m; *-suc; m<m+n; m≤m+n; ^-monoʳ-≤; *-monoʳ-≤)
   renaming (≤-trans to ≤ℕ-trans; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
-open import Data.Product using (_,_; Σ; proj₁; proj₂)
+open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Rational using
-  (ℚ; 0ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; Positive; positive) renaming (-_ to neg)
+  (ℚ; 0ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; positive) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (+-identityʳ; neg-distrib-+; neg-distribˡ-*; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans
   ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; pos*pos⇒pos; positive⁻¹; ∣-p∣≡∣p∣
   ; ∣p+q∣≤∣p∣+∣q∣; neg-antimono-<; +-mono-<)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; sym; trans; subst; subst₂)
+  (_≡_; cong; cong₂; sym; subst; subst₂)
 open import Relation.Binary.PropositionalEquality.Properties using (module ≡-Reasoning)
 open ≡-Reasoning
 
@@ -275,8 +275,6 @@ negℝ-*ℝ x y = ≈ℝ-of-eq _ _ centre-eq
         a = node x (2 ℕ* n); b = node y (2 ℕ* n)
         La = RealI.l a; Ua = RealI.u a
         Lb = RealI.l b; Ub = RealI.u b
-        a' = node (negℝ x) (2 ℕ* n)
-        La' = RealI.l a'; Ua' = RealI.u a'
 
         LHS-unfold :
           RealI.l (node (negℝ (x *ℝ y)) n)

@@ -28,11 +28,12 @@ open import Data.Rational.Properties using
   (+-assoc; +-comm; +-inverseʳ; neg-distrib-+; +-mono-<-≤; ≤-refl; ≤-reflexive
   ; <⇒≤; <-cmp; ≤-trans; ≤-antisym; neg-antimono-≤; 0≤∣p∣
   ; ∣-p∣≡∣p∣; ∣p∣≡p∨∣p∣≡-p; 0≤p⇒∣p∣≡p; toℚᵘ-cancel-<; toℚᵘ-fromℚᵘ)
-open import Data.Rational.Unnormalised.Base as ℚᵘ using (ℚᵘ; mkℚᵘ; *≡*; *<*)
-open import Data.Rational.Unnormalised.Properties as ℚᵘP using (<-respʳ-≃; <-respˡ-≃)
+open import Data.Rational.Unnormalised.Base
+  using (ℚᵘ; mkℚᵘ; _≃_; *≡*; *<*) renaming (_<_ to _<ᵘ_)
+open import Data.Rational.Unnormalised.Properties using (<-respˡ-≃; <-respʳ-≃)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
@@ -373,8 +374,8 @@ rawR k = mkℚᵘ (+ 1) k
 combFrac : (N d t : ℕ) → ℚ
 combFrac N d t = fromℚᵘ (rawComb N d t)
 
-flip-≃ : {a b : ℚᵘ} → ℚᵘ._≃_ a b → ℚᵘ._≃_ b a
-flip-≃ (ℚᵘ.*≡* e) = ℚᵘ.*≡* (sym e)
+flip-≃ : {a b : ℚᵘ} → _≃_ a b → _≃_ b a
+flip-≃ (*≡* e) = *≡* (sym e)
 
 -- Cross-multiplication, general version.
 --
@@ -403,17 +404,17 @@ comb-strict : (N d k t : ℕ) →
   combFrac N d t < fromℚᵘ (rawR k)
 comb-strict N d k t h =
   toℚᵘ-cancel-<
-    (let eqL : ℚᵘ._≃_ (toℚᵘ (combFrac N d t)) (rawComb N d t)
+    (let eqL : _≃_ (toℚᵘ (combFrac N d t)) (rawComb N d t)
          eqL = toℚᵘ-fromℚᵘ (rawComb N d t)
-         eqR : ℚᵘ._≃_ (toℚᵘ (fromℚᵘ (rawR k))) (rawR k)
+         eqR : _≃_ (toℚᵘ (fromℚᵘ (rawR k))) (rawR k)
          eqR = toℚᵘ-fromℚᵘ (rawR k)
-         cross : ℚᵘ._<_ (rawComb N d t) (rawR k)
-         cross = ℚᵘ.*<* (rawCross N d k t h)
-         p1 : ℚᵘ._<_ (toℚᵘ (combFrac N d t)) (rawR k)
-         p1 = ℚᵘP.<-respˡ-≃ (flip-≃ eqL) cross
-         p2 : ℚᵘ._<_ (toℚᵘ (combFrac N d t))
+         cross : _<ᵘ_ (rawComb N d t) (rawR k)
+         cross = *<* (rawCross N d k t h)
+         p1 : _<ᵘ_ (toℚᵘ (combFrac N d t)) (rawR k)
+         p1 = <-respˡ-≃ (flip-≃ eqL) cross
+         p2 : _<ᵘ_ (toℚᵘ (combFrac N d t))
                      (toℚᵘ (fromℚᵘ (rawR k)))
-         p2 = ℚᵘP.<-respʳ-≃ (flip-≃ eqR) p1
+         p2 = <-respʳ-≃ (flip-≃ eqR) p1
      in p2)
 
 ------------------------------------------------------------------------

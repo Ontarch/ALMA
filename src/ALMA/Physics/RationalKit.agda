@@ -8,7 +8,7 @@
 
 module ALMA.Physics.RationalKit where
 
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _*_; _-_; -_)
+open import Data.Rational using (0ℚ; 1ℚ; _+_; _*_; _-_; -_)
 open import Data.Rational.Properties using
   (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-comm; *-identityˡ
   ; *-zeroˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*)

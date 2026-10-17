@@ -27,7 +27,7 @@ module ALMA.Cosmos.M.ListCosmos where
 
 open import Agda.Primitive using (lzero)
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Agda.Builtin.Sigma using (Σ; _,_)
+open import Agda.Builtin.Sigma using (_,_)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Data.Fin.Base using (Fin; opposite) renaming (zero to fzero; suc to fsuc)
 open import Data.Fin.Properties using (opposite-involutive)
@@ -71,7 +71,7 @@ BinFC = record
   ; F-resp-≈     = λ _ → ≈sr-refl
   }
 
-open DC using (UniDet; uniFMapˢ; uniFMˢ)
+open DC using (UniDet; uniFMˢ)
 
 ------------------------------------------------------------------------
 -- Index, label and edge fibre for the binary universe

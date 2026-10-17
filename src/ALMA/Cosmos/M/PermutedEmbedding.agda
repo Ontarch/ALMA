@@ -43,7 +43,6 @@ open import Relation.Nullary.Negation using (¬_)
 open import Categories.Category.Core using (Category)
 open import Categories.Category.Indiscrete using (Indiscrete)
 open import Categories.Functor.Core using (Functor)
-open Functor using (F₀)
 
 open import ALMA.Cosmos.ContCategory using (ContCat; ≈sr-refl)
 open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)

@@ -28,7 +28,7 @@ open import Data.Product.Base using (_×_; proj₁; proj₂)
 open import Function.Base using (id; _∘_)
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Structures using (IsEquivalence)
-open import Relation.Binary.PropositionalEquality.Core as Prop using (cong; sym; trans)
+open import Relation.Binary.PropositionalEquality.Core as Prop using (cong)
 open import Relation.Binary.PropositionalEquality.Properties renaming
   (isEquivalence to ≡-isEquivalence)
 open import Relation.Nullary.Negation using (¬_)

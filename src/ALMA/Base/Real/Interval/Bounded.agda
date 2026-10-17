@@ -15,7 +15,7 @@
 
 module ALMA.Base.Real.Interval.Bounded where
 
-open import Data.Nat using (ℕ; z≤n; s≤s)
+open import Data.Nat using (z≤n; s≤s)
 open import Data.Integer using (+<+)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; ∣_∣; _≤_; _<_)
 open import Data.Rational.Base using (*<*) renaming (-_ to neg)
@@ -25,7 +25,7 @@ open import Data.Rational.Properties using
 open ≤-Reasoning
 open import Data.Product using (Σ; _,_; _×_)
 open import Data.Sum using (inj₁; inj₂)
-open import Relation.Binary.PropositionalEquality using (_≡_; sym)
+open import Relation.Binary.PropositionalEquality using (sym)
 
 open import ALMA.Base.Real.Interval using (RealI)
 open import ALMA.Base.Real.Interval.Order using (l; u; l-mono'; u-mono')

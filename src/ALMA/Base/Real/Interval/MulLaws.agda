@@ -20,14 +20,14 @@
 
 module ALMA.Base.Real.Interval.MulLaws where
 
-open import Data.Nat using (ℕ; suc) renaming (_*_ to _ℕ*_)
+open import Data.Nat using (ℕ) renaming (_*_ to _ℕ*_)
 import Data.Nat.Properties as ℕP
 open import Data.Product using (_,_; Σ; _×_; proj₁; proj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; ∣_∣; nonNegative)
 open import Data.Rational.Base using (_÷_) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-identityˡ; +-identityʳ; +-inverseʳ; +-assoc; +-comm; *-identityˡ; *-identityʳ
+  (+-identityˡ; +-identityʳ; +-inverseʳ; +-comm; *-identityˡ; *-identityʳ
   ; *-zeroˡ; *-assoc; *-comm; *-distribʳ-+; *-distribˡ-+; neg-distribˡ-*
   ; neg-distribʳ-*; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; +-mono-≤; neg-antimono-≤
   ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣p∣≡p∨∣p∣≡-p
@@ -50,7 +50,7 @@ open import ALMA.Base.Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-trans)
 open import ALMA.Base.Real.Interval.Rational using
   (min; max; max-eq; min-eq; sub-add; negsub)
 open import ALMA.Base.Real.Interval.Kit using
-  (half; ≈ℝ-of-rec; recipPow2-mono; n≤2n; 2n≤4n; *-mono-≤-nonNeg
+  (half; ≈ℝ-of-rec; n≤2n; 2n≤4n; *-mono-≤-nonNeg
   ; add-self; 2*2n≡4n; 0≤recipPow2; abs-swap; tri-diff; two-half; 2ℚ*half≡1
   ; 0≤half; half≤1; half-drop)
 open import ALMA.Base.Real.Interval.Node using
@@ -389,9 +389,6 @@ centre-*ℝ≈ x y n =
 -- 私有助手（II）
 
 private
-  recipPow2-0 : recipPow2 0 ≡ 1ℚ
-  recipPow2-0 = refl
-
   centre-mag : (x : RealI) → Σ ℚ (λ M → 0ℚ ≤ M × (∀ n → ∣ centre x n ∣ ≤ M))
   centre-mag x =
     let M , 0≤M , inside = bounded x
@@ -810,10 +807,6 @@ private
     A B : ℕ → ℚ
     A n = cxy2 n * cz2 n
     B n = cx2 n * cyz2 n
-
-    X Y : ℕ → ℚ
-    X n = cx4 n * cy4 n * cz2 n
-    Y n = cx2 n * (cy4 n * cz4 n)
 
     t1 ta tb tc t5 : ℕ → ℚ
     t1 n = (width (x *ℝ y) (2 ℕ* n) * width z (2 ℕ* n)) * half

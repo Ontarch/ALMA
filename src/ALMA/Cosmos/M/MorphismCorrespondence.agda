@@ -34,9 +34,8 @@ module ALMA.Cosmos.M.MorphismCorrespondence where
 
 open import Agda.Primitive using (lzero)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
-open import Data.Nat using (ℕ)
-open import Data.Fin.Base using (Fin; zero)
-open import Data.Product.Base using (Σ; _,_; proj₁)
+open import Data.Fin.Base using (zero)
+open import Data.Product.Base using (Σ; _,_)
 open import Relation.Binary.PropositionalEquality.Core using (cong)
 open import Relation.Nullary.Negation using (¬_)
 
@@ -61,7 +60,6 @@ private
   sysP = MO.sys C₀ ListFC (λ _ → propEqOn _)
 
   dList = LS.dList
-  dSwap = LS.dSwap
 
   -- StructuredEndo is a carried congruent system endomorphism (an FMˢ
   -- bundle), the M-base counterpart of the legacy StructuredFunc.

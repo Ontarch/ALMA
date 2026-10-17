@@ -25,7 +25,7 @@
 
 module ALMA.Base.Real.IntervalEquiv where
 
-open import Data.Integer using (+_; -[1+_]; +[1+_]; +0; +<+)
+open import Data.Integer using (+_; -[1+_]; +[1+_]; +0)
 import Data.Integer.Properties
 open import Data.Nat using
   (ℕ; zero; suc; _≥_; _^_; z≤n; _∸_; s≤s)
@@ -37,16 +37,16 @@ open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; ∣_∣; NonZero; Positive; nonNegative; NonNegative)
-open import Data.Rational.Base using (mkℚ; 1/_; _÷_) renaming (-_ to neg)
+open import Data.Rational.Base using (mkℚ; _÷_) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (≤-reflexive; ≤-refl; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; +-mono-<-≤; +-inverseʳ
-  ; *-inverseʳ; *-inverseˡ; *-assoc; *-identityˡ; *-identityʳ; pos⇒nonZero
-  ; 1/pos⇒pos; pos⇒nonNeg; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg
-  ; pos*pos⇒pos; *-cancelˡ-≤-pos; ≤-antisym; neg-antimono-≤; neg-distrib-+)
-open import Data.Rational.Unnormalised.Base as ℚᵘ using (ℚᵘ; mkℚᵘ; *≡*)
-open import Data.Rational.Unnormalised.Properties as ℚᵘP using (<-respʳ-≃; <-respˡ-≃)
+  (≤-reflexive; ≤-refl; ≤-trans; <⇒≤; +-inverseʳ; *-inverseʳ; *-inverseˡ
+  ; *-assoc; *-identityˡ; *-identityʳ; pos⇒nonZero; 1/pos⇒pos; pos⇒nonNeg)
+open import Data.Rational.Unnormalised.Base
+  using (ℚᵘ; mkℚᵘ; _≃_; *≡*; *<*) renaming (_<_ to _<ᵘ_)
+open import Data.Rational.Unnormalised.Properties
+  using (≃-reflexive; <-respˡ-≃; <-respʳ-≃)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; trans; sym; cong; cong₂; subst; module ≡-Reasoning)
+  (_≡_; refl; trans; sym; cong; module ≡-Reasoning)
 
 open import ALMA.Base.Real using (CauchySeq; ε; embed; 2ℚ≡1+1; 2*embed; embed-suc-pos)
 open import ALMA.Base.Real.Interval using (RealI; pos-pow)
@@ -563,7 +563,6 @@ recip≤1 q 1≤q nz =
       1ℚ
     ∎
   where open Data.Rational.Properties.≤-Reasoning
-        open Data.Rational.Base using (1/_)
 
 1≤embed-suc : (d : ℕ) → 1ℚ ≤ embed (suc d)
 1≤embed-suc d =
@@ -703,25 +702,25 @@ fracL M t = Data.Rational.fromℚᵘ (rawL M t)
 prod≡fracL : (M t : ℕ) → embed M * recip2^t t ≡ fracL M t
 prod≡fracL M t = prod-eq M (2 ^ t Data.Nat.∸ 1)
 
-flip-≃ : {a b : ℚᵘ} → ℚᵘ._≃_ a b → ℚᵘ._≃_ b a
-flip-≃ (ℚᵘ.*≡* e) = ℚᵘ.*≡* (sym e)
+flip-≃ : {a b : ℚᵘ} → _≃_ a b → _≃_ b a
+flip-≃ (*≡* e) = *≡* (sym e)
 
 fracL-strict : (M k t : ℕ) →
   (M ℕ* suc k) <N 2 ^ t →
   fracL M t < recip-suc k
 fracL-strict M k t h =
   Data.Rational.Properties.toℚᵘ-cancel-<
-    (let crossℚᵘ : ℚᵘ._<_ (rawL M t) (rawR k)
-         crossℚᵘ = ℚᵘ.*<* (rawCross h)
-         eqL : ℚᵘ._≃_ (Data.Rational.toℚᵘ (fracL M t)) (rawL M t)
+    (let crossℚᵘ : _<ᵘ_ (rawL M t) (rawR k)
+         crossℚᵘ = *<* (rawCross h)
+         eqL : _≃_ (Data.Rational.toℚᵘ (fracL M t)) (rawL M t)
          eqL = Data.Rational.Properties.toℚᵘ-fromℚᵘ (rawL M t)
-         eqR : ℚᵘ._≃_ (Data.Rational.toℚᵘ (recip-suc k)) (rawR k)
-         eqR = ℚᵘP.≃-reflexive refl
-         p1 : ℚᵘ._<_ (Data.Rational.toℚᵘ (fracL M t)) (rawR k)
-         p1 = ℚᵘP.<-respˡ-≃ (flip-≃ eqL) crossℚᵘ
-         p2 : ℚᵘ._<_ (Data.Rational.toℚᵘ (fracL M t))
+         eqR : _≃_ (Data.Rational.toℚᵘ (recip-suc k)) (rawR k)
+         eqR = ≃-reflexive refl
+         p1 : _<ᵘ_ (Data.Rational.toℚᵘ (fracL M t)) (rawR k)
+         p1 = <-respˡ-≃ (flip-≃ eqL) crossℚᵘ
+         p2 : _<ᵘ_ (Data.Rational.toℚᵘ (fracL M t))
                        (Data.Rational.toℚᵘ (recip-suc k))
-         p2 = ℚᵘP.<-respʳ-≃ (flip-≃ eqR) p1
+         p2 = <-respʳ-≃ (flip-≃ eqR) p1
      in p2)
   where
     open ≡-Reasoning

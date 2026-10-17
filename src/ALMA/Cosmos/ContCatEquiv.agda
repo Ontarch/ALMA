@@ -76,7 +76,7 @@ module _ {o h e s p : Level}
     open ContIso renaming (from to contFrom)
     open import Categories.Morphism C using (_≅_) renaming (module ≅ to C≅)
     open _≅_ using (from; to)
-    open import Categories.Morphism.IsoEquiv C using (_≃_; module _≃_)
+    open import Categories.Morphism.IsoEquiv C using (module _≃_)
 
     Core→C : Functor CoreC C
     Core→C = record

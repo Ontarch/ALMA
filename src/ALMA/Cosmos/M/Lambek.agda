@@ -30,14 +30,15 @@ open import Categories.Functor.Core using (Functor)
 
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Base.MCorrSetoid using (EqOn)
-open import ALMA.Cosmos.M.Object as MO
+open import ALMA.Cosmos.M.Object using
+  (I; A; ana; ana-unfold; ana-unfold˘; CosmosM; ≈CosmosM; unfold-coalgebra)
 
 module _ {o h e s p : Level}
          {C  : Category o h e}
          {FC : Functor C (ContCat s p)} where
 
   module _ {ℓd : Level}
-           (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i)) where
+           (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i)) where
 
     --------------------------------------------------------------------
     -- in-F ∘ out ≈ id
@@ -48,10 +49,10 @@ module _ {o h e s p : Level}
     --
     -- 即 ana-unfold。
 
-    lambek-in∘out : ∀ {i : MO.I C FC} (t : MO.CosmosM C FC i)
-                  → MO.≈CosmosM C FC ≈CD
-                      (MO.ana C FC (MO.unfold-coalgebra C FC) i t) t
-    lambek-in∘out t = MO.ana-unfold C FC ≈CD t
+    lambek-in∘out : ∀ {i : I C FC} (t : CosmosM C FC i)
+                  → ≈CosmosM C FC ≈CD
+                      (ana C FC (unfold-coalgebra C FC) i t) t
+    lambek-in∘out t = ana-unfold C FC ≈CD t
 
     --------------------------------------------------------------------
     -- out ∘ in-F ≈ id
@@ -62,7 +63,7 @@ module _ {o h e s p : Level}
     --
     -- 即 ana-unfold˘。
 
-    lambek-out∘in : ∀ {i : MO.I C FC} (t : MO.CosmosM C FC i)
-                  → MO.≈CosmosM C FC ≈CD
-                      t (MO.ana C FC (MO.unfold-coalgebra C FC) i t)
-    lambek-out∘in t = MO.ana-unfold˘ C FC ≈CD t
+    lambek-out∘in : ∀ {i : I C FC} (t : CosmosM C FC i)
+                  → ≈CosmosM C FC ≈CD
+                      t (ana C FC (unfold-coalgebra C FC) i t)
+    lambek-out∘in t = ana-unfold˘ C FC ≈CD t

@@ -37,11 +37,11 @@ open import Categories.Functor.Core using (Functor)
 open import ALMA.Base.MCorr using (M)
 open import ALMA.Base.MCorrSetoid using
   (EqOn; SysEq; propEqOn; FiberAdjˢ; symAdjˢ; compAdjˢ; Morphˢ
-  ; _≈Mˢ_; here-eq; below-eq; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
+  ; here-eq; below-eq; ≈Mˢ-refl; ≈Mˢ-sym; ≈Mˢ-trans)
 open import ALMA.Base.MCorrSetoidCat using (FMapˢ; FMˢ)
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)
-open import ALMA.Cosmos.M.Object as MO
+open import ALMA.Cosmos.M.Object using (I; E; sys; CosmosM; CosmosData; ≈CosmosM)
 
 module _ {o h e s p : Level}
          (C  : Category o h e)
@@ -52,16 +52,16 @@ module _ {o h e s p : Level}
     aL = o ⊔ h ⊔ e ⊔ s ⊔ p
     bL = o ⊔ s ⊔ p
 
-    propLabel : (i : MO.I C FC) → EqOn {ℓ = aL} (MO.CosmosData C FC)
+    propLabel : (i : I C FC) → EqOn {ℓ = aL} (CosmosData C FC)
     propLabel _ = propEqOn _
 
     sysP : SysEq iL aL bL aL bL
-    sysP = MO.sys C FC propLabel
+    sysP = sys C FC propLabel
 
     ≈A = SysEq.≈A sysP
     ≈E = SysEq.≈E sysP
 
-    EM = MO.E C FC
+    EM = E C FC
 
   ----------------------------------------------------------------------
   -- General deterministic data
@@ -78,10 +78,10 @@ module _ {o h e s p : Level}
   record GenDet (S : Functor (ShapeCat C FC) (ShapeCat C FC))
          : Set aL where
     field
-      σ   : (x : MO.I C FC) → MO.CosmosData C FC → MO.CosmosData C FC
-      pb  : (v : MO.I C FC)
-          → Σ (MO.I C FC) λ x' → Functor.F₀ S x' ≡ v
-      adj : (x : MO.I C FC) (d : MO.CosmosData C FC) (v : MO.I C FC)
+      σ   : (x : I C FC) → CosmosData C FC → CosmosData C FC
+      pb  : (v : I C FC)
+          → Σ (I C FC) λ x' → Functor.F₀ S x' ≡ v
+      adj : (x : I C FC) (d : CosmosData C FC) (v : I C FC)
           → FiberAdjˢ (propEqOn (EM (Functor.F₀ S x) (σ x d) v))
                       (propEqOn (EM x d (proj₁ (pb v))))
   open GenDet public
@@ -108,11 +108,11 @@ module _ {o h e s p : Level}
   -- 命题边 EqOn 下的边重定位
 
   private
-    edge-reloc : ∀ {x y : MO.I C FC}
-                 (u : MO.CosmosM C FC x)
+    edge-reloc : ∀ {x y : I C FC}
+                 (u : CosmosM C FC x)
                  {e e' : EM x (M.here u) y}
                → e ≡ e'
-               → MO.≈CosmosM C FC propLabel
+               → ≈CosmosM C FC propLabel
                    (M.below u y e) (M.below u y e')
     edge-reloc u {e = z} {e' = .z} refl =
       ≈Mˢ-refl ≈A ≈E (M.below u _ z)
@@ -121,7 +121,7 @@ module _ {o h e s p : Level}
     mapR-of : (S : Functor (ShapeCat C FC) (ShapeCat C FC))
               (g : GenDet S)
             → ∀ {x v} → Functor.F₀ S x ≡ v
-            → MO.CosmosM C FC x → MO.CosmosM C FC v
+            → CosmosM C FC x → CosmosM C FC v
     mapR-of S g = Morphˢ.mapR (FMapˢ.asMorphˢ (genFMapˢ S g))
 
   ----------------------------------------------------------------------
@@ -139,10 +139,10 @@ module _ {o h e s p : Level}
   private
     go : (S : Functor (ShapeCat C FC) (ShapeCat C FC))
          (g : GenDet S)
-       → ∀ {x v : MO.I C FC} (r : Functor.F₀ S x ≡ v)
-         {t s : MO.CosmosM C FC x}
-       → MO.≈CosmosM C FC propLabel t s
-       → MO.≈CosmosM C FC propLabel (mapR-of S g r t) (mapR-of S g r s)
+       → ∀ {x v : I C FC} (r : Functor.F₀ S x ≡ v)
+         {t s : CosmosM C FC x}
+       → ≈CosmosM C FC propLabel t s
+       → ≈CosmosM C FC propLabel (mapR-of S g r t) (mapR-of S g r s)
     go S g {x = x} {.(Functor.F₀ S x)} refl {t = t} {s = s} h
         .here-eq = cong (σ g x) (h .here-eq)
     go S g {x = x} {.(Functor.F₀ S x)} refl {t = t} {s = s} h
@@ -170,13 +170,13 @@ module _ {o h e s p : Level}
       adjH = proj₁ (h .below-eq x')
 
       hfwd : ∀ (e₁ : EM x dT x')
-           → MO.≈CosmosM C FC propLabel
+           → ≈CosmosM C FC propLabel
                (M.below t x' e₁)
                (M.below s x' (FiberAdjˢ.to adjH e₁))
       hfwd = proj₁ (proj₂ (h .below-eq x'))
 
       hbwd : ∀ (e₂ : EM x dS x')
-           → MO.≈CosmosM C FC propLabel
+           → ≈CosmosM C FC propLabel
                (M.below s x' e₂)
                (M.below t x' (FiberAdjˢ.fro adjH e₂))
       hbwd = proj₂ (proj₂ (h .below-eq x'))
@@ -205,7 +205,7 @@ module _ {o h e s p : Level}
       --
       -- 正向的源层子互模拟；仅由 h 与 edge-reloc 构造，其中无 go。
       hF : ∀ (q : EM (Functor.F₀ S x) dTσ v)
-         → MO.≈CosmosM C FC propLabel
+         → ≈CosmosM C FC propLabel
              (M.below t x' (FiberAdjˢ.fro Aₜ q))
              (M.below s x' (FiberAdjˢ.fro Aₛ (FiberAdjˢ.to adjOut q)))
       hF q =
@@ -221,7 +221,7 @@ module _ {o h e s p : Level}
       -- 反向的源层子互模拟，方向取 t-子 ≈ s-子，使单个 go（再取像对称
       -- ≈Mˢ-sym）即得目标。
       hT : ∀ (r : EM (Functor.F₀ S x) dSσ v)
-         → MO.≈CosmosM C FC propLabel
+         → ≈CosmosM C FC propLabel
              (M.below t x' (FiberAdjˢ.fro Aₜ (FiberAdjˢ.fro adjOut r)))
              (M.below s x' (FiberAdjˢ.fro Aₛ r))
       hT r =
@@ -237,9 +237,9 @@ module _ {o h e s p : Level}
 
   gen-map-cong : (S : Functor (ShapeCat C FC) (ShapeCat C FC))
                  (g : GenDet S)
-               → ∀ {x : MO.I C FC} {t s : MO.CosmosM C FC x}
-               → MO.≈CosmosM C FC propLabel t s
-               → MO.≈CosmosM C FC propLabel
+               → ∀ {x : I C FC} {t s : CosmosM C FC x}
+               → ≈CosmosM C FC propLabel t s
+               → ≈CosmosM C FC propLabel
                    (FMapˢ.mapFˢ (genFMapˢ S g) x t)
                    (FMapˢ.mapFˢ (genFMapˢ S g) x s)
   gen-map-cong S g = go S g refl

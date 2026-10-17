@@ -29,7 +29,7 @@ module ALMA.Cosmos.Carried.FinPushColimitCat where
 
 open import Agda.Primitive using (lzero; lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Data.Nat.Base using (ℕ; zero; suc; _≤_; _<_; z≤n)
+open import Data.Nat.Base using (ℕ; zero; suc; _≤_; z≤n)
 open import Data.Nat.Properties using
   (≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0)
 open import Data.Fin.Base using (Fin; inject₁; toℕ)
@@ -316,8 +316,6 @@ module FinColimit
     trans (emb-eq n (q (foldD p) x)) (coh-path Z ψ emb-eq p x)
 
   open import Categories.Diagram.Cocone chainF
-  open import Categories.Category.Construction.Cocones chainF using (Cocones)
-  open import Categories.Object.Initial Cocones
   open import Categories.Diagram.Colimit chainF using (Colimit)
 
   mkCocone : Cocone

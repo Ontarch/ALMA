@@ -25,24 +25,24 @@ open import Data.Nat using (ℕ; zero; suc; _∸_; _^_)
 open import Data.Nat.Properties using (m∸n+n≡m; +-suc; m≤m+n)
   renaming (+-comm to +-commℕ; +-identityʳ to +-identityʳℕ)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_ ; _≤_; NonZero; Positive; NonNegative)
+  (ℚ; 0ℚ; 1ℚ; _-_; _*_; _<_ ; _≤_; NonZero; Positive; NonNegative)
 open import Data.Rational.Base using (1/_; positive)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Rational.Properties using
-  (+-mono-≤; neg-antimono-≤; +-assoc; *-assoc; *-comm; *-inverseʳ; *-inverseˡ
+  (+-mono-≤; neg-antimono-≤; *-assoc; *-comm; *-inverseʳ; *-inverseˡ
   ; *-identityˡ; *-identityʳ; *-zeroˡ; *-monoʳ-≤-nonNeg; *-monoˡ-<-pos; ≤-reflexive
   ; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; pos⇒nonZero; pos⇒nonNeg; 1/pos⇒pos; <-cmp)
   renaming (<-trans to <-transℚ ; <-irrefl to <-irreflℚ)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (Tri; tri<; tri≈; tri>)
 
 open import ALMA.Base.Real using (embed; reciprocal-cong; embed-suc-pos)
-open import ALMA.Base.Real.Interval using (RealI; pos-pow)
+open import ALMA.Base.Real.Interval using (RealI)
 open import ALMA.Base.Real.IntervalEquiv using
   (node; width; width-n; recipPow2; bound-w; embed-mono-<; n<2^n; suc∸1; 0<2^n; pos-2^t)
 open import ALMA.Base.Real.Interval.Rational using (¬<⇒≥; pos-diff)
@@ -322,11 +322,6 @@ u-mono' r {n} {m} n≤m =
     lzm = l z m
     uym = u y m
     lym = l y m
-
-    uxm<lzm : uxm < lzm
-    uxm<lzm =
-      ≤-<-trans (u-mono' x n≤m)
-                (<-≤-trans uxn<lzn (l-mono' z n≤m))
 
     width-ym<d : u y m - l y m < d
     width-ym<d =

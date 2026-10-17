@@ -20,28 +20,28 @@
 module ALMA.Base.Real.Interval.Mul where
 
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣; Positive; NonNegative; NonPositive
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣; NonNegative
   ; positive; nonNegative; nonPositive)
 open import Data.Rational.Base using (_÷_; 1/_) renaming (-_ to neg)
 open import Data.Product using (_,_; proj₁; proj₂)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Empty using (⊥; ⊥-elim)
+open import Data.Sum using (inj₁; inj₂)
+open import Data.Empty using (⊥-elim)
 open import Data.Rational.Properties using
   (+-mono-≤; +-mono-≤-<; +-assoc; +-comm; +-identityʳ; +-identityˡ; +-inverseʳ
   ; +-inverseˡ; *-assoc; *-comm; *-distribʳ-+; *-distribˡ-+; neg-distribˡ-*
   ; neg-distribʳ-*; ≤-refl; ≤-reflexive; ≤-trans; ≤-antisym; ≤-total; <⇒≤
-  ; ≤-<-trans; <-≤-trans; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonPos
-  ; *-monoˡ-≤-nonPos; pos*pos⇒pos; positive⁻¹; <-cmp; *-identityˡ; *-identityʳ
-  ; *-inverseʳ; *-inverseˡ; *-zeroˡ; *-zeroʳ; ∣p*q∣≡∣p∣*∣q∣; ∣p∣≡p∨∣p∣≡-p
+  ; <-≤-trans; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonPos
+  ; *-monoˡ-≤-nonPos; pos*pos⇒pos; positive⁻¹; <-cmp; *-identityˡ
+  ; *-inverseʳ; *-zeroʳ; ∣p*q∣≡∣p∣*∣q∣; ∣p∣≡p∨∣p∣≡-p
   ; ∣-p∣≡∣p∣; 0≤∣p∣; 0≤p⇒∣p∣≡p; 1/pos⇒pos)
-  renaming (<-trans to <-transℚ ; <-irrefl to <-irreflℚ)
+  renaming (<-irrefl to <-irreflℚ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
-open import Relation.Binary.Definitions using (Tri; tri<; tri≈; tri>)
+open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 
-open import ALMA.Base.Real using (embed; 2ℚ; 2ℚ≡1+1; embed-suc-pos)
+open import ALMA.Base.Real using (embed; 2ℚ; embed-suc-pos)
 open import ALMA.Base.Real.Interval using (RealI)
 open import ALMA.Base.Real.IntervalEquiv using (bounded-diff; mono-half)
 open import ALMA.Base.Real.Interval.Rational using

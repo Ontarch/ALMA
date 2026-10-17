@@ -31,8 +31,10 @@ open import Categories.Functor.Core using (Functor)
 
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Base.MCorrSetoid using (EqOn)
-open import ALMA.Cosmos.M.Object as MO
-open import ALMA.Cosmos.M.Terminal as MT
+open import ALMA.Cosmos.M.Object using
+  (I; A; Coalgebra; ana; ana-unfold; ana-unfold˘; ≈CosmosM; ≈CosmosM-refl
+  ; CosmosM; unfold-coalgebra)
+open import ALMA.Cosmos.M.Terminal using (≈CosmosM-trans)
 
 module _ {o h e s p : Level}
          {C  : Category o h e}
@@ -42,7 +44,7 @@ module _ {o h e s p : Level}
     L = o ⊔ h ⊔ e ⊔ s ⊔ p
 
   module _ {ℓd : Level}
-           (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i)) where
+           (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i)) where
 
     --------------------------------------------------------------------
     -- An object
@@ -55,8 +57,8 @@ module _ {o h e s p : Level}
     record CoalgObj : Set (lsuc (L ⊔ ℓd)) where
       constructor mkCoalg
       field
-        Xst : MO.I C FC → Set L
-        γ   : MO.Coalgebra C FC L Xst
+        Xst : I C FC → Set L
+        γ   : Coalgebra C FC L Xst
     open CoalgObj public
 
     --------------------------------------------------------------------
@@ -72,13 +74,13 @@ module _ {o h e s p : Level}
     record Coalg⇒ (X Y : CoalgObj) : Set (L ⊔ ℓd) where
       field
         map  : ∀ i → Xst X i → Xst Y i
-        comm : ∀ i x → MO.≈CosmosM C FC ≈CD
-                         (MO.ana C FC (γ Y) i (map i x))
-                         (MO.ana C FC (γ X) i x)
+        comm : ∀ i x → ≈CosmosM C FC ≈CD
+                         (ana C FC (γ Y) i (map i x))
+                         (ana C FC (γ X) i x)
     open Coalg⇒ public
 
     private
-      ≈M-trans = MT.≈CosmosM-trans {C = C} {FC = FC} ≈CD
+      ≈M-trans = ≈CosmosM-trans {C = C} {FC = FC} ≈CD
 
     -- Identity state map; commutation is bisimulation reflexivity.
     --
@@ -86,7 +88,7 @@ module _ {o h e s p : Level}
     idCoalg : ∀ X → Coalg⇒ X X
     idCoalg X .map _ x = x
     idCoalg X .comm i x =
-      MO.≈CosmosM-refl C FC ≈CD (MO.ana C FC (γ X) i x)
+      ≈CosmosM-refl C FC ≈CD (ana C FC (γ X) i x)
 
     -- Composition: chain the two commutation bisimulations.
     --
@@ -145,9 +147,9 @@ module _ {o h e s p : Level}
     --
     -- 状态族为 CosmosM，余代数为观察余代数 unfold-coalgebra；到终余
     -- 代数的唯一态射即 anamorphism。
-    ! : ∀ X → Coalg⇒ X (mkCoalg (MO.CosmosM C FC) (MO.unfold-coalgebra C FC))
-    ! X .map i x = MO.ana C FC (γ X) i x
-    ! X .comm i x = MO.ana-unfold C FC ≈CD (MO.ana C FC (γ X) i x)
+    ! : ∀ X → Coalg⇒ X (mkCoalg (CosmosM C FC) (unfold-coalgebra C FC))
+    ! X .map i x = ana C FC (γ X) i x
+    ! X .comm i x = ana-unfold C FC ≈CD (ana C FC (γ X) i x)
 
     -- Uniqueness up to bisimulation: eta gives t ≈ ana unfold t, the
     -- morphism's commutation gives ana unfold t ≈ ana γ, and
@@ -156,24 +158,24 @@ module _ {o h e s p : Level}
     -- 互模拟意义下的唯一性：eta 给出 t ≈ ana unfold t，态射交换给出
     -- ana unfold t ≈ ana γ，传递性闭合，无依赖重写。
     !-unique : ∀ X
-                 (f : Coalg⇒ X (mkCoalg (MO.CosmosM C FC)
-                                        (MO.unfold-coalgebra C FC)))
+                 (f : Coalg⇒ X (mkCoalg (CosmosM C FC)
+                                        (unfold-coalgebra C FC)))
                  i x
-             → MO.≈CosmosM C FC ≈CD
-                 (map f i x) (MO.ana C FC (γ X) i x)
+             → ≈CosmosM C FC ≈CD
+                 (map f i x) (ana C FC (γ X) i x)
     !-unique X f i x =
-      ≈M-trans (MO.ana-unfold˘ C FC ≈CD (map f i x)) (comm f i x)
+      ≈M-trans (ana-unfold˘ C FC ≈CD (map f i x)) (comm f i x)
 
     record IsTerminalUpToBisim : Set (lsuc (L ⊔ ℓd)) where
       field
         bang        : ∀ X → Coalg⇒ X
-                         (mkCoalg (MO.CosmosM C FC) (MO.unfold-coalgebra C FC))
+                         (mkCoalg (CosmosM C FC) (unfold-coalgebra C FC))
         bang-unique : ∀ X
                         (f : Coalg⇒ X
-                          (mkCoalg (MO.CosmosM C FC) (MO.unfold-coalgebra C FC)))
+                          (mkCoalg (CosmosM C FC) (unfold-coalgebra C FC)))
                         i x
-                    → MO.≈CosmosM C FC ≈CD
-                        (map f i x) (MO.ana C FC (γ X) i x)
+                    → ≈CosmosM C FC ≈CD
+                        (map f i x) (ana C FC (γ X) i x)
 
     cosmosMIsTerminal : IsTerminalUpToBisim
     cosmosMIsTerminal = record

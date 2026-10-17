@@ -223,8 +223,8 @@ module _ {a b c d e : Level} {S : Set a} {T : Set c} (P : T → Set b)
     counit : ∀ f {s} (p : P (shape f s)) → posL f (posR f p) ≡ p
     counit = proj₂ adj
 
-    open SubstTransport-Right posR using (_≈sr_; ≈sr-isEquivalence)
-    open SubstTransport-Left  posL using (_≈sl_; ≈sl-isEquivalence)
+    open SubstTransport-Right posR using (_≈sr_)
+    open SubstTransport-Left  posL using (_≈sl_)
 
     -- _≈R_ implies _≈L_: apply _≈R_'s position-eq at posL f r, then
     -- collapse the g-side round-trip using counit and unit.

@@ -30,7 +30,7 @@ open import Agda.Primitive using (Level)
 open import Agda.Builtin.Sigma using (_,_)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Axiom.UniquenessOfIdentityProofs using (UIP)
-open import Data.Unit.Polymorphic.Base using (⊤; tt)
+open import Data.Unit.Polymorphic.Base using (tt)
 open import Relation.Binary.PropositionalEquality.Core using (sym; trans; cong)
 
 open import ALMA.Base.MCorr using (FMap; FiberAdj)

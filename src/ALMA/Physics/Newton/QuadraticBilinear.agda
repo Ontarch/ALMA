@@ -16,14 +16,14 @@
 
 module ALMA.Physics.Newton.QuadraticBilinear where
 
-open import Data.Rational using (ℚ; _+_; _*_; -_)
+open import Data.Rational using (_+_; _*_; -_)
 open import Data.Rational.Properties using
   (+-assoc; *-distribˡ-+; *-distribʳ-+; neg-distrib-+)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; trans; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Newton.Quadratic using
-  (Obs; obs; bracket; add; scale; twoℚ; fourℚ; mkObs)
+  (obs; bracket; add; scale; twoℚ; fourℚ; mkObs)
 open import ALMA.Physics.RationalKit using
   (pairs2; pairs4; front; frontS; front-neg; factor2; factor4; front-negS)
 

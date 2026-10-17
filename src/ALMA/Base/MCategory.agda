@@ -540,7 +540,6 @@ module Container-Specialization (i a b : Level) where
 -- I = ⊤ 处的容器终余代数
 
 module _ {i a b : Level} (S : Set a) (P : S → Set b) where
-  open Container-Specialization i a b
 
   ContainerCoalg : Set (a ⊔ b)
   ContainerCoalg =

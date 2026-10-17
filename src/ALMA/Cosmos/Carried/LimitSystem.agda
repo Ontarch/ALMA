@@ -181,7 +181,7 @@ module LimitSystem
   s∞ v = toℕ (t v (natToFin v))
 
   open TrivDet {i = lzero} ℕ s∞
-    using (sys; E; DetM)
+    using (sys; DetM)
 
   L∞ = sys
 
@@ -276,7 +276,7 @@ module LimitSystem
 
   module Leg (m : ℕ) where
     open TrivDet {i = lzero} (Fin (n-at m)) (t m)
-      renaming (sys to sysₘ; DetM to DetMₘ)
+      renaming (DetM to DetMₘ)
 
     orbit-fin : (x : Fin (n-at m)) → DetMₘ x
     orbit-fin x .here      = tt

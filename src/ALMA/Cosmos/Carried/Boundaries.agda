@@ -19,7 +19,7 @@ module ALMA.Cosmos.Carried.Boundaries where
 
 open import Agda.Primitive using (lzero; _⊔_)
 open import Agda.Builtin.Sigma using (Σ; _,_)
-open import Agda.Builtin.Equality using (_≡_; refl)
+open import Agda.Builtin.Equality using (_≡_)
 open import Data.Product.Base using (_×_)
 open import Data.Empty using (⊥)
 open import Data.Nat using (ℕ; suc; _≤_)

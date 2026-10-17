@@ -17,18 +17,16 @@
 
 module ALMA.Base.Real.CauchyToInterval where
 
-open import Data.Nat using (ℕ; zero; suc; _^_; _⊔_) renaming (_≤_ to _≤N_)
-open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m)
-  renaming (≤-trans to ≤N-trans; ≤-reflexive to ≤N-reflexive)
-import Data.Nat as ℕ
-import Data.Nat.Properties as ℕP
+open import Data.Nat using
+  (ℕ; zero; suc; _^_; _⊔_; s≤s) renaming (_≤_ to _≤N_; _<_ to _<N_)
+open import Data.Nat.Properties using
+  (m≤m⊔n; m≤n⊔m) renaming (≤-refl to ≤N-refl; ≤-trans to ≤N-trans; ≤-reflexive to ≤N-reflexive)
 open import Data.Product using (_,_)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; Positive; NonNegative; NonZero
-  ; positive; nonNegative)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; NonNegative; NonZero; positive; nonNegative)
 open import Data.Rational.Base using (1/_; _÷_) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-identityˡ; +-inverseʳ; +-inverseˡ; neg-distrib-+
+  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseʳ; +-inverseˡ; neg-distrib-+
   ; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; <-trans; +-mono-≤
   ; +-mono-<-≤; *-inverseʳ; pos⇒nonZero; positive⁻¹; *-cancelˡ-<-nonNeg
   ; *-assoc; *-comm; *-identityʳ; *-identityˡ)
@@ -43,7 +41,7 @@ open import ALMA.Base.Real.Interval using
 open import ALMA.Base.Real.Interval.Mul using (cancel-z; le-shift; cancelʳ)
 open import ALMA.Base.Real.Interval.Node using (mul-nonNeg)
 open import ALMA.Base.Real.Interval.Rational using (r≤|r|; -r≤|r|; sub-add)
-open import ALMA.Base.Real.IntervalEquiv using (embed-mono-<)
+open import ALMA.Base.Real.IntervalEquiv using (embed-mono-<; node; centre)
 
 ------------------------------------------------------------------------
 -- Sampling index and position
@@ -92,14 +90,16 @@ M-mono x n = m≤m⊔n (M x n) (seq-μ x (K (suc n)))
 μ≤M-suc : (x : CauchySeq) (n : ℕ) → seq-μ x (K n) ≤N M x (suc n)
 μ≤M-suc x n = ≤N-trans (μ≤M x n) (M-mono x n)
 
-K<sK : (n : ℕ) → K n ℕ.< suc (K n)
-K<sK n = ℕ.s≤s ℕP.≤-refl
+K<sK : (n : ℕ) → K n <N suc (K n)
+K<sK n = s≤s ≤N-refl
 
+------------------------------------------------------------------------
 -- Reciprocal is strictly antitone on positive rationals:
--- 0 < a → a < b → 1/b < 1/a.
+--   0 < a → a < b → 1/b < 1/a.
 --
 -- 正有理数上倒数严格反单调：
--- 0 < a → a < b → 1/b < 1/a。
+--   0 < a → a < b → 1/b < 1/a。
+
 recip-strict : ∀ {a b : ℚ} (0<a : 0ℚ < a) (a<b : a < b) →
   (1/ b) {{pos⇒nonZero b {{positive (<-≤-trans 0<a (<⇒≤ a<b))}}}}
   <
@@ -165,184 +165,243 @@ recip-strict {a} {b} 0<a a<b =
 --
 -- 主构造
 
-cauchy→realI : CauchySeq → RealI
-cauchy→realI x = go 0
-  where
-    a : ℕ → ℚ
-    a n = centre-c x n
+module _ (x : CauchySeq) where
 
-    -- Adjacent sampled centres are within δ (suc n).
-    --
-    -- 相邻采样中心落在 δ (suc n) 内。
-    cauchy-adj : ∀ n → ∣ a n - a (suc n) ∣ < δ (suc n)
-    cauchy-adj n =
-      <-trans
-        (seq-cauchy x (K n) (M x n) (M x (suc n))
-          (μ≤M x n) (μ≤M-suc x n))
-        (ε-K<δ-suc n)
+  a : ℕ → ℚ
+  a n = centre-c x n
 
-    dn-dsn≡dsn : ∀ n → δ n - δ (suc n) ≡ δ (suc n)
-    dn-dsn≡dsn n = begin
-      δ n - δ (suc n)
-        ≡⟨ cong (λ z → z - δ (suc n)) (sym (δ-half n)) ⟩
-      (δ (suc n) + δ (suc n)) - δ (suc n)
-        ≡⟨ cancel-z (δ (suc n)) (δ (suc n)) ⟩
-      δ (suc n)
+  -- Adjacent sampled centres are within δ (suc n).
+  --
+  -- 相邻采样中心落在 δ (suc n) 内。
+  cauchy-adj : ∀ n → ∣ a n - a (suc n) ∣ < δ (suc n)
+  cauchy-adj n =
+    <-trans
+      (seq-cauchy x (K n) (M x n) (M x (suc n))
+        (μ≤M x n) (μ≤M-suc x n))
+      (ε-K<δ-suc n)
+
+  dn-dsn≡dsn : ∀ n → δ n - δ (suc n) ≡ δ (suc n)
+  dn-dsn≡dsn n = begin
+    δ n - δ (suc n)
+      ≡⟨ cong (λ z → z - δ (suc n)) (sym (δ-half n)) ⟩
+    (δ (suc n) + δ (suc n)) - δ (suc n)
+      ≡⟨ cancel-z (δ (suc n)) (δ (suc n)) ⟩
+    δ (suc n)
+      ∎
+
+  sub-shift : ∀ a b c d → a - b ≤ c - d → a - c ≤ b - d
+  sub-shift a b c d h =
+    subst₂ _≤_
+      lhs-eq
+      rhs-eq
+      (+-mono-≤ h (≤-refl {b - c}))
+    where
+      lhs-eq : (a - b) + (b - c) ≡ a - c
+      lhs-eq = begin
+        (a - b) + (b - c)
+          ≡⟨⟩
+        (a + neg b) + (b + neg c)
+          ≡⟨ +-assoc a (neg b) (b + neg c) ⟩
+        a + (neg b + (b + neg c))
+          ≡⟨ cong (a +_) (sym (+-assoc (neg b) b (neg c))) ⟩
+        a + ((neg b + b) + neg c)
+          ≡⟨ cong (a +_) (cong (_+ neg c) (+-inverseˡ b)) ⟩
+        a + (0ℚ + neg c)
+          ≡⟨ cong (a +_) (+-identityˡ (neg c)) ⟩
+        a + neg c
+          ≡⟨⟩
+        a - c
         ∎
 
-    sub-shift : ∀ a b c d → a - b ≤ c - d → a - c ≤ b - d
-    sub-shift a b c d h =
-      subst₂ _≤_
-        lhs-eq
-        rhs-eq
-        (+-mono-≤ h (≤-refl {b - c}))
-      where
-        lhs-eq : (a - b) + (b - c) ≡ a - c
-        lhs-eq = begin
-          (a - b) + (b - c)
-            ≡⟨⟩
-          (a + neg b) + (b + neg c)
-            ≡⟨ +-assoc a (neg b) (b + neg c) ⟩
-          a + (neg b + (b + neg c))
-            ≡⟨ cong (a +_) (sym (+-assoc (neg b) b (neg c))) ⟩
-          a + ((neg b + b) + neg c)
-            ≡⟨ cong (a +_) (cong (_+ neg c) (+-inverseˡ b)) ⟩
-          a + (0ℚ + neg c)
-            ≡⟨ cong (a +_) (+-identityˡ (neg c)) ⟩
-          a + neg c
-            ≡⟨⟩
-          a - c
-          ∎
+      rhs-eq : (c - d) + (b - c) ≡ b - d
+      rhs-eq = begin
+        (c - d) + (b - c)
+          ≡⟨⟩
+        (c + neg d) + (b + neg c)
+          ≡⟨ +-comm (c + neg d) (b + neg c) ⟩
+        (b + neg c) + (c + neg d)
+          ≡⟨ +-assoc b (neg c) (c + neg d) ⟩
+        b + (neg c + (c + neg d))
+          ≡⟨ cong (b +_) (sym (+-assoc (neg c) c (neg d))) ⟩
+        b + ((neg c + c) + neg d)
+          ≡⟨ cong (b +_) (cong (_+ neg d) (+-inverseˡ c)) ⟩
+        b + (0ℚ + neg d)
+          ≡⟨ cong (b +_) (+-identityˡ (neg d)) ⟩
+        b + neg d
+          ≡⟨⟩
+        b - d
+        ∎
 
-        rhs-eq : (c - d) + (b - c) ≡ b - d
-        rhs-eq = begin
-          (c - d) + (b - c)
-            ≡⟨⟩
-          (c + neg d) + (b + neg c)
-            ≡⟨ +-comm (c + neg d) (b + neg c) ⟩
-          (b + neg c) + (c + neg d)
-            ≡⟨ +-assoc b (neg c) (c + neg d) ⟩
-          b + (neg c + (c + neg d))
-            ≡⟨ cong (b +_) (sym (+-assoc (neg c) c (neg d))) ⟩
-          b + ((neg c + c) + neg d)
-            ≡⟨ cong (b +_) (cong (_+ neg d) (+-inverseˡ c)) ⟩
-          b + (0ℚ + neg d)
-            ≡⟨ cong (b +_) (+-identityˡ (neg d)) ⟩
-          b + neg d
-            ≡⟨⟩
-          b - d
-          ∎
+  go : ℕ → RealI
+  RealI.l (go n)  = a n - δ n
+  RealI.u (go n)  = a n + δ n
+  RealI.lo (go n) =
+    subst₂ _<_
+      (sym (+-comm (a n) (neg (δ n))))
+      (sym (+-comm (a n) (δ n)))
+      (+-mono-<-≤ (negδ<δ n) (≤-refl {a n}))
+  RealI.next (go n) = go (suc n)
+  RealI.nest (go n) = nest1 , nest2 , nest3'
+    where
+      an  = a n
+      asn = a (suc n)
+      dn  = δ n
+      dsn = δ (suc n)
+      adj = cauchy-adj n
 
-    go : ℕ → RealI
-    RealI.l (go n)  = a n - δ n
-    RealI.u (go n)  = a n + δ n
-    RealI.lo (go n) =
-      subst₂ _<_
-        (sym (+-comm (a n) (neg (δ n))))
-        (sym (+-comm (a n) (δ n)))
-        (+-mono-<-≤ (negδ<δ n) (≤-refl {a n}))
-    RealI.next (go n) = go (suc n)
-    RealI.nest (go n) = nest1 , nest2 , nest3'
-      where
-        an  = a n
-        asn = a (suc n)
-        dn  = δ n
-        dsn = δ (suc n)
-        adj = cauchy-adj n
+      asn-an<dsn : asn - an < dsn
+      asn-an<dsn =
+        subst (λ z → z < dsn)
+              (begin
+                neg (an - asn)
+                  ≡⟨⟩
+                neg (an + neg asn)
+                  ≡⟨ neg-distrib-+ an (neg asn) ⟩
+                neg an + neg (neg asn)
+                  ≡⟨ cong (neg an +_) (neg-invol asn) ⟩
+                neg an + asn
+                  ≡⟨ +-comm (neg an) asn ⟩
+                asn + neg an
+                  ≡⟨⟩
+                asn - an
+                ∎)
+              (≤-<-trans (-r≤|r| (an - asn)) adj)
 
-        an-asn<dsn : an - asn < dsn
-        an-asn<dsn = ≤-<-trans (r≤|r| (an - asn)) adj
+      nest1 : an - dn ≤ asn - dsn
+      nest1 =
+        sub-shift an asn dn dsn
+          (subst (λ z → an - asn ≤ z)
+                 (sym (dn-dsn≡dsn n))
+                 (≤-trans (r≤|r| (an - asn)) (<⇒≤ adj)))
 
-        asn-an<dsn : asn - an < dsn
-        asn-an<dsn =
-          subst (λ z → z < dsn)
-                (begin
-                  neg (an - asn)
-                    ≡⟨⟩
-                  neg (an + neg asn)
-                    ≡⟨ neg-distrib-+ an (neg asn) ⟩
-                  neg an + neg (neg asn)
-                    ≡⟨ cong (neg an +_) (neg-invol asn) ⟩
-                  neg an + asn
-                    ≡⟨ +-comm (neg an) asn ⟩
-                  asn + neg an
-                    ≡⟨⟩
-                  asn - an
-                  ∎)
-                (≤-<-trans (-r≤|r| (an - asn)) adj)
-
-        nest1 : an - dn ≤ asn - dsn
-        nest1 =
-          sub-shift an asn dn dsn
-            (subst (λ z → an - asn ≤ z)
-                   (sym (dn-dsn≡dsn n))
-                   (≤-trans (r≤|r| (an - asn)) (<⇒≤ adj)))
-
-        nest2 : asn + dsn ≤ an + dn
-        nest2 =
-          let h1 : asn ≤ dsn + an
-              h1 = le-shift {x = asn} {y = an} {z = dsn}
-                     (<⇒≤ asn-an<dsn)
-              h2 : asn + dsn ≤ (dsn + an) + dsn
-              h2 = +-mono-≤ h1 (≤-refl {dsn})
-              eq : (dsn + an) + dsn ≡ an + dn
-              eq = begin
-                (dsn + an) + dsn
-                  ≡⟨ +-assoc dsn an dsn ⟩
-                dsn + (an + dsn)
-                  ≡⟨ cong (dsn +_) (+-comm an dsn) ⟩
-                dsn + (dsn + an)
-                  ≡⟨ sym (+-assoc dsn dsn an) ⟩
-                (dsn + dsn) + an
-                  ≡⟨ cong (_+ an) (δ-half n) ⟩
-                dn + an
-                  ≡⟨ +-comm dn an ⟩
-                an + dn
-                  ∎
-          in subst (λ z → asn + dsn ≤ z) eq h2
-
-        diff-sum : ∀ x y → (x + y) - (x - y) ≡ y + y
-        diff-sum x y = begin
-          (x + y) - (x - y)
-            ≡⟨⟩ (x + y) - (x + neg y)
-            ≡⟨ sub-add x y x (neg y) ⟩
-            (x - x) + (y - neg y)
-            ≡⟨ cong₂ _+_ (+-inverseʳ x) (sub-neg y) ⟩
-            0ℚ + (y + y) ≡⟨ +-identityˡ (y + y) ⟩ y + y ∎
-          where
-            sub-neg : ∀ z → z - neg z ≡ z + z
-            sub-neg z = begin
-              z - neg z ≡⟨⟩ z + neg (neg z) ≡⟨ cong (z +_) (neg-invol z) ⟩ z + z ∎
-
-        nest3 : (asn + dsn) - (asn - dsn) ≤ (dn + dn) ÷ embed 2
-        nest3 =
-          subst (λ z → (asn + dsn) - (asn - dsn) ≤ z)
-                (sym (begin
-                  (dn + dn) ÷ embed 2
-                    ≡⟨ double-half dn ⟩
-                  dn
-                    ≡⟨ dn≡dsn+dsn ⟩
-                  dsn + dsn
-                    ∎))
-                (≤-reflexive (diff-sum asn dsn))
-          where
-            dn≡dsn+dsn : dn ≡ dsn + dsn
-            dn≡dsn+dsn = begin
-              dn
-                ≡⟨ sym (cancelʳ dn dsn) ⟩
-              (dn - dsn) + dsn
-                ≡⟨ cong (_+ dsn) (dn-dsn≡dsn n) ⟩
-              dsn + dsn
+      nest2 : asn + dsn ≤ an + dn
+      nest2 =
+        let h1 : asn ≤ dsn + an
+            h1 = le-shift {x = asn} {y = an} {z = dsn}
+                   (<⇒≤ asn-an<dsn)
+            h2 : asn + dsn ≤ (dsn + an) + dsn
+            h2 = +-mono-≤ h1 (≤-refl {dsn})
+            eq : (dsn + an) + dsn ≡ an + dn
+            eq = begin
+              (dsn + an) + dsn
+                ≡⟨ +-assoc dsn an dsn ⟩
+              dsn + (an + dsn)
+                ≡⟨ cong (dsn +_) (+-comm an dsn) ⟩
+              dsn + (dsn + an)
+                ≡⟨ sym (+-assoc dsn dsn an) ⟩
+              (dsn + dsn) + an
+                ≡⟨ cong (_+ an) (δ-half n) ⟩
+              dn + an
+                ≡⟨ +-comm dn an ⟩
+              an + dn
                 ∎
+        in subst (λ z → asn + dsn ≤ z) eq h2
 
-        -- Convert the RHS from (δ n + δ n) ÷ 2 to
-        -- ((a n + δ n) - (a n - δ n)) ÷ 2.
-        --
-        -- 把右端从 (δ n + δ n) ÷ 2 转成
-        -- ((a n + δ n) - (a n - δ n)) ÷ 2。
-        nest3' : RealI.u (go (suc n)) - RealI.l (go (suc n))
-                   ≤ (RealI.u (go n) - RealI.l (go n)) ÷ embed 2
-        nest3' =
-          subst (λ z → RealI.u (go (suc n)) - RealI.l (go (suc n)) ≤ z)
-                (cong (λ w → w ÷ embed 2) (sym (diff-sum (a n) (δ n))))
-                nest3
+      diff-sum : ∀ x y → (x + y) - (x - y) ≡ y + y
+      diff-sum x y = begin
+        (x + y) - (x - y)
+          ≡⟨⟩ (x + y) - (x + neg y)
+          ≡⟨ sub-add x y x (neg y) ⟩
+          (x - x) + (y - neg y)
+          ≡⟨ cong₂ _+_ (+-inverseʳ x) (sub-neg y) ⟩
+          0ℚ + (y + y) ≡⟨ +-identityˡ (y + y) ⟩ y + y ∎
+        where
+          sub-neg : ∀ z → z - neg z ≡ z + z
+          sub-neg z = begin
+            z - neg z ≡⟨⟩ z + neg (neg z) ≡⟨ cong (z +_) (neg-invol z) ⟩ z + z ∎
+
+      nest3 : (asn + dsn) - (asn - dsn) ≤ (dn + dn) ÷ embed 2
+      nest3 =
+        subst (λ z → (asn + dsn) - (asn - dsn) ≤ z)
+              (sym (begin
+                (dn + dn) ÷ embed 2
+                  ≡⟨ double-half dn ⟩
+                dn
+                  ≡⟨ dn≡dsn+dsn ⟩
+                dsn + dsn
+                  ∎))
+              (≤-reflexive (diff-sum asn dsn))
+        where
+          dn≡dsn+dsn : dn ≡ dsn + dsn
+          dn≡dsn+dsn = begin
+            dn
+              ≡⟨ sym (cancelʳ dn dsn) ⟩
+            (dn - dsn) + dsn
+              ≡⟨ cong (_+ dsn) (dn-dsn≡dsn n) ⟩
+            dsn + dsn
+              ∎
+
+      -- Convert the RHS from (δ n + δ n) ÷ 2 to
+      -- ((a n + δ n) - (a n - δ n)) ÷ 2.
+      --
+      -- 把右端从 (δ n + δ n) ÷ 2 转成
+      -- ((a n + δ n) - (a n - δ n)) ÷ 2。
+      nest3' : RealI.u (go (suc n)) - RealI.l (go (suc n))
+                 ≤ (RealI.u (go n) - RealI.l (go n)) ÷ embed 2
+      nest3' =
+        subst (λ z → RealI.u (go (suc n)) - RealI.l (go (suc n)) ≤ z)
+              (cong (λ w → w ÷ embed 2) (sym (diff-sum (a n) (δ n))))
+              nest3
+
+------------------------------------------------------------------------
+-- cauchy→realI
+--
+-- 柯西序列 → 嵌套区间实数。
+
+cauchy→realI : CauchySeq → RealI
+cauchy→realI x = go x 0
+
+------------------------------------------------------------------------
+-- node (go x 0) n ≡ go x n
+--
+-- 迭代后继 n 次后回到 go x n。
+
+node-go : (x : CauchySeq) (n : ℕ) → node (go x 0) n ≡ go x n
+node-go x zero    = refl
+node-go x (suc n) = cong RealI.next (node-go x n)
+
+------------------------------------------------------------------------
+-- Exported lemma: the centre of the n-th layer of cauchy→realI is
+-- the sampled centre seq-f x (M x n).
+--
+-- 导出引理：cauchy→realI 的第 n 层中心就是采样中心
+-- seq-f x (M x n)。
+
+centre-cauchy→realI : (x : CauchySeq) (n : ℕ) →
+  centre (cauchy→realI x) n ≡ seq-f x (M x n)
+centre-cauchy→realI x n = begin
+  centre (cauchy→realI x) n
+    ≡⟨⟩
+  centre (go x 0) n
+    ≡⟨ cong₂ (λ p q → (p + q) ÷ embed 2)
+             (cong RealI.l (node-go x n))
+             (cong RealI.u (node-go x n)) ⟩
+  (RealI.l (go x n) + RealI.u (go x n)) ÷ embed 2
+    ≡⟨⟩
+  ((a x n - δ n) + (a x n + δ n)) ÷ embed 2
+    ≡⟨ cong (_÷ embed 2) (cancel-dn (a x n) (δ n)) ⟩
+  (a x n + a x n) ÷ embed 2
+    ≡⟨ double-half (a x n) ⟩
+  a x n
+    ≡⟨⟩
+  centre-c x n
+    ≡⟨⟩
+  seq-f x (M x n)
+    ∎
+  where
+    cancel-dn : ∀ a d → (a - d) + (a + d) ≡ a + a
+    cancel-dn a d = begin
+      (a - d) + (a + d)
+        ≡⟨ +-assoc a (neg d) (a + d) ⟩
+      a + (neg d + (a + d))
+        ≡⟨ cong (a +_) (sym (+-assoc (neg d) a d)) ⟩
+      a + ((neg d + a) + d)
+        ≡⟨ cong (a +_) (cong (_+ d) (+-comm (neg d) a)) ⟩
+      a + ((a + neg d) + d)
+        ≡⟨ cong (a +_) (+-assoc a (neg d) d) ⟩
+      a + (a + (neg d + d))
+        ≡⟨ cong (a +_) (cong (a +_) (+-inverseˡ d)) ⟩
+      a + (a + 0ℚ)
+        ≡⟨ cong (a +_) (+-identityʳ a) ⟩
+      a + a
+      ∎

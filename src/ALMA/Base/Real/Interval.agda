@@ -31,8 +31,8 @@ open import Data.Integer using (-[1+_]; +[1+_]; +0)
 open import Data.Nat.Coprimality using (1-coprimeTo) renaming (sym to coprime-sym)
 open import Data.Nat.Properties using (m^n≢0)
 open import Data.Product using (_,_; _×_)
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; Positive; NonZero)
-open import Data.Rational.Base using (mkℚ; 1/_; _÷_; _-_) renaming (-_ to neg)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _*_; Positive; NonZero)
+open import Data.Rational.Base using (mkℚ; _÷_; _-_) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (mkℚ+-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; ≤-reflexive; ≤-refl; ≤-trans
   ; <⇒≤; <-trans; +-mono-≤; +-mono-<-≤; +-identityʳ; +-identityˡ; +-inverseʳ

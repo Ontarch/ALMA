@@ -287,9 +287,10 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
           ≡⟨ cong embed (sym (den-2 k)) ⟩
         b
         ∎
+      n2m : NonZero (2ℚ * m)
+      n2m = subst NonZero (sym e2m) (pos⇒nonZero b)
       instance
-        n2m : NonZero (2ℚ * m)
-        n2m = subst NonZero (sym e2m) (pos⇒nonZero b)
+        _ = n2m
       t : ℚ
       t = 1/ (2ℚ * m)
       l1 : t ≡ ε (suc (2 ℕ* k))

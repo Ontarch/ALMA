@@ -42,7 +42,7 @@ open import Data.Rational.Properties using
 open import Data.Integer.Base using (ℤ; 1ℤ) renaming (_+_ to _ℤ+_)
 open import Data.Product.Base using (_,_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; sym; cong; cong₂; module ≡-Reasoning)
 
 open import ALMA.Physics.Quantum.Gaussian using
   (ℂ; re; conj; norm²; _+ᶜ_; _*ᶜ_; norm²-mul; norm²-conj)

@@ -50,11 +50,14 @@ import ALMA.Base.Real.Interval.Mul
 import ALMA.Base.Real.Interval.Node
 import ALMA.Base.Real.Interval.Order
 import ALMA.Base.Real.Interval.Bounded
-import ALMA.Base.Real.Interval.OrderLaws
+import ALMA.Base.Real.Interval.Abs
 import ALMA.Base.Real.Interval.ArithLaws
 import ALMA.Base.Real.Interval.MulLaws
-import ALMA.Base.Real.Interval.Abs
+import ALMA.Base.Real.Interval.OrderLaws
 import ALMA.Base.Real.Interval.MulOrder
+import ALMA.Base.Real.Interval.Recip
+import ALMA.Base.Real.Interval.Complete
+import ALMA.Base.Real.Interval.Inverse
 
 import ALMA.Physics.RationalKit
 import ALMA.Physics.CausalOrder

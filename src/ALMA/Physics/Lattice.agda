@@ -33,7 +33,6 @@
 module ALMA.Physics.Lattice where
 
 open import Agda.Primitive using (lzero)
-open import Data.Nat.Base using (ℕ)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Data.Empty using (⊥)
 open import Data.Fin.Base using (Fin)

@@ -24,8 +24,6 @@ open import Data.Fin.Base using (Fin)
 open import Data.Product.Base using (Σ; _,_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
-open import ALMA.Base.Equivalence.DiscreteEq using (DiscreteEq)
-
 ------------------------------------------------------------------------
 -- The structure
 --
@@ -67,8 +65,6 @@ record IsConservative {a s : Level} {X : Set a} {Scalar : Set s}
              → Sum (outputs x ix)
                     (λ i → amp Q x (index x ix i) (reach x ix i))
                ≡ One
-
-open IsConservative
 
 ------------------------------------------------------------------------
 -- Projection to DiscreteEq

@@ -767,8 +767,6 @@ module Cong {i j a b c d : Level}
             ηt  = FiberAdj.η At et'
             Sraw    = below S xS₁ es
             SCan'   = below S xS₁ (FiberAdj.fro Dadj e0')
-            B0'     = below S xT₁ e0'
-            TrawCan = below T xT₁ et'
             Traw    = below T xT₁ (FiberAdj.fro At (FiberAdj.to At et'))
             hrb : Traw ≈M relocate dd Sraw
             hrb =
@@ -823,8 +821,6 @@ module Cong {i j a b c d : Level}
             ηt  = FiberAdj.η At et'
             Sraw    = below S xS₁ es
             SCan'   = below S xS₁ (FiberAdj.fro Dadj e0')
-            B0'     = below S xT₁ e0'
-            TrawCan = below T xT₁ et'
             Traw    = below T xT₁ (FiberAdj.fro At (FiberAdj.to At et'))
             hrb : Traw ≈M relocate dd Sraw
             hrb =

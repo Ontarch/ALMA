@@ -23,7 +23,7 @@
 module ALMA.Cosmos.Carried.SeqColimitS where
 
 open import Agda.Primitive using (Level; _⊔_; lsuc)
-open import Agda.Builtin.Sigma using (Σ; _,_)
+open import Agda.Builtin.Sigma using (Σ)
 open import Agda.Builtin.Equality using (_≡_)
 open import Data.Nat.Base using (ℕ; zero; suc)
 

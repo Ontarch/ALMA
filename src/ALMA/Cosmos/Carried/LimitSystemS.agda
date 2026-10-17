@@ -30,7 +30,7 @@ open import Data.Nat.Properties using
   (≤-pred; ≤-refl; m≤n⇒m≤1+n; m≤n⇒m<n∨m≡n; n≤0⇒n≡0; m≥n⇒m⊓n≡n)
 open import Data.Fin.Base using (Fin; zero; suc; toℕ; inject₁)
 open import Data.Fin.Properties using (toℕ-injective; toℕ-inject₁; toℕ<n)
-open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
+open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Relation.Binary.PropositionalEquality.Core using (cong; trans; sym)
 

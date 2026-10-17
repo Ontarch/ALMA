@@ -18,7 +18,7 @@
 module ALMA.Cosmos.Carried.FinEmbed where
 
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Data.Nat using (ℕ; suc; _<_; _≤_)
+open import Data.Nat using (ℕ; suc; _<_)
 open import Data.Nat.Properties using (≤-pred; >⇒≢; m≤n⇒m<n∨m≡n)
 open import Data.Fin.Base using (Fin; inject₁; lower₁; toℕ)
 open import Data.Fin.Properties using

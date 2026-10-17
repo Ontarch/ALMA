@@ -16,10 +16,10 @@
 
 module ALMA.Physics.CausalCurvature where
 
-open import Data.Nat using (ℕ; zero; suc) renaming (_≡ᵇ_ to _≡ℕᵇ_)
+open import Data.Nat using (ℕ) renaming (_≡ᵇ_ to _≡ℕᵇ_)
 open import Data.Fin using (Fin; toℕ)
 open import Data.Bool using (Bool; _∧_; _∨_)
-open import Data.Integer using (ℤ; _+_; _-_; _*_; +_)
+open import Data.Integer using (ℤ; _+_; _-_; +_)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 open import ALMA.Physics.CausalSet using (diamond)

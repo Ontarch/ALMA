@@ -29,7 +29,7 @@
 module ALMA.Cosmos.M.TowerSeparation where
 
 open import Agda.Primitive using (lzero)
-open import Agda.Builtin.Equality using (_≡_; refl)
+open import Agda.Builtin.Equality using (refl)
 open import Agda.Builtin.Sigma using (_,_)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Data.Nat using (ℕ; suc)

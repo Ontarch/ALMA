@@ -87,7 +87,7 @@ ListFC = record
   ; F-resp-≈     = λ _ → ≈sr-refl
   }
 
-open GC using (GenDet; genFMapˢ; genFMˢ)
+open GC using (GenDet; genFMˢ)
 
 ------------------------------------------------------------------------
 -- Indices, labels and edge fibres

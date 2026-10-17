@@ -21,7 +21,7 @@ module ALMA.Base.Real.Interval.Equiv where
 open import Data.Nat using (ℕ; suc; _≥_; _⊔_; _*_)
 open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m) renaming (≤-trans to ≤-transℕ)
 open import Data.Product using (Σ; _,_)
-open import Data.Rational using (0ℚ; _+_; _-_; _<_; _≤_; ∣_∣; -_)
+open import Data.Rational using (0ℚ; _+_; _-_; _<_; ∣_∣; -_)
 open import Data.Rational.Properties using
   (+-mono-<; +-inverseʳ; 0≤p⇒∣p∣≡p; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; ≤-refl
   ; ≤-<-trans; <-≤-trans; module ≤-Reasoning)

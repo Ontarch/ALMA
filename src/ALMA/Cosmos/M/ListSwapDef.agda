@@ -28,7 +28,7 @@
 module ALMA.Cosmos.M.ListSwapDef where
 
 open import Agda.Primitive using (lzero)
-open import Data.Unit.Polymorphic.Base using (⊤; tt)
+open import Data.Unit.Polymorphic.Base using (tt)
 open import Data.Nat using (ℕ; _+_)
 open import Data.Fin.Base using (Fin; zero; toℕ)
 open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
@@ -39,9 +39,7 @@ open import Relation.Nullary.Negation using (¬_)
 
 open import Categories.Category.Core using (Category)
 open import Categories.Category.Instance.One using (One)
-open import Categories.Functor using () renaming (id to idF)
-open import Categories.Functor.Core using (Functor)
-open Functor using (F₀)
+open import Categories.Functor using (Functor) renaming (id to idF)
 
 open import ALMA.Cosmos.ContCategory using (ContCat; ≈sr-refl)
 open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)

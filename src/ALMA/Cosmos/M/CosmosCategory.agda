@@ -31,7 +31,7 @@ open import Categories.Functor.Core using (Functor)
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Base.MCorrSetoid using (SysEq; EqOn)
 open import ALMA.Base.MCorrSetoidCat using (MCorrCatˢ; FMˢ; idFMˢ; compFMˢ)
-open import ALMA.Cosmos.M.Object as MO
+open import ALMA.Cosmos.M.Object using (I; A; sys)
 
 module _ {o h e s p : Level}
          (C  : Category o h e)
@@ -52,9 +52,9 @@ module _ {o h e s p : Level}
   -- ≈CD 是选择命题标签（容器制度）还是自然同构标签（一般范畴制度）的
   -- 唯一接缝。
   cosmosSys : ∀ {ℓd : Level}
-              (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
+              (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
             → SysEq iL aL bL ℓd bL
-  cosmosSys ≈CD = MO.sys C FC ≈CD
+  cosmosSys ≈CD = sys C FC ≈CD
 
   -- MCorrCatˢ with its level arguments pinned
   --
@@ -64,7 +64,7 @@ module _ {o h e s p : Level}
   --
   -- sys ≈CD 是其一个对象。
   CosmosMCat : ∀ {ℓd : Level}
-               (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
+               (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
              → Category (lsuc (aL ⊔ ℓd)) (aL ⊔ ℓd) (aL ⊔ ℓd)
   CosmosMCat {ℓd = ℓd} _ = MCorrCatˢ iL aL bL ℓd bL
 
@@ -76,16 +76,16 @@ module _ {o h e s p : Level}
   --
   -- 取代旧 _⇒ℱ[S]_ 的携带式类型。
   CosmosM-endo : ∀ {ℓd : Level}
-                  (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
+                  (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
                 → Set (aL ⊔ ℓd)
   CosmosM-endo ≈CD = FMˢ (cosmosSys ≈CD) (cosmosSys ≈CD)
 
   id-endo : ∀ {ℓd : Level}
-              (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
+              (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
           → CosmosM-endo ≈CD
   id-endo _ = idFMˢ
 
   comp-endo : ∀ {ℓd : Level}
-                (≈CD : (i : MO.I C FC) → EqOn {ℓ = ℓd} (MO.A C FC i))
+                (≈CD : (i : I C FC) → EqOn {ℓ = ℓd} (A C FC i))
               → CosmosM-endo ≈CD → CosmosM-endo ≈CD → CosmosM-endo ≈CD
   comp-endo _ g f = compFMˢ g f

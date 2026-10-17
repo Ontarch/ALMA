@@ -38,7 +38,7 @@ module ALMA.Base.MCorrInitialAlgebra where
 
 open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Agda.Builtin.Sigma using (Σ; _,_)
-open import Data.Product.Base using (_×_; proj₁; proj₂)
+open import Data.Product.Base using (_×_)
 
 open import ALMA.Base.MCorr using (M)
 open import ALMA.Base.MCorrSetoid using

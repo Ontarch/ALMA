@@ -29,7 +29,7 @@ module ALMA.Cosmos.Carried.SameIndexCatS where
 open import Agda.Primitive using (Level; lzero; lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
 open import Agda.Builtin.Sigma using (Σ; _,_)
-open import Data.Unit.Polymorphic.Base using (⊤; tt)
+open import Data.Unit.Polymorphic.Base using (⊤)
 open import Data.Nat.Base using (ℕ)
 open import Relation.Binary.Structures using (IsEquivalence)
 

@@ -1,4 +1,4 @@
-﻿------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Rational algebra and convergence engines
 --
 -- The rational-level lemmas and the two convergence engines on which
@@ -23,14 +23,14 @@ import Data.Integer.Properties as ℤP
 open import Data.Product using (_,_; Σ; proj₁; proj₂)
 open import Data.Rational.Base using (1/_; *≤*; positive)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _≤_; _<_; ∣_∣; NonNegative; nonNegative; NonZero)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _≤_; _<_; ∣_∣; nonNegative; NonZero)
 open import Data.Rational.Properties using
   (+-inverseʳ; *-identityˡ; *-identityʳ; *-assoc; *-comm; *-inverseʳ; *-distribʳ-+
   ; *-distribˡ-+; ≤-refl; ≤-reflexive; ≤-trans; 0≤p⇒∣p∣≡p; pos⇒nonZero; positive⁻¹
   ; 1/pos⇒pos; pos*pos⇒pos; <-≤-trans; ≤-<-trans; <⇒≤; *-monoˡ-≤-nonNeg
   ; *-monoʳ-≤-nonNeg; *-cancelˡ-≤-pos; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; trans; sym; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import ALMA.Base.Real using (embed; 2ℚ; 2ℚ≡1+1; ε; 0<ε; embed-suc-pos; telescope)

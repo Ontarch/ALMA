@@ -54,7 +54,7 @@ open import ALMA.Cosmos.Carried.SeqColimitCat using (Chain⇒; ωCat; _∘ch_)
 import ALMA.Cosmos.Carried.SeqColimitCat as SQC
 open import ALMA.Cosmos.Carried.SameIndexCatS using
   (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_; ≈i-refl; ≈i-sym; ≈i-trans
-  ; ∘-resp-≈i; assoc-i; identityˡ-i; identityʳ-i; SameIndexCat)
+  ; ∘-resp-≈i; SameIndexCat)
 open import ALMA.Cosmos.Carried.LimitSystemS using (n-at)
 import ALMA.Cosmos.Carried.LimitSystemS as LS
 
@@ -1303,9 +1303,6 @@ module Tower {ℓ : Level} (T : LabeledFinTower ℓ) where
       }
 
     open import Categories.Diagram.Cocone chainFun
-    open import Categories.Category.Construction.Cocones chainFun
-      using (Cocones)
-    open import Categories.Object.Initial Cocones
     open import Categories.Diagram.Colimit chainFun using (Colimit)
 
     -- One-step and path coherence of the canonical legs.
