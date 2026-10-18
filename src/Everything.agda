@@ -4,8 +4,7 @@ module Everything where
 
 import ALMA.Base.IndexedMType
 import ALMA.Base.MCategory
-import ALMA.Base.MCorr  -- Carried correspondence kernel (zero subst / cast)
-                        -- 携带式对应内核（零 subst / cast）
+import ALMA.Base.MCorr  -- Carried correspondence kernel / 携带式对应内核
 import ALMA.Base.MCorrSetoid
 import ALMA.Base.MCorrSetoidCat
 import ALMA.Base.DetCat
@@ -126,7 +125,6 @@ import ALMA.Cosmos.Carried.FinColimit
 import ALMA.Cosmos.Carried.FinTower
 import ALMA.Cosmos.Carried.DetColimit
 import ALMA.Cosmos.Carried.Boundaries
-
 import ALMA.Cosmos.Carried.SeqColimitS
 import ALMA.Cosmos.Carried.SeqColimitCat
 import ALMA.Cosmos.Carried.ColimitPolarity
@@ -134,24 +132,11 @@ import ALMA.Cosmos.Carried.LimitSystemS
 import ALMA.Cosmos.Carried.FinPushMediateS
 import ALMA.Cosmos.Carried.FinPushColimitS
 import ALMA.Cosmos.Carried.FinPushColimitCat
-
 import ALMA.Cosmos.Carried.SameIndexCatS
 import ALMA.Cosmos.Carried.SameIndexColimitS
 import ALMA.Cosmos.Carried.NontrivialPullTowerS
 import ALMA.Cosmos.Carried.NontrivialPushTowerS
 import ALMA.Cosmos.Carried.ChainColimitPropS
-
-------------------------------------------------------------------------
--- Frozen archives
--- The ontological root of subst: when A is essentially determined by B
--- at parameter p₀, yet is expressed independently, the misalignment
--- between A's self-contained appearance and its instance-position
--- must manifest as subst at every point of connection between A and B.
---
--- 冻结存档
--- subst 的本体论根源：当 A 本质上由 B 在参数 p₀ 处决定，却被独立表达时，
--- A 的自足外观与其实例位置之间的错位，必然在 A 与 B 的每个连接点上以 subst
--- 的形式显露。
 
 import ALMA.SecondPass.ContCatEquivFunctor
 import ALMA.SecondPass.Unfolding
@@ -199,8 +184,14 @@ import ALMA.SecondPass.FinCatInfinityTowerCompat
 import ALMA.SecondPass.FinCatInfinityColimit
 import ALMA.SecondPass.FinCatInfinityColimitUniversal
 import ALMA.SecondPass.Instances
--- import ALMA.SecondPass.WIP  -- uniqueness blocked at FMap/⇒ℱX layer
-                               -- 唯一性在 FMap/⇒ℱX 层受阻
+import ALMA.SecondPass.ShiftedTower
+import ALMA.SecondPass.FinCatInfinitySubstitution
+import ALMA.SecondPass.FinCatInfinityProjectionUnfold
+import ALMA.SecondPass.FinCatInfinitySubCocone
+import ALMA.SecondPass.FinCatInfinityMediate
+import ALMA.SecondPass.FinCatInfinityMediateUniqueness
+import ALMA.SecondPass.FinCatInfinityEndomorphismCandidates
+import ALMA.SecondPass.FinCatInfinitySubstDstSelf
 
 import ALMA.InitialPass.ObjEquivCat
 import ALMA.InitialPass.ObjEquivFunctor
@@ -216,12 +207,19 @@ import ALMA.InitialPass.Cosmos
 
 import ALMA.Prototype.Prelude
 import ALMA.Prototype.Cosmos
+import ALMA.Prototype.Properties.SubstCore
+import ALMA.Prototype.Properties.Transport
+import ALMA.Prototype.Properties.Equiv
+import ALMA.Prototype.Properties.Composition
+import ALMA.Prototype.Properties.CongBase
+-- import ALMA.Prototype.Properties.Cong  -- comp-cong-≃⇒ℱ.onunfold-eq is a hole;
+                                          -- excluded from CI
+                                          -- comp-cong-≃⇒ℱ.onunfold-eq 是洞；
+                                          -- 从 CI 排除
+import ALMA.Prototype.Properties.MorphLift
+import ALMA.Prototype.Properties.Bisim
+import ALMA.Prototype.Properties.Dynamics
 import ALMA.Prototype.Indestructibility
 import ALMA.Prototype.Beings
 import ALMA.Prototype.Universe
 import ALMA.Prototype.StandardModel
--- import ALMA.Prototype.Properties  -- comp-cong-≃⇒ℱ hit a subst coherence
-                                     -- obstruction and was left as a hole,
-                                     -- excluded from CI
-                                     -- comp-cong-≃⇒ℱ 撞上 subst 相干性障碍，
-                                     -- 留为洞，从 CI 排除

@@ -7,6 +7,7 @@
 -- 基于类型论、范畴论、容器与余代数展开构建；
 -- Cosmos 是内化于类型论中的多项式函子的终余代数
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.Cosmos where
@@ -78,7 +79,6 @@ mutual
                     : Set (o ⊔ h ⊔ s ⊔ p) where
     inductive
     private
-      module C = Category C
       module S = Functor S
       UF = out F
       UG = out G
@@ -184,9 +184,6 @@ _∘⇒ℱ_ {C = C} {FC = FC} {F = F} {G = G} {H = H} g f .out = record
   where
     open MorphismObject
     open MorphismMorphism
-    UF = out F
-    UG = out G
-    UH = out H
     moF = morphismObj (f .out)
     moG = morphismObj (g .out)
     mmF = morphismMor (f .out)

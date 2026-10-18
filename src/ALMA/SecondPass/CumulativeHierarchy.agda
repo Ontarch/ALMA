@@ -12,6 +12,7 @@
 -- 以及 Lambek 一致性封装。 具体实例在单独的 CumulativeHierarchyInstances
 -- 模块中提供
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.CumulativeHierarchy where
@@ -213,8 +214,6 @@ embed {C = C} {FC = FC} x ed .out = record
   }
   where
     open EmbeddingData ed
-    module C  = Category C
-    module FC = Functor FC
     UX = out x
     module UX = Unfolding UX
 
@@ -326,12 +325,6 @@ record LambekConsistency {o h e s p} {C : Category o h e} {FC : Functor C (ContC
     in-F′ : Unfolding FC′ (Cosmos C′ FC′) → Cosmos C′ FC′
     in-F′ = in-F {C = C′} {FC = FC′}
     
-    -- Left inverse law of the embedded layer's Lambek isomorphism
-    --
-    -- 嵌入层 Lambek 同构的左逆律
-    in∘out≈id′ : ∀ (z : Cosmos C′ FC′) → in-F′ (out z) ≈C z
-    in∘out≈id′ = in∘out≈id {C = C′} {FC = FC′}
-    
     -- Next-seed map of x, used to state out-consistency
     --
     -- x 的下一层种子映射，用于陈述 out-consistency
@@ -366,7 +359,6 @@ mkLambekConsistency {C = C} {FC = FC} fam =
     open UniformEmbeddingFamily fam
     C′ = ShapeCat C FC
     FC′ = FC∘π FC
-    in-F′ = in-F {C = C′} {FC = FC′}
     in∘out≈id′ = in∘out≈id {C = C′} {FC = FC′}
     UX-next : (x : Cosmos C FC) {A₀ : Category.Obj C} (s : ShapeOf FC A₀)
             → Cosmos C FC

@@ -14,6 +14,7 @@
 -- 恒等，EmbeddingData 对任意形状类型无条件成立；这与 CumulativeHierarchy
 -- 中外层方向的障碍（要求 s₁ ≡ s₀）形成对比
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.CumulativeHierarchyInner where
@@ -71,8 +72,6 @@ embed-inner {C = C} {FC = FC} x ed .out = record
   }
   where
     open EmbeddingData ed
-    module C  = Category C
-    module FC = Functor FC
     UX = out x
     module UX = Unfolding UX
 

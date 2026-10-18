@@ -14,6 +14,7 @@
 -- 映射 aut→⇒ℱ。证明 aut→⇒ℱ 是群同态（aut-id、aut-comp、aut-inv）、
 -- 单射（aut-injective），并保持 _≈PA_（aut→⇒ℱ-resp-≈）
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.ContainerAutomorphism where
@@ -302,7 +303,7 @@ module _ {s p : Level} (C : Container s p) where
         }
     ; onunfold-next = λ {A} s → aut→⇒ℱ φ (Unfolding.unfold-next (out x) s)
     }
-    where open Unfolding; open ≡-Reasoning
+    where open ≡-Reasoning
 
   -- Identity homomorphism property
   -- 恒等同态性质

@@ -12,6 +12,7 @@
 --   MorphismObject ：S 由 alpha 派生，并追加 pts-compat 定律
 --   forget 为遗忘映射，由 forget-id 与 forget-comp 证明函子性
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.MorphismObject.MorphismObject where
@@ -227,8 +228,6 @@ module IdentityMorphismObject
   {o h e s p u : Level} {C : Category o h e}
   {FC : Functor C (ContCat s p)} {X : Set u}
   (UF : Unfolding FC X) where
-  private
-    module UF = Unfolding UF
 
   idα : NaturalTransformation FC (FC ∘F id)
   idα = NaturalIsomorphism.F⇐G (unitorʳ {F = FC})

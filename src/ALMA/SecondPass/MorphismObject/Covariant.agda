@@ -6,6 +6,7 @@
 -- with the container natural isomorphism
 -- Covariant 见证对象映射与位置映射同容器自然同构之间的交换性
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.MorphismObject.Covariant where
@@ -47,9 +48,7 @@ module _ {o h e o′ ℓ′ e′ s p u v : Level}
                          (Functor.₀ (Unfolding.unfoldFunctor UG)
                                     (Functor.₀ S (A , s)))) where
   private
-    module C  = Category C; module D  = Category D
-    module FC = Functor FC; module FD = Functor FD
-    module UF = Unfolding UF; module UG = Unfolding UG; module Sf = Functor S
+    module UG = Unfolding UG; module Sf = Functor S
   record Covariant : Set (o ⊔ s ⊔ p) where
     field
       -- Position mapping: sends each position of FC over shape s

@@ -9,6 +9,7 @@
 -- 借助 S 的函子性，MorphismMorphism 的复合直接成立。
 -- 提供逐点命题相等的等价关系 _≈MM_。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.MorphismMorphism where
@@ -41,8 +42,6 @@ module _ {o h e o′ ℓ′ e′ s p : Level}
          (S  : Functor (ShapeCat C FC) (ShapeCat D FD)) where
   private
     module C  = Category C
-    module FC = Functor FC
-    module FD = Functor FD
     module Sf = Functor S
 
   actP-from-S : ∀ {A B} (f : C._⇒_ A B) {s : ShapeOf FC A} {t : ShapeOf FC B}
@@ -71,10 +70,6 @@ module _ {o h e o′ ℓ′ e′ s p u v : Level}
          (MO : MorphismObject UF UG S shapeTrans) where
   private
     module C  = Category C
-    module D  = Category D
-    module FC = Functor FC
-    module FD = Functor FD
-    module Sf = Functor S
     module MO = MorphismObject MO
 
   record MorphismMorphism : Set (o ⊔ h ⊔ s ⊔ p) where
@@ -137,11 +132,7 @@ module _ {o₁ h₁ e₁ o₂ h₂ e₂ o₃ h₃ e₃ s p u v w : Level}
          (shTrans₂ : ∀ {A} {s : ShapeOf FD A} → PosOf FD s
                    → ShapeOf FE (Functor.₀ (Unfolding.unfoldFunctor UH) (Functor.₀ S₂ (A , s)))) where
   private
-    module FC = Functor FC
-    module FD = Functor FD
-    module FE = Functor FE
     module S₁ = Functor S₁
-    module S₂ = Functor S₂
     open MorphismObject
 
   -- The composition of MorphismMorphisms is automatic: the needed coherence

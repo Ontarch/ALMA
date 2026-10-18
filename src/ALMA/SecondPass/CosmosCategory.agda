@@ -7,6 +7,7 @@
 -- 定义 _⇒ℱ_ 见证上的等价 _≈ℱ_（余归纳互模拟），验证范畴律，
 -- 并构造 Category 实例
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.CosmosCategory where
@@ -23,9 +24,8 @@ open import Categories.Functor.Core using (Functor)
 open import ALMA.Cosmos.ContCategory using (ContCat)
 open import ALMA.Cosmos.ContCategoryLemmas using (ShapeOf; PosOf)
 open import ALMA.SecondPass.MorphismObject using (MorphismObject)
-open import ALMA.SecondPass.Cosmos
-  using (Cosmos; _⇒ℱ[_]_; _⇒ℱ_; ⇒ℱLayer[_]; id⇒ℱ; _∘⇒ℱ_
-        ; module _⇒ℱ[_]_ ; module ⇒ℱLayer[_])
+open import ALMA.SecondPass.Cosmos using
+  (Cosmos; _⇒ℱ_; id⇒ℱ; _∘⇒ℱ_; module _⇒ℱ[_]_ ; module ⇒ℱLayer[_])
 open _⇒ℱ[_]_
 open ⇒ℱLayer[_]
 

@@ -9,6 +9,7 @@
 -- StrictLayer / strictStep / strictStep-suc —— 层级步进
 -- strictEmbed —— 将宇宙嵌入严格提升后的下一层
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.StrictLift where
@@ -32,7 +33,7 @@ open import ALMA.Cosmos.ContCatEquiv using (ShapeCat)
 open import ALMA.SecondPass.Unfolding using (Unfolding)
 open import ALMA.SecondPass.Cosmos using (Cosmos; out; UnitCat; UnitContainerFunctor)
 open import ALMA.SecondPass.Terminal using (_≈C_)
-open import ALMA.SecondPass.Lambek using (in-F; in∘out≈id)
+open import ALMA.SecondPass.Lambek using (in-F)
 open import ALMA.SecondPass.CumulativeHierarchy
   using (FC∘π; EmbeddingData; UniformEmbeddingFamily)
 
@@ -358,7 +359,6 @@ strictEmbed L x ed .out = record
   }
   where
     FC_L = StrictLayer.FC L
-    C′   = StrictLayer.C (strictStep-suc L)
     FC′  = StrictLayer.FC (strictStep-suc L)
     open ≡-Reasoning
     UX = out x
@@ -441,8 +441,6 @@ record StrictLambekConsistency {o h e s p}
     se x = strictEmbed L x (getData x)
     in-F' : Unfolding FC_L' (Cosmos C_L' FC_L') → Cosmos C_L' FC_L'
     in-F' = in-F {C = C_L'} {FC = FC_L'}
-    in∘out≈id' : ∀ z → in-F' (out z) ≈C z
-    in∘out≈id' = in∘out≈id {C = C_L'} {FC = FC_L'}
   field
 
     -- in-F′ ∘ out is bisimilar to the identity on strict embeddings

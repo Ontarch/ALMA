@@ -8,6 +8,7 @@
 -- 为宇宙层定义展开函子，将带形状的对象映射到基范畴，并为下一层宇宙提供种子
 -- 同时给出展开的 Setoid 结构及其诱导的 Setoids 自函子
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.SecondPass.Unfolding where
@@ -47,8 +48,6 @@ module _ {o h e s p u : Level}
          (X : Set u) where
   private
     module C   = Category C
-    module F   = Functor F
-    ShapeCat′ : Category (o ⊔ s) (h ⊔ s) e
     ShapeCat′ = ShapeCat C F
 
   record Unfolding : Set (o ⊔ h ⊔ e ⊔ s ⊔ p ⊔ u) where
@@ -114,8 +113,6 @@ module UnfoldingSetoid {o h e s p : Level}
                        {C : Category o h e}
                        {F : Functor C (ContCat s p)} where
   private
-    module C = Category C
-    module F = Functor F
     ShapeOf′ = ShapeOf F
     PosOf′   = PosOf F
 
