@@ -43,6 +43,7 @@ import ALMA.Base.Real.Interval
 import ALMA.Base.Real.Interval.Rational
 import ALMA.Base.Real.IntervalEquiv
 import ALMA.Base.Real.CauchyToInterval
+import ALMA.Base.Real.Interval.Reasoning
 import ALMA.Base.Real.Interval.Equiv
 import ALMA.Base.Real.Interval.Kit
 import ALMA.Base.Real.Interval.Arith
@@ -90,7 +91,6 @@ import ALMA.Physics.Newton.DegreeBoundary
 import ALMA.Physics.LatticeCoherence
 import ALMA.Physics.Lattice
 
-import ALMA.Cosmos
 import ALMA.Cosmos.ContCategory
 import ALMA.Cosmos.ContCategoryLemmas
 import ALMA.Cosmos.ContFunctor

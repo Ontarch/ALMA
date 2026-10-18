@@ -37,7 +37,9 @@ open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
 open import Data.Empty using (⊥)
 open import Relation.Nullary.Negation using (¬_)
-open import Relation.Binary.PropositionalEquality.Core using (cong; trans; sym)
+open import Relation.Binary.PropositionalEquality using
+  (cong; trans; sym; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
@@ -538,9 +540,13 @@ module Tower {ℓ : Level} (T : LabeledFinTower ℓ) where
     forward-to : (k m v : ℕ)
                → extend^ k (mk m (lab m v)) ≡ mk (k + m) (lab (k + m) v)
     forward-to zero    m v = refl
-    forward-to (suc k) m v =
-      trans (cong extend (forward-to k m v))
-            (cong (mk (suc (k + m))) (sym (lab-coh (k + m) v)))
+    forward-to (suc k) m v = begin
+        extend (extend^ k (mk m (lab m v)))
+          ≡⟨ cong extend (forward-to k m v) ⟩
+        extend (mk (k + m) (lab (k + m) v))
+          ≡⟨ cong (mk (suc (k + m))) (sym (lab-coh (k + m) v)) ⟩
+        mk (suc (k + m)) (lab (suc (k + m)) v)
+        ∎
 
     -- The thread born at stage v and the stage-m label at v are the same
     -- ray: extend both to the common stage m + v.

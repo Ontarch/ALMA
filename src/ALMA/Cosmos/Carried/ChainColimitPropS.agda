@@ -27,10 +27,11 @@ module ALMA.Cosmos.Carried.ChainColimitPropS where
 
 open import Agda.Primitive using (Level; lsuc)
 open import Agda.Builtin.Equality using (_≡_; refl)
-open import Relation.Binary.PropositionalEquality.Core using (sym; trans; cong)
 open import Data.Nat.Base using (ℕ; zero; suc; _+_)
 open import Data.Nat.Properties using (+-comm)
-
+open import Relation.Binary.PropositionalEquality using
+  (sym; cong; module ≡-Reasoning)
+open ≡-Reasoning
 open import ALMA.Base.MCorr using (M)
 open import ALMA.Base.MCorrSetoid using (SysEq; EqOn; propEqOn; _≈Mˢ_)
 open SysEq
@@ -135,17 +136,26 @@ module _ (d : ℕ → ℕ) {ℓ : Level} where
 
     ≈Thread-trans : {v : ℕ} {t u w : Thread v}
                   → t ≈Thread u → u ≈Thread w → t ≈Thread w
-    ≈Thread-trans {u = u} p q = record
+    ≈Thread-trans {t = t} {u = u} {w = w} p q = record
       { dl = c + a
       ; dr = b + r
-      ; same =
-          trans (sym (extend^-comp c a _))
-          (trans (cong (extend^ c) (same p))
-          (trans (extend^-comp c b u)
-          (trans (iter-add-comm c b u)
-          (trans (sym (extend^-comp b c u))
-          (trans (cong (extend^ b) (same q))
-                 (extend^-comp b r _))))))
+      ; same = begin
+          extend^ (c + a) t
+            ≡⟨ sym (extend^-comp c a t) ⟩
+          extend^ c (extend^ a t)
+            ≡⟨ cong (extend^ c) (same p) ⟩
+          extend^ c (extend^ b u)
+            ≡⟨ extend^-comp c b u ⟩
+          extend^ (c + b) u
+            ≡⟨ iter-add-comm c b u ⟩
+          extend^ (b + c) u
+            ≡⟨ sym (extend^-comp b c u) ⟩
+          extend^ b (extend^ c u)
+            ≡⟨ cong (extend^ b) (same q) ⟩
+          extend^ b (extend^ r w)
+            ≡⟨ extend^-comp b r w ⟩
+          extend^ (b + r) w
+          ∎
       }
       where
       a = dl p ; b = dr p ; c = dl q ; r = dr q

@@ -35,7 +35,9 @@ open import Data.Nat.Properties using
 open import Data.Fin.Base using (Fin; inject₁; toℕ)
 open import Data.Fin.Properties using (toℕ-injective; toℕ-inject₁; toℕ<n)
 open import Data.Sum.Base using (inj₁; inj₂)
-open import Relation.Binary.PropositionalEquality.Core using (cong; cong₂; trans; sym)
+open import Relation.Binary.PropositionalEquality using
+ (cong; cong₂; trans; sym; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
@@ -188,10 +190,15 @@ module FinColimit
       -- suc v 层代表。
       cl-suc : ∀ v k (le : k ≤ v) → cl (suc v) k ≡ inject₁ (cl v k)
       cl-suc v k le =
-        toℕ-injective
-          (trans (cl-toℕ (suc v) k (m≤n⇒m≤1+n (m≤n⇒m≤1+n le)))
-            (sym (trans (toℕ-inject₁ (cl v k))
-                        (cl-toℕ v k (m≤n⇒m≤1+n le)))))
+        toℕ-injective (begin
+            toℕ (cl (suc v) k)
+              ≡⟨ cl-toℕ (suc v) k (m≤n⇒m≤1+n (m≤n⇒m≤1+n le)) ⟩
+            k
+              ≡⟨ sym (cl-toℕ v k (m≤n⇒m≤1+n le)) ⟩
+            toℕ (cl v k)
+              ≡⟨ sym (toℕ-inject₁ (cl v k)) ⟩
+            toℕ (inject₁ (cl v k))
+            ∎)
 
       cl-top : ∀ v → cl (suc v) (suc v) ≡ natToFin (suc v)
       cl-top v =
