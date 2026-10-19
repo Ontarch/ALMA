@@ -15,7 +15,7 @@
 
 module ALMA.Prototype.Properties.MorphLift where
 
-open import ALMA.Prototype.Properties.CongBase public
+open import ALMA.Prototype.Properties.Cong public
 
 -- A lifting of homomorphisms to the unfolded cosmoi, compatible with
 -- id and comp

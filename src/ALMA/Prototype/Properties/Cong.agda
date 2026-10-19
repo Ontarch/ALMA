@@ -1,30 +1,44 @@
 ------------------------------------------------------------------------
 -- Composition congruence for ≃⇒ℱ: the top-level assembly
 --
+-- The full congruence theorem comp-cong-≃⇒ℱ, assembled from the
+-- pointwise lemmas in CongPaths, CongPos, and CongHom. The
+-- .onunfold-eq component uses the auxiliary comp-cong-≃⇒ℱ-aux, whose
+-- recursive call sits directly at the copattern clause head and is
+-- accepted by the guardedness checker.
+--
 -- 复合在 ≃⇒ℱ 下的同余：顶层组装
+--
+-- 完整的同余定理 comp-cong-≃⇒ℱ，由 CongPaths、CongPos、CongHom 中的
+-- 逐点引理组装。其 .onunfold-eq 分支通过辅助函数 comp-cong-≃⇒ℱ-aux
+-- 实现，递归调用直接位于 copattern 子句头部，被 guardedness 检查器接受。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module ALMA.Prototype.Properties.Cong where
 
-open import ALMA.Prototype.Properties.CongBase public
+open import ALMA.Prototype.Properties.CongHom public
 
--- Full composition congruence: the .onunfold-eq component is a hole
+-- Auxiliary: composition congruence with an explicit cast on the RHS.
+-- Pattern-matches on rhs-eq = refl so the recursive call in onunfold-eq
+-- is directly at the clause head (termination checker can see it).
 --
--- 完整的复合同余：.onunfold-eq 分支是洞
-comp-cong-≃⇒ℱ : ∀ {ℓ} (F G H : Cosmos ℓ) (f1 f2 : F ⇒ℱ G) (g1 g2 : G ⇒ℱ H)
-              → f1 ≃⇒ℱ f2 → g1 ≃⇒ℱ g2
-              → (g1 ∘⇒ℱ f1) ≃⇒ℱ (g2 ∘⇒ℱ f2)
-comp-cong-≃⇒ℱ {ℓ} F G H f1 f2 g1 g2 f-eq g-eq .onObj-eq X =
+-- 辅助函数：带显式右端强制转换的复合同余。对 rhs-eq = refl 进行模式匹配，
+-- 使 onunfold-eq 中的递归调用直接位于子句头部（终止检查器可识别）。
+comp-cong-≃⇒ℱ-aux : ∀ {ℓ} (F G H : Cosmos ℓ) (f1 f2 : F ⇒ℱ G) (g1 g2 : G ⇒ℱ H)
+                  → f1 ≃⇒ℱ f2 → g1 ≃⇒ℱ g2
+                  → {b : F ⇒ℱ H} (rhs-eq : (g2 ∘⇒ℱ f2) ≡ b)
+                  → (g1 ∘⇒ℱ f1) ≃⇒ℱ b
+comp-cong-≃⇒ℱ-aux {ℓ} F G H f1 f2 g1 g2 f-eq g-eq refl .onObj-eq X =
   comp-obj-eq F G H f1 f2 g1 g2 f-eq g-eq X
-comp-cong-≃⇒ℱ {ℓ} F G H f1 f2 g1 g2 f-eq g-eq .onShape-eq {A} s =
+comp-cong-≃⇒ℱ-aux {ℓ} F G H f1 f2 g1 g2 f-eq g-eq refl .onShape-eq {A} s =
   comp-shape-eq F G H f1 f2 g1 g2 f-eq g-eq s
-comp-cong-≃⇒ℱ F G H f1 f2 g1 g2 f-eq g-eq .onPos-eq {A} {s} p =
+comp-cong-≃⇒ℱ-aux F G H f1 f2 g1 g2 f-eq g-eq refl .onPos-eq {A} {s} p =
   pos-combine F G H f1 f2 g1 g2 f-eq g-eq p
-comp-cong-≃⇒ℱ {ℓ} F G H f1 f2 g1 g2 f-eq g-eq .onHom-eq {A} {B} h =
+comp-cong-≃⇒ℱ-aux {ℓ} F G H f1 f2 g1 g2 f-eq g-eq refl .onHom-eq {A} {B} h =
   hom-combine F G H f1 f2 g1 g2 f-eq g-eq h
-comp-cong-≃⇒ℱ {ℓ} F G H f1 f2 g1 g2 f-eq g-eq .onunfold-eq {A} s =
+comp-cong-≃⇒ℱ-aux {ℓ} F G H f1 f2 g1 g2 f-eq g-eq refl .onunfold-eq {A} s =
   let
     eqO-f : onObj f1 A ≡ onObj f2 A
     eqO-f = onObj-eq f-eq A
@@ -203,5 +217,35 @@ comp-cong-≃⇒ℱ {ℓ} F G H f1 f2 g1 g2 f-eq g-eq .onunfold-eq {A} s =
     comp-subst-comm : (subst₂ (λ A B → A ⇒ℱ B) path-f-G path-g-total (onunfold g2 t2)) ∘⇒ℱ (subst (λ C → unfold F s ⇒ℱ C) path-f-G (onunfold f2 s))
                     ≡ subst (λ C → unfold F s ⇒ℱ C) path-g-total (onunfold g2 t2 ∘⇒ℱ onunfold f2 s)
     comp-subst-comm = subst₂-comp-eq path-f-G path-g-total (onunfold g2 t2) (onunfold f2 s)
+    -- path-g-total ≡ comp-unfold-path ... s (the goal path)
+    --
+    -- path-g-total 与目标路径 comp-unfold-path 相等
+    path-eq : path-g-total ≡ comp-unfold-path F G H f1 f2 g1 g2 f-eq g-eq s
+    path-eq = comp-unfold-path≡trans F G H f1 f2 g1 g2 f-eq g-eq s
+    -- The recursive call's RHS ≡ goal's RHS (at the unfolded level)
+    --
+    -- 递归调用的右端 ≡ 目标右端（在展开层）
+    rhs-eq' : (subst₂ (λ A B → A ⇒ℱ B) path-f-G path-g-total (onunfold g2 t2))
+             ∘⇒ℱ
+             (subst (λ C → unfold F s ⇒ℱ C) path-f-G (onunfold f2 s))
+           ≡ subst (λ C → unfold F s ⇒ℱ C) (comp-unfold-path F G H f1 f2 g1 g2 f-eq g-eq s)
+                   (onunfold (g2 ∘⇒ℱ f2) s)
+    rhs-eq' = trans comp-subst-comm
+               (cong (λ p → subst (λ C → unfold F s ⇒ℱ C) p (onunfold (g2 ∘⇒ℱ f2) s)) path-eq)
   in
-    {!   !}
+    comp-cong-≃⇒ℱ-aux (unfold F s) (unfold G t1) (unfold H s1-g)
+      (onunfold f1 s)
+      (subst (λ C → unfold F s ⇒ℱ C) path-f-G (onunfold f2 s))
+      (onunfold g1 t1)
+      (subst₂ (λ A B → A ⇒ℱ B) path-f-G path-g-total (onunfold g2 t2))
+      f-bisim g-bisim-final
+      rhs-eq'
+
+-- Full composition congruence: calls the auxiliary with refl.
+--
+-- 完整的复合同余：以 refl 调用辅助函数。
+comp-cong-≃⇒ℱ : ∀ {ℓ} (F G H : Cosmos ℓ) (f1 f2 : F ⇒ℱ G) (g1 g2 : G ⇒ℱ H)
+              → f1 ≃⇒ℱ f2 → g1 ≃⇒ℱ g2
+              → (g1 ∘⇒ℱ f1) ≃⇒ℱ (g2 ∘⇒ℱ f2)
+comp-cong-≃⇒ℱ F G H f1 f2 g1 g2 f-eq g-eq =
+  comp-cong-≃⇒ℱ-aux F G H f1 f2 g1 g2 f-eq g-eq refl

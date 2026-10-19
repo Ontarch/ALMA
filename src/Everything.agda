@@ -211,11 +211,10 @@ import ALMA.Prototype.Properties.SubstCore
 import ALMA.Prototype.Properties.Transport
 import ALMA.Prototype.Properties.Equiv
 import ALMA.Prototype.Properties.Composition
-import ALMA.Prototype.Properties.CongBase
--- import ALMA.Prototype.Properties.Cong  -- comp-cong-≃⇒ℱ.onunfold-eq is a hole;
-                                          -- excluded from CI
-                                          -- comp-cong-≃⇒ℱ.onunfold-eq 是洞；
-                                          -- 从 CI 排除
+import ALMA.Prototype.Properties.CongPaths
+import ALMA.Prototype.Properties.CongPos
+import ALMA.Prototype.Properties.CongHom
+import ALMA.Prototype.Properties.Cong
 import ALMA.Prototype.Properties.MorphLift
 import ALMA.Prototype.Properties.Bisim
 import ALMA.Prototype.Properties.Dynamics

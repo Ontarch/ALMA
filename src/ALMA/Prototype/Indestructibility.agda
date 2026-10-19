@@ -22,7 +22,7 @@ Fundamental Forms of Existence → Two Construction Modes → Process Identity �
 
 module ALMA.Prototype.Indestructibility where
 
-open import ALMA.Prototype.Cosmos public
+open import ALMA.Prototype.Properties.Dynamics public
 
 -- Fundamental forms of existence: Eternal streams and persistence predicates
 -- 基础存在形式：永恒流与持存谓词
