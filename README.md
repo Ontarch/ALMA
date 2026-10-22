@@ -24,17 +24,17 @@ The formalization has undergone three migrations across tools, each rooted in a 
 
 ## Key Contribution / 核心贡献
 
-The ontological root of subst: when A is essentially determined by B at parameter p₀, yet is expressed independently, the misalignment between A's self-contained appearance and its instance-position must manifest as subst at every point of connection between A and B.
+The ontological root of subst: whatever is essentially determined by an other, once expressed as self-contained and closed, will necessarily manifest its concealed dependence as a substitutive structure in all its relations to the determining other.
 
 The central construction of the formalization is Cosmos. It replaces the (B , next) presentation of indexed M-types with an E-M-type, so that no next function and no next-comm equation appear; container structure, an intrinsic category, the action of morphisms on shapes, coalgebraic unfolding, and dynamic self-reference are all carried as data, thereby granting philosophical thought—an infinite, unbounded, dynamic and self-referential cosmology—a machine-checkable, subst-free, rigorous expression. Its ontological commitment is as follows: what Cosmos characterizes is the structure of the Cosmos insofar as it can be determined by logical necessity, rather than a hypothetical model in the empirical-scientific sense subject to physical falsification—though this does not preclude the structure's trivialization under specific conditions, whereby it degenerates into precisely such a model.
 
-The Equivalence/ sub-tree mirrors this convergence at the level of observation equivalence. All degenerations—ScaleInvariant, DiscreteEq, and their specialisations to group actions, linear dynamics, topological and manifold equivalences—are instances of a single indexed coinductive skeleton Mᵢ, whose central instance LayeredEqGen organises them into a two-axis lattice. This aligns the code structure with the paper's three fundamental features of the stable world-structure (distinguishability, continuous variation, transformation invariance).
+The Equivalence/ layer mirrors this convergence at the level of observation equivalence. All degenerations—ScaleInvariant, DiscreteEq, and their specialisations to group actions, linear dynamics, topological and manifold equivalences—are instances of a single indexed coinductive skeleton Mᵢ, whose central instance LayeredEqGen organises them into a two-axis lattice. This aligns the code structure with the paper's three fundamental features of the stable world-structure (distinguishability, continuous variation, transformation invariance).
 
-subst 的本体论根源：当 A 本质上由 B 在参数 p₀ 处决定，却被独立表达时，A 的自足外观与其实例位置之间的错位，必然在 A 与 B 的每个连接点上以 subst 的形式显露。
+subst 的本体论根源：凡本质上由他者所规定者，一旦被表述为自足封闭，其被遮蔽的依赖性就必然在它与规定者的全部关系中显现为替代结构。
 
-形式化的核心构造是 Cosmos。它以 E-M 型取代 (B , next) 表示的索引 M 型，使 next 函数与 next-comm 交换等式不再出现；容器结构、内禀范畴、态射对形状的变换、余代数展开以及动态自我指涉，全部携带为数据，从而使哲学思想——无限、无界、动态且自我指涉的宇宙论——获得机器可检验的、无 subst 的严格表达。其本体论承诺在于：Cosmos 所刻画的，是宇宙就其可被逻辑必然性所规定而言的结构，而非经验科学意义上可被物理检验的假设模型——这并不排斥该结构在特定条件下平凡化，从而退化为这样的模型。
+形式化的核心构造是 Cosmos。它用 E-M 型取代索引 M 型的 (B, next) 表示，从而使 next 函数与 next-comm 交换等式不再出现；容器结构、内禀范畴、态射对形状的作用、余代数展开以及动态自我指涉，全部作为数据被携带。这使得哲学思想——无限、无界、动态且自我指涉的宇宙论——获得了机器可检验、无 subst 的严格表达。其本体论承诺在于：Cosmos 所刻画的是宇宙就其可被逻辑必然性所规定而言的结构，而非经验科学意义上可被物理证伪的假设模型。不过，这并不排斥该结构在特定条件下平凡化，从而退化为那样的模型。
 
-Equivalence/ 子树在观察等价层面呈现了同一收敛模式：所有退化——ScaleInvariant、DiscreteEq，及其在群作用、线性动力学、拓扑与流形等价上的特化——都是单一索引余归纳骨架 Mᵢ 的实例；其中心实例 LayeredEqGen 将它们组织为两轴退化格。这使代码结构与论文中稳定世界结构的三大特征（可区分性、连续变化性、变换不变性）逐项对应。
+Equivalence/ 层在观察等价层面呈现了同一收敛模式：所有的退化形式——ScaleInvariant、DiscreteEq，及其在群作用、线性动力学、拓扑与流形等价上的特化——都是单一索引余归纳骨架 Mᵢ 的实例；其核心实例 LayeredEqGen 将它们组织为双轴退化格。这使代码结构与论文中稳定世界结构的三大特征（可区分性、连续变化性、变换不变性）逐项对应。
 
 ## Dependencies & Build / 依赖与构建
 
@@ -56,9 +56,19 @@ agda -i src src/Everything.agda
 
 ## Architecture / 架构
 
-**Base/** — Foundational structures: the indexed coinductive skeleton Mᵢ and the two-axis degeneracy lattice Equivalence/, together with constructive Cauchy reals and interval arithmetic supplying a rational continuum Real/. Equivalence originated when the uniqueness proof of the colimit's universal property in SecondPass/ was blocked; tracing the cause revealed that all equivalence relations share this single skeleton. Real/ originated from the needs of physical instances.
+**Base/** — Foundational structures: the indexed coinductive skeleton Mᵢ,
+container/morphism categories, setoid colimits, and shared algebraic lemmas.
 
-**Physics/** — Derived mathematical physics: a shared rational toolkit, the causal order and slice reading, and the combinatorial GR skeleton (finite causal sets, chain curvature, the Einstein action and its discrete variation, and the four-dimensional Benincasa–Dowker integer core), with the Newton, Quantum, and Spacetime layers (Lorentz quadratic form, Lorentz group, Clifford algebra Cl(3,1)). Every construction is exact and algebraic over ℚ or ℕ: curvature and the field equations emerge from the causal order. The next step in formalisation calls for ℝ, which the standard library does not provide; existing mathematical libraries treat ℝ in a way that depends on the univalence axiom, conflicting with this project's ontological commitments. Hence Real/ is being built in-house.
+**Equivalence/** — The two-axis degeneracy lattice, built as instances of
+the single skeleton Mᵢ. It originated when the uniqueness proof of the colimit's
+universal property in `SecondPass/` was blocked; tracing the cause revealed
+that all equivalence relations share this single skeleton.
+
+**Real/** — Constructive Cauchy reals and interval arithmetic supplying a
+rational continuum. It originated from the needs of the physical instances in `Physics/`.
+
+**Physics/** — Derived mathematical physics. Every construction is exact
+and algebraic over ℚ or ℕ. The next step in formalisation calls for ℝ, which the standard library does not provide; existing mathematical libraries treat ℝ in a way that depends on the univalence axiom. Hence Real/ is being built in-house.
 
 **Cosmos/** — It turns decisively to the carried M architecture, replacing the (B , next) presentation by edge-family indexing and carrying container structure, the intrinsic category, the action of morphisms on shapes, coalgebraic unfolding, and dynamic self-reference as data.
 
@@ -68,9 +78,13 @@ agda -i src src/Everything.agda
 
 **Prototype/** — The initial, fully self-contained and hand-unfolded prototype. It traces the trajectory from a one-to-one mapping of philosophical concepts to their convergence into a single coinductive record, where the resulting "subst hell" motivated all subsequent refactoring. It is the first Agda formalisation of the paper's philosophical ideas.
 
-**Base/** —— 基础结构：索引余归纳骨架 Mᵢ 与两轴退化格 Equivalence/，以及构造性柯西实数与区间算术所提供的有理连续统 Real/。Equivalence 起源于 SecondPass/ 中余极限泛性质唯一性证明受阻时的回溯：发现所有等价关系共享这一骨架。Real/ 起源于物理实例的需求。
+**Base/** —— 基础结构：索引余归纳骨架 Mᵢ、容器/态射范畴、setoid 余极限，以及共享代数引理。
 
-**Physics/** —— 派生的数学物理：共享的有理工具集、因果序与切片读法，以及组合 GR 骨架（有限因果集、链曲率、爱因斯坦作用量及其离散变分、四维 Benincasa–Dowker 整数核），并含 Newton、Quantum 与 Spacetime 各层（洛伦兹二次型、洛伦兹群、克利福德代数 Cl(3,1)）。全部构造皆为 ℚ 或 ℕ 上精确、代数的：曲率与场方程从因果序涌现。下一步形式化需要 ℝ，而标准库不提供；现有数学库对 ℝ 的处理又依赖单价性公理，与本项目的本体论承诺冲突，故自行构造 Real/。
+**Equivalence/** —— 两轴退化格，作为单一骨架 Mᵢ 的实例构造。它起源于 `SecondPass/` 中余极限泛性质唯一性证明受阻时的回溯：发现所有等价关系共享这一骨架。
+
+**Real/** —— 构造性柯西实数与区间算术，提供有理连续统。它起源于 `Physics/` 中物理实例的需求。
+
+**Physics/** —— 派生的数学物理。全部构造皆为 ℚ 或 ℕ 上精确、代数的。下一步形式化需要 ℝ，而标准库不提供；现有数学库对 ℝ 的处理又依赖单价性公理，故自行构造 Real/。
 
 **Cosmos/** —— 彻底转向携带式 M 架构，以边族索引取代 (B , next) 表示，把容器结构、内禀范畴、态射对形状的变换、余代数展开与动态自我指涉全部携带为数据。
 
