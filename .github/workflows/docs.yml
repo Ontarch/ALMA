@@ -81,19 +81,19 @@ jobs:
           echo "agda-categories"  >> ~/.config/agda/defaults
 
       - name: Generate Agda HTML documentation
-        run: |
-          agda --html --html-dir=./docs src/Everything.agda
+        run: make html
 
       - name: Debug – list generated files
         run: |
           echo "=== docs/ tree (first 80) ==="
           find ./docs -type f | sort | head -80
           echo ""
-          echo "=== Everything.html location ==="
+          echo "=== index.html / Everything.html locations ==="
+          find ./docs -name 'index.html'
           find ./docs -name 'Everything.html'
           echo ""
           echo "=== Sample of absolute links (before fix) ==="
-          grep -oP 'href="/[^"]*"' "$(find ./docs -name 'Everything.html' | head -1)" | head -10 || true
+          grep -oP 'href="/[^"]*"' "$(find ./docs -name 'index.html' | head -1)" | head -10 || true
 
       - name: Rewrite absolute paths for /ALMA/ subpath
         run: |
@@ -110,29 +110,7 @@ jobs:
             -exec sed -i 's|url(/\([^/]\)|url(/ALMA/\1|g' {} +
 
           echo "=== Sample after fix ==="
-          grep -oP 'href="[^"]*"' "$(find ./docs -name 'Everything.html' | head -1)" | head -10 || true
-
-      - name: Create redirect index.html
-        run: |
-          TARGET=$(find ./docs -name 'Everything.html' -printf '%P\n' | head -n1)
-          if [ -z "$TARGET" ]; then
-            echo "::error::Everything.html not found in docs/"
-            exit 1
-          fi
-          echo "Redirect target: $TARGET"
-          cat > docs/index.html <<EOF
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <meta http-equiv="refresh" content="0; url=$TARGET">
-            <title>ALMA Documentation</title>
-          </head>
-          <body>
-            <p>Redirecting to <a href="$TARGET">$TARGET</a>…</p>
-          </body>
-          </html>
-          EOF
+          grep -oP 'href="[^"]*"' "$(find ./docs -name 'index.html' | head -1)" | head -10 || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

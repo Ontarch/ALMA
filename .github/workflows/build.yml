@@ -83,4 +83,4 @@ jobs:
           echo "=== agda-categories.agda-lib ==="; cat agda-categories/agda-categories.agda-lib || true
 
       - name: Type-check project
-        run: agda src/Everything.agda
+        run: make check
