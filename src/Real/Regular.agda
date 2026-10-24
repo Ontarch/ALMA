@@ -1,27 +1,7 @@
 ------------------------------------------------------------------------
 -- Modulus regularization
 --
--- A Cauchy sequence carries an arbitrary convergence modulus μ: it
--- need not be monotone, nor satisfy μ k ≥ k. This module replaces the
--- modulus by a regular one,
---
---   μ' 0    = μ 0 ⊔ 0
---   μ' (1+k) = μ' k ⊔ μ (1+k) ⊔ (1+k),
---
--- which is manifestly monotone and dominates both k and μ k. The
--- underlying sequence of rationals is unchanged, so the regularized
--- sequence is pointwise equal (hence ≈) to the original.
---
 -- 模数正规化
---
--- 柯西序列携带任意收敛模数 μ：它不必单调，也不必满足 μ k ≥ k。
--- 本模块将模数替换为正规模数
---
---   μ' 0    = μ 0 ⊔ 0
---   μ' (1+k) = μ' k ⊔ μ (1+k) ⊔ (1+k)，
---
--- 它显然单调，且同时支配 k 与 μ k。底层有理序列不变，故正规化
--- 序列与原序列逐点相等（因而 ≈）。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -31,10 +11,11 @@ module Real.Regular where
 open import Data.Nat using (ℕ; zero; suc; _⊔_; _∸_)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_)
 open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; ⊔-lub; m+[n∸m]≡n; +-comm)
+  (m≤m⊔n; m≤n⊔m; ⊔-lub; m+[n∸m]≡n; +-comm; module ≤-Reasoning)
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl)
-open import Data.Rational using (ℚ; ∣_∣; _-_; _<_)
-open import Relation.Binary.PropositionalEquality using (_≡_; sym)
+open ≤-Reasoning
+open import Data.Rational using (ℚ; ∣_∣; _-_; _<_; _≤_)
+open import Relation.Binary.PropositionalEquality using (_≡_; sym; trans; cong)
 
 open import Real using (CauchySeq; ε)
 open Real.CauchySeq using (f; μ; cauchy)
@@ -73,13 +54,13 @@ open Real.CauchySeq using (f; μ; cauchy)
            (m≤m⊔n (μr x k ⊔ μ x (suc k)) (suc k))
 
 ------------------------------------------------------------------------
--- Iterated monotonicity.
+-- Iterated monotonicity
 --
--- 迭代单调性。
-
 -- μr x a ≤ μr x (a + d), by d repeated growth steps.
 -- Recursion is on the plain natural d, never on a proof, so no
 -- constructor-injectivity is required.
+--
+-- 迭代单调性
 --
 -- μr x a ≤ μr x (a + d)，由 d 次增长步组成；仅对普通自然数 d 递归，
 -- 不匹配任何证明，因此不依赖构造子的单射性。
@@ -92,17 +73,35 @@ open Real.CauchySeq using (f; μ; cauchy)
 --
 -- 当 a ≤ b 时，μ x a 被 μr x b 控制。
 μ≤μr : (x : CauchySeq) (b a : ℕ) → a ≤N b → μ x a ≤N μr x b
-μ≤μr x b a a≤b
-  rewrite sym (m+[n∸m]≡n a≤b) | +-comm a (b ∸ a) =
-  ≤N-trans (μr≥μ x a) (μr-step x a (b ∸ a))
+μ≤μr x b a a≤b = begin
+  μ x a
+    ≤⟨ μr≥μ x a ⟩
+  μr x a
+    ≤⟨ μr-step x a (b ∸ a) ⟩
+  μr x (b ∸ a +ℕ a)
+    ≡⟨ cong (μr x) (idx a≤b) ⟩
+  μr x b
+  ∎
+  where
+  idx : a ≤N b → b ∸ a +ℕ a ≡ b
+  idx a≤b = trans (+-comm (b ∸ a) a)
+                  (m+[n∸m]≡n {m = a} {n = b} a≤b)
 
 -- μr is monotone in its index.
 --
 -- μr 对其索引单调。
 μr-mono≤ : (x : CauchySeq) (a b : ℕ) → a ≤N b → μr x a ≤N μr x b
-μr-mono≤ x a b a≤b
-  rewrite sym (m+[n∸m]≡n a≤b) | +-comm a (b ∸ a) =
-  μr-step x a (b ∸ a)
+μr-mono≤ x a b a≤b = begin
+  μr x a
+    ≤⟨ μr-step x a (b ∸ a) ⟩
+  μr x (b ∸ a +ℕ a)
+    ≡⟨ cong (μr x) idx ⟩
+  μr x b
+  ∎
+  where
+  idx : b ∸ a +ℕ a ≡ b
+  idx = trans (+-comm (b ∸ a) a)
+              (m+[n∸m]≡n {m = a} {n = b} a≤b)
 
 ------------------------------------------------------------------------
 -- Regularization leaves the rational sequence unchanged.

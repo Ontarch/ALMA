@@ -1,47 +1,33 @@
 ------------------------------------------------------------------------
 -- Representation round-trip equivalence
 --
--- The two constructions of reals — constructive Cauchy sequences
--- (CauchySeq) and coinductive nested intervals (RealI) — are
--- mutually retractive:
---
---   cauchy→realI (realI→cauchy x) ≈ℝ x   (interval side)
---
--- The Cauchy side is proved in a second module.
---
 -- 表示往返等价
---
--- 实数的两种构造——构造性柯西序列（CauchySeq）与余归纳嵌套区间
--- （RealI）——互为收缩：
---
---   cauchy→realI (realI→cauchy x) ≈ℝ x   （区间侧）
---
--- 柯西侧在后续模块中给出。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module Real.Interval.Retract where
 
-open import Data.Nat using (ℕ)
-  renaming (_≤_ to _≤N_; _≥_ to _≥N_)
-open import Data.Nat.Properties renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl)
+open import Data.Nat using (ℕ) renaming (_≤_ to _≤N_; _≥_ to _≥N_)
+open import Data.Nat.Properties
+  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl)
 open import Data.Rational using (ℚ; 0ℚ; _≤_; _-_; _*_; ∣_∣)
 open import Data.Rational.Properties using (≤-trans)
   renaming (≤-refl to ≤Q-refl)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; trans; sym; subst)
+  (_≡_; refl; trans; sym; subst; cong)
 
 open import Real using (CauchySeq)
-open Real.CauchySeq using (f)
+open CauchySeq using (f)
 open import Real.Interval using (RealI)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Node using (0≤width-n)
 open import Real.IntervalEquiv using
-  (realI→cauchy; μx-dom; width-nV; centre; width)
+  (realI→cauchy; μx-dom; centre; width; recipPow2; centre-diff≤)
 open import Real.CauchyToInterval using
   (cauchy→realI; M; K; M≥μK; K≥k; centre-cauchy→realI)
 open import Real.Interval.Kit using (≈ℝ-of-rec)
+open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 
 ------------------------------------------------------------------------
 -- Interval side: cauchy→realI (realI→cauchy x) ≈ℝ x
@@ -63,16 +49,16 @@ cauchy→realI-retract x = ≈ℝ-of-rec y x w0 0≤w0 bound
   where
   r : CauchySeq
   r = realI→cauchy x
+
   y : RealI
   y = cauchy→realI r
+
   w0 : ℚ
   w0 = width x 0
+
   0≤w0 : 0ℚ ≤ w0
   0≤w0 = 0≤width-n x 0
 
-  -- M r n ≥ n, via n ≤ K n ≤ μ r (K n) ≤ M r n.
-  --
-  -- M r n ≥ n，经 n ≤ K n ≤ μ r (K n) ≤ M r n。
   Mn≥n : ∀ n → n ≤N M r n
   Mn≥n n =
     ≤N-trans (K≥k n)
@@ -82,9 +68,11 @@ cauchy→realI-retract x = ≈ℝ-of-rec y x w0 0≤w0 bound
   eq n = trans (centre-cauchy→realI r n) refl
 
   bound : ∀ n →
-    ∣_∣ (centre y n - centre x n) ≤ w0 * Real.IntervalEquiv.recipPow2 n
-  bound n =
-    subst (λ z → ∣_∣ (z - centre x n) ≤ w0 * Real.IntervalEquiv.recipPow2 n)
-          (sym (eq n))
-          (Real.IntervalEquiv.centre-diff≤
-             x n (M r n) n (Mn≥n n) ≤N-refl)
+    ∣ centre y n - centre x n ∣ ≤ w0 * recipPow2 n
+  bound n = begin≤
+    ∣ centre y n - centre x n ∣
+      ≈⟨ cong (λ z → ∣ z - centre x n ∣) (eq n) ⟩
+    ∣ centre x (M r n) - centre x n ∣
+      ≤⟨ centre-diff≤ x n (M r n) n (Mn≥n n) ≤N-refl ⟩
+    w0 * recipPow2 n
+    ≤∎
