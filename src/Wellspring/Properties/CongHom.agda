@@ -12,9 +12,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.CongHom where
+module Wellspring.Properties.CongHom where
 
-open import Prototype.Properties.CongPos public
+open import Wellspring.Properties.CongPos public
 
 subst-comp-tgt : ∀ {ℓ} {A B C1 C2 : Cosmos ℓ} (eq : C1 ≡ C2)
                 → (f : A ⇒ℱ B) (g : B ⇒ℱ C1)

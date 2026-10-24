@@ -15,9 +15,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.Bisim where
+module Wellspring.Properties.Bisim where
 
-open import Prototype.Properties.MorphLift public
+open import Wellspring.Properties.MorphLift public
 
 -- Bisimulation of parallel morphisms, coinductively
 --

@@ -14,9 +14,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.Composition where
+module Wellspring.Properties.Composition where
 
-open import Prototype.Properties.Equiv public
+open import Wellspring.Properties.Equiv public
 
 -- Composition equations and paths
 --

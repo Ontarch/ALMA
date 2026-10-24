@@ -7,7 +7,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.ContCatEquiv where
+module SketchPass.ContCatEquiv where
 
 open import Agda.Primitive using (Level; lsuc)
 open import Relation.Binary using (IsEquivalence)
@@ -16,9 +16,9 @@ open import Data.Container.Morphism using (id; _∘_)
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor)
 
-open import InitialPass.ContCategory
+open import SketchPass.ContCategory
   using (_≈M_; ≈M-sym; ≈M-trans; ∘M-assoc; ∘M-identityʳ; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ; ContCat; module ≈M-Reasoning)
-open import InitialPass.ObjEquivCat using (ObjEquivCat)
+open import SketchPass.ObjEquivCat using (ObjEquivCat)
 
 -- Functor from the base category to the category of containers
 record ContCatEquiv (ℓ : Level) : Set (lsuc (lsuc ℓ)) where

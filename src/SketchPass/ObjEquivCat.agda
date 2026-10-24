@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.ObjEquivCat where
+module SketchPass.ObjEquivCat where
 
 open import Agda.Primitive using (_⊔_; lsuc; Level)
 open import Relation.Binary using (IsEquivalence)

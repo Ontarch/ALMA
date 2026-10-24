@@ -23,9 +23,9 @@ transient processes with phase transitions, and the standard model overview
 -}
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module Prototype.StandardModel where
+module Wellspring.StandardModel where
 
-open import Prototype.Universe public
+open import Wellspring.Universe public
 
 -- Basic types
 -- 基础类型

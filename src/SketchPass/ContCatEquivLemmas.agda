@@ -5,7 +5,7 @@
 -- and comp-nat-shape-eq (shape extraction for composite naturality)
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
-module InitialPass.ContCatEquivLemmas where
+module SketchPass.ContCatEquivLemmas where
 
 open import Agda.Primitive using (lsuc)
 open import Relation.Binary.PropositionalEquality
@@ -15,14 +15,14 @@ open import Data.Container.Morphism using (_∘_)
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor)
 
-open import InitialPass.ContCategory using (≈M-sym; ≈M-trans; ∘M-assoc; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ)
-open import InitialPass.ObjEquivCat using (ObjEquivCat)
-open import InitialPass.ObjEquivFunctor using (ObjEquivFunctor)
-open import InitialPass.ContCatEquiv using (ContCatEquiv)
-open import InitialPass.ContCatEquivFunctor using (ContCatEquivFunctor; compContCatEquivFunctor)
-open import InitialPass.Unfolding using (Unfolding)
-open import InitialPass.MorphismObject using (MorphismObject)
-open import InitialPass.ContCategoryLemmas
+open import SketchPass.ContCategory using (≈M-sym; ≈M-trans; ∘M-assoc; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ)
+open import SketchPass.ObjEquivCat using (ObjEquivCat)
+open import SketchPass.ObjEquivFunctor using (ObjEquivFunctor)
+open import SketchPass.ContCatEquiv using (ContCatEquiv)
+open import SketchPass.ContCatEquivFunctor using (ContCatEquivFunctor; compContCatEquivFunctor)
+open import SketchPass.Unfolding using (Unfolding)
+open import SketchPass.MorphismObject using (MorphismObject)
+open import SketchPass.ContCategoryLemmas
   using (shape-eq-from-≈M; ShapeOf; PosOf; shape-eq-sym; shape-eq-trans; shape-eq-assoc; shape-eq-resp-ˡ; shape-eq-resp-ʳ)
 
 onPos-subst-comm :

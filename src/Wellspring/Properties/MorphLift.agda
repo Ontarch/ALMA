@@ -13,9 +13,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.MorphLift where
+module Wellspring.Properties.MorphLift where
 
-open import Prototype.Properties.Cong public
+open import Wellspring.Properties.Cong public
 
 -- A lifting of homomorphisms to the unfolded cosmoi, compatible with
 -- id and comp

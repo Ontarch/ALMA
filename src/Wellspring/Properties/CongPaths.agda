@@ -14,9 +14,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.CongPaths where
+module Wellspring.Properties.CongPaths where
 
-open import Prototype.Properties.Composition public
+open import Wellspring.Properties.Composition public
 
 -- Unfold path along a ≃⇒ℱ witness
 --

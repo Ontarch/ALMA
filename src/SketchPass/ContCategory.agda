@@ -7,7 +7,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.ContCategory where
+module SketchPass.ContCategory where
 
 open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Relation.Binary.Structures using (IsEquivalence)

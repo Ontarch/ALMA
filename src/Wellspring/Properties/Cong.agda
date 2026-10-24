@@ -16,9 +16,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.Cong where
+module Wellspring.Properties.Cong where
 
-open import Prototype.Properties.CongHom public
+open import Wellspring.Properties.CongHom public
 
 -- Auxiliary: composition congruence with an explicit cast on the RHS.
 -- Pattern-matches on rhs-eq = refl so the recursive call in onunfold-eq

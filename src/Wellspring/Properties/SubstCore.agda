@@ -13,9 +13,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.SubstCore where
+module Wellspring.Properties.SubstCore where
 
-open import Prototype.Cosmos public
+open import Wellspring.Cosmos public
 
 -- Basic homotopy equations
 --

@@ -19,9 +19,9 @@ Universe structure, projection and non-reconstruction theorem, inevitability of 
 -}
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module Prototype.Universe where
+module Wellspring.Universe where
 
-open import Prototype.Beings public
+open import Wellspring.Beings public
 
 -- Irreducibility and fundamental definition of the universe
 -- 不可消减性与宇宙的基本定义

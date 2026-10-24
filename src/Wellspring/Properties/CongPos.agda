@@ -12,9 +12,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.CongPos where
+module Wellspring.Properties.CongPos where
 
-open import Prototype.Properties.CongPaths public
+open import Wellspring.Properties.CongPaths public
 
 -- Position-level proof used by the .onPos-eq component of comp-cong
 --

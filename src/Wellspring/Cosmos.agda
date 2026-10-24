@@ -11,9 +11,9 @@ Cosmos 是在类型论中内部化的多项式函子的终余代数
 
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module Prototype.Cosmos where
+module Wellspring.Cosmos where
 
-open import Prototype.Prelude public
+open import Wellspring.Prelude public
 
 -- The core record: Cosmos is the largest universe-like structure closed under unfolding
 -- 核心记录：Cosmos 是一个在展开运算下封闭的最大的类宇宙结构

@@ -29,7 +29,7 @@ Empty type elimination ⊥-elim -- Law of Non-Contradiction
 
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module Prototype.Prelude where
+module Wellspring.Prelude where
 
 open import Agda.Primitive using (lsuc; Setω; _⊔_; Level) public
 open import Level using (Lift; lift; 0ℓ) public

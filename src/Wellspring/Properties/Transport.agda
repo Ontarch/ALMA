@@ -15,9 +15,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.Transport where
+module Wellspring.Properties.Transport where
 
-open import Prototype.Properties.SubstCore public
+open import Wellspring.Properties.SubstCore public
 
 -- Transport of Pos/Hom and related lemmas
 --

@@ -15,9 +15,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.Dynamics where
+module Wellspring.Properties.Dynamics where
 
-open import Prototype.Properties.Bisim public
+open import Wellspring.Properties.Bisim public
 
 -- Coinductive evaluation of a shape: values at objects and recursive
 -- evaluation at positions

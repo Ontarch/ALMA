@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.ContCatEquivFunctor where
+module SketchPass.ContCatEquivFunctor where
 
 open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Data.Container.Core using (_⇒_)
@@ -14,11 +14,11 @@ open import Data.Container.Morphism using (id; _∘_)
 open import Categories.Category using (Category)
 open import Categories.Functor  using (Functor)
 
-open import InitialPass.ContCategory
+open import SketchPass.ContCategory
   using (_≈M_; ≈M-refl; ≈M-sym; ∘M-assoc; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ; ContCat; module ≈M-Reasoning)
-open import InitialPass.ContCatEquiv using (ContCatEquiv; contCatEquivFromIso)
-open import InitialPass.ObjEquivCat using (ObjEquivCat)
-open import InitialPass.ObjEquivFunctor
+open import SketchPass.ContCatEquiv using (ContCatEquiv; contCatEquivFromIso)
+open import SketchPass.ObjEquivCat using (ObjEquivCat)
+open import SketchPass.ObjEquivFunctor
   using (ObjEquivFunctor; compObjEquivFunctor; objEquivFunctorFromIso)
 
 -- Functor between ContCatEquiv instances: preserves object equivalences and container structure

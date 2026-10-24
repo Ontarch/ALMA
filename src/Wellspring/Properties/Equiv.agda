@@ -14,9 +14,9 @@
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
-module Prototype.Properties.Equiv where
+module Wellspring.Properties.Equiv where
 
-open import Prototype.Properties.Transport public
+open import Wellspring.Properties.Transport public
 
 -- Shape/position reasoning related to ≃⇒ℱ
 --

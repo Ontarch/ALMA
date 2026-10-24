@@ -20,6 +20,54 @@ import Base.SetoidColimit
 import Base.RelEquipment
 import Base.RationalRing
 
+import Cosmos.ContCategory
+import Cosmos.ContCategoryLemmas
+import Cosmos.ContFunctor
+import Cosmos.ContCatEquiv
+
+import Cosmos.Carried.FinNatUIP
+import Cosmos.Carried.DetSys
+import Cosmos.Carried.TrivProj
+import Cosmos.Carried.FinProj
+import Cosmos.Carried.SeqColimit
+import Cosmos.Carried.LimitSystem
+import Cosmos.Carried.FinEmbed
+import Cosmos.Carried.FinColimit
+import Cosmos.Carried.FinTower
+import Cosmos.Carried.DetColimit
+import Cosmos.Carried.Boundaries
+import Cosmos.Carried.SeqColimitS
+import Cosmos.Carried.SeqColimitCat
+import Cosmos.Carried.ColimitPolarity
+import Cosmos.Carried.LimitSystemS
+import Cosmos.Carried.FinPushMediateS
+import Cosmos.Carried.FinPushColimitS
+import Cosmos.Carried.FinPushColimitCat
+import Cosmos.Carried.SameIndexCatS
+import Cosmos.Carried.SameIndexColimitS
+import Cosmos.Carried.NontrivialPullTowerS
+import Cosmos.Carried.NontrivialPushTowerS
+import Cosmos.Carried.ChainColimitPropS
+
+import Cosmos.M.Object
+import Cosmos.M.ContainerInstance
+import Cosmos.M.Terminal
+import Cosmos.M.CoalgCat
+import Cosmos.M.Lambek
+import Cosmos.M.CosmosCategory
+import Cosmos.M.DetCongruence
+import Cosmos.M.GenCongruence
+import Cosmos.M.ListCosmos
+import Cosmos.M.ListSwap
+import Cosmos.M.ListSwapDef
+import Cosmos.M.MorphismCorrespondence
+import Cosmos.M.ContainerAutomorphism
+import Cosmos.M.PermutationNonCommutative
+import Cosmos.M.PermutedEmbedding
+import Cosmos.M.TowerSeparation
+import Cosmos.M.NontrivialLimit
+import Cosmos.M.SewingObstruction
+
 import Equivalence
 import Equivalence.Core
 import Equivalence.SubstTransport
@@ -35,6 +83,36 @@ import Equivalence.ManifoldEq
 import Equivalence.QuantumLayer
 import Equivalence.Lattice
 import Equivalence.StrongEquiv
+
+import Physics.CausalOrder
+import Physics.CausalSlice
+import Physics.CausalSet
+import Physics.CausalSetOrder
+import Physics.CausalCurvature
+import Physics.EinsteinAction
+import Physics.FourDAction
+
+import Physics.Spacetime.LorentzForm
+import Physics.Spacetime.LorentzGroup
+import Physics.Spacetime.Clifford
+
+import Physics.Quantum.Gaussian
+import Physics.Quantum.FiniteVec
+import Physics.Quantum.Measurement
+import Physics.Quantum.Stochastic
+import Physics.Quantum.Rotation
+import Physics.Quantum.AmplitudeComp
+import Physics.Quantum.UnitaryInstrument
+
+import Physics.Newton.Poisson
+import Physics.Newton.Quadratic
+import Physics.Newton.QuadraticBilinear
+import Physics.Newton.QuadraticSkew
+import Physics.Newton.QuadraticJacobi
+import Physics.Newton.DegreeBoundary
+
+import Physics.LatticeCoherence
+import Physics.Lattice
 
 import Real
 import Real.Regular
@@ -67,84 +145,6 @@ import Real.Interval.WeakComplete
 import Real.Interval.Recip
 import Real.Interval.Inverse
 import Real.Interval.Retract
-
-import Physics.CausalOrder
-import Physics.CausalSlice
-import Physics.CausalSet
-import Physics.CausalSetOrder
-import Physics.CausalCurvature
-import Physics.EinsteinAction
-import Physics.FourDAction
-
-import Physics.Spacetime.LorentzForm
-import Physics.Spacetime.LorentzGroup
-import Physics.Spacetime.Clifford
-
-import Physics.Quantum.Gaussian
-import Physics.Quantum.FiniteVec
-import Physics.Quantum.Measurement
-import Physics.Quantum.Stochastic
-import Physics.Quantum.Rotation
-import Physics.Quantum.AmplitudeComp
-import Physics.Quantum.UnitaryInstrument
-
-import Physics.Newton.Poisson
-import Physics.Newton.Quadratic
-import Physics.Newton.QuadraticBilinear
-import Physics.Newton.QuadraticSkew
-import Physics.Newton.QuadraticJacobi
-import Physics.Newton.DegreeBoundary
-
-import Physics.LatticeCoherence
-import Physics.Lattice
-
-import Cosmos.ContCategory
-import Cosmos.ContCategoryLemmas
-import Cosmos.ContFunctor
-import Cosmos.ContCatEquiv
-
-import Cosmos.M.Object
-import Cosmos.M.ContainerInstance
-import Cosmos.M.Terminal
-import Cosmos.M.CoalgCat
-import Cosmos.M.Lambek
-import Cosmos.M.CosmosCategory
-import Cosmos.M.DetCongruence
-import Cosmos.M.GenCongruence
-import Cosmos.M.ListCosmos
-import Cosmos.M.ListSwap
-import Cosmos.M.ListSwapDef
-import Cosmos.M.MorphismCorrespondence
-import Cosmos.M.ContainerAutomorphism
-import Cosmos.M.PermutationNonCommutative
-import Cosmos.M.PermutedEmbedding
-import Cosmos.M.TowerSeparation
-import Cosmos.M.NontrivialLimit
-import Cosmos.M.SewingObstruction
-
-import Cosmos.Carried.FinNatUIP
-import Cosmos.Carried.DetSys
-import Cosmos.Carried.TrivProj
-import Cosmos.Carried.FinProj
-import Cosmos.Carried.SeqColimit
-import Cosmos.Carried.LimitSystem
-import Cosmos.Carried.FinEmbed
-import Cosmos.Carried.FinColimit
-import Cosmos.Carried.FinTower
-import Cosmos.Carried.DetColimit
-import Cosmos.Carried.Boundaries
-import Cosmos.Carried.SeqColimitS
-import Cosmos.Carried.SeqColimitCat
-import Cosmos.Carried.ColimitPolarity
-import Cosmos.Carried.LimitSystemS
-import Cosmos.Carried.FinPushMediateS
-import Cosmos.Carried.FinPushColimitS
-import Cosmos.Carried.FinPushColimitCat
-import Cosmos.Carried.SameIndexCatS
-import Cosmos.Carried.SameIndexColimitS
-import Cosmos.Carried.NontrivialPullTowerS
-import Cosmos.Carried.NontrivialPushTowerS
-import Cosmos.Carried.ChainColimitPropS
 
 import SecondPass.ContCatEquivFunctor
 import SecondPass.Unfolding
@@ -201,32 +201,32 @@ import SecondPass.FinCatInfinityMediateUniqueness
 import SecondPass.FinCatInfinityEndomorphismCandidates
 import SecondPass.FinCatInfinitySubstDstSelf
 
-import InitialPass.ObjEquivCat
-import InitialPass.ObjEquivFunctor
-import InitialPass.ContCategory
-import InitialPass.ContCategoryLemmas
-import InitialPass.ContCatEquiv
-import InitialPass.ContCatEquivFunctor
-import InitialPass.Unfolding
-import InitialPass.MorphismObject
-import InitialPass.ContCatEquivLemmas
-import InitialPass.MorphismMorphism
-import InitialPass.Cosmos
+import SketchPass.ObjEquivCat
+import SketchPass.ObjEquivFunctor
+import SketchPass.ContCategory
+import SketchPass.ContCategoryLemmas
+import SketchPass.ContCatEquiv
+import SketchPass.ContCatEquivFunctor
+import SketchPass.Unfolding
+import SketchPass.MorphismObject
+import SketchPass.ContCatEquivLemmas
+import SketchPass.MorphismMorphism
+import SketchPass.Cosmos
 
-import Prototype.Prelude
-import Prototype.Cosmos
-import Prototype.Properties.SubstCore
-import Prototype.Properties.Transport
-import Prototype.Properties.Equiv
-import Prototype.Properties.Composition
-import Prototype.Properties.CongPaths
-import Prototype.Properties.CongPos
-import Prototype.Properties.CongHom
-import Prototype.Properties.Cong
-import Prototype.Properties.MorphLift
-import Prototype.Properties.Bisim
-import Prototype.Properties.Dynamics
-import Prototype.Indestructibility
-import Prototype.Beings
-import Prototype.Universe
-import Prototype.StandardModel
+import Wellspring.Prelude
+import Wellspring.Cosmos
+import Wellspring.Properties.SubstCore
+import Wellspring.Properties.Transport
+import Wellspring.Properties.Equiv
+import Wellspring.Properties.Composition
+import Wellspring.Properties.CongPaths
+import Wellspring.Properties.CongPos
+import Wellspring.Properties.CongHom
+import Wellspring.Properties.Cong
+import Wellspring.Properties.MorphLift
+import Wellspring.Properties.Bisim
+import Wellspring.Properties.Dynamics
+import Wellspring.Indestructibility
+import Wellspring.Beings
+import Wellspring.Universe
+import Wellspring.StandardModel

@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.ContCategoryLemmas where
+module SketchPass.ContCategoryLemmas where
 
 open import Relation.Binary.PropositionalEquality
   using (_≡_; refl; sym; trans; cong; trans-reflʳ)
@@ -14,7 +14,7 @@ open import Data.Container.Core using (Container; _⇒_; shape; position)
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor)
 
-open import InitialPass.ContCategory
+open import SketchPass.ContCategory
   using (_≈M_; ≈M-sym; ≈M-trans; ∘M-assoc; ∘M-resp-≈ˡ; ∘M-resp-≈ʳ; ContCat)
 
 -- Basic ≈M operations

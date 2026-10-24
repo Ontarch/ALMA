@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.Unfolding where
+module SketchPass.Unfolding where
 
 open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Relation.Binary using (IsEquivalence; Reflexive; Symmetric; Transitive)
@@ -20,10 +20,10 @@ open import Categories.Category.Instance.Sets using (Sets)
 open import Categories.Category.Construction.Elements using (Elements)
 open import Categories.Functor using (Functor; _∘F_)
 
-open import InitialPass.ContCategory using (ContCat)
-open import InitialPass.ObjEquivCat using (ObjEquivCat)
-open import InitialPass.ContCatEquiv using (ContCatEquiv)
-open import InitialPass.ContCategoryLemmas
+open import SketchPass.ContCategory using (ContCat)
+open import SketchPass.ObjEquivCat using (ObjEquivCat)
+open import SketchPass.ContCatEquiv using (ContCatEquiv)
+open import SketchPass.ContCategoryLemmas
   using (shape-eq-from-≈M; ShapeOf; PosOf; actSOf; actPOf)
 
 -- container-based unfolding system

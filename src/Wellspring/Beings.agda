@@ -19,9 +19,9 @@ Processes, Tensor Product Categorical Structure, Coherent Patterns, Evolution, a
 -}
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module Prototype.Beings where
+module Wellspring.Beings where
 
-open import Prototype.Indestructibility public
+open import Wellspring.Indestructibility public
 
 -- Process: Fundamental structure of dynamic beings (O: Accident, C: Essence)
 -- 过程：动态存在者的基本结构（O：偶性，C：本质）

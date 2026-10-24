@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.Cosmos where
+module SketchPass.Cosmos where
 
 open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Relation.Binary.PropositionalEquality
@@ -23,16 +23,16 @@ open import Categories.Category.Instance.Setoids using (Setoids)
 open import Categories.Category.Construction.Elements using (Elements)
 open import Categories.Functor using (Functor)
 
-open import InitialPass.ContCategory using (≈M-refl; ContCat)
-open import InitialPass.ObjEquivCat using (ObjEquivCat)
-open import InitialPass.ContCatEquiv using (ContCatEquiv; contCatEquivFromIso)
-open import InitialPass.ContCatEquivFunctor
+open import SketchPass.ContCategory using (≈M-refl; ContCat)
+open import SketchPass.ObjEquivCat using (ObjEquivCat)
+open import SketchPass.ContCatEquiv using (ContCatEquiv; contCatEquivFromIso)
+open import SketchPass.ContCatEquivFunctor
   using (ContCatEquivFunctor; idContCatEquivFunctor; compContCatEquivFunctor)
-open import InitialPass.Unfolding
+open import SketchPass.Unfolding
   using (Unfolding; module UnfoldingSetoid; module UnfoldingFunctor)
-open import InitialPass.MorphismObject
+open import SketchPass.MorphismObject
   using (MorphismObject; idMorphismObject; compMorphismObject)
-open import InitialPass.MorphismMorphism
+open import SketchPass.MorphismMorphism
   using (MorphismMorphism; idMorphismMorphism; compMorphismMorphism)
 
 -- Core Definitions: CosmosF and Cosmos as Terminal Coalgebra

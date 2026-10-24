@@ -6,13 +6,13 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.ObjEquivFunctor where
+module SketchPass.ObjEquivFunctor where
 
 open import Agda.Primitive using (Level; _⊔_)
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor; _∘F_)
 
-open import InitialPass.ObjEquivCat using (ObjEquivCat; objEquivCatFromIso)
+open import SketchPass.ObjEquivCat using (ObjEquivCat; objEquivCatFromIso)
 
 -- ObjEquivFunctor: functor between categories with object equivalence
 record ObjEquivFunctor {o ℓ e : Level} (C D : ObjEquivCat o ℓ e) : Set (o ⊔ ℓ ⊔ e) where

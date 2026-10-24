@@ -20,9 +20,9 @@ Fundamental Forms of Existence → Two Construction Modes → Process Identity �
 -}
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module Prototype.Indestructibility where
+module Wellspring.Indestructibility where
 
-open import Prototype.Properties.Dynamics public
+open import Wellspring.Properties.Dynamics public
 
 -- Fundamental forms of existence: Eternal streams and persistence predicates
 -- 基础存在形式：永恒流与持存谓词

@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.MorphismMorphism where
+module SketchPass.MorphismMorphism where
 
 open import Agda.Primitive using (Level; lsuc)
 open import Relation.Binary.PropositionalEquality
@@ -15,16 +15,16 @@ open import Data.Container.Core using (shape)
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor)
 
-open import InitialPass.ObjEquivCat using (ObjEquivCat)
-open import InitialPass.ObjEquivFunctor using (ObjEquivFunctor)
-open import InitialPass.ContCatEquiv using (ContCatEquiv)
-open import InitialPass.ContCatEquivFunctor using (ContCatEquivFunctor; compContCatEquivFunctor)
-open import InitialPass.ContCategoryLemmas
+open import SketchPass.ObjEquivCat using (ObjEquivCat)
+open import SketchPass.ObjEquivFunctor using (ObjEquivFunctor)
+open import SketchPass.ContCatEquiv using (ContCatEquiv)
+open import SketchPass.ContCatEquivFunctor using (ContCatEquivFunctor; compContCatEquivFunctor)
+open import SketchPass.ContCategoryLemmas
   using (shape-eq-from-≈M; ShapeOf; PosOf; actSOf; actPOf)
-open import InitialPass.Unfolding using (Unfolding)
-open import InitialPass.MorphismObject
+open import SketchPass.Unfolding using (Unfolding)
+open import SketchPass.MorphismObject
   using (MorphismObject; idMorphismObject; compMorphismObject)
-open import InitialPass.ContCatEquivLemmas using (onPos-subst-comm; comp-nat-shape-eq)
+open import SketchPass.ContCatEquivLemmas using (onPos-subst-comm; comp-nat-shape-eq)
 
 record MorphismMorphism {ℓ : Level}
   {CEF CEG : ContCatEquiv ℓ}

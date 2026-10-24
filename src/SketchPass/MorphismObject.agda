@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
-module InitialPass.MorphismObject where
+module SketchPass.MorphismObject where
 
 open import Agda.Primitive using (Level; lsuc)
 open import Relation.Binary.Structures using (IsEquivalence)
@@ -16,14 +16,14 @@ open import Data.Product using (_,_)
 open import Data.Container.Core using (shape)
 open import Categories.Functor using (Functor)
 
-open import InitialPass.ContCategory using (_≈M_)
-open import InitialPass.ObjEquivCat using (ObjEquivCat)
-open import InitialPass.ContCatEquiv using (ContCatEquiv)
-open import InitialPass.ObjEquivFunctor using (ObjEquivFunctor)
-open import InitialPass.ContCatEquivFunctor
+open import SketchPass.ContCategory using (_≈M_)
+open import SketchPass.ObjEquivCat using (ObjEquivCat)
+open import SketchPass.ContCatEquiv using (ContCatEquiv)
+open import SketchPass.ObjEquivFunctor using (ObjEquivFunctor)
+open import SketchPass.ContCatEquivFunctor
   using (ContCatEquivFunctor; idContCatEquivFunctor; compContCatEquivFunctor)
-open import InitialPass.Unfolding using (Unfolding)
-open import InitialPass.ContCategoryLemmas using (shape-eq-from-≈M; ShapeOf; PosOf)
+open import SketchPass.Unfolding using (Unfolding)
+open import SketchPass.ContCategoryLemmas using (shape-eq-from-≈M; ShapeOf; PosOf)
 
 record MorphismObject {ℓ : Level}
   {CEF CEG : ContCatEquiv ℓ}

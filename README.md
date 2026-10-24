@@ -59,40 +59,39 @@ agda -i src src/Everything.agda
 **Base/** — Foundational structures: the indexed coinductive skeleton Mᵢ,
 container/morphism categories, setoid colimits, and shared algebraic lemmas.
 
+**Cosmos/** — It turns decisively to the carried M architecture, replacing the (B , next) presentation by edge-family indexing and carrying container structure, the intrinsic category, the action of morphisms on shapes, coalgebraic unfolding, and dynamic self-reference as data.
+
 **Equivalence/** — The two-axis degeneracy lattice, built as instances of
 the single skeleton Mᵢ. It originated when the uniqueness proof of the colimit's
 universal property in `SecondPass/` was blocked; tracing the cause revealed
 that all equivalence relations share this single skeleton.
 
+**Physics/** — Derived mathematical physics. Every construction is exact and algebraic over ℚ or ℕ. The next step in formalisation calls for ℝ, which the standard library does not provide; existing mathematical libraries treat ℝ in a way that depends on the univalence axiom. Hence Real/ is being built in-house.
+
 **Real/** — Constructive Cauchy reals and interval arithmetic supplying a
 rational continuum. It originated from the needs of the physical instances in `Physics/`.
 
-**Physics/** — Derived mathematical physics. Every construction is exact
-and algebraic over ℚ or ℕ. The next step in formalisation calls for ℝ, which the standard library does not provide; existing mathematical libraries treat ℝ in a way that depends on the univalence axiom. Hence Real/ is being built in-house.
-
-**Cosmos/** — It turns decisively to the carried M architecture, replacing the (B , next) presentation by edge-family indexing and carrying container structure, the intrinsic category, the action of morphisms on shapes, coalgebraic unfolding, and dynamic self-reference as data.
-
 **SecondPass/** — The second structural reorganisation. It introduced the MorphismObject / Unfolding framework, built the cross-universe cumulative hierarchy and the FinCatN tower, and concentrated the project's subst debt.
 
-**InitialPass/** — Structural reorganisation incorporating community feedback: splitting the monolithic prototype into separate modules.
+**SketchPass/** — Structural reorganisation incorporating community feedback: splitting the monolithic Wellspring into separate modules.
 
-**Prototype/** — The initial, fully self-contained and hand-unfolded prototype. It traces the trajectory from a one-to-one mapping of philosophical concepts to their convergence into a single coinductive record, where the resulting "subst hell" motivated all subsequent refactoring. It is the first Agda formalisation of the paper's philosophical ideas.
+**Wellspring/** — The initial, fully self-contained and hand-unfolded Wellspring. It traces the trajectory from a one-to-one mapping of philosophical concepts to their convergence into a single coinductive record, where the resulting "subst hell" motivated all subsequent refactoring. It is the first Agda formalisation of the paper's philosophical ideas.
 
 **Base/** —— 基础结构：索引余归纳骨架 Mᵢ、容器/态射范畴、setoid 余极限，以及共享代数引理。
 
-**Equivalence/** —— 两轴退化格，作为单一骨架 Mᵢ 的实例构造。它起源于 `SecondPass/` 中余极限泛性质唯一性证明受阻时的回溯：发现所有等价关系共享这一骨架。
+**Cosmos/** —— 彻底转向携带式 M 架构，以边族索引取代 (B , next) 表示，把容器结构、内禀范畴、态射对形状的变换、余代数展开与动态自我指涉全部携带为数据。
 
-**Real/** —— 构造性柯西实数与区间算术，提供有理连续统。它起源于 `Physics/` 中物理实例的需求。
+**Equivalence/** —— 两轴退化格，作为单一骨架 Mᵢ 的实例构造。它起源于 `SecondPass/` 中余极限泛性质唯一性证明受阻时的回溯：发现所有等价关系共享这一骨架。
 
 **Physics/** —— 派生的数学物理。全部构造皆为 ℚ 或 ℕ 上精确、代数的。下一步形式化需要 ℝ，而标准库不提供；现有数学库对 ℝ 的处理又依赖单价性公理，故自行构造 Real/。
 
-**Cosmos/** —— 彻底转向携带式 M 架构，以边族索引取代 (B , next) 表示，把容器结构、内禀范畴、态射对形状的变换、余代数展开与动态自我指涉全部携带为数据。
+**Real/** —— 构造性柯西实数与区间算术，提供有理连续统。它起源于 `Physics/` 中物理实例的需求。
 
 **SecondPass/** —— 第二次结构重组。引入 MorphismObject / Unfolding 框架，构建跨宇宙累积层级与 FinCatN 塔，集中了项目的 subst 债务。
 
-**InitialPass/** —— 吸纳社区反馈后的结构重组：将单体原型拆分为独立模块。
+**SketchPass/** —— 吸纳社区反馈后的结构重组：将初始原型拆分为独立模块。
 
-**Prototype/** —— 完全自包含、手工展开的初始原型。它记录了从哲学概念的一对一映射到收敛为单一余归纳记录的演进轨迹；正是由此引发的"subst hell" 问题推动了后续全部重构。它是论文哲学思想在 Agda 中的首次形式化呈现。
+**Wellspring/** —— 完全自包含、手工展开的初始原型。它记录了从哲学概念的一对一映射到收敛为单一余归纳记录的演进轨迹；正是由此引发的"subst hell" 问题推动了后续全部重构。它是论文哲学思想在 Agda 中的首次形式化呈现。
 
 ## Contributing / 贡献指南
 
