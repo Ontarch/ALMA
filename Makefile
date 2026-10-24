@@ -34,10 +34,10 @@ $(INDEX): $(SRCS)
 	@echo "" >> $@
 	@echo "module index where" >> $@
 	@echo "" >> $@
-	@echo "-- 概览：带描述的模块列表见 Everything.html" >> $@
+	@echo "-- Module list with descriptions" >> $@
 	@echo "import Everything" >> $@
 	@echo "" >> $@
-	@echo "-- 详尽列表：全部可用模块" >> $@
+	@echo "-- All modules" >> $@
 	@for m in $(MODULES); do echo "import $$m" >> $@; done
 	@echo "Generated $@"
 
