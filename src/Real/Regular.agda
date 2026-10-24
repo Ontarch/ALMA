@@ -11,14 +11,14 @@ module Real.Regular where
 open import Data.Nat using (ℕ; zero; suc; _⊔_; _∸_)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_)
 open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; ⊔-lub; m+[n∸m]≡n; +-comm; module ≤-Reasoning)
+  (m≤m⊔n; m≤n⊔m; m+[n∸m]≡n; +-comm; module ≤-Reasoning)
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl)
 open ≤-Reasoning
-open import Data.Rational using (ℚ; ∣_∣; _-_; _<_; _≤_)
-open import Relation.Binary.PropositionalEquality using (_≡_; sym; trans; cong)
+open import Data.Rational using (∣_∣; _-_; _<_)
+open import Relation.Binary.PropositionalEquality using (_≡_; trans; cong)
 
 open import Real using (CauchySeq; ε)
-open Real.CauchySeq using (f; μ; cauchy)
+open CauchySeq using (f; μ; cauchy)
 
 ------------------------------------------------------------------------
 -- The regular modulus: a running maximum that also tracks k.

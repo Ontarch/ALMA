@@ -8,17 +8,14 @@
 
 module Real.Interval.Retract where
 
-open import Data.Nat using (ℕ) renaming (_≤_ to _≤N_; _≥_ to _≥N_)
+open import Data.Nat using () renaming (_≤_ to _≤N_)
 open import Data.Nat.Properties
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl)
 open import Data.Rational using (ℚ; 0ℚ; _≤_; _-_; _*_; ∣_∣)
-open import Data.Rational.Properties using (≤-trans)
-  renaming (≤-refl to ≤Q-refl)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; trans; sym; subst; cong)
+  (_≡_; refl; trans; cong)
 
 open import Real using (CauchySeq)
-open CauchySeq using (f)
 open import Real.Interval using (RealI)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Node using (0≤width-n)

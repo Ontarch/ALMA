@@ -10,26 +10,20 @@ module Real.Interval.RegularRep where
 
 open import Data.Nat using (ℕ; zero; suc; _⊔_; _^_; _∸_)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<N_)
-open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; m+[n∸m]≡n; ^-monoʳ-≤)
+open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m+[n∸m]≡n; ^-monoʳ-≤)
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; +-comm to +-commℕ)
 open import Data.Product using (proj₁; proj₂)
-open import Data.Rational using
-  (ℚ; 0ℚ; _*_; _<_; _≤_; ∣_∣; _-_; positive)
-open import Data.Rational.Base using (1/_)
-open import Data.Rational.Properties using
-  (≤-refl; ≤-trans; ≤-<-trans; <⇒≤; pos⇒nonNeg; *-monoʳ-≤-nonNeg)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; subst)
+open import Data.Rational using (ℚ; _*_; _<_; _≤_; ∣_∣; _-_; positive)
+open import Data.Rational.Properties using (<⇒≤; pos⇒nonNeg; *-monoʳ-≤-nonNeg)
 
 open import Real using (CauchySeq; ε; embed)
 open CauchySeq using (μ)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using
-  (centre; width; width-n; recipPow2; bound-w; realI→cauchy
-  ; B<2^sucB; frac-strict; 0<width)
+  (centre; width; width-n; recipPow2; bound-w; realI→cauchy; B<2^sucB
+  ; frac-strict; 0<width)
 open import Real.Interval.Kit using (0<recipPow2)
-open import Real.Interval.Reasoning using
-  (begin≤_; begin<_; _≤∎; _≤⟨_⟩_; _≤⟨_⟩<_; _<⟨_⟩<_)
+open import Real.Interval.Reasoning using (begin≤_; begin<_; _≤∎; _≤⟨_⟩_; _≤⟨_⟩<_)
 
 ------------------------------------------------------------------------
 -- The regular index

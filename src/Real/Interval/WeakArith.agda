@@ -11,35 +11,26 @@ module Real.Interval.WeakArith where
 open import Data.Nat using (ℕ; zero; suc; _∸_; _^_; s≤s; z≤n)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<N_)
 open import Data.Nat.Properties using
-  (m≤m+n; m≤n+m; m+[n∸m]≡n; n≤1+n; n<1+n
-  ; +-suc; *-suc; *-monoʳ-≤; ^-monoʳ-≤; *-distribˡ-+; m≤n*m)
-  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl
-          ; ≤-reflexive to ≤N-reflexive; <⇒≤ to <N⇒≤N
-          ; +-comm to +-commℕ; +-identityˡ to +-identityˡℕ
-          ; +-identityʳ to +-identityʳℕ; +-assoc to +-assocℕ
-          ; *-assoc to *-assocℕ; *-comm to *-commℕ
-          ; *-identityʳ to *-identityʳℕ)
+  (m≤m+n; m≤n+m; m+[n∸m]≡n; n≤1+n; +-suc; *-suc; *-monoʳ-≤; *-distribˡ-+)
+  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
+  ; +-comm to +-commℕ; +-assoc to +-assocℕ; *-assoc to *-assocℕ
+  ; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; positive; Positive; NonZero;
-   NonNegative)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; positive; Positive; NonZero; NonNegative)
 open import Data.Rational.Base using (1/_; *<*; -_)
 open import Data.Integer using (+<+)
 open import Data.Rational.Properties using
-  (≤-refl; ≤-reflexive; ≤-trans; ≤-<-trans; <-≤-trans; <-trans
-  ; +-mono-<; +-mono-≤; +-mono-≤-<; +-identityʳ; +-identityˡ; +-assoc
-  ; +-inverseʳ; +-inverseˡ; neg-distrib-+
-  ; positive⁻¹; pos⇒nonNeg; pos⇒nonZero; pos*pos⇒pos
-  ; *-monoʳ-≤-nonNeg; *-inverseʳ; *-inverseˡ; *-assoc; *-comm
-  ; *-identityˡ; *-identityʳ; <⇒≤; *-distribʳ-+; +-comm
-  ; *-cancelˡ-<-nonNeg)
+  (≤-refl; ≤-reflexive; ≤-trans; ≤-<-trans; <-≤-trans; +-mono-<; +-mono-≤-<
+  ; +-identityʳ; +-identityˡ; +-assoc; +-inverseˡ; neg-distrib-+; pos⇒nonNeg
+  ; pos⇒nonZero; pos*pos⇒pos; *-inverseʳ; *-inverseˡ; *-assoc; *-comm
+  ; *-identityˡ; *-identityʳ; <⇒≤; *-distribʳ-+; +-comm; *-cancelˡ-<-nonNeg)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Real using
-  (ε; embed; embed-suc-pos; embed-suc-nonZero; 2ℚ; 2*embed
-  ; halve; reciprocal-cong; 0<embed; 1/embed; embed-mono-<; embed-mono-≤
-  ; embed-+-hom; embed-*-hom; embed-*)
+  (ε; embed; embed-suc-nonZero; 2ℚ; 2*embed; halve; 0<embed; reciprocal-cong
+  ; 1/embed; embed-mono-<; embed-mono-≤; embed-+-hom; embed-*)
 
 ------------------------------------------------------------------------
 -- Half and its NonZero proof
@@ -442,11 +433,7 @@ double-recip : ∀ k →
   (1/ embed (h+1 k)) {{h+1-nonZero {k}}}
     + (1/ embed (h+1 k)) {{h+1-nonZero {k}}} ≡ ε k
 double-recip k =
-  let pos-2ℚ : Positive 2ℚ
-      pos-2ℚ = positive (0<embed 1)
-      pos-p : Positive (embed (suc k))
-      pos-p = embed-suc-pos {k}
-      nz-p : NonZero (embed (suc k))
+  let nz-p : NonZero (embed (suc k))
       nz-p = embed-suc-nonZero {k}
       pos-2p : Positive (2ℚ * embed (suc k))
       pos-2p = pos*pos⇒pos 2ℚ (embed (suc k))
@@ -597,9 +584,6 @@ u-bound u 0<u {{nz-u}} {{nz-2u}} {{nz-4u}} {{nz-nx}} =
   in subst (λ x → (1/ four-u) {{nz-4u}} + (1/ next) {{nz-nx}} < x)
            (halve u {{nz-u}} {{nz-2u}})
            (+-mono-< h2 h1)
-  where
-  0<1 : 0ℚ < 1ℚ
-  0<1 = *<* (+<+ (s≤s z≤n))
 
 ------------------------------------------------------------------------
 -- Base bound

@@ -9,56 +9,38 @@
 
 module Real.Interval.WeakComplete where
 
-open import Data.Nat using (ℕ; zero; suc; _⊔_; _^_; _∸_; s≤s; z≤n)
+open import Data.Nat using (ℕ; zero; suc; _⊔_; _∸_; s≤s)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<N_)
 open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; m≤m+n; m≤n+m; ≤-total; n≤1+n; n<1+n; m+[n∸m]≡n
-  ; +-suc; *-suc; *-monoʳ-≤; *-monoˡ-≤; ^-monoʳ-≤; *-distribˡ-+
+  (m≤m⊔n; m≤n⊔m; m≤m+n; ≤-total; n<1+n; m+[n∸m]≡n; +-suc; *-monoʳ-≤
   ; m≤n⇒m⊔n≡n; m≤n*m)
-  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl
-          ; ≤-reflexive to ≤N-reflexive; <⇒≤ to <N⇒≤N
-          ; +-comm to +-commℕ; +-mono-≤ to +-mono-≤N
-          ; +-identityˡ to +-identityˡℕ; +-identityʳ to +-identityʳℕ
-          ; +-assoc to +-assocℕ; *-assoc to *-assocℕ
-          ; ≤-<-trans to ≤N-<-trans; <-≤-trans to <-≤N-trans
-          ; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
-open import Data.Product using (Σ; _×_; _,_; proj₁; proj₂)
+  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
+  ; <⇒≤ to <N⇒≤N; +-comm to +-commℕ; +-identityˡ to +-identityˡℕ
+  ; +-identityʳ to +-identityʳℕ; ≤-<-trans to ≤N-<-trans
+  ; <-≤-trans to <-≤N-trans)
+open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; positive; Positive; NonZero)
-open import Data.Rational.Base using (1/_; *<*; -_)
-open import Data.Integer using (+<+)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; Positive; NonZero)
+open import Data.Rational.Base using (1/_; -_)
 open import Data.Rational.Properties using
-  (≤-refl; ≤-reflexive; ≤-trans; ≤-<-trans; <-≤-trans; <-trans
-  ; +-mono-<; +-mono-≤; +-mono-≤-<; +-identityʳ; +-identityˡ; +-assoc
-  ; +-inverseʳ; +-inverseˡ; neg-distrib-+
-  ; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; positive⁻¹
-  ; pos⇒nonNeg; pos⇒nonZero; pos*pos⇒pos; *-monoʳ-≤-nonNeg; *-inverseʳ
-  ; *-inverseˡ; *-assoc; *-comm; *-identityˡ; *-identityʳ; <⇒≤
-  ; *-distribʳ-+; +-comm)
+  (≤-refl; ≤-reflexive; ≤-<-trans; <-≤-trans; <-trans; +-mono-<; +-mono-≤
+  ; +-mono-≤-<; ∣-p∣≡∣p∣; positive⁻¹; pos⇒nonZero; pos*pos⇒pos; *-comm
+  ; *-identityˡ; *-distribʳ-+)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Real using
-  (CauchySeq; ε; 0<ε; embed; embed-suc-pos; embed-suc-nonZero; 2ℚ; 2*embed
-  ; halve; reciprocal-cong; 0<embed; 1/embed; embed-mono-<; embed-mono-≤
-  ; embed-+-hom; embed-*-hom; embed-*)
-open CauchySeq using (μ)
+  (CauchySeq; ε; embed; embed-suc-pos; reciprocal-cong; 0<embed; 1/embed; embed-+-hom)
 open import Real.Interval using (RealI)
-open import Real.IntervalEquiv using
-  (centre; width; width-n; width-nV; recipPow2; bound-w; realI→cauchy
-  ; B<2^sucB; frac-strict; 0<width)
+open import Real.IntervalEquiv using (centre)
 open import Real.Interval.Kit using (tri-diff)
-open import Real.CauchyToInterval using
-  (cauchy→realI; centre-cauchy→realI; M; K; M≥μK; K≥k)
+open import Real.CauchyToInterval using (cauchy→realI; centre-cauchy→realI; M; K; K≥k)
 open import Real.Interval.WeakArith using
-  (half; h; h-mono; h≡suc2c; h≥2k
-  ; h+1; h+1≡suc; h+1≥2*suc
-  ; 2ss; 2ss-nonZero; εs-half; 2ss2a≡4a
-  ; h+1-nonZero; strict-recip
-  ; recip-antitone-≤; base-bound; prod≤2^; embed-prod<
-  ; cancel-*; doubleN; diff-neg)
+  (half; h; h-mono; h≡suc2c; h≥2k; h+1; h+1≡suc; h+1≥2*suc; 2ss; 2ss-nonZero
+  ; εs-half; 2ss2a≡4a; strict-recip; recip-antitone-≤; base-bound; prod≤2^
+  ; embed-prod<; cancel-*; doubleN; diff-neg)
 open import Real.Interval.RegularRep using (reg; reg-reg)
 
 ------------------------------------------------------------------------
@@ -402,33 +384,55 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
           --
           -- 有理脚手架：
           --   x = k+2，y = k+3，t = 1/((k+2)(k+3))。
+          x : ℚ
           x = embed (suc (suc k))
+
+          y : ℚ
           y = embed (suc (suc (suc k)))
-          instance
-            pos-x : Positive x
-            pos-x = embed-suc-pos
-            pos-y : Positive y
-            pos-y = embed-suc-pos
-            pos-xy : Positive (x * y)
-            pos-xy = pos*pos⇒pos x y
-            nz-xy : NonZero (x * y)
-            nz-xy = pos⇒nonZero (x * y)
-            pos-yx : Positive (y * x)
-            pos-yx = pos*pos⇒pos y x
-            nz-yx : NonZero (y * x)
-            nz-yx = pos⇒nonZero (y * x)
-          t = 1/(x * y)
-          inv-x = 1/ x
-          inv-y = 1/ y
+
+          pos-x : Positive x
+          pos-x = embed-suc-pos {suc k}
+
+          pos-y : Positive y
+          pos-y = embed-suc-pos {suc (suc k)}
+
+          pos-xy : Positive (x * y)
+          pos-xy = pos*pos⇒pos x {{pos-x}} y {{pos-y}}
+
+          pos-yx : Positive (y * x)
+          pos-yx = pos*pos⇒pos y {{pos-y}} x {{pos-x}}
+
+          nz-x : NonZero x
+          nz-x = pos⇒nonZero x {{pos-x}}
+
+          nz-y : NonZero y
+          nz-y = pos⇒nonZero y {{pos-y}}
+
+          nz-xy : NonZero (x * y)
+          nz-xy = pos⇒nonZero (x * y) {{pos-xy}}
+
+          nz-yx : NonZero (y * x)
+          nz-yx = pos⇒nonZero (y * x) {{pos-yx}}
+
+          t : ℚ
+          t = 1/_ (x * y) {{nz-xy}}
+
+          inv-x : ℚ
+          inv-x = 1/_ x {{nz-x}}
+
+          inv-y : ℚ
+          inv-y = 1/_ y {{nz-y}}
 
           h1 : x * t ≡ inv-y
-          h1 = cancel-* x y
+          h1 = cancel-* x y {{nz-x}} {{nz-y}} {{nz-xy}}
 
-          inv-yx : 1/(y * x) ≡ t
-          inv-yx = reciprocal-cong (y * x) (x * y) (*-comm y x)
+          inv-yx : 1/_ (y * x) {{nz-yx}} ≡ t
+          inv-yx = reciprocal-cong (y * x) (x * y)
+                     {{nz-yx}} {{nz-xy}} (*-comm y x)
 
           h2 : y * t ≡ inv-x
-          h2 = trans (cong (y *_) (sym inv-yx)) (cancel-* y x)
+          h2 = trans (cong (y *_) (sym inv-yx))
+                     (cancel-* y x {{nz-y}} {{nz-x}} {{nz-yx}})
 
           x+1≡y : x + 1ℚ ≡ y
           x+1≡y =
@@ -482,7 +486,7 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
           seg2<t : crossB < t
           seg2<t =
             strict-recip (x * y) (embed (4 *ℕ suc j))
-                         (positive⁻¹ (x * y)) x*y<4sj
+                         (positive⁻¹ (x * y) {{pos-xy}}) x*y<4sj
           e1≡ : ε (suc (suc k)) ≡ inv-y
           e1≡ = sym (1/embed (suc (suc k)))
           ek≡ : ε (suc k) ≡ inv-x
