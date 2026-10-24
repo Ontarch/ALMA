@@ -1,13 +1,19 @@
 ------------------------------------------------------------------------
--- Non-trivial Cosmos instance: list container (Shape = ℕ, Position = Fin n)
--- Constructs ListCosmos / OtherCosmos, a non-standard _⇒ℱ_ witness
--- (swap-⇒ℱ with onPos = position permutation), and a concrete counterexample
--- (otherSF) showing StructuredFunc is strictly larger than CoalgHom
+-- Non-trivial Cosmos instance
 --
--- 非平凡 Cosmos 实例：列表容器（形状 = ℕ，位置 = Fin n）
--- 构造 ListCosmos / OtherCosmos、非标准 _⇒ℱ_ 见证（onPos 为位置置换），
--- 以及具体反例 otherSF，证明 StructuredFunc 严格包含 CoalgHom
+-- The list container (Shape = ℕ, Position = Fin n) as a non-trivial
+-- Cosmos instance. Constructs ListCosmos / OtherCosmos, a non-standard
+-- _⇒ℱ_ witness (swap-⇒ℱ with onPos = position permutation), and a
+-- concrete counterexample (otherSF) showing StructuredFunc is strictly
+-- larger than CoalgHom.
+--
+-- 非平凡 Cosmos 实例
+--
+-- 列表容器（形状 = ℕ，位置 = Fin n）作为非平凡 Cosmos 实例。构造
+-- ListCosmos / OtherCosmos、非标准 _⇒ℱ_ 见证（onPos 为位置置换），
+-- 以及具体反例 otherSF，证明 StructuredFunc 严格包含 CoalgHom。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.ListCosmos where

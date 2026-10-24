@@ -1,17 +1,21 @@
 ------------------------------------------------------------------------
--- Terminal coalgebra of the Unfolding endofunctor, up to bisimulation
--- (Setoid carrier + ≡ commute)
--- Defines general F-coalgebras with Setoid carriers and Func structure maps,
--- the anamorphism (unfold) into Cosmos, a bisimulation relation _≈C_ on Cosmos,
--- and establishes the universal property: Cosmos is the terminal coalgebra of
--- the unfolding endofunctor constructed from the container functor,
--- up to bisimulation
+-- Terminal coalgebra up to bisimulation
 --
--- 展开自函子在互模拟意义下的终余代数（Setoid 载体 + ≡ 交换条件）
--- 定义具有 Setoid 载体与 Func 结构映射的一般 F-余代数、到 Cosmos 的 anamorphism（展开）、
--- Cosmos 上的互模拟关系 _≈C_，并证明泛性质：Cosmos 是由容器函子构造的展开自函子
--- 在互模拟意义下的终余代数
+-- Setoid carrier plus ≡ commute. Defines general F-coalgebras with
+-- Setoid carriers and Func structure maps, the anamorphism (unfold)
+-- into Cosmos, a bisimulation relation _≈C_ on Cosmos, and establishes
+-- the universal property: Cosmos is the terminal coalgebra of the
+-- unfolding endofunctor constructed from the container functor, up to
+-- bisimulation.
+--
+-- 互模拟意义下的终余代数
+--
+-- Setoid 载体加 ≡ 交换条件。定义具有 Setoid 载体与 Func 结构映射的
+-- 一般 F-余代数、到 Cosmos 的 anamorphism（展开）、Cosmos 上的互模拟
+-- 关系 _≈C_，并证明泛性质：Cosmos 是由容器函子构造的展开自函子在互
+-- 模拟意义下的终余代数。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.Terminal where

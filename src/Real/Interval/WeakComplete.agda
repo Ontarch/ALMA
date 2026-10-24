@@ -1,8 +1,14 @@
 ------------------------------------------------------------------------
--- Completeness of real intervals under the weakest (full-metric) Cauchy
--- condition
+-- Weak completeness of real intervals
 --
--- 最弱（全度量）柯西条件下实数区间的完备性
+-- Completeness of real intervals under the weakest (full-metric) Cauchy
+-- condition: every WeakCauchy sequence of RealI converges to its
+-- diagonal limit.
+--
+-- 实数区间的弱完备性
+--
+-- 最弱（全度量）柯西条件下实数区间的完备性：每个 WeakCauchy 的
+-- RealI 序列收敛到其对角极限。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

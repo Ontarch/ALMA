@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------
 -- Lambek's lemma for the terminal coalgebra Cosmos
+--
 -- out : Cosmos → Unfolding Cosmos is a weak isomorphism:
 --   in-F ∘ out is bisimilar to id, and out ∘ in-F is US._≈U_-equivalent to id
 -- The inverse in-F is obtained from the universal property of the terminal
@@ -9,6 +10,7 @@
 --   out (in-F y) ≡ mapUnfolding (in-F ∘ out) y
 --
 -- Cosmos 终余代数的 Lambek 引理
+--
 -- out : Cosmos → Unfolding Cosmos 构成弱同构：
 --   in-F ∘ out 与 id 互模拟，展开等价 US._≈U_
 -- 逆映射 in-F 由终对象的泛性质构造。关键恒等式为：
@@ -16,6 +18,7 @@
 --   out ∘ in-F ≈F id
 --   out (in-F y) ≡ mapUnfolding (in-F ∘ out) y
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.Lambek where

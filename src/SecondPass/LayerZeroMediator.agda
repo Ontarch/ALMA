@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
--- LayerZeroMediator — dependent embedding on the FinCat n tower
--- LayerZeroMediator —— FinCat n 塔上的依赖嵌入
+-- Dependent embedding on the FinCat n tower
 --
 -- The tower has singleton position sets, so pos-inhabited and its
 -- naturality are automatic. This allows a dependent embedding whose F₀
@@ -9,6 +8,9 @@
 --     (x : Cosmos) → EmbeddingData x → Cosmos′
 -- "LayerZero" records compatibility only for layer-0 inputs. The
 -- parameter m encodes n = suc (suc m), so n ≥ 2 holds definitionally
+--
+-- FinCat n 塔上的依赖嵌入
+--
 -- 塔的位置集为单点集，故 pos-inhabited 及其自然性自动成立。
 -- 这使得依赖嵌入的 F₀ 可以依赖输入宇宙的 F₀。形式上，
 -- strictEmbed-dependent 具有依赖函数类型
@@ -16,6 +18,7 @@
 -- "LayerZero" 记录只对层 0 的输入刻画相容性。
 -- 参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.LayerZeroMediator where

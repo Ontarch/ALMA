@@ -1,9 +1,11 @@
 ------------------------------------------------------------------------
 -- CosmosCategory: the category of Cosmos objects and structured simulations
--- 宇宙范畴：以 Cosmos 为对象、_⇒ℱ_ 为态射的范畴
 --
 -- Defines the equivalence _≈ℱ_ on _⇒ℱ_ witnesses (coinductive bisimulation),
 -- proves the category laws, and assembles a Category instance.
+--
+-- 宇宙范畴：以 Cosmos 为对象、_⇒ℱ_ 为态射的范畴
+--
 -- 定义 _⇒ℱ_ 见证上的等价 _≈ℱ_（余归纳互模拟），验证范畴律，
 -- 并构造 Category 实例
 ------------------------------------------------------------------------

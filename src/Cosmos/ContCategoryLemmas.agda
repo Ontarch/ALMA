@@ -1,20 +1,21 @@
 ------------------------------------------------------------------------
+-- Container morphism lemmas
+--
 -- Container morphism equivalence lemmas, container functor basics and
--- projections
+-- projections. Shape-level laws for _≈sr_ (sym, trans, assoc,
+-- whiskering), basic container functor projections (ShapeOf, PosOf,
+-- actSOf, actPOf), and transport of container shapes along object
+-- equalities (transport, transport-refl, transport-sym, transport-trans,
+-- transport-cong), encapsulating the recurring subst patterns: transport
+-- along an object equality, cancellation along sym, split a composite
+-- transport, and push a transport through a shape-level map.
 --
--- Shape-level laws for _≈sr_ (sym, trans, assoc, whiskering), basic
--- container functor projections (ShapeOf, PosOf, actSOf, actPOf), and
--- transport of container shapes along object equalities (transport,
--- transport-refl, transport-sym, transport-trans, transport-cong),
--- encapsulating the recurring subst patterns: transport along an object
--- equality, cancellation along sym, split a composite transport, and
--- push a transport through a shape-level map.
+-- 容器态射引理
 --
--- 容器态射等价引理与容器函子基础与投影
---
--- _≈sr_ 的形状层面代数律（对称、传递、结合、左右复合）、容器函子的基本
--- 投影（ShapeOf、PosOf、actSOf、actPOf）、及沿底范畴对象等式运输容器
--- 形状（transport、transport-refl、transport-sym、transport-trans、
+-- 容器态射等价引理与容器函子基础与投影。_≈sr_ 的形状层面代数律
+-- （对称、传递、结合、左右复合）、容器函子的基本投影
+-- （ShapeOf、PosOf、actSOf、actPOf）、及沿底范畴对象等式运输容器形状
+-- （transport、transport-refl、transport-sym、transport-trans、
 -- transport-cong），封装反复出现的 subst 模式：沿对象等式运输形状、
 -- 消去沿 sym 的运输、拆分复合运输、把运输推过形状层映射。
 ------------------------------------------------------------------------

@@ -1,23 +1,17 @@
-{-
-An attempt to encode the arguments of the paper into Agda code,
-before the philosophical thought of the paper fully converges
-upon Cosmos as a new mathematical structure.
-
-Retained to reflect the thinking process from attempting to express
-philosophical thought in Agda to ultimately converging upon Cosmos.
-
-在论文的哲学思想完全收敛于 Cosmos 这一新的数学结构之前，
-将论文各个论证写成 Agda 代码的尝试。
-予以保留，以体现从尝试用 Agda 表达哲学思想
-并最终收敛于 Cosmos 的思考过程。
-
-Eternity and Indestructibility
-永恒性与不可消减性
+------------------------------------------------------------------------
+-- Eternity and indestructibility
 --
-Fundamental Forms of Existence → Two Construction Modes → Process Identity → Core Ontological Theorem → Uniqueness Theorem
- → Historical Paths and Ontological Process Identity → Distinction Between Epistemic Equivalence and Ontological Identity
-基础存在形式 → 两种构造模式 → 过程同一性 → 核心存在论定理 → 唯一性定理 → 历史路径与本体论过程同一 → 认识论等价与本体论同一的区分
--}
+-- Fundamental forms of existence → two construction modes → process
+-- identity → core ontological theorem → uniqueness theorem →
+-- historical paths and ontological process identity → distinction
+-- between epistemic equivalence and ontological identity.
+--
+-- 永恒性与不可消减性
+--
+-- 基础存在形式 → 两种构造模式 → 过程同一性 → 核心存在论定理 → 唯一
+-- 性定理 → 历史路径与本体论过程同一 → 认识论等价与本体论同一的区分。
+------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module Wellspring.Indestructibility where

@@ -1,14 +1,17 @@
 ------------------------------------------------------------------------
 -- Closure Properties of Cosmos
--- Cosmos 的闭包性质
 --
 -- out / in-F form an adjoint equivalence between Cosmos and Unfolding Cosmos
 -- map closure: any Setoid endofunction lifts to a universe transformation
 -- UnitCosmos uniqueness among UnitLike cosmoi
+--
+-- Cosmos 的闭包性质
+--
 -- out / in-F 构成 Cosmos 与 Unfolding Cosmos 之间的伴随等价
 -- 映射闭包：任意 Setoid 自映射可提升为宇宙变换
 -- UnitCosmos 在 UnitLike 宇宙中的唯一性
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.Closure where

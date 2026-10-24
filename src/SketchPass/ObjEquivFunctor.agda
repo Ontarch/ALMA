@@ -2,8 +2,14 @@
 -- Functors between categories with object equivalence
 --
 -- Preserve object equivalence and commute with transport. Includes
--- composition and a constructor from ordinary functors via isomorphisms
+-- composition and a constructor from ordinary functors via isomorphisms.
+--
+-- 带对象等价的范畴之间的函子
+--
+-- 保持对象等价并与传输交换。包括复合，以及经由同构从普通函子构造的
+-- 构造器。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.ObjEquivFunctor where

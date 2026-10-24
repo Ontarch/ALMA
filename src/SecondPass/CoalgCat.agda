@@ -1,15 +1,18 @@
 ------------------------------------------------------------------------
 -- Category of F-coalgebras and terminal object packaging
--- F-余代数范畴与终对象封装
 --
 -- Constructs CoalgCat: objects are CosmosF-coalgebras, morphisms are
 -- coalgebra homomorphisms, equivalence is pointwise propositional equality
 -- Packages cosmosCoalg as terminal up to bisimulation _≈C_, without funext
 -- or proof irrelevance (strengthening to _≡_ would require both)
+--
+-- F-余代数范畴与终对象封装
+--
 -- 构造 CoalgCat：对象为 CosmosF-余代数，态射为余代数同态，等价为逐点命题相等
 -- 将 cosmosCoalg 封装为互模拟 _≈C_ 意义下的终对象（无需函数外延性与证明无关性；
 -- 强化到 _≡_ 需要二者）
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.CoalgCat where

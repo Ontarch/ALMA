@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Conditional framework for the FinCat n tower with dep-embed-tower
--- FinCat n 塔上以 dep-embed-tower 为嵌入的条件性框架
 --
 -- Replaces the EmbeddingRule parameter of FinCatNColimit.WithSurjectivity
 -- by the concrete tower-level embedding dep-embed-tower, eliminating the
@@ -9,6 +8,9 @@
 -- NontrivialLimitDep. Both hypotheses are discharged unconditionally
 -- downstream (unif by FinCatNDefaultUnif, surj by FinCatNSurjectivity).
 -- The parameter m encodes n = suc (suc m), so n ≥ 2 holds definitionally
+--
+-- FinCat n 塔上以 dep-embed-tower 为嵌入的条件性框架
+--
 -- 将 FinCatNColimit.WithSurjectivity 的 EmbeddingRule 参数替换为具体
 -- 塔层嵌入 dep-embed-tower，消除 embed-eq 边条件。给定一致嵌入族 unif
 -- 与其满射性见证 surj，构造 UniversalLimitDep 与 NontrivialLimitDep
@@ -16,6 +18,7 @@
 -- surj 由 FinCatNSurjectivity）。参数 m 编码 n = suc (suc m)，
 -- 使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNColimitWithDep where

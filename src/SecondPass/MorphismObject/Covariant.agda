@@ -1,9 +1,11 @@
 ------------------------------------------------------------------------
 -- Object-level homomorphisms between unfolding systems
--- 展开系统之间的对象级同态
 --
 -- A Covariant witnesses the commutation of object/position mappings
 -- with the container natural isomorphism
+--
+-- 展开系统之间的对象级同态
+--
 -- Covariant 见证对象映射与位置映射同容器自然同构之间的交换性
 ------------------------------------------------------------------------
 

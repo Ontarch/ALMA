@@ -1,10 +1,12 @@
 ------------------------------------------------------------------------
--- Unfolding Functor Record
+-- Unfolding functor record
+--
 -- Defines the unfolding functor for a cosmos layer, mapping shaped objects to
 -- the base category with seeds for the next universe
 -- Also provides the setoid of unfoldings and the induced endofunctor on Setoids
 --
 -- 展开函子记录
+--
 -- 为宇宙层定义展开函子，将带形状的对象映射到基范畴，并为下一层宇宙提供种子
 -- 同时给出展开的 Setoid 结构及其诱导的 Setoids 自函子
 ------------------------------------------------------------------------

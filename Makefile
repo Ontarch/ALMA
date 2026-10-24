@@ -22,8 +22,11 @@ $(EVERYTHING): $(SRCS)
 	@echo "module Everything where" >> $@
 	@for file in $$(find src -name '*.agda' ! -name 'Everything.agda' ! -name 'index.agda' ! -name '.*' | LC_COLLATE='C' sort); do \
 	  module=$$(echo "$$file" | sed -e 's|^src/||' -e 's|/|.|g' -e 's|\.agda$$||'); \
+	  en=$$(awk 'BEGIN{h=0} /^----+$$/{if(h)exit;h=1;next} h && /^-- /{print; exit}' "$$file"); \
+	  zh=$$(awk 'BEGIN{h=0} /^----+$$/{if(h)exit;h=1;next} h && /^-- /' "$$file" | grep -m1 -P '[\x{4e00}-\x{9fff}]' || true); \
 	  echo "" >> $@; \
-	  awk 'BEGIN{ h=0 } /^----+$$/ { if (h) exit; h=1; next } h && /^-- / { print }' "$$file" >> $@; \
+	  if [ -n "$$en" ]; then echo "$$en" >> $@; fi; \
+	  if [ -n "$$zh" ] && [ "$$zh" != "$$en" ]; then echo "$$zh" >> $@; fi; \
 	  echo "import $$module" >> $@; \
 	done
 	@echo "Generated $@"

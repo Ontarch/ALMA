@@ -1,21 +1,26 @@
 ------------------------------------------------------------------------
--- Instances — the three equivalence relations as LayeredEqGen instances
--- Each of _≈C_, _≈ℱ_, _≈⇒ℱX_ is embedded into LayeredEqGen. All three
--- share the same constant observation family Σ Obj (ShapeOf FC), so
--- obs-map is the identity function. For _≈ℱ_ and _≈⇒ℱX_ the state is a
--- triple of two Cosmos and a witness; the layer carries the source-
--- target equalities that align the witness's shapeTrans and onPos
--- before comparison. Only the embedding into LayeredEqGen is definable:
--- the reverse would require eliminating those equalities, which needs
--- path irrelevance and is not available under --safe
+-- LayeredEqGen instances
 --
--- 实例 —— 三个等价关系作为 LayeredEqGen 实例
--- _≈C_、_≈ℱ_、_≈⇒ℱX_ 各自嵌入 LayeredEqGen。三者共享同一个常数观察族
--- Σ Obj (ShapeOf FC)，故 obs-map 为恒等函数。_≈ℱ_ 与 _≈⇒ℱX_ 的状态是
--- 两个 Cosmos 与见证的三元组；layer 携带源-目标等式，用于在比较前
--- 对齐见证的 shapeTrans 与 onPos。只有嵌入 LayeredEqGen 可定义：
--- 反向需要消去这些等式，需要路径无关性，在 --safe 下不可用
+-- The three equivalence relations as LayeredEqGen instances. Each of
+-- _≈C_, _≈ℱ_, _≈⇒ℱX_ is embedded into LayeredEqGen. All three share the
+-- same constant observation family Σ Obj (ShapeOf FC), so obs-map is the
+-- identity function. For _≈ℱ_ and _≈⇒ℱX_ the state is a triple of two
+-- Cosmos and a witness; the layer carries the source-target equalities
+-- that align the witness's shapeTrans and onPos before comparison. Only
+-- the embedding into LayeredEqGen is definable: the reverse would require
+-- eliminating those equalities, which needs path irrelevance and is not
+-- available under --safe.
+--
+-- LayeredEqGen 实例
+--
+-- 三个等价关系作为 LayeredEqGen 实例。_≈C_、_≈ℱ_、_≈⇒ℱX_ 各自嵌入
+-- LayeredEqGen。三者共享同一个常数观察族 Σ Obj (ShapeOf FC)，故
+-- obs-map 为恒等函数。_≈ℱ_ 与 _≈⇒ℱX_ 的状态是两个 Cosmos 与见证的
+-- 三元组；layer 携带源-目标等式，用于在比较前对齐见证的 shapeTrans
+-- 与 onPos。只有嵌入 LayeredEqGen 可定义：反向需要消去这些等式，需要
+-- 路径无关性，在 --safe 下不可用。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.Instances where

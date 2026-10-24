@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Witness over FinCat n for n ≥ 2
--- FinCat n（n ≥ 2）上的见证
 --
 -- Provides the trivial container, the tower, the two distinguished
 -- cosmoi (cosmos-idN and cosmos-const0N), and their non-bisimilarity.
@@ -8,11 +7,15 @@
 -- definitionally; this is required by cosmos-idN≉cosmos-const0N,
 -- since at n = 1 the type Fin 1 is a singleton and the two cosmoi
 -- coincide
+--
+-- FinCat n（n ≥ 2）上的见证
+--
 -- 提供平凡容器、塔、两个区分宇宙（cosmos-idN 与 cosmos-const0N）
 -- 及其非互模拟性。参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立；
 -- 这是 cosmos-idN≉cosmos-const0N 所必需的，因 n = 1 时 Fin 1 为单点集，
 -- 两个宇宙重合
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNWitness where

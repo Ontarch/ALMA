@@ -1,24 +1,25 @@
 ------------------------------------------------------------------------
--- Deterministic congruence engine for the LABEL-CHANGING container
--- regime, strictly generalising DetCongruence
+-- Label-changing congruence engine
 --
--- A carried label action σ : (x : I) → CosmosData → CosmosData replaces
--- the identity label map, so the image tree at F₀ S x carries the
--- (possibly different) label σ x d. This is the regime of the old
--- label-changing _⇒ℱ_ witnesses such as the list swap01. The canonical
--- child coverage stays label-independent, so the coinductive engine is
--- structurally the fixed-label one; the only change is that the target
--- edge fibres carry σ x dT / σ x dS instead of dT / dS. The fixed-label
--- engine is the special case σ x d = d (DetCongruence).
+-- Deterministic congruence engine for the label-changing container
+-- regime, strictly generalising DetCongruence. A carried label action
+-- σ : (x : I) → CosmosData → CosmosData replaces the identity label
+-- map, so the image tree at F₀ S x carries the (possibly different)
+-- label σ x d. This is the regime of the old label-changing _⇒ℱ_
+-- witnesses such as the list swap01. The canonical child coverage stays
+-- label-independent, so the coinductive engine is structurally the
+-- fixed-label one; the only change is that the target edge fibres carry
+-- σ x dT / σ x dS instead of dT / dS. The fixed-label engine is the
+-- special case σ x d = d (DetCongruence).
 --
--- 改标签容器制度下的确定性同余引擎，严格泛化 DetCongruence
+-- 改标签同余引擎
 --
--- 携带的标签作用 σ : (x : I) → CosmosData → CosmosData 取代恒等标签
--- 映射，使 F₀ S x 处的像树携带（可能不同的）标签 σ x d。这正是旧的
--- 改标签 _⇒ℱ_ 见证（如列表 swap01）所处的制度。规范子覆盖仍与标签
--- 无关，故余归纳引擎与固定标签版结构相同；唯一变化是目标边纤维携带
--- σ x dT / σ x dS 而非 dT / dS。固定标签引擎是 σ x d = d 的特例
--- （DetCongruence）。
+-- 改标签容器制度下的确定性同余引擎，严格泛化 DetCongruence。携带的
+-- 标签作用 σ : (x : I) → CosmosData → CosmosData 取代恒等标签映射，使
+-- F₀ S x 处的像树携带（可能不同的）标签 σ x d。这正是旧的改标签 _⇒ℱ_
+-- 见证（如列表 swap01）所处的制度。规范子覆盖仍与标签无关，故余归纳
+-- 引擎与固定标签版结构相同；唯一变化是目标边纤维携带 σ x dT / σ x dS
+-- 而非 dT / dS。固定标签引擎是 σ x d = d 的特例（DetCongruence）。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

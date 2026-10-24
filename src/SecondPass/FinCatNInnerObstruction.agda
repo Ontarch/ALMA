@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Obstruction: inner-rule admits no injective liftAt at layer 0
--- 障碍：inner-rule 在层 0 上不允许单射的 liftAt
 --
 -- This module has no constructive downstream users; it is a diagnostic
 -- instance of the general obstruction in FinCatNProjectiveObstruction.
@@ -13,6 +12,8 @@
 -- therefore unprovable for inner-rule. The parameter m encodes
 -- n = suc (suc m), so n ≥ 2 holds definitionally
 --
+-- 障碍：inner-rule 在层 0 上不允许单射的 liftAt
+--
 -- 本模块没有构造性下游使用方；它是 FinCatNProjectiveObstruction 中
 -- 一般障碍的诊断实例。它记录：为何沿 inner-rule 的 FinCat n 塔上
 -- 任意 LiftedLimitStructure 在提升后必须把层 0 的 cosmos-idN 与
@@ -21,6 +22,7 @@
 -- 因此任何要求 liftAt 0 = id（或单射）的下游结果对 inner-rule 不可证。
 -- 参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNInnerObstruction where

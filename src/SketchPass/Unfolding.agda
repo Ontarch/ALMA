@@ -1,9 +1,15 @@
 ------------------------------------------------------------------------
--- Unfolding Functor Record
+-- Unfolding functor record
 --
--- Defines the unfolding functor for a cosmos layer, mapping shaped objects to
--- the base category with seeds for the next universe
+-- Defines the unfolding functor for a cosmos layer, mapping shaped
+-- objects to the base category with seeds for the next universe.
+--
+-- 展开函子记录
+--
+-- 为宇宙层定义展开函子，将带形状的对象映射到基范畴，并为下一层宇宙
+-- 提供种子。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.Unfolding where

@@ -1,10 +1,12 @@
 ------------------------------------------------------------------------
--- StrictLift: level raising for the cumulative hierarchy
+-- Level raising for the cumulative hierarchy
+--
 -- LiftContainerFunctor — Functor (ContCat s p) → Functor (ContCat (s ⊔ s′) (p ⊔ p′))
 -- StrictLayer / strictStep / strictStep-suc — layer stepping
 -- strictEmbed — embedding a cosmos into the strictly-raised next layer
 --
--- 严格层级提升：累积层级的层级递增迭代
+-- 累积层级的层级递增迭代
+--
 -- LiftContainerFunctor —— 函子 ContCat s p → ContCat (s ⊔ s′) (p ⊔ p′)
 -- StrictLayer / strictStep / strictStep-suc —— 层级步进
 -- strictEmbed —— 将宇宙嵌入严格提升后的下一层

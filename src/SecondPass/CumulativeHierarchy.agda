@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------
 -- Cumulative Hierarchy of Cosmoi — Core Abstraction
+--
 -- Defines the iteration of shape categories: Cₙ₊₁ = ShapeCat Cₙ FCₙ,
 -- FCₙ₊₁ = FCₙ ∘F π, together with the coinductive embedding construction
 -- from EmbeddingData, the consistency conditions for uniform families,
@@ -7,6 +8,7 @@
 -- the separate module CumulativeHierarchyInstances
 --
 -- 宇宙的累积层级 —— 核心抽象
+--
 -- 定义形状范畴的迭代：Cₙ₊₁ = ShapeCat Cₙ FCₙ，FCₙ₊₁ = FCₙ ∘F π，
 -- 并给出由 EmbeddingData 构造的余归纳嵌入、一致族应满足的一致性条件，
 -- 以及 Lambek 一致性封装。 具体实例在单独的 CumulativeHierarchyInstances

@@ -1,36 +1,23 @@
 ------------------------------------------------------------------------
--- FinCat∞ projection: tower embedding, layer-0 projection, and its
--- faithfulness and conservativity
--- FinCat∞ 投影：塔嵌入、层 0 投影，及其忠实性与保守性
+-- FinCat∞ projection
 --
--- Along the tower family {FinCatN m} (m → ∞), provides the tower-family
--- embedding embedN and colimit injection projN at the functor level,
--- together with the cocone condition projN (suc m) ∘ embedN m ≅ projN m;
--- and the layer-0 projection projCosmos with its faithfulness (separation
--- is preserved) and conservativity (bisimulation is reflected), so that
--- the projection neither erases nor fabricates bisimulation information
--- between FinCatN and FinCat∞
--- 沿塔族 {FinCatN m}（m → ∞），提供函子层面的塔族嵌入 embedN 与余极限注入
--- projN，以及余锥条件 projN (suc m) ∘ embedN m ≅ projN m；
--- 并提供层 0 投影 projCosmos 及其忠实性（区分保持）与保守性（互模拟反映），
--- 使投影在 FinCatN 与 FinCat∞ 之间既不擦除也不捏造互模拟信息
+-- Tower embedding, layer-0 projection, and their faithfulness and
+-- conservativity. Along the tower family {FinCatN m} (m → ∞), provides
+-- the tower-family embedding embedN and colimit injection projN at the
+-- functor level, together with the cocone condition
+-- projN (suc m) ∘ embedN m ≅ projN m; and the layer-0 projection
+-- projCosmos with its faithfulness (separation is preserved) and
+-- conservativity (bisimulation is reflected), so that the projection
+-- neither erases nor fabricates bisimulation information between
+-- FinCatN and FinCat∞.
 --
--- Zero-subst carried style: the old partial finFromℕ-maybe / fromMaybe /
--- defaultFin (collapse to fzero out of range) machine and its two
--- proof-level subst are replaced by (1) a structurally recursive,
--- Cubical-safe strict dichotomy ≤-or-> (no Dec/Bool match), (2) the total
--- clamp representative cl from Carried.LimitSystem. extendFin reads f in
--- range and is the identity k out of range (the colimit-leg convention
--- needed by projCosmos-id); defaultFin is the total clamp. The Fin 3
--- swap witness is built directly at Fin n by rewrite m=1, deleting the
--- eight subst (λ n' → Fin n' → Fin n') casts.
--- 零 subst 携带式：旧的偏函数 finFromℕ-maybe / fromMaybe / defaultFin
--- （越界塌成 fzero）机器及其两处证明级 subst，替换为 (1) 结构化递归、
--- Cubical 安全的严格二分 ≤-or->（无 Dec/Bool 模式匹配），(2) 来自
--- Carried.LimitSystem 的全函数 clamp 代表 cl。extendFin 范围内读 f、
--- 范围外恒等于 k（projCosmos-id 所需的余极限腿约定）；defaultFin 为
--- 全函数 clamp。Fin 3 swap 见证经 rewrite m=1 直接在 Fin n 上构造，
--- 删除八处 subst (λ n' → Fin n' → Fin n') 搬移。
+-- FinCat∞ 投影
+--
+-- 塔嵌入、层 0 投影，及其忠实性与保守性。沿塔族 {FinCatN m}（m → ∞），
+-- 提供函子层面的塔族嵌入 embedN 与余极限注入 projN，以及余锥条件
+-- projN (suc m) ∘ embedN m ≅ projN m；并提供层 0 投影 projCosmos 及其
+-- 忠实性（区分保持）与保守性（互模拟反映），使投影在 FinCatN 与
+-- FinCat∞ 之间既不擦除也不捏造互模拟信息。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

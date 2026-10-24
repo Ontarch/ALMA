@@ -1,22 +1,22 @@
 ------------------------------------------------------------------------
--- Algebraic Newtonian mechanics: Jacobi identity and the harmonic
--- oscillator
+-- Algebraic Newtonian mechanics: Jacobi identity and the harmonic oscillator
 --
 -- Continuing from the preceding slices (QuadraticBilinear,
 -- QuadraticSkew), which gave ℚ-bilinearity and skew-symmetry, this
 -- slice closes the Lie-algebra axiomatics with the Jacobi identity and
 -- then instantiates the algebraic dynamics on the harmonic oscillator,
 -- whose velocities leave the constant (central) sector and rotate
--- within h₃. Everything is exact over ℚ. Every coefficient is a universal polynomial over ℚ,
--- so the standard-library ℚ ring solver discharges it.
+-- within h₃. Everything is exact over ℚ. Every coefficient is a
+-- universal polynomial over ℚ, so the standard-library ℚ ring solver
+-- discharges it.
 --
 -- 代数版牛顿力学：Jacobi 恒等式与谐振子
 --
 -- 承接前序切片（QuadraticBilinear、QuadraticSkew）已给的 ℚ-双线性与
 -- 反对称性，本切片以 Jacobi 恒等式闭合其 Lie 代数公理，继而把代数动力学
 -- 实例化为谐振子——其速度离开常数（中心）截段、在 h₃ 内部旋转。全部结论
--- 在 ℚ 上精确成立。每个系数都是 ℚ 上的
--- 全称多项式，故由标准库 ℚ 环求解器消去。
+-- 在 ℚ 上精确成立。每个系数都是 ℚ 上的全称多项式，故由标准库 ℚ 环求解器
+-- 消去。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

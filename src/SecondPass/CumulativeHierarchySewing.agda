@@ -1,16 +1,19 @@
 ------------------------------------------------------------------------
 -- CumulativeHierarchySewing — stitching, obstruction, and direction dichotomy
+--
 -- UnitSewing: unit tower stitches; unit limit is terminal
 -- FinCatSewing: outer-rule obstruction at layer 1
 -- DirectionDichotomy: for a rigid strict layer, outer-rule propagates
 -- EmbeddingData iff every shape type is a singleton
 --
 -- 累积层级缝合 —— 缝合、障碍与方向二分
+--
 -- UnitSewing：单位塔缝合；单位极限终余代数
 -- FinCatSewing：outer-rule 在第 1 层的障碍
 -- DirectionDichotomy：对刚性严格层，outer-rule 传播 EmbeddingData
 -- 当且仅当每个形状类型单元素
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.CumulativeHierarchySewing where

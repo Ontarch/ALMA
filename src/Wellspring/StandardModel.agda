@@ -1,26 +1,17 @@
-{-
-An attempt to encode the arguments of the paper into Agda code,
-before the philosophical thought of the paper fully converges
-upon Cosmos as a new mathematical structure.
+------------------------------------------------------------------------
+-- Standard model: concrete instantiation of ALMA
+--
+-- Defines basic attribute types, core beings (stable self and random
+-- environment), feedback system frameworks, coherence and consciousness
+-- emergence, transient processes with phase transitions, and the
+-- standard model overview.
+--
+-- 标准模型：ALMA 框架的具体实例化
+--
+-- 定义了基础属性类型、核心存在者（稳定自我与随机环境）、反馈系统框架、
+-- 相干性与意识涌现、含相变的瞬态过程，以及标准模型总览。
+------------------------------------------------------------------------
 
-Retained to reflect the thinking process from attempting to express
-philosophical thought in Agda to ultimately converging upon Cosmos.
-
-在论文的哲学思想完全收敛于 Cosmos 这一新的数学结构之前，
-将论文各个论证写成 Agda 代码的尝试。
-予以保留，以体现从尝试用 Agda 表达哲学思想
-并最终收敛于 Cosmos 的思考过程。
-
-Standard Model: Concrete instantiation of the ALMA universe framework
-标准模型：ALMA 宇宙框架的具体实例化
-
-Defines basic attribute types, core beings (stable self and random environment),
-feedback system frameworks, coherence and consciousness emergence,
-transient processes with phase transitions, and the standard model overview
-定义了基础属性类型、核心存在者（稳定自我与随机环境）、
-反馈系统框架、相干性与意识涌现、
-含相变的瞬态过程，以及标准模型总览
--}
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module Wellspring.StandardModel where

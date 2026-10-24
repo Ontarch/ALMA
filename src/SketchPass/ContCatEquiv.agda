@@ -3,8 +3,14 @@
 --
 -- Defines ContCatEquiv: an ObjEquivCat equipped with a functor to
 -- the container category, and a transport of containers coherent
--- with the object equivalence
+-- with the object equivalence.
+--
+-- 带对象等价与容器函子的范畴
+--
+-- 定义 ContCatEquiv：装备了到容器范畴的函子、以及与对象等价相干的
+-- 容器传输的 ObjEquivCat。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.ContCatEquiv where

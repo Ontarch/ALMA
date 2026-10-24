@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Generic obstruction for projective embeddings
--- 投影式嵌入的泛型障碍
 --
 -- For any embedding rule R and enriched tower over the FinCat n tower,
 -- if the layer-0 embedding of some pair of cosmoi collapses to
@@ -11,6 +10,9 @@
 -- and inner-rule, instantiated in FinCatNOuterObstruction and
 -- FinCatNInnerObstruction. The parameter m encodes n = suc (suc m),
 -- so n ≥ 2 holds definitionally
+--
+-- 投影式嵌入的泛型障碍
+--
 -- 对任意嵌入规则 R 与 FinCat n 塔上的丰富塔，若某对宇宙在层 0 的
 -- 嵌入在层 1 上塌缩为 _≈C_ 等价的宇宙，则 liftAt 0 无法区分该对。
 -- 从而，只要该对本身不 _≈C_ 等价，沿 R 的 LiftedLimitStructure
@@ -18,6 +20,7 @@
 -- 公共骨架，分别在 FinCatNOuterObstruction 与 FinCatNInnerObstruction
 -- 中实例化。参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNProjectiveObstruction where

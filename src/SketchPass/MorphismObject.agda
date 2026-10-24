@@ -1,9 +1,16 @@
 ------------------------------------------------------------------------
 -- Object-level homomorphisms between unfolding systems
 --
--- A MorphismObject witnesses the commutation of object/position mappings
--- with the container natural transformation, up to object equivalence
+-- Defines MorphismObject: a witness that object and position mappings
+-- commute with the container natural transformation, up to object
+-- equivalence.
+--
+-- 展开系统之间的对象级同态
+--
+-- 定义 MorphismObject：见证对象映射与位置映射同容器自然变换交换，
+-- 模去对象等价。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.MorphismObject where

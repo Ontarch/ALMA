@@ -1,9 +1,15 @@
 ------------------------------------------------------------------------
--- Container morphism equivalence lemmas and container functor basics
+-- Container morphism equivalence lemmas
 --
--- shape-level laws for _≈M_ (sym, trans, assoc, whiskering) and
--- basic functoriality of actSOf/actPOf (id, comp, resp-≈)
+-- Shape-level laws for _≈M_ (sym, trans, assoc, whiskering) and basic
+-- functoriality of actSOf / actPOf (id, comp, resp-≈).
+--
+-- 容器态射等价引理
+--
+-- _≈M_ 的形状层面代数律（对称、传递、结合、左右复合），以及
+-- actSOf / actPOf 的基础函子性（id、comp、resp-≈）。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.ContCategoryLemmas where

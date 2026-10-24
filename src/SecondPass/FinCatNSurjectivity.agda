@@ -1,17 +1,20 @@
 ------------------------------------------------------------------------
 -- Surjectivity of the dependent embedding on the FinCat n tower
--- FinCat n 塔上依赖嵌入的满射性
 --
 -- Proves SurjectivityForTower for arbitrary uniform embedding families:
 -- every cosmos at layer suc k arises, up to _≈C_, as dep-embed-tower k y
 -- for some y at layer k. Uses only the tower's intrinsic structural facts
 -- (shape-singleton-at, pos-inhabited-tower). The parameter m encodes
 -- n = suc (suc m), so n ≥ 2 holds definitionally
+--
+-- FinCat n 塔上依赖嵌入的满射性
+--
 -- 对任意一致嵌入族证明 SurjectivityForTower：第 suc k 层的任意宇宙都
 -- 在 _≈C_ 意义下等于某第 k 层宇宙 y 的 dep-embed-tower k y 像。
 -- 仅使用塔的固有结构事实（shape-singleton-at、pos-inhabited-tower）。
 -- 参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNSurjectivity where

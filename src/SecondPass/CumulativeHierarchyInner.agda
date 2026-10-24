@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- CumulativeHierarchyInner — the inner-preserving embedding direction
--- 累积层级内层 —— 保内层方向的嵌入
 --
 -- Provides the inner-preserving direction of the unfold functor,
 -- F₀ ((A, s₀), s₁) = (A, s₀), i.e. the fibration projection π' of the
@@ -9,6 +8,9 @@
 -- unconditionally constructible at any shape type — in contrast to the
 -- outer direction of CumulativeHierarchy, whose obstruction demands
 -- s₁ ≡ s₀
+--
+-- 累积层级内层 —— 保内层方向的嵌入
+--
 -- 给出展开函子的保内层方向 F₀ ((A, s₀), s₁) = (A, s₀)，即 Elements
 -- 构造的纤维化投影 π'。因 F₀ 定义性等于第一分量投影，retract 退化为
 -- 恒等，EmbeddingData 对任意形状类型无条件成立；这与 CumulativeHierarchy

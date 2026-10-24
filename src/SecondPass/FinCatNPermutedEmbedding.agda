@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Permuted embedding: refuting the extended criterion C
--- 置换嵌入：反驳扩展后的判据 C
 --
 -- For every f : Fin n → Fin n with a left inverse, constructs a
 -- tower-specific embedding permuted-embed f (layer-k F₀ maps z to
@@ -10,6 +9,9 @@
 -- layer 0, while liftAt 0 is the identity and hence injective — refuting
 -- criterion C: feasibility does not imply preservation of input F₀
 -- The witness is unconditional via swap01
+--
+-- 置换嵌入：反驳扩展后的判据 C
+--
 -- 对每个带左逆的 f : Fin n → Fin n，构造塔特定嵌入 permuted-embed f
 -- （第 k 层 F₀ 映 z 为 liftF k f (x.F₀ (proj₁ z))）与 liftAt
 -- （施加 invPow k f f⁻¹ 抵消累积的 f），打包为 PermutedPathWitness
@@ -18,6 +20,7 @@
 -- 见证经 swap01 无条件成立
 -- 参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNPermutedEmbedding where

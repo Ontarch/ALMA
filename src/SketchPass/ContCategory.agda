@@ -3,8 +3,15 @@
 --
 -- Defines the equivalence _≈M_ on containers (polynomial functors)
 -- (propositional equality of shapes, heterogeneous equality of positions
--- via transport), verifies the category laws, and constructs a Category instance
+-- via transport), verifies the category laws, and constructs a Category
+-- instance.
+--
+-- 容器范畴
+--
+-- 定义容器（多项式函子）上的等价 _≈M_（形状命题相等、位置经传输的异质
+-- 相等），验证范畴律，并构造 Category 实例。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.ContCategory where

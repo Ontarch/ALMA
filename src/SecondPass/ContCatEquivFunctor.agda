@@ -1,12 +1,15 @@
 ------------------------------------------------------------------------
 -- Morphisms between ContCat-valued functors
+--
 -- A natural transformation α : FC ⟹ FD ∘ H
 -- where FC, FD : ContCat-valued functors, H : C → D
 --
 -- ContCat 值函子之间的态射
+--
 -- 自然变换 α : FC ⟹ FD ∘ H，
 -- 其中 FC、FD 为取值于 ContCat 的函子，H : C → D 为基函子
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.ContCatEquivFunctor where

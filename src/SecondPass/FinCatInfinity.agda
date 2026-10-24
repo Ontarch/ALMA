@@ -1,35 +1,19 @@
 ------------------------------------------------------------------------
 -- FinCat∞: the colimit category Indiscrete ℕ (carried, zero-subst core)
--- FinCat∞：余极限范畴 Indiscrete ℕ（携带式零 subst 内核）
 --
 -- The family {FinCatN m} = {Indiscrete (Fin n_m)}, n_m = suc (suc m),
 -- has colimit Indiscrete ℕ. This module now keeps only the live surface:
 --
 --   FinCat∞ / TrivialFC∞ / ∞Layer / ∞Idx / ∞Tower / n-at
 --
--- The Set-level colimit universal property (formerly a ~170-line
--- construction with inject₁^d packaged in subst Fin (+-suc) and a
--- two-way ≤-total argument) is now provided ZERO-SUBST by
--- ALMA.Cosmos.Carried.FinColimit (FinCone / colimitUniv), re-exported
--- below under the historical names for a stable API. The d-fold finite
--- embedding is embFin from LimitSystem, whose target size
--- n-at (shift d m) reduces definitionally (shift d m = m + d by the same
--- recursion), so there is no subst Fin (+-suc) / castCosmos /
--- ShiftedTower anywhere.
+-- FinCat∞：余极限范畴 Indiscrete ℕ（携带式零 subst 内核）
 --
 -- 有限族 {FinCatN m} = {Indiscrete (Fin n_m)}（n_m = suc (suc m)）的余
 -- 极限为 Indiscrete ℕ。本模块现在只保留活跃表面：
 --
 --   FinCat∞ / TrivialFC∞ / ∞Layer / ∞Idx / ∞Tower / n-at
---
--- Set 层余极限泛性质（先前是约 170 行、把 inject₁^d 包在
--- subst Fin (+-suc) 并用双向 ≤-total 的构造）现由
--- ALMA.Cosmos.Carried.FinColimit（FinCone / colimitUniv）零 subst 提
--- 供，并在下方以历史名重新导出以稳定 API。d 次有限嵌入即 LimitSystem
--- 的 embFin，其目标尺寸 n-at (shift d m) 定义性归约（shift d m 与
--- m + d 是同一递归），故全程无 subst Fin (+-suc) / castCosmos /
--- ShiftedTower。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatInfinity where

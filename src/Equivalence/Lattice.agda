@@ -6,6 +6,8 @@
 -- them spans a two-axis parameter space. The records are related by
 -- projections, not inclusions: no canonical map back exists in general.
 --
+-- 退化格
+--
 -- LayeredEqGen 的退化格。LayeredEqGen 有两个字段：fst（当前层）与
 -- snd（递归）；保留或去掉它们张成一个两轴参数空间。记录之间由投影
 -- 联系，而非包含：一般不存在反向的典范映射。

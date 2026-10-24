@@ -1,8 +1,12 @@
 ------------------------------------------------------------------------
--- Finite-depth half of the terminal sequence of the indexed
--- edge-family functor
+-- Finite-depth terminal sequence
 --
--- 索引边族函子终序列的有限深度一半
+-- The finite-depth half of the terminal sequence of the indexed
+-- edge-family functor.
+--
+-- 有限深度终序列
+--
+-- 索引边族函子终序列的有限深度一半。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

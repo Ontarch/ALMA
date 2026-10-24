@@ -1,22 +1,18 @@
-{-
-An attempt to encode the arguments of the paper into Agda code,
-before the philosophical thought of the paper fully converges
-upon Cosmos as a new mathematical structure.
-
-Retained to reflect the thinking process from attempting to express
-philosophical thought in Agda to ultimately converging upon Cosmos.
-
-在论文的哲学思想完全收敛于 Cosmos 这一新的数学结构之前，
-将论文各个论证写成 Agda 代码的尝试。
-予以保留，以体现从尝试用 Agda 表达哲学思想
-并最终收敛于 Cosmos 的思考过程。
-
-Dynamic correlation from beings to the totality of beings; the relationship between finite perspectives and infinite essence
-从存在者到存在者整体的动态关联性，有限视角与无限本质的关系
+------------------------------------------------------------------------
+-- Universe structure and the non-reconstruction theorem
 --
-Universe structure, projection and non-reconstruction theorem, inevitability of non-uniformity theorem, interaction, coupling, and common essence
-宇宙结构、投影与不可重构定理、非均匀性必然定理、交互、耦合与共同本质
--}
+-- Dynamic correlation from beings to the totality of beings; the
+-- relationship between finite perspectives and infinite essence.
+-- Universe structure, projection and non-reconstruction theorem,
+-- inevitability of non-uniformity theorem, interaction, coupling, and
+-- common essence.
+--
+-- 宇宙结构与不可重构定理
+--
+-- 从存在者到存在者整体的动态关联性，有限视角与无限本质的关系。
+-- 宇宙结构、投影与不可重构定理、非均匀性必然定理、交互、耦合与共同本质。
+------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module Wellspring.Universe where

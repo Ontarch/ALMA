@@ -1,9 +1,16 @@
 ------------------------------------------------------------------------
--- MorphismMorphism: compatibility of position maps with hom-actions
+-- Compatibility of position maps with hom-actions
 --
--- onActP : onPos commutes with the container position maps actPOf,
---          modulo the shape transport induced by the naturality of CF
+-- Defines MorphismMorphism: onPos commutes with the container position
+-- maps actPOf, modulo the shape transport induced by the naturality of
+-- the container natural transformation.
+--
+-- 位置映射与态射作用的相容性
+--
+-- 定义 MorphismMorphism：onPos 与容器位置映射 actPOf 交换，模去由容器
+-- 自然变换的自然性所诱导的形状传输。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.MorphismMorphism where

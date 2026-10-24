@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Conditional non-triviality of a limit over the FinCat n tower
--- FinCat n 塔上极限的条件性非平凡性
 --
 -- Defines the ideal universal property a limit over an enriched tower
 -- would have to satisfy (Cocone, UniversalLimit), non-triviality as
@@ -11,6 +10,9 @@
 -- over any EnrichedTower outer-rule i. The construction of a
 -- non-triviality witness is parameterised over FinCatN m and lives in
 -- the nested module FinCatNVariants
+--
+-- FinCat n 塔上极限的条件性非平凡性
+--
 -- 定义丰富塔上极限应满足的理想泛性质（Cocone、UniversalLimit），
 -- 以 liftAt 的区分性定义非平凡性（NontrivialLimit），并证明：
 -- 若目标空间平凡（所有宇宙互模拟），则不存在非平凡极限；
@@ -19,6 +21,7 @@
 -- EnrichedTower outer-rule i 泛型陈述。非平凡见证的构造以
 -- FinCatN m 为参数，位于嵌套模块 FinCatNVariants 中
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.ConditionalNontrivialLimit where

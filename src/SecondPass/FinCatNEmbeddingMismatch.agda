@@ -1,19 +1,22 @@
 ------------------------------------------------------------------------
 -- Diagnostic: outer-rule ≠ dep-embed at every layer of the FinCat n tower
+--
 -- Also exposes a general mismatch skeleton (embed-mismatch-general):
 -- strictEmbed and dep-embed-general differ whenever the input cosmos's
--- F₀ is non-trivial on some shape, as witnessed by a probe function
+-- F₀ is non-trivial on some shape, as witnessed by a probe function.
 -- No downstream users; records why FinCatNColimit.WithSurjectivity's
 -- `embed-eq` is unsatisfiable for R = outer-rule. The parameter m
--- encodes n = suc (suc m), so n ≥ 2 holds definitionally
+-- encodes n = suc (suc m), so n ≥ 2 holds definitionally.
+--
 -- 诊断：outer-rule 在 FinCat n 塔的每一层上 ≠ dep-embed
--- 同时暴露一般化不匹配骨架 embed-mismatch-general：
--- 当输入宇宙的 F₀ 在某形状上非平凡（由探针函数见证）时，
--- strictEmbed 与 dep-embed-general 不相等
--- 无下游使用方；记录 FinCatNColimit.WithSurjectivity 的 `embed-eq`
--- 在 R = outer-rule 下不可满足。参数 m 编码 n = suc (suc m)，
--- 使 n ≥ 2 定义性成立
+--
+-- 同时暴露一般化不匹配骨架 embed-mismatch-general：当输入宇宙的 F₀
+-- 在某形状上非平凡（由探针函数见证）时，strictEmbed 与
+-- dep-embed-general 不相等。无下游使用方；记录
+-- FinCatNColimit.WithSurjectivity 的 `embed-eq` 在 R = outer-rule 下
+-- 不可满足。参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNEmbeddingMismatch where

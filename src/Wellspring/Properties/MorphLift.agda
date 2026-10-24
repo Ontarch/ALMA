@@ -1,14 +1,14 @@
 ------------------------------------------------------------------------
--- MorphLift: lifting morphisms to unfolded cosmoi
+-- Lifting morphisms to unfolded cosmoi
 --
 -- A coinductive structure assigning to each hom and shape a morphism
 -- between the corresponding unfolded cosmoi, together with compatibility
 -- with identity and composition.
 --
--- MorphLift：将态射提升到展开宇宙
+-- 将态射提升到展开宇宙
 --
--- 余归纳结构，为每个 hom 与 shape 指派对应展开宇宙之间的态射，
--- 并要求其与恒等和复合相容。
+-- 余归纳结构，为每个 hom 与 shape 指派对应展开宇宙之间的态射，并要求
+-- 其与恒等和复合相容。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

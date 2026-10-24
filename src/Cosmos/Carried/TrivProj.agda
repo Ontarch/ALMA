@@ -1,19 +1,21 @@
 ------------------------------------------------------------------------
+-- Surjective finite projections
+--
 -- Surjective finite-projection correspondences between trivial-fibre
--- deterministic systems (the carried projCosmos)
+-- deterministic systems (the carried projCosmos). A stage of the
+-- FinCat tower is a trivial-fibre system over Fin (n-at m), and the
+-- limit L∞ is one over ℕ. The finite projection
+-- projCosmos m : L∞ → stage m is a surjective index map u : I → J,
+-- hence a child-surjective MCorr FMap. childF is edge-independent and
+-- uses the section: the canonical source child of any target child v
+-- is pre v with graph witness surj v. The edge fibres are
+-- index-equality propositions, so the FiberAdj round-trips η / ε
+-- relate two proofs of the SAME equality and are closed by UIP derived
+-- from decidable equality (Hedberg).
 --
--- A stage of the FinCat tower is a trivial-fibre system over
--- Fin (n-at m), and the limit L∞ is one over ℕ. The finite projection
--- projCosmos m : L∞ → stage m is a surjective index map u : I → J, hence
--- a child-surjective MCorr FMap. childF is edge-independent and uses
--- the section: the canonical source child of any target child v is
--- pre v with graph witness surj v. The edge fibres are index-equality
--- propositions, so the FiberAdj round-trips η / ε relate two proofs of
--- the SAME equality and are closed by UIP derived from decidable
--- equality (Hedberg).
+-- 满射有限投影
 --
--- 平凡纤维确定性系统之间的满射有限投影对应（携带式 projCosmos）
---
+-- 平凡纤维确定性系统之间的满射有限投影对应（携带式 projCosmos）。
 -- FinCat 塔的一层是 Fin (n-at m) 上的平凡纤维系统，极限 L∞ 是 ℕ 上的
 -- 同类系统。有限投影 projCosmos m : L∞ → 第 m 层 是满射索引映射
 -- u : I → J，故是子节点满的 MCorr FMap。childF 与边无关并用截面：目标

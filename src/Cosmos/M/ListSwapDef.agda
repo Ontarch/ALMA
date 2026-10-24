@@ -1,26 +1,25 @@
 ------------------------------------------------------------------------
+-- Definitionally involutive list swap
+--
 -- ListSwapDef: a label-changing deterministic endomorphism on a small
--- universe whose position permutation is DEFINITIONALLY involutive on
--- every relevant shape
+-- universe whose position permutation is definitionally involutive on
+-- every relevant shape. The carried fibre adjunction closes by pure
+-- construction. The position set at shape n is Fin n ⊎ Fin n (two
+-- copies), and flip swaps the two summands. inj₁/inj₂ are constructors
+-- of the ordinary (non-indexed) sum type, so splitting on them is legal
+-- under --cubical-compatible, and flip ∘ flip reduces to the identity
+-- definitionally in every clause. Contrast: the general ℕ/Fin swap01
+-- (ListSwap) only has propositional involution and needs the conditional
+-- DecUIP theorem for ε.
 --
--- The carried fibre adjunction closes by pure construction.
--- The position set at shape n is Fin n ⊎ Fin n (two copies), and
--- flip swaps the two summands.
--- inj₁/inj₂ are constructors of the ordinary (non-indexed) sum type, so
--- splitting on them is legal under --cubical-compatible, and
--- flip ∘ flip reduces to the identity definitionally in every clause.
--- Contrast: the general ℕ/Fin swap01 (ListSwap) only has propositional
--- involution and needs the conditional DecUIP theorem for ε.
+-- 定义性对合的列表交换
 --
--- ListSwapDef：一个小宇宙上的改标签确定性自态射，其位置置换在所有相
--- 关形状上均定义性对合
---
--- 携带纤维伴随由纯构造闭合。
--- 形状 n 处的位置集为 Fin n ⊎ Fin n（两份副本），置换 flip 交换两个
--- 求和分支。inj₁/inj₂ 是普通（非索引）求和类型的构造子，故在
--- --cubical-compatible 下对其匹配合法，且 flip ∘ flip 在每个子句中
--- 定义性归约为恒等。对照：一般 ℕ/Fin 的 swap01（ListSwap）仅命题对合，
--- 其 ε 需要条件 DecUIP 定理。
+-- ListSwapDef：一个小宇宙上的改标签确定性自态射，其位置置换在所有相关
+-- 形状上均定义性对合。携带纤维伴随由纯构造闭合。形状 n 处的位置集为
+-- Fin n ⊎ Fin n（两份副本），置换 flip 交换两个求和分支。inj₁/inj₂ 是
+-- 普通（非索引）求和类型的构造子，故在 --cubical-compatible 下对其匹配
+-- 合法，且 flip ∘ flip 在每个子句中定义性归约为恒等。对照：一般 ℕ/Fin
+-- 的 swap01（ListSwap）仅命题对合，其 ε 需要条件 DecUIP 定理。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

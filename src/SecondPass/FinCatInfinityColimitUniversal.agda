@@ -1,28 +1,16 @@
 ------------------------------------------------------------------------
 -- Universal property of the compatible-tower colimit
--- 相容塔余极限泛性质
 --
 -- Provides the colimit cocone, the cross-category morphism equivalence
 -- _≈⇒ℱX_, the iterated tower embeddings embedCosmos^d / lift-subtower,
 -- and the left-unit law for comp⇒ℱX-id-left
+--
+-- 相容塔余极限泛性质
+--
 -- 提供余极限余锥、跨范畴态射等价 _≈⇒ℱX_、迭代塔嵌入 embedCosmos^d /
 -- lift-subtower，以及 comp⇒ℱX-id-left 的左单位律
---
--- Zero-subst carried style: the d-fold Fin embedding is the carried
--- embFin (re-exported as inject₁^d from FinCatInfinity, target size
--- n-at (shift d m) reduces definitionally); the finFromℕ-maybe /
--- restrictFin machine in embedCosmos congruence is replaced by the total
--- clamp representative cl and the FinEmbed lemmas embedF-inject₁ /
--- embedF-newtop split by the Cubical-safe ≤-or->; the single transport
--- subst in transport-to-S-proj is replaced by a plain rewrite of the
--- natural-number index equality. No subst, no cast, no Maybe, no Dec/Bool.
--- 零 subst 携带式：d 次 Fin 嵌入即携带式 embFin（由 FinCatInfinity 再导出
--- 为 inject₁^d，目标尺寸 n-at (shift d m) 定义性归约）；embedCosmos 同余
--- 中的 finFromℕ-maybe / restrictFin 机器替换为全函数 clamp 代表 cl 与
--- FinEmbed 引理 embedF-inject₁ / embedF-newtop，按 Cubical 安全的
--- ≤-or-> 拆分；transport-to-S-proj 中唯一的传输 subst 改为对自然数索引
--- 等式的普通 rewrite。无 subst、无 cast、无 Maybe、无 Dec/Bool。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatInfinityColimitUniversal where

@@ -1,20 +1,21 @@
 ------------------------------------------------------------------------
+-- Non-trivial fibre pull tower
+--
 -- Non-trivial fibre inverse (pull / limit) system on identity-index
--- carried functors
+-- carried functors. The push tower only carries labels forward (l-emb).
+-- A cochain needs a backward arrow, so an inverse system adds l-proj,
+-- the retraction of l-emb on the already-born part
+-- (proj-emb : l-proj ∘ l-emb ≡ id). Every arrow keeps the global id,
+-- hence is an identity-index Idx⇒ and the construction lives in
+-- SameIndexCatS: the limit fibre carries a pointwise setoid.
 --
--- The push tower only carries labels forward (l-emb). A cochain needs a
--- backward arrow, so an inverse system adds l-proj, the retraction of
--- l-emb on the already-born part (proj-emb : l-proj ∘ l-emb ≡ id).
--- Every arrow keeps the global id, hence is an identity-index Idx⇒ and
--- the construction lives in SameIndexCatS: the limit fibre carries
--- a pointwise setoid.
+-- 非平凡纤维 pull 塔
 --
--- 同索引携带函子上的非平凡纤维逆向（pull / limit）系统
---
--- push 塔只向前携带标签（l-emb）。余链需要反向箭头，故逆向系统加入
--- l-proj，即 l-emb 在已诞生部分上的收缩
--- （proj-emb：l-proj ∘ l-emb ≡ id）。每条箭头保持全局 id，因而是索引
--- 恒等的 Idx⇒，构造落在 SameIndexCatS 中：极限纤维携带逐点 setoid。
+-- 同索引携带函子上的非平凡纤维逆向（pull / limit）系统。push 塔只向前
+-- 携带标签（l-emb）。余链需要反向箭头，故逆向系统加入 l-proj，即 l-emb
+-- 在已诞生部分上的收缩（proj-emb：l-proj ∘ l-emb ≡ id）。每条箭头保持
+-- 全局 id，因而是索引恒等的 Idx⇒，构造落在 SameIndexCatS 中：极限纤维
+-- 携带逐点 setoid。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

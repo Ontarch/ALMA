@@ -1,17 +1,20 @@
 ------------------------------------------------------------------------
--- FinCatNColimit — dependent embedding and LimitLayer for the FinCat n tower
--- FinCatNColimit —— FinCat n 塔的依赖嵌入与极限层
+-- Dependent embedding and LimitLayer for the FinCat n tower
 --
 -- Provides dep-F₀, dep-F₁, dep-embed, the LimitLayer with
 -- layer∞ = nLayer, the LimitCompatible proof, the layer lifting map
 -- dep-liftAt with its resp/step lemmas, and the conditional framework
 -- WithSurjectivity (parameterised by R, fams, embed-eq, surj)
--- The parameter m encodes n = suc (suc m), so n ≥ 2 holds definitionally
+-- The parameter m encodes n = suc (suc m), so n ≥ 2 holds definitionally.
+--
+-- FinCat n 塔的依赖嵌入与极限层
+--
 -- 提供 dep-F₀、dep-F₁、dep-embed、layer∞ = nLayer 的 LimitLayer、
 -- LimitCompatible 证明、层提升映射 dep-liftAt 及其 resp/step 引理，
 -- 以及条件性框架 WithSurjectivity（以 R、fams、embed-eq、surj 为参数）
--- 参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立
+-- 参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNColimit where

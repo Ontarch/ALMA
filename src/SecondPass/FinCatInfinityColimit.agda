@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Cross-category cosmos morphisms and colimit of a compatible tower
--- 跨范畴宇宙态射与相容塔的余极限
 --
 -- Defines the cross-category cosmos morphism _⇒ℱX[_]_, its identity and
 -- composition, and the shape functors S-proj / S-embed associated with
@@ -9,24 +8,14 @@
 -- x_{suc m} ≈C embedCosmos m x_m; its colimit towerColimit satisfies
 -- projCosmos m x_m ≈C towerColimit for all m, and is unique.
 --
+-- 跨范畴宇宙态射与相容塔的余极限
+--
 -- 定义跨范畴宇宙态射 _⇒ℱX[_]_ 及其恒等与复合，以及塔相关的形状函子
 -- S-proj 与 S-embed。借助这些，projCosmos 与 embedCosmos 被提升为
 -- 跨范畴态射。相容塔 {x_m} 满足 x_{suc m} ≈C embedCosmos m x_m；
 -- 其余极限 towerColimit 满足对所有 m，projCosmos m x_m ≈C towerColimit，且唯一。
---
--- Zero-subst carried style: the partial finFromℕ-maybe / restrictFin
--- machine and every explicit Fin-index subst are deleted. The total clamp
--- representative cl (exact on the inject₁ image, top dummy beyond range)
--- supplies both the projection default and the embedding predecessor;
--- cross-stage agreement is cl-embed-default, and the only rewrites are
--- natural-number stage arithmetic (m + suc d = suc (m + d) is definitional,
--- m + (k ∸ m) = k by m+[n∸m]≡n). No subst, no cast, no Dec/Bool match.
--- 零 subst 携带式：删除偏函数 finFromℕ-maybe / restrictFin 机器及所有
--- 显式 Fin 索引 subst。全函数 clamp 代表 cl（inject₁ 像上精确、越界取
--- 末位哑元）同时提供投影默认值与嵌入前驱；跨层一致由 cl-embed-default
--- 给出，唯一的 rewrite 是自然数层算术（m + suc d = suc (m + d) 为定义性，
--- m + (k ∸ m) = k 由 m+[n∸m]≡n）。无 subst、无 cast、无 Dec/Bool 匹配。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatInfinityColimit where

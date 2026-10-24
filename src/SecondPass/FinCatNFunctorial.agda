@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Functoriality of the FinCat n tower at every layer
--- FinCat n 塔每一层上的函子性
 --
 -- The default uniform embedding family of the FinCat n tower is
 -- functorial at every layer: for each k, embed′ k preserves _≈C_, and
@@ -10,6 +9,9 @@
 -- invariance proof. These yield the EmbedFamily at every layer and the
 -- EnrichedTower instance along the outer-preserving rule. The parameter
 -- m encodes n = suc (suc m), so n ≥ 2 holds definitionally
+--
+-- FinCat n 塔每一层上的函子性
+--
 -- FinCat n 塔的默认一致嵌入族在每一层上均函子性：对每个 k，
 -- embed′ k 保持 _≈C_，且 strictEmbed 保持 _≈C_。证明依赖两个塔的
 -- 固有事实：层容器函子的 F₀ 在任意态射下不变，且 actSOf 与沿该
@@ -17,6 +19,7 @@
 -- 规则的 EnrichedTower 实例。参数 m 编码 n = suc (suc m)，
 -- 使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNFunctorial where

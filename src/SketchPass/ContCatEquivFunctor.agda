@@ -1,9 +1,17 @@
 ------------------------------------------------------------------------
--- ContCatEquivFunctor: morphism between ContCatEquiv instances
+-- Morphism between ContCatEquiv instances
 --
--- Combines an ObjEquivFunctor with a container natural transformation
--- contCatEquivFunctorFromIso: constructor using objEquivFunctorFromIso + a natural transformation
+-- Combines an ObjEquivFunctor with a container natural transformation.
+-- contCatEquivFunctorFromIso: constructor using
+-- objEquivFunctorFromIso plus a natural transformation.
+--
+-- ContCatEquiv 实例间的态射
+--
+-- 将 ObjEquivFunctor 与容器自然变换组合起来。
+-- contCatEquivFunctorFromIso：使用 objEquivFunctorFromIso 加一个自然
+-- 变换的构造器。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.ContCatEquivFunctor where

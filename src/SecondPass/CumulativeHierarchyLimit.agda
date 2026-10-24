@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Cumulative Hierarchy Limit — the tower and its layers
--- 累积层级的极限 —— 塔及其各层
 --
 -- Defines the indexing of strictly-growing layers, the Tower record and
 -- its iterated layers, the LimitLayer and LimitCompatible records, the
@@ -8,10 +7,14 @@
 -- the unit tower instance. The framework is parameterised by an
 -- EmbeddingRule R, making it direction-agnostic; the unit instance uses
 -- outer-rule
+--
+-- 累积层级的极限 —— 塔及其各层
+--
 -- 定义严格增长层级的索引、含迭代层的 Tower 记录、LimitLayer 与
 -- LimitCompatible 记录、迭代嵌入 iterEmbed 及其复合律，以及单位塔实例
 -- 框架以 EmbeddingRule R 为参数，使其方向无关；单位实例使用 outer-rule
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.CumulativeHierarchyLimit where

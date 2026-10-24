@@ -1,30 +1,31 @@
 ------------------------------------------------------------------------
--- Non-commutativity of the position permutation group Sₙ for n ≥ 3, and
--- the 3-cycle, on the carried M base
+-- Non-commutative position permutations
 --
--- The algebra lives in the carried position automorphism group PosAutˢ
--- of ContainerAutomorphism (Part A): a per-shape permutation with a
--- carried two-sided inverse, no naturality / subst field. To keep
--- everything definitional and free of Fin indexed matching (and hence
--- of DecUIP/K), the finite position sets are ordinary NON-indexed
--- enumerations Three / Two; matching their constructors is legal under
--- --cubical-compatible, the transpositions are definitionally
--- involutive, the 3-cycle reduces to refl in three clauses, and every
--- disequality is constructive no-confusion absorbed by the empty
--- pattern. This supplies the group-level fact that makes the
--- cosmos-level routing divergence unavoidable for n ≥ 3 (the two
+-- Non-commutativity of the position permutation group Sₙ for n ≥ 3,
+-- and the 3-cycle, on the carried M base. The algebra lives in the
+-- carried position automorphism group PosAutˢ of ContainerAutomorphism
+-- (Part A): a per-shape permutation with a carried two-sided inverse, no
+-- naturality / subst field. To keep everything definitional and free of
+-- Fin indexed matching (and hence of DecUIP/K), the finite position sets
+-- are ordinary non-indexed enumerations Three / Two; matching their
+-- constructors is legal under --cubical-compatible, the transpositions
+-- are definitionally involutive, the 3-cycle reduces to refl in three
+-- clauses, and every disequality is constructive no-confusion absorbed
+-- by the empty pattern. This supplies the group-level fact that makes
+-- the cosmos-level routing divergence unavoidable for n ≥ 3 (the two
 -- orderings of s01, s12 already disagree at position 1), together with
 -- the n = 2 abelian threshold.
 --
--- 携带式 M 底座上位置置换群 Sₙ 在 n ≥ 3 时的非交换性与 3-循环
+-- 位置置换的非交换性
 --
--- 代数落在 ContainerAutomorphism（A 部）的携带位置自同构群 PosAutˢ：
--- 携带双侧逆的逐形状置换，无自然性 / subst 字段。为使一切定义性且免于
--- Fin 索引匹配（也即免于 DecUIP/K），有限位置集声明为普通的非索引枚举
--- Three / Two；在 --cubical-compatible 下匹配其构造子合法，对换定义
--- 性对合，3-循环三条子句即归约为 refl，每个不等都是构造性无混淆、由
--- 空模式吸收。这供给使宇宙层路由发散在 n ≥ 3 不可避免的群级事实
--- （s01、s12 的两种次序已在位置 1 处不同），以及 n = 2 的阿贝尔阈值。
+-- 携带式 M 底座上位置置换群 Sₙ 在 n ≥ 3 时的非交换性与 3-循环。代数
+-- 落在 ContainerAutomorphism（A 部）的携带位置自同构群 PosAutˢ：携带
+-- 双侧逆的逐形状置换，无自然性 / subst 字段。为使一切定义性且免于 Fin
+-- 索引匹配（也即免于 DecUIP/K），有限位置集声明为普通的非索引枚举
+-- Three / Two；在 --cubical-compatible 下匹配其构造子合法，对换定义性
+-- 对合，3-循环三条子句即归约为 refl，每个不等都是构造性无混淆、由空
+-- 模式吸收。这供给使宇宙层路由发散在 n ≥ 3 不可避免的群级事实（s01、
+-- s12 的两种次序已在位置 1 处不同），以及 n = 2 的阿贝尔阈值。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

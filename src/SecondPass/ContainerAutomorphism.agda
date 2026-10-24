@@ -1,18 +1,18 @@
 ------------------------------------------------------------------------
--- Position automorphisms of a container C and their induced
--- endomorphisms on Cosmos objects over the constant functor returning C
--- 容器 C 的位置自同构及其在基于常值函子返回 C 的 Cosmos 对象上
--- 诱导的自态射
+-- Position automorphisms of a container C
 --
 -- Defines PosAut (position automorphisms with naturality), its group
 -- structure under composition (posAutGroup), and the map aut→⇒ℱ sending
 -- each position automorphism to a structured simulation x ⇒ℱ x. Proves
 -- aut→⇒ℱ is a group homomorphism (aut-id, aut-comp, aut-inv), injective
--- (aut-injective), and respects _≈PA_ (aut→⇒ℱ-resp-≈)
+-- (aut-injective), and respects _≈PA_ (aut→⇒ℱ-resp-≈).
+--
+-- 容器 C 的位置自同构
+--
 -- 定义 PosAut（具有自然性的位置自同构）、其复合下的群结构
 -- （posAutGroup），以及将每个位置自同构映射为结构化模拟 x ⇒ℱ x 的
 -- 映射 aut→⇒ℱ。证明 aut→⇒ℱ 是群同态（aut-id、aut-comp、aut-inv）、
--- 单射（aut-injective），并保持 _≈PA_（aut→⇒ℱ-resp-≈）
+-- 单射（aut-injective），并保持 _≈PA_（aut→⇒ℱ-resp-≈）。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

@@ -1,9 +1,16 @@
 ------------------------------------------------------------------------
 -- Category with an object equivalence relation
 --
--- Defines ObjEquivCat: a Category equipped with an object equivalence _≈ₒ_ and a coherent transport of morphisms
--- The standard instance uses the notion of isomorphism from category theory
+-- Defines ObjEquivCat: a Category equipped with an object equivalence
+-- _≈ₒ_ and a coherent transport of morphisms. The standard instance
+-- uses the notion of isomorphism from category theory.
+--
+-- 带对象等价关系的范畴
+--
+-- 定义 ObjEquivCat：装备了对象等价 _≈ₒ_ 与相干态射传输的范畴。标准
+-- 实例采用范畴论中的同构概念。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.ObjEquivCat where

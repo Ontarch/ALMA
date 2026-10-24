@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
--- DependentEmbedding — type class for dependent strict embeddings
--- DependentEmbedding —— 依赖严格嵌入的类型类
+-- Type class for dependent strict embeddings
 --
 -- Defines the type class DependentEmbeddingRule, whose EmbedDep field
 -- captures the exact prerequisites of the dependent strict embedding
@@ -8,11 +7,15 @@
 -- singletons of the next layer. The pointwise equality embed-eq becomes
 -- definitional (refl) once dep-embed-general is registered as the
 -- EmbedDep field of dep-rule
+--
+-- 依赖严格嵌入的类型类
+--
 -- 定义类型类 DependentEmbeddingRule，其 EmbedDep 字段精确刻画
 -- 依赖严格嵌入 dep-embed 的前提条件：位置居民、位置单点性、
 -- 以及下一层的形状单点性。一旦把 dep-embed-general 注册为
 -- dep-rule 的 EmbedDep 字段，逐点等式 embed-eq 就成为定义性相等（refl）
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.DependentEmbedding where

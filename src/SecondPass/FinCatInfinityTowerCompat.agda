@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
--- Tower embedding compatibility: projCosmos (suc m) ∘ embedCosmos m ≈C projCosmos m
--- 塔嵌入兼容性：projCosmos (suc m) ∘ embedCosmos m ≈C projCosmos m
+-- Tower embedding compatibility
 --
+-- projCosmos (suc m) ∘ embedCosmos m ≈C projCosmos m:
 -- embedCosmos m embeds a cosmos on FinCatN m into FinCatN (suc m):
 --   F₀ = embedF f: on the inject₁ image apply f then inject₁, the new top
 --   element is fixed; unfold-next follows the edge at the total clamp
@@ -11,6 +11,10 @@
 -- unfold-next lemma cl-embed-default says the two clamp representatives
 -- agree across stages. This is the colimit cocone compatibility at the
 -- cosmos level.
+--
+-- 塔嵌入兼容性
+--
+-- 证明 projCosmos (suc m) ∘ embedCosmos m ≈C projCosmos m：
 -- embedCosmos m 将层 m 宇宙嵌入层 suc m：
 --   F₀ = embedF f：在 inject₁ 像上先应用 f 再注入，新末位元素固定；
 --   unfold-next 在源层的全函数 clamp 代表 cl m (toℕ A) 处跟随边
@@ -18,18 +22,8 @@
 -- （范围内读 f、超出层界恒等、新末位固定）；unfold-next 引理
 -- cl-embed-default 表明两个 clamp 代表跨层一致。这是余极限余锥在
 -- 宇宙层面的相容性。
---
--- Zero-subst carried style: the finFromℕ-maybe / fromMaybe / restrictFin
--- machine and its ~80 lines of proof-level subst bookkeeping are deleted.
--- The one-step embedding is the total FinEmbed.embedF (new top fixed),
--- cross-stage representatives are cl from Carried.LimitSystem, and the
--- only arithmetic is the minimum-level clamp idempotence clamp-val plus
--- inj-cl; no subst, no cast, no Dec/Bool match.
--- 零 subst 携带式：删除 finFromℕ-maybe / fromMaybe / restrictFin 机器及其
--- 约 80 行证明级 subst 簿记。一步嵌入即全函数 FinEmbed.embedF（新末位
--- 固定），跨层代表用 Carried.LimitSystem 的 cl，唯一算术是最小值层面的
--- clamp 幂等 clamp-val 与 inj-cl；无 subst、无 cast、无 Dec/Bool 匹配。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatInfinityTowerCompat where

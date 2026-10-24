@@ -1,14 +1,15 @@
 ------------------------------------------------------------------------
+-- The category of containers
+--
 -- The category of containers (syntactic presentations of polynomial
--- functors)
+-- functors). The morphism equivalence is the generic
+-- pointwise-with-transport relation from SubstTransport-Right,
+-- instantiated at container morphisms, and the container-specific
+-- composition laws and the Category instance are added.
 --
--- The morphism equivalence is the generic pointwise-with-transport
--- relation from SubstTransport-Right, instantiated at container
--- morphisms, and the container-specific composition laws and the
--- Category instance are added.
+-- 容器范畴
 --
--- 容器范畴（容器是多项式函子的语法表示；多项式函子是容器的语义解释）
---
+-- 容器范畴（容器是多项式函子的语法表示；多项式函子是容器的语义解释）。
 -- 态射等价在 SubstTransport-Right 的逐点相等 + 传输关系在容器态射上
 -- 实例化并添加容器特有的复合定律与 Category 实例。
 ------------------------------------------------------------------------

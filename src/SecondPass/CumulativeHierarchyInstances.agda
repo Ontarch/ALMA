@@ -1,15 +1,18 @@
 ------------------------------------------------------------------------
 -- Cumulative Hierarchy of Cosmoi — Concrete Instances
+--
 -- Provides concrete instances of EmbeddingData, UniformEmbeddingFamily,
 -- FunctorialEmbeddingFamily, and LambekConsistency for the terminal
 -- category UnitCat and for FinCat n, together with the hierarchy
 -- constructions based on them
 --
 -- 宇宙的累积层级 —— 具体实例
+--
 -- 为终范畴 UnitCat 及 FinCat n 提供 EmbeddingData、UniformEmbeddingFamily、
 -- FunctorialEmbeddingFamily 与 LambekConsistency 的具体实例，
 -- 并给出基于这些实例的层级构造
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.CumulativeHierarchyInstances where

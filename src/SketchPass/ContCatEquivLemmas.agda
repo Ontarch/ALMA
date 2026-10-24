@@ -1,9 +1,15 @@
 ------------------------------------------------------------------------
--- Lemmas for ContCatEquiv: onPos-subst and composite naturality shape
+-- Lemmas for ContCatEquiv
 --
 -- Provides onPos-subst-comm (onPos commutes with shape substitution)
--- and comp-nat-shape-eq (shape extraction for composite naturality)
+-- and comp-nat-shape-eq (shape extraction for composite naturality).
+--
+-- ContCatEquiv 引理
+--
+-- 提供 onPos-subst-comm（onPos 与形状替换交换）与 comp-nat-shape-eq
+-- （复合自然性的形状提取）。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 module SketchPass.ContCatEquivLemmas where
 

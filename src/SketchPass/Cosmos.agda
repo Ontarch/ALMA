@@ -1,9 +1,16 @@
 ------------------------------------------------------------------------
--- ALMA — Infinite, Unbounded, Self-Referential Dynamic Cosmos
+-- ALMA — infinite, unbounded, self-referential dynamic cosmos
 --
--- Built with type theory, category theory, containers, and coalgebraic unfolding
--- Cosmos is the terminal coalgebra of a polynomial functor internalized in type theory
+-- Built with type theory, category theory, containers, and coalgebraic
+-- unfolding. Cosmos is the terminal coalgebra of a polynomial functor
+-- internalized in type theory.
+--
+-- ALMA —— 无限、无界、自指的动态宇宙
+--
+-- 基于类型论、范畴论、容器（containers）和余代数展开（coalgebraic
+-- unfolding）构建。Cosmos 是在类型论中内部化的多项式函子的终余代数。
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module SketchPass.Cosmos where

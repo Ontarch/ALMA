@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------
 -- Object-level homomorphisms between unfolding systems
+--
 --   Raw            : contravariant position map under an arbitrary shape
 --                    functor S, no unfolding-preservation law
 --   MorphismObject : Raw refined with S derived from a container natural
@@ -8,6 +9,7 @@
 --   by forget-id and forget-comp
 --
 -- 展开系统之间的对象级同态
+--
 --   Raw            ：任意形状函子 S 下的反变位置映射，无展开保持定律
 --   MorphismObject ：S 由 alpha 派生，并追加 pts-compat 定律
 --   forget 为遗忘映射，由 forget-id 与 forget-comp 证明函子性

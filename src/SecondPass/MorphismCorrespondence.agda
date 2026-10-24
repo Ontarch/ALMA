@@ -1,15 +1,18 @@
 ------------------------------------------------------------------------
 -- Correspondence between _⇒ℱ_ (structured simulation) and CoalgHom
--- _⇒ℱ_（结构化模拟）与余代数同态的对应
 --
 -- Establishes: standard bisimulation _≈C_ is a subrelation of _⇒ℱ_;
 -- every CoalgHom induces pointwise _⇒ℱ_ witnesses (forget functor);
 -- StandardConditions characterises the image of forget; non-fullness
 -- is conditional on nontrivial Cosmos instances
+--
+-- _⇒ℱ_（结构化模拟）与余代数同态的对应
+--
 -- 证明：标准互模拟 _≈C_ 是 _⇒ℱ_ 的子关系；每个 CoalgHom 诱导逐点 _⇒ℱ_
 -- 见证（忘却函子）；StandardConditions 刻画忘却函子的像；非满性依赖于
 -- 非平凡 Cosmos 实例的存在
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.MorphismCorrespondence where

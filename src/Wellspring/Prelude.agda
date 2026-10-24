@@ -1,35 +1,34 @@
-{-
-Semantic Bridge between Agda and ALMA
-Agda 与 ALMA 之间的语义桥梁
-
-Self-referential closure of the type system -- Epistemic cycle (transcendental framework)
-类型系统的自指闭包 -- 认识论循环（先验框架）
-
-The self-evident ground of the judgment form Γ ⊢ t : A -- Being (abstract logic)
-判断形式 Γ ⊢ t : A 的自明基础 -- 存在（抽象逻辑）
-
-The postulation of the type universe Set -- Cosmos (dynamic whole)
-类型宇宙 Set 的公设 -- 宇宙（动态整体）
-
-Closed term t : A -- Beings (concrete forms)
-封闭项 t : A -- 存在者（具体形式）
-
-Dependent sum type Σ A B -- Existential quantifier (encapsulates a being and its proof)
-依赖和类型 Σ A B -- 存在量词（封装了一个存在者及其证明）
-
-The empty type ⊥ has no closed terms -- Nothingness
-空类型 ⊥ 没有封闭项 -- 虚无
-
-Identity type constructor refl : t ≡ t -- Law of Identity
-同一性类型构造子 refl : t ≡ t -- 同一律
-
-Empty type elimination ⊥-elim -- Law of Non-Contradiction
-空类型消去 ⊥-elim -- 矛盾律
--}
+------------------------------------------------------------------------
+-- Semantic bridge between Agda and ALMA
+--
+-- Self-referential closure of the type system -- Epistemic cycle (transcendental framework)
+-- The self-evident ground of the judgment form Γ ⊢ t : A -- Being (abstract logic)
+-- The postulation of the type universe Set -- Cosmos (dynamic whole)
+-- Closed term t : A -- Beings (concrete forms)
+-- Dependent sum type Σ A B -- Existential quantifier (encapsulates a being and its proof)
+-- The empty type ⊥ has no closed terms -- Nothingness
+-- Identity type constructor refl : t ≡ t -- Law of Identity
+-- Empty type elimination ⊥-elim -- Law of Non-Contradiction
+-- 
+-- Agda 与 ALMA 之间的语义桥梁
+--
+-- 类型系统的自指闭包 -- 认识论循环（先验框架）
+-- 判断形式 Γ ⊢ t : A 的自明基础 -- 存在（抽象逻辑）
+-- 类型宇宙 Set 的公设 -- 宇宙（动态整体）
+-- 封闭项 t : A -- 存在者（具体形式）
+-- 依赖和类型 Σ A B -- 存在量词（封装了一个存在者及其证明）
+-- 空类型 ⊥ 没有封闭项 -- 虚无
+-- 同一性类型构造子 refl : t ≡ t -- 同一律
+-- 空类型消去 ⊥-elim -- 矛盾律
+------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
 
 module Wellspring.Prelude where
+
+-- Early Agda formalization of the paper's core ideas
+--
+-- 将哲学论文核心思想形式化为 Agda 的最初尝试
 
 open import Agda.Primitive using (lsuc; Setω; _⊔_; Level) public
 open import Level using (Lift; lift; 0ℓ) public

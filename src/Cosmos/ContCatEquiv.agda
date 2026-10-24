@@ -1,8 +1,12 @@
 ------------------------------------------------------------------------
--- ContCatEquiv: container isomorphisms transport along isos in C;
+-- Container isomorphism transport
+--
+-- ContCatEquiv: container isomorphisms transport along isos in C.
 -- ContCatEquivEmbedding: lift this transport to natural transformations
--- via the embedding ContCat → [Setoids, Setoids]; ShapeCat: Grothendieck
--- construction of the shape functor.
+-- via the embedding ContCat → [Setoids, Setoids]. ShapeCat:
+-- Grothendieck construction of the shape functor.
+--
+-- 容器同构传输
 --
 -- 分别定义：容器同构沿 C 中同构的传输结构 ContCatEquiv、通过容器嵌入
 -- 将传输提升为自然变换的 ContCatEquivEmbedding、形状范畴 ShapeCat

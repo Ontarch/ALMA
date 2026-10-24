@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Non-commutative composition of permutation embeddings (n ≥ 3)
--- 置换嵌入的非交换复合（n ≥ 3）
 --
 -- When n ≥ 3, the permutation group Sₙ is non-abelian. Two results:
 --   * Non-commutativity: taking f = swap01, g = swap12 gives
@@ -9,6 +8,9 @@
 --   * Period 3: c = swap01 ∘ swap12 is a 3-cycle (c³ = id), so the
 --     iterated F₀ projection has period 3 rather than 2
 -- Threshold: n = 3; for n = 2 the group is ℤ₂, commutative
+--
+-- 置换嵌入的非交换复合（n ≥ 3）
+--
 -- 当 n ≥ 3 时，置换群 Sₙ 非交换。两个结果：
 --   * 非交换性：取 f = swap01、g = swap12 时 f ∘ g ≠ g ∘ f，
 --     故两层序列 [f,g] 与 [g,f] 给出不互模拟的宇宙
@@ -16,6 +18,7 @@
 --     故迭代 F₀ 投影周期为 3 而非 2
 -- 阈值在 n = 3；n = 2 时群为 ℤ₂，交换
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNNonCommutative where

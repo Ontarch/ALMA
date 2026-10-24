@@ -1,10 +1,12 @@
 ------------------------------------------------------------------------
 -- MorphismMorphism: compatibility of position maps with hom-actions
--- 态射间态射：位置映射与态射作用的相容性
 --
 -- actP-from-S is the canonical position map derived from S.
 -- The composition of MorphismMorphisms is direct via functoriality of S.
 -- An equivalence _≈MM_ (pointwise propositional equality) is provided.
+--
+-- 态射间态射：位置映射与态射作用的相容性
+--
 -- actP-from-S 是由 S 典范导出的位置映射。
 -- 借助 S 的函子性，MorphismMorphism 的复合直接成立。
 -- 提供逐点命题相等的等价关系 _≈MM_。

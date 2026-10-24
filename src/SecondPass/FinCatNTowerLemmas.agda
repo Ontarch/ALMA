@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Structural lemmas about the FinCat n tower (n ≥ 2)
--- FinCat n 塔（n ≥ 2）的结构引理
 --
 -- Collects results depending only on the base layer FinCatN m,
 -- independent of any limit construction: shape-set inhabitation and
@@ -10,12 +9,16 @@
 -- retraction of a Cosmos into its base layer (nTower-retract).
 -- The parameter m encodes n = suc (suc m), so that n ≥ 2 holds
 -- definitionally
+--
+-- FinCat n 塔（n ≥ 2）的结构引理
+--
 -- 汇集只依赖基层 FinCatN m、不依赖任何极限构造的结果：每层形状集的
 -- 可居留性与单点性、层对象与 Fin n 的双射、任意两个层对象之间的规范
 -- 态射（hom）、每层的可坍缩性（nTower-collapsible）、从 Cosmos 到其
 -- 基层的规范收缩（nTower-retract）。
 -- 参数 m 编码 n = suc (suc m)，使 n ≥ 2 定义性成立
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.FinCatNTowerLemmas where

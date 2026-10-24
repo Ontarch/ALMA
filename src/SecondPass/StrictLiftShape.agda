@@ -1,16 +1,19 @@
 ------------------------------------------------------------------------
 -- Shape stability under strictStep-suc
--- strictStep-suc 下的形状稳定性
 --
 -- Abstract properties of containers that are preserved by one strict step:
 -- singleton shape sets stay singletons
 -- distinct shapes stay distinct
 -- These are general results about strictStep-suc, not tied to any concrete tower
+--
+-- strictStep-suc 下的形状稳定性
+--
 -- 关于容器形状的抽象性质在一步严格提升下的保持：
 -- 单点形状集保持单点
 -- 相异形状保持相异
 -- 这是关于 strictStep-suc 的一般结果，不依赖任何具体塔
 ------------------------------------------------------------------------
+
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SecondPass.StrictLiftShape where

@@ -1,6 +1,5 @@
 ------------------------------------------------------------------------
 -- Inner-preserving strict embedding over an arbitrary strict layer
--- 任意严格层上的保内层严格嵌入
 --
 -- Provides the inner-preserving unfold functor F₀ ((A, s), u) = A, the
 -- inner-preserving strict embedding strictEmbed-inner, the unconditional
@@ -8,6 +7,9 @@
 -- constructions are generic over any StrictLayer and independent of any
 -- concrete tower; the FinCatN tower instance is instantiated in
 -- FinCatNInnerObstruction
+--
+-- 任意严格层上的保内层严格嵌入
+--
 -- 提供保内层展开函子 F₀ ((A, s), u) = A、保内层严格嵌入
 -- strictEmbed-inner、EmbeddingData 沿其无条件传播，以及内层规则。
 -- 所有构造对任意 StrictLayer 泛型，且独立于具体塔；
