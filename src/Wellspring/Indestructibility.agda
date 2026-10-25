@@ -762,7 +762,6 @@ compose-core-preserving
     proof : ∀ {i : I} (state : X i) → pair-proj π₁ π₂ i (proj₁ (ICoalgebra.𝛂 (cp1 .coalg) i state)) ≡ (c , d)
     proof {i} state = 
       let
-        output = proj₁ (ICoalgebra.𝛂 (cp1 .coalg) i state)
         p1 = cp1 .core-preservation state
         p2 = cp2 .core-preservation state
       in

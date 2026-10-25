@@ -16,7 +16,7 @@
 
 module SketchPass.ContCatEquivFunctor where
 
-open import Agda.Primitive using (Level; lsuc; _⊔_)
+open import Agda.Primitive using (Level; lsuc)
 open import Data.Container.Core using (_⇒_)
 open import Data.Container.Morphism using (id; _∘_)
 open import Categories.Category using (Category)
@@ -33,7 +33,6 @@ open import SketchPass.ObjEquivFunctor
 record ContCatEquivFunctor {ℓ : Level} (F G : ContCatEquiv ℓ) : Set (lsuc ℓ) where
   private
     module FC = ObjEquivCat (ContCatEquiv.base F)
-    module GC = ObjEquivCat (ContCatEquiv.base G)
     module F  = ContCatEquiv F
     module G  = ContCatEquiv G
   field
@@ -150,8 +149,6 @@ module _ {ℓ} {C D : Category (lsuc ℓ) (lsuc ℓ) (lsuc ℓ)}
     import Categories.Morphism C as MC
     F-contEquiv = contCatEquivFromIso C FC
     G-contEquiv = contCatEquivFromIso D FD
-    module FE = ContCatEquiv F-contEquiv
-    module GE = ContCatEquiv G-contEquiv
     objEquivF  = objEquivFunctorFromIso {C = C} {D} F
   contCatEquivFunctorFromIso : ContCatEquivFunctor F-contEquiv G-contEquiv
   contCatEquivFunctorFromIso = record
@@ -160,4 +157,3 @@ module _ {ℓ} {C D : Category (lsuc ℓ) (lsuc ℓ) (lsuc ℓ)}
     ; natural         = nat
     ; transport-nat   = λ eqA → nat (MC._≅_.from eqA)
     }
-open import Categories.NaturalTransformation using (NaturalTransformation)

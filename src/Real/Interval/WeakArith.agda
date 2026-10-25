@@ -11,10 +11,11 @@ module Real.Interval.WeakArith where
 open import Data.Nat using (ℕ; zero; suc; _∸_; _^_; s≤s; z≤n)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<N_)
 open import Data.Nat.Properties using
-  (m≤m+n; m≤n+m; m+[n∸m]≡n; n≤1+n; +-suc; *-suc; *-monoʳ-≤; *-distribˡ-+)
+  (m≤m+n; m≤n+m; m+[n∸m]≡n; n≤1+n; +-suc; *-suc; *-monoʳ-≤; *-mono-≤; *-distribˡ-+)
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
-  ; +-comm to +-commℕ; +-assoc to +-assocℕ; *-assoc to *-assocℕ
-  ; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
+  ; +-comm to +-commℕ; +-assoc to +-assocℕ; *-assoc to *-assocℕ; *-comm to *-commℕ
+  ; +-identityʳ to +-identityʳℕ; *-identityʳ to *-identityʳℕ; *-identityˡ to *-identityˡℕ
+  ; +-mono-< to +-mono-<N; ≤-<-trans to ≤N-<-trans)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; positive; Positive; NonZero; NonNegative)
 open import Data.Rational.Base using (1/_; *<*; -_)
@@ -31,6 +32,7 @@ open ≡-Reasoning
 open import Real using
   (ε; embed; embed-suc-nonZero; 2ℚ; 2*embed; halve; 0<embed; reciprocal-cong
   ; 1/embed; embed-mono-<; embed-mono-≤; embed-+-hom; embed-*)
+open import Real.IntervalEquiv using (recipPow2; n<2^n)
 
 ------------------------------------------------------------------------
 -- Half and its NonZero proof
@@ -44,6 +46,14 @@ half : ℚ
 half = (1/ embed 2) {{embed2-nonZero}}
 
 ------------------------------------------------------------------------
+-- Basic rational facts
+--
+-- 基本有理事实
+
+0<1-ℚ : 0ℚ < 1ℚ
+0<1-ℚ = *<* (+<+ (s≤s z≤n))
+
+------------------------------------------------------------------------
 -- Strict reciprocal antitonicity
 --
 -- 严格倒数反单调
@@ -52,43 +62,72 @@ strict-recip : (a b : ℚ) → (0<a : 0ℚ < a) → (a<b : a < b) →
   1/_ b {{pos⇒nonZero b {{positive (<-≤-trans 0<a (<⇒≤ a<b))}}}}
   < 1/_ a {{pos⇒nonZero a {{positive 0<a}}}}
 strict-recip a b 0<a a<b =
-  *-cancelˡ-<-nonNeg (a * b) {{ab-nn}}
-    (<-≤-trans (≤-<-trans lhs a<b) rhs)
-  where
-  0<b = <-≤-trans 0<a (<⇒≤ a<b)
-  a-nz = pos⇒nonZero a {{positive 0<a}}
-  b-nz = pos⇒nonZero b {{positive 0<b}}
-  ab-pos : Positive (a * b)
-  ab-pos = pos*pos⇒pos a {{positive 0<a}} b {{positive 0<b}}
-  ab-nn : NonNegative (a * b)
-  ab-nn = pos⇒nonNeg (a * b) {{ab-pos}}
-  lhs : (a * b) * 1/_ b {{b-nz}} ≤ a
-  lhs = ≤-reflexive (begin
-    (a * b) * 1/_ b {{b-nz}}
-      ≡⟨ *-assoc a b _ ⟩
-    a * (b * 1/_ b {{b-nz}})
-      ≡⟨ cong (a *_) (*-inverseʳ b {{b-nz}}) ⟩
-    a * 1ℚ
-      ≡⟨ *-identityʳ a ⟩
-    a
-    ∎)
-  rhs : b ≤ (a * b) * 1/_ a {{a-nz}}
-  rhs = ≤-reflexive (begin
-    b
-      ≡⟨ sym (*-identityʳ b) ⟩
-    b * 1ℚ
-      ≡⟨ cong (b *_) (sym (*-inverseʳ a {{a-nz}})) ⟩
-    b * (a * 1/_ a {{a-nz}})
-      ≡⟨ sym (*-assoc b a (1/_ a {{a-nz}})) ⟩
-    (b * a) * 1/_ a {{a-nz}}
-      ≡⟨ cong (λ z → z * 1/_ a {{a-nz}}) (*-comm b a) ⟩
-    (a * b) * 1/_ a {{a-nz}}
-    ∎)
+  let
+    0<b = <-≤-trans 0<a (<⇒≤ a<b)
+    a-nz = pos⇒nonZero a {{positive 0<a}}
+    b-nz = pos⇒nonZero b {{positive 0<b}}
+    ab-pos : Positive (a * b)
+    ab-pos = pos*pos⇒pos a {{positive 0<a}} b {{positive 0<b}}
+    ab-nn : NonNegative (a * b)
+    ab-nn = pos⇒nonNeg (a * b) {{ab-pos}}
+    lhs-eq : (a * b) * 1/_ b {{b-nz}} ≡ a
+    lhs-eq =
+      begin
+        (a * b) * 1/_ b {{b-nz}}
+          ≡⟨ *-assoc a b _ ⟩
+        a * (b * 1/_ b {{b-nz}})
+          ≡⟨ cong (a *_) (*-inverseʳ b {{b-nz}}) ⟩
+        a * 1ℚ
+          ≡⟨ *-identityʳ a ⟩
+        a
+        ∎
+    rhs-eq : b ≡ (a * b) * 1/_ a {{a-nz}}
+    rhs-eq =
+      begin
+        b
+          ≡⟨ sym (*-identityʳ b) ⟩
+        b * 1ℚ
+          ≡⟨ cong (b *_) (sym (*-inverseʳ a {{a-nz}})) ⟩
+        b * (a * 1/_ a {{a-nz}})
+          ≡⟨ sym (*-assoc b a (1/_ a {{a-nz}})) ⟩
+        (b * a) * 1/_ a {{a-nz}}
+          ≡⟨ cong (λ z → z * 1/_ a {{a-nz}}) (*-comm b a) ⟩
+        (a * b) * 1/_ a {{a-nz}}
+        ∎
+  in *-cancelˡ-<-nonNeg (a * b) {{ab-nn}}
+       (<-≤-trans (≤-<-trans (≤-reflexive lhs-eq) a<b)
+                  (≤-reflexive rhs-eq))
 
 ------------------------------------------------------------------------
 -- Product of reciprocals and cancellation
 --
 -- 倒数之积与消去
+
+1/*-inner : ∀ p q .{{_ : NonZero p}} .{{_ : NonZero q}} →
+  (1/ q) * (p * q) ≡ p * ((1/ q) * q)
+1/*-inner p q =
+  begin
+    (1/ q) * (p * q)
+      ≡⟨ sym (*-assoc (1/ q) p q) ⟩
+    ((1/ q) * p) * q
+      ≡⟨ cong (λ x → x * q) (*-comm (1/ q) p) ⟩
+    (p * (1/ q)) * q
+      ≡⟨ *-assoc p (1/ q) q ⟩
+    p * ((1/ q) * q)
+      ∎
+
+1/*-rearrange : ∀ p q .{{_ : NonZero p}} .{{_ : NonZero q}} →
+  ((1/ p) * (1/ q)) * (p * q) ≡ ((1/ p) * p) * ((1/ q) * q)
+1/*-rearrange p q =
+  begin
+    ((1/ p) * (1/ q)) * (p * q)
+      ≡⟨ *-assoc (1/ p) (1/ q) (p * q) ⟩
+    (1/ p) * ((1/ q) * (p * q))
+      ≡⟨ cong ((1/ p) *_) (1/*-inner p q) ⟩
+    (1/ p) * (p * ((1/ q) * q))
+      ≡⟨ sym (*-assoc (1/ p) p ((1/ q) * q)) ⟩
+    ((1/ p) * p) * ((1/ q) * q)
+      ∎
 
 1/* : ∀ p q .{{_ : NonZero p}} .{{_ : NonZero q}} .{{_ : NonZero (p * q)}} →
   (1/ p) * (1/ q) ≡ 1/ (p * q)
@@ -101,7 +140,7 @@ strict-recip a b 0<a a<b =
     ((1/ p) * (1/ q)) * ((p * q) * (1/ (p * q)))
       ≡⟨ sym (*-assoc ((1/ p) * (1/ q)) (p * q) (1/ (p * q))) ⟩
     (((1/ p) * (1/ q)) * (p * q)) * (1/ (p * q))
-      ≡⟨ cong (λ x → x * (1/ (p * q))) rearrange₀ ⟩
+      ≡⟨ cong (λ x → x * (1/ (p * q))) (1/*-rearrange p q) ⟩
     (((1/ p) * p) * ((1/ q) * q)) * (1/ (p * q))
       ≡⟨ cong (λ x → x * (1/ (p * q)))
              (cong₂ _*_ (*-inverseˡ p) (*-inverseˡ q)) ⟩
@@ -109,62 +148,49 @@ strict-recip a b 0<a a<b =
       ≡⟨ *-identityˡ (1/ (p * q)) ⟩
     1/ (p * q)
       ∎
-  where
-  rearrange₀ : ((1/ p) * (1/ q)) * (p * q) ≡ ((1/ p) * p) * ((1/ q) * q)
-  rearrange₀ =
-    begin
-      ((1/ p) * (1/ q)) * (p * q)
-        ≡⟨ *-assoc (1/ p) (1/ q) (p * q) ⟩
-      (1/ p) * ((1/ q) * (p * q))
-        ≡⟨ cong ((1/ p) *_) (begin
-          (1/ q) * (p * q)
-            ≡⟨ sym (*-assoc (1/ q) p q) ⟩
-          ((1/ q) * p) * q
-            ≡⟨ cong (λ x → x * q) (*-comm (1/ q) p) ⟩
-          (p * (1/ q)) * q
-            ≡⟨ *-assoc p (1/ q) q ⟩
-          p * ((1/ q) * q) ∎) ⟩
-      (1/ p) * (p * ((1/ q) * q))
-        ≡⟨ sym (*-assoc (1/ p) p ((1/ q) * q)) ⟩
-      ((1/ p) * p) * ((1/ q) * q)
-        ∎
+
+cancel-*-inner : ∀ x y .{{_ : NonZero (x * y)}} →
+  (x * (1/(x * y))) * y ≡ (x * y) * (1/(x * y))
+cancel-*-inner x y =
+  begin
+    (x * (1/(x * y))) * y
+      ≡⟨ *-assoc x (1/(x * y)) y ⟩
+    x * ((1/(x * y)) * y)
+      ≡⟨ cong (x *_) (*-comm (1/(x * y)) y) ⟩
+    x * (y * (1/(x * y)))
+      ≡⟨ sym (*-assoc x y (1/(x * y))) ⟩
+    (x * y) * (1/(x * y))
+      ∎
+
+cancel-*-rearrange : ∀ x y .{{_ : NonZero x}} .{{_ : NonZero y}}
+                     .{{_ : NonZero (x * y)}} →
+  (x * (1/(x * y))) * (y * (1/ y))
+    ≡ ((x * y) * (1/(x * y))) * (1/ y)
+cancel-*-rearrange x y =
+  begin
+    (x * (1/(x * y))) * (y * (1/ y))
+      ≡⟨ sym (*-assoc (x * (1/(x * y))) y (1/ y)) ⟩
+    ((x * (1/(x * y))) * y) * (1/ y)
+      ≡⟨ cong (_* (1/ y)) (cancel-*-inner x y) ⟩
+    ((x * y) * (1/(x * y))) * (1/ y)
+      ∎
 
 cancel-* : ∀ x y .{{_ : NonZero x}} .{{_ : NonZero y}}
             .{{_ : NonZero (x * y)}} →
   x * (1/(x * y)) ≡ 1/ y
 cancel-* x y =
   begin
-    x * t
-      ≡⟨ sym (*-identityʳ (x * t)) ⟩
-    (x * t) * 1ℚ
-      ≡⟨ cong ((x * t) *_) (sym (*-inverseʳ y)) ⟩
-    (x * t) * (y * s)
-      ≡⟨ rearrange ⟩
-    ((x * y) * t) * s
-      ≡⟨ cong (_* s) (*-inverseʳ (x * y)) ⟩
-    1ℚ * s
-      ≡⟨ *-identityˡ s ⟩
-    s
-      ∎
-  where
-  t = 1/(x * y)
-  s = 1/ y
-  rearrange : (x * t) * (y * s) ≡ ((x * y) * t) * s
-  rearrange =
-    begin
-      (x * t) * (y * s)
-        ≡⟨ sym (*-assoc (x * t) y s) ⟩
-      ((x * t) * y) * s
-        ≡⟨ cong (_* s) (begin
-          (x * t) * y
-            ≡⟨ *-assoc x t y ⟩
-          x * (t * y)
-            ≡⟨ cong (x *_) (*-comm t y) ⟩
-          x * (y * t)
-            ≡⟨ sym (*-assoc x y t) ⟩
-          (x * y) * t
-          ∎) ⟩
-      ((x * y) * t) * s
+    x * (1/(x * y))
+      ≡⟨ sym (*-identityʳ (x * (1/(x * y)))) ⟩
+    (x * (1/(x * y))) * 1ℚ
+      ≡⟨ cong ((x * (1/(x * y))) *_) (sym (*-inverseʳ y)) ⟩
+    (x * (1/(x * y))) * (y * (1/ y))
+      ≡⟨ cancel-*-rearrange x y ⟩
+    ((x * y) * (1/(x * y))) * (1/ y)
+      ≡⟨ cong (_* (1/ y)) (*-inverseʳ (x * y)) ⟩
+    1ℚ * (1/ y)
+      ≡⟨ *-identityˡ (1/ y) ⟩
+    1/ y
       ∎
 
 ------------------------------------------------------------------------
@@ -276,24 +302,41 @@ recip-step : ∀ d a → 0ℚ < embed a →
   1/ embed (d +ℕ a) ≤ 1/ embed a
 recip-step zero    a 0<a = ≤-refl
 recip-step (suc d) a 0<a {{nz-a}} {{nz-da}} =
-  let i = d +ℕ a
-      pi : 0ℚ < embed i
-      pi = pos-+ d a 0<a
-      nz-i : NonZero (embed i)
-      nz-i = pos⇒nonZero (embed i) {{positive pi}}
-      nz-si : NonZero (embed (suc i))
-      nz-si = pos⇒nonZero (embed (suc i)) {{positive (0<embed i)}}
-      strict = recip-antitone i (suc i) pi (s≤s ≤N-refl)
-                 {{nz-i}} {{nz-si}}
-      ih = recip-step d a 0<a {{nz-a}} {{nz-i}}
+  let
+    i = d +ℕ a
+    pi : 0ℚ < embed i
+    pi = pos-+ d a 0<a
+    nz-i : NonZero (embed i)
+    nz-i = pos⇒nonZero (embed i) {{positive pi}}
+    nz-si : NonZero (embed (suc i))
+    nz-si = pos⇒nonZero (embed (suc i)) {{positive (0<embed i)}}
+    strict = recip-antitone i (suc i) pi (s≤s ≤N-refl)
+               {{nz-i}} {{nz-si}}
+    ih = recip-step d a 0<a {{nz-a}} {{nz-i}}
   in ≤-trans (<⇒≤ strict) ih
 
 recip-antitone-≤ : ∀ a b → 0ℚ < embed a → a ≤N b →
   .{{_ : NonZero (embed a)}} .{{_ : NonZero (embed b)}} →
   1/ embed b ≤ 1/ embed a
-recip-antitone-≤ a b 0<a a≤b {{nz-a}} {{nz-b}}
-  rewrite sym (m+[n∸m]≡n a≤b) | +-commℕ a (b ∸ a) =
-  recip-step (b ∸ a) a 0<a {{nz-a}} {{nz-b}}
+recip-antitone-≤ a b 0<a a≤b {{nz-a}} {{nz-b}} =
+  ≤-trans (≤-reflexive cong-recip)
+          (recip-step d a 0<a {{nz-a}} {{nz-da}})
+  where
+  d : ℕ
+  d = b ∸ a
+  0<b : 0ℚ < embed b
+  0<b = <-≤-trans 0<a (embed-mono-≤ a≤b)
+  nz-b' : NonZero (embed b)
+  nz-b' = pos⇒nonZero (embed b) {{positive 0<b}}
+  eq1 : a +ℕ d ≡ b
+  eq1 = m+[n∸m]≡n a≤b
+  eq2 : d +ℕ a ≡ b
+  eq2 = trans (+-commℕ d a) eq1
+  nz-da : NonZero (embed (d +ℕ a))
+  nz-da = subst (λ z → NonZero (embed z)) (sym eq2) nz-b'
+  cong-recip : (1/ embed b) {{nz-b'}} ≡ (1/ embed (d +ℕ a)) {{nz-da}}
+  cong-recip = reciprocal-cong (embed b) (embed (d +ℕ a))
+                 {{nz-b'}} {{nz-da}} (cong embed (sym eq2))
 
 ------------------------------------------------------------------------
 -- 2ss equations and NonZero proofs
@@ -315,28 +358,30 @@ recip-antitone-≤ a b 0<a a≤b {{nz-a}} {{nz-b}}
 
 2ss-nonZero : ∀ {k} → NonZero (embed (2ss k))
 2ss-nonZero {k} =
-  let p = embed (suc (suc k))
-      eq : 2ℚ * p ≡ embed (2ss k)
-      eq = trans (2*embed (suc (suc k)))
-                 (cong embed (sym (2ss-eq k)))
-      pos-2p : Positive (2ℚ * p)
-      pos-2p = pos*pos⇒pos 2ℚ p
+  let
+    p = embed (suc (suc k))
+    eq : 2ℚ * p ≡ embed (2ss k)
+    eq = trans (2*embed (suc (suc k)))
+               (cong embed (sym (2ss-eq k)))
+    pos-2p : Positive (2ℚ * p)
+    pos-2p = pos*pos⇒pos 2ℚ p
   in subst NonZero eq (pos⇒nonZero (2ℚ * p) {{pos-2p}})
 
 εs-half : ∀ k → ε (suc k) * half ≡ (1/ embed (2ss k)) {{2ss-nonZero {k}}}
 εs-half k =
-  let p = embed (suc (suc k))
-      eq : 2ℚ * p ≡ embed (2ss k)
-      eq = trans (2*embed (suc (suc k)))
-                 (cong embed (sym (2ss-eq k)))
-      nz-2ℚ : NonZero 2ℚ
-      nz-2ℚ = embed-suc-nonZero {1}
-      nz-p : NonZero p
-      nz-p = embed-suc-nonZero {suc k}
-      pos-2p : Positive (2ℚ * p)
-      pos-2p = pos*pos⇒pos 2ℚ p
-      nz-2p : NonZero (2ℚ * p)
-      nz-2p = pos⇒nonZero (2ℚ * p) {{pos-2p}}
+  let
+    p = embed (suc (suc k))
+    eq : 2ℚ * p ≡ embed (2ss k)
+    eq = trans (2*embed (suc (suc k)))
+               (cong embed (sym (2ss-eq k)))
+    nz-2ℚ : NonZero 2ℚ
+    nz-2ℚ = embed-suc-nonZero {1}
+    nz-p : NonZero p
+    nz-p = embed-suc-nonZero {suc k}
+    pos-2p : Positive (2ℚ * p)
+    pos-2p = pos*pos⇒pos 2ℚ p
+    nz-2p : NonZero (2ℚ * p)
+    nz-2p = pos⇒nonZero (2ℚ * p) {{pos-2p}}
   in
   begin
     ε (suc k) * half
@@ -369,12 +414,13 @@ h+1-eq (suc k) =
 
 h+1-nonZero : ∀ {k} → NonZero (embed (h+1 k))
 h+1-nonZero {k} =
-  let p = embed (suc k)
-      eq : 2ℚ * p ≡ embed (h+1 k)
-      eq = trans (2*embed (suc k))
-                 (cong embed (sym (h+1-eq k)))
-      pos-2p : Positive (2ℚ * p)
-      pos-2p = pos*pos⇒pos 2ℚ p
+  let
+    p = embed (suc k)
+    eq : 2ℚ * p ≡ embed (h+1 k)
+    eq = trans (2*embed (suc k))
+               (cong embed (sym (h+1-eq k)))
+    pos-2p : Positive (2ℚ * p)
+    pos-2p = pos*pos⇒pos 2ℚ p
   in subst NonZero eq (pos⇒nonZero (2ℚ * p) {{pos-2p}})
 
 ------------------------------------------------------------------------
@@ -433,18 +479,19 @@ double-recip : ∀ k →
   (1/ embed (h+1 k)) {{h+1-nonZero {k}}}
     + (1/ embed (h+1 k)) {{h+1-nonZero {k}}} ≡ ε k
 double-recip k =
-  let nz-p : NonZero (embed (suc k))
-      nz-p = embed-suc-nonZero {k}
-      pos-2p : Positive (2ℚ * embed (suc k))
-      pos-2p = pos*pos⇒pos 2ℚ (embed (suc k))
-      nz-2p : NonZero (2ℚ * embed (suc k))
-      nz-2p = pos⇒nonZero (2ℚ * embed (suc k)) {{pos-2p}}
-      rc : (1/ embed (h+1 k)) {{h+1-nonZero {k}}}
-         ≡ (1/ (2ℚ * embed (suc k))) {{nz-2p}}
-      rc = reciprocal-cong (embed (h+1 k)) (2ℚ * embed (suc k))
-             {{h+1-nonZero {k}}} {{nz-2p}}
-             (trans (cong embed (h+1-eq k))
-                    (sym (2*embed (suc k))))
+  let
+    nz-p : NonZero (embed (suc k))
+    nz-p = embed-suc-nonZero {k}
+    pos-2p : Positive (2ℚ * embed (suc k))
+    pos-2p = pos*pos⇒pos 2ℚ (embed (suc k))
+    nz-2p : NonZero (2ℚ * embed (suc k))
+    nz-2p = pos⇒nonZero (2ℚ * embed (suc k)) {{pos-2p}}
+    rc : (1/ embed (h+1 k)) {{h+1-nonZero {k}}}
+       ≡ (1/ (2ℚ * embed (suc k))) {{nz-2p}}
+    rc = reciprocal-cong (embed (h+1 k)) (2ℚ * embed (suc k))
+           {{h+1-nonZero {k}}} {{nz-2p}}
+           (trans (cong embed (h+1-eq k))
+                  (sym (2*embed (suc k))))
   in
   begin
     (1/ embed (h+1 k)) {{h+1-nonZero {k}}}
@@ -459,9 +506,87 @@ double-recip k =
       ∎
 
 ------------------------------------------------------------------------
+-- Pow2 baseline
+--
+-- Pow2 基线
+
+1≤2N : 1 ≤N 2
+1≤2N = s≤s z≤n
+
+1≤2^n : ∀ k → 1 ≤N 2 ^ k
+1≤2^n zero    = ≤N-refl
+1≤2^n (suc k) = *-mono-≤ 1≤2N (1≤2^n k)
+
+suc-pow-∸1 : ∀ k → suc (2 ^ k ∸ 1) ≡ 2 ^ k
+suc-pow-∸1 k = m+[n∸m]≡n (1≤2^n k)
+
+------------------------------------------------------------------------
+-- Half · recipPow2
+--
+-- 二分之一乘 recipPow2
+
+hr-d : ℕ → ℕ
+hr-d n = 2 ^ n ∸ 1
+
+hr-q : ℕ → ℚ
+hr-q n = embed (suc (hr-d n))
+
+hr-eq : ∀ n → 2 *ℕ suc (hr-d n) ≡ suc (2 ^ suc n ∸ 1)
+hr-eq n =
+  begin
+    2 *ℕ suc (hr-d n)
+      ≡⟨ cong (2 *ℕ_) (suc-pow-∸1 n) ⟩
+    2 *ℕ 2 ^ n
+      ≡⟨⟩
+    2 ^ suc n
+      ≡⟨ sym (suc-pow-∸1 (suc n)) ⟩
+    suc (2 ^ suc n ∸ 1)
+      ∎
+
+hr-2q-nz : ∀ n → NonZero (2ℚ * hr-q n)
+hr-2q-nz n =
+  pos⇒nonZero (2ℚ * hr-q n) {{pos*pos⇒pos 2ℚ (hr-q n)}}
+
+hr-eqd-nz : ∀ n → NonZero (embed (2 *ℕ suc (hr-d n)))
+hr-eqd-nz n =
+  subst NonZero (2*embed (suc (hr-d n))) (hr-2q-nz n)
+
+half*recipPow2 : ∀ n → half * recipPow2 n ≡ recipPow2 (suc n)
+half*recipPow2 n =
+  begin
+    half * recipPow2 n
+      ≡⟨ 1/* 2ℚ (hr-q n) {{_}} {{_}} {{hr-2q-nz n}} ⟩
+    1/_ (2ℚ * hr-q n) {{hr-2q-nz n}}
+      ≡⟨ reciprocal-cong (2ℚ * hr-q n)
+                          (embed (2 *ℕ suc (hr-d n)))
+                          {{hr-2q-nz n}}
+                          {{hr-eqd-nz n}}
+                          (2*embed (suc (hr-d n))) ⟩
+    1/_ (embed (2 *ℕ suc (hr-d n))) {{hr-eqd-nz n}}
+      ≡⟨ reciprocal-cong (embed (2 *ℕ suc (hr-d n)))
+                          (embed (suc (2 ^ suc n ∸ 1)))
+                          {{hr-eqd-nz n}}
+                          {{_}}
+                          (cong embed (hr-eq n)) ⟩
+    1/_ (embed (suc (2 ^ suc n ∸ 1))) {{_}}
+      ≡⟨⟩
+    recipPow2 (suc n)
+    ∎
+
+------------------------------------------------------------------------
 -- 4·embed
 --
 -- 4·embed
+
+4*embed-2*2n≡4n : ∀ n → 2 *ℕ (2 *ℕ n) ≡ 4 *ℕ n
+4*embed-2*2n≡4n n =
+  begin
+    2 *ℕ (2 *ℕ n)
+      ≡⟨ sym (*-assocℕ 2 2 n) ⟩
+    (2 *ℕ 2) *ℕ n
+      ≡⟨⟩
+    4 *ℕ n
+      ∎
 
 4*embed : ∀ n → 2ℚ * (2ℚ * embed n) ≡ embed (4 *ℕ n)
 4*embed n =
@@ -471,22 +596,9 @@ double-recip k =
     2ℚ * embed (2 *ℕ n)
       ≡⟨ 2*embed (2 *ℕ n) ⟩
     embed (2 *ℕ (2 *ℕ n))
-      ≡⟨ cong embed (2*2n≡4n n) ⟩
+      ≡⟨ cong embed (4*embed-2*2n≡4n n) ⟩
     embed (4 *ℕ n)
       ∎
-  where
-  2*2n≡4n : ∀ n → 2 *ℕ (2 *ℕ n) ≡ 4 *ℕ n
-  2*2n≡4n n =
-    begin
-      2 *ℕ (2 *ℕ n)
-        ≡⟨ sym (*-assocℕ 2 2 n) ⟩
-      (2 *ℕ 2) *ℕ n
-        ≡⟨ cong (λ x → x *ℕ n) 2*2≡4 ⟩
-      4 *ℕ n
-        ∎
-    where
-    2*2≡4 : 2 *ℕ 2 ≡ 4
-    2*2≡4 = refl
 
 ------------------------------------------------------------------------
 -- Negation and difference helpers
@@ -539,21 +651,13 @@ double u =
 x<2x : ∀ x → 0ℚ < x → x < 2ℚ * x
 x<2x x 0<x =
   subst (λ y → x < y) (sym (double x))
-    (subst (λ z → z < x + x) idstep
+    (subst (λ z → z < x + x) (+-identityʳ x)
       (+-mono-≤-< (≤-refl {x = x}) 0<x))
-  where
-  idstep : x + 0ℚ ≡ x
-  idstep = +-identityʳ x
 
 x<x+1 : ∀ x → x < x + 1ℚ
 x<x+1 x =
-  subst (λ z → z < x + 1ℚ) idstep
-    (+-mono-≤-< (≤-refl {x = x}) 0<1)
-  where
-  idstep : x + 0ℚ ≡ x
-  idstep = +-identityʳ x
-  0<1 : 0ℚ < 1ℚ
-  0<1 = *<* (+<+ (s≤s z≤n))
+  subst (λ z → z < x + 1ℚ) (+-identityʳ x)
+    (+-mono-≤-< (≤-refl {x = x}) 0<1-ℚ)
 
 ------------------------------------------------------------------------
 -- Generic bound for a positive rational u
@@ -567,20 +671,21 @@ u-bound : ∀ u → 0ℚ < u →
   {{_ : NonZero (2ℚ * u + 1ℚ)}} →
   1/ (2ℚ * (2ℚ * u)) + 1/ (2ℚ * u + 1ℚ) < 1/ u
 u-bound u 0<u {{nz-u}} {{nz-2u}} {{nz-4u}} {{nz-nx}} =
-  let two-u = 2ℚ * u
-      four-u = 2ℚ * two-u
-      next = two-u + 1ℚ
-      0<two-u : 0ℚ < two-u
-      0<two-u = subst (λ x → 0ℚ < x) (sym (double u))
-                      (+-mono-< 0<u 0<u)
-      two-u<next : two-u < next
-      two-u<next = x<x+1 two-u
-      two-u<four-u : two-u < four-u
-      two-u<four-u = x<2x two-u 0<two-u
-      h1 : (1/ next) {{nz-nx}} < (1/ two-u) {{nz-2u}}
-      h1 = strict-recip two-u next 0<two-u two-u<next
-      h2 : (1/ four-u) {{nz-4u}} < (1/ two-u) {{nz-2u}}
-      h2 = strict-recip two-u four-u 0<two-u two-u<four-u
+  let
+    two-u = 2ℚ * u
+    four-u = 2ℚ * two-u
+    next = two-u + 1ℚ
+    0<two-u : 0ℚ < two-u
+    0<two-u = subst (λ x → 0ℚ < x) (sym (double u))
+                    (+-mono-< 0<u 0<u)
+    two-u<next : two-u < next
+    two-u<next = x<x+1 two-u
+    two-u<four-u : two-u < four-u
+    two-u<four-u = x<2x two-u 0<two-u
+    h1 : (1/ next) {{nz-nx}} < (1/ two-u) {{nz-2u}}
+    h1 = strict-recip two-u next 0<two-u two-u<next
+    h2 : (1/ four-u) {{nz-4u}} < (1/ two-u) {{nz-2u}}
+    h2 = strict-recip two-u four-u 0<two-u two-u<four-u
   in subst (λ x → (1/ four-u) {{nz-4u}} + (1/ next) {{nz-nx}} < x)
            (halve u {{nz-u}} {{nz-2u}})
            (+-mono-< h2 h1)
@@ -593,77 +698,80 @@ u-bound u 0<u {{nz-u}} {{nz-2u}} {{nz-4u}} {{nz-nx}} =
 1+n≡ : ∀ n → 1 +ℕ n ≡ suc n
 1+n≡ n = refl
 
+base-go : ∀ k (u : ℚ) → 0ℚ < u
+       → u ≡ embed (suc k)
+       → 2ℚ * u ≡ embed (2 *ℕ suc k)
+       → 2ℚ * (2ℚ * u) ≡ embed (4 *ℕ suc k)
+       → 2ℚ * u + 1ℚ ≡ embed (suc (2 *ℕ suc k))
+       → (1/ embed (4 *ℕ suc k)) + (1/ embed (suc (2 *ℕ suc k))) < ε k
+base-go k u 0<u u≡ e2u e4u enx =
+  let
+    two-u = 2ℚ * u
+    four-u = 2ℚ * two-u
+    next = two-u + 1ℚ
+    nz-u : NonZero u
+    nz-u = pos⇒nonZero u {{positive 0<u}}
+    nz-2u : NonZero two-u
+    nz-2u = subst NonZero (sym e2u)
+              (embed-suc-nonZero {k +ℕ (suc k +ℕ 0)})
+    nz-4u : NonZero four-u
+    nz-4u = subst NonZero (sym e4u)
+              (embed-suc-nonZero
+                {k +ℕ (suc k +ℕ (suc k +ℕ (suc k +ℕ 0)))})
+    nz-nx : NonZero next
+    nz-nx = subst NonZero (sym enx)
+              (embed-suc-nonZero {suc (k +ℕ (suc k +ℕ 0))})
+    nz-E4 : NonZero (embed (4 *ℕ suc k))
+    nz-E4 = embed-suc-nonZero
+              {k +ℕ (suc k +ℕ (suc k +ℕ (suc k +ℕ 0)))}
+    nz-Enx : NonZero (embed (suc (2 *ℕ suc k)))
+    nz-Enx = embed-suc-nonZero {suc (k +ℕ (suc k +ℕ 0))}
+    a = (1/ four-u) {{nz-4u}}
+    b = (1/ next) {{nz-nx}}
+    c = (1/ u) {{nz-u}}
+    gen : a + b < c
+    gen = u-bound u 0<u {{nz-u}} {{nz-2u}} {{nz-4u}} {{nz-nx}}
+    eq1 : a ≡ (1/ embed (4 *ℕ suc k)) {{nz-E4}}
+    eq1 = reciprocal-cong four-u (embed (4 *ℕ suc k))
+            {{nz-4u}} {{nz-E4}} e4u
+    eq2 : b ≡ (1/ embed (suc (2 *ℕ suc k))) {{nz-Enx}}
+    eq2 = reciprocal-cong next (embed (suc (2 *ℕ suc k)))
+            {{nz-nx}} {{nz-Enx}} enx
+    eq3 : c ≡ ε k
+    eq3 = trans
+            (reciprocal-cong u (embed (suc k))
+              {{nz-u}} {{embed-suc-nonZero {k}}} u≡)
+            (1/embed k)
+    s1 = subst (λ x → x + b < c) eq1 gen
+    s2 = subst (λ x → (1/ embed (4 *ℕ suc k)) {{nz-E4}} + x < c) eq2 s1
+    s3 = subst (λ x → (1/ embed (4 *ℕ suc k)) {{nz-E4}}
+                       + (1/ embed (suc (2 *ℕ suc k))) {{nz-Enx}} < x)
+               eq3 s2
+  in s3
+
 base-bound : ∀ k →
   1/ embed (4 *ℕ suc k) + 1/ embed (suc (2 *ℕ suc k)) < ε k
 base-bound k =
-  let u = embed (suc k)
-      e2u : 2ℚ * u ≡ embed (2 *ℕ suc k)
-      e2u = 2*embed (suc k)
-      e4u : 2ℚ * (2ℚ * u) ≡ embed (4 *ℕ suc k)
-      e4u = 4*embed (suc k)
-      enx : 2ℚ * u + 1ℚ ≡ embed (suc (2 *ℕ suc k))
-      enx =
-        begin
-          2ℚ * u + 1ℚ
-            ≡⟨ cong (λ x → x + 1ℚ) e2u ⟩
-          embed (2 *ℕ suc k) + 1ℚ
-            ≡⟨ +-comm (embed (2 *ℕ suc k)) 1ℚ ⟩
-          1ℚ + embed (2 *ℕ suc k)
-            ≡⟨ sym (embed-+-hom 1 (2 *ℕ suc k)) ⟩
-          embed (1 +ℕ 2 *ℕ suc k)
-            ≡⟨ cong embed (1+n≡ (2 *ℕ suc k)) ⟩
-          embed (suc (2 *ℕ suc k))
-            ∎
-  in go u (0<embed k) refl e2u e4u enx
-  where
-  E4 = embed (4 *ℕ suc k)
-  Enx = embed (suc (2 *ℕ suc k))
-  go : (u : ℚ) → 0ℚ < u
-     → u ≡ embed (suc k)
-     → 2ℚ * u ≡ embed (2 *ℕ suc k)
-     → 2ℚ * (2ℚ * u) ≡ embed (4 *ℕ suc k)
-     → 2ℚ * u + 1ℚ ≡ embed (suc (2 *ℕ suc k))
-     → 1/ E4 + 1/ Enx < ε k
-  go u 0<u u≡ e2u e4u enx =
-    let two-u = 2ℚ * u
-        four-u = 2ℚ * two-u
-        next = two-u + 1ℚ
-        nz-u : NonZero u
-        nz-u = pos⇒nonZero u {{positive 0<u}}
-        nz-2u : NonZero two-u
-        nz-2u = subst NonZero (sym e2u)
-                  (embed-suc-nonZero {k +ℕ (suc k +ℕ 0)})
-        nz-4u : NonZero four-u
-        nz-4u = subst NonZero (sym e4u)
-                  (embed-suc-nonZero
-                    {k +ℕ (suc k +ℕ (suc k +ℕ (suc k +ℕ 0)))})
-        nz-nx : NonZero next
-        nz-nx = subst NonZero (sym enx)
-                  (embed-suc-nonZero {suc (k +ℕ (suc k +ℕ 0))})
-        nz-E4 : NonZero E4
-        nz-E4 = embed-suc-nonZero
-                  {k +ℕ (suc k +ℕ (suc k +ℕ (suc k +ℕ 0)))}
-        nz-Enx : NonZero Enx
-        nz-Enx = embed-suc-nonZero {suc (k +ℕ (suc k +ℕ 0))}
-        a = (1/ four-u) {{nz-4u}}
-        b = (1/ next) {{nz-nx}}
-        c = (1/ u) {{nz-u}}
-        gen : a + b < c
-        gen = u-bound u 0<u {{nz-u}} {{nz-2u}} {{nz-4u}} {{nz-nx}}
-        eq1 : a ≡ (1/ E4) {{nz-E4}}
-        eq1 = reciprocal-cong four-u E4 {{nz-4u}} {{nz-E4}} e4u
-        eq2 : b ≡ (1/ Enx) {{nz-Enx}}
-        eq2 = reciprocal-cong next Enx {{nz-nx}} {{nz-Enx}} enx
-        eq3 : c ≡ ε k
-        eq3 = trans
-                (reciprocal-cong u (embed (suc k))
-                  {{nz-u}} {{embed-suc-nonZero {k}}} u≡)
-                (1/embed k)
-        s1 = subst (λ x → x + b < c) eq1 gen
-        s2 = subst (λ x → (1/ E4) {{nz-E4}} + x < c) eq2 s1
-        s3 = subst (λ x → (1/ E4) {{nz-E4}} + (1/ Enx) {{nz-Enx}} < x)
-                   eq3 s2
-    in s3
+  let
+    u = embed (suc k)
+    e2u : 2ℚ * u ≡ embed (2 *ℕ suc k)
+    e2u = 2*embed (suc k)
+    e4u : 2ℚ * (2ℚ * u) ≡ embed (4 *ℕ suc k)
+    e4u = 4*embed (suc k)
+    enx : 2ℚ * u + 1ℚ ≡ embed (suc (2 *ℕ suc k))
+    enx =
+      begin
+        2ℚ * u + 1ℚ
+          ≡⟨ cong (λ x → x + 1ℚ) e2u ⟩
+        embed (2 *ℕ suc k) + 1ℚ
+          ≡⟨ +-comm (embed (2 *ℕ suc k)) 1ℚ ⟩
+        1ℚ + embed (2 *ℕ suc k)
+          ≡⟨ sym (embed-+-hom 1 (2 *ℕ suc k)) ⟩
+        embed (1 +ℕ 2 *ℕ suc k)
+          ≡⟨ cong embed (1+n≡ (2 *ℕ suc k)) ⟩
+        embed (suc (2 *ℕ suc k))
+          ∎
+  in base-go k u (0<embed k) refl e2u e4u enx
 
 ------------------------------------------------------------------------
 -- Natural-number doubling and bounds
@@ -685,59 +793,284 @@ doubleN x =
 k+4≤2k+4 : ∀ k →
   suc (suc (suc (suc k))) ≤N 2 *ℕ suc (suc k)
 k+4≤2k+4 k =
-  ≤N-trans mid (≤N-reflexive (sym a≡))
-  where
-  mid : suc (suc (suc (suc k))) ≤N
+  let
+    mid : suc (suc (suc (suc k))) ≤N
+          suc (suc (suc (suc (k +ℕ k))))
+    mid = s≤s (s≤s (s≤s (s≤s (m≤m+n k k))))
+    inner : k +ℕ suc (suc k) ≡ suc (suc (k +ℕ k))
+    inner = trans (+-suc k (suc k)) (cong suc (+-suc k k))
+    a≡ : 2 *ℕ suc (suc k) ≡ suc (suc (suc (suc (k +ℕ k))))
+    a≡ =
+      begin
+        2 *ℕ suc (suc k)
+          ≡⟨ doubleN (suc (suc k)) ⟩
+        suc (suc k) +ℕ suc (suc k)
+          ≡⟨ refl ⟩
+        suc (suc (k +ℕ suc (suc k)))
+          ≡⟨ cong (λ x → suc (suc x)) inner ⟩
         suc (suc (suc (suc (k +ℕ k))))
-  mid = s≤s (s≤s (s≤s (s≤s (m≤m+n k k))))
-  inner : k +ℕ suc (suc k) ≡ suc (suc (k +ℕ k))
-  inner = trans (+-suc k (suc k)) (cong suc (+-suc k k))
-  a≡ : 2 *ℕ suc (suc k) ≡
-       suc (suc (suc (suc (k +ℕ k))))
-  a≡ =
-    begin
-      2 *ℕ suc (suc k)
-        ≡⟨ doubleN (suc (suc k)) ⟩
-      suc (suc k) +ℕ suc (suc k)
-        ≡⟨ refl ⟩
-      suc (suc (k +ℕ suc (suc k)))
-        ≡⟨ cong (λ x → suc (suc x)) inner ⟩
-      suc (suc (suc (suc (k +ℕ k))))
-        ∎
+          ∎
+  in ≤N-trans mid (≤N-reflexive (sym a≡))
 
 prod≤2^ : ∀ k →
   suc (suc k) *ℕ suc (suc (suc k)) ≤N 2 ^ suc (suc (suc k))
 prod≤2^ zero =
   s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))
 prod≤2^ (suc k) =
-  ≤N-trans (≤N-trans p1 (≤N-reflexive step1)) p3
-  where
-  a = suc (suc k)
-  b = suc a
-  c = suc b
-  c≤2a : c ≤N 2 *ℕ a
-  c≤2a = k+4≤2k+4 k
-  p1 : b *ℕ c ≤N b *ℕ (2 *ℕ a)
-  p1 = *-monoʳ-≤ b c≤2a
-  p3 : 2 *ℕ (a *ℕ b) ≤N 2 *ℕ (2 ^ b)
-  p3 = *-monoʳ-≤ 2 (prod≤2^ k)
-  step1 : b *ℕ (2 *ℕ a) ≡ 2 *ℕ (a *ℕ b)
-  step1 =
-    begin
-      b *ℕ (2 *ℕ a)
-        ≡⟨ cong (b *ℕ_) (doubleN a) ⟩
-      b *ℕ (a +ℕ a)
-        ≡⟨ *-distribˡ-+ b a a ⟩
-      b *ℕ a +ℕ b *ℕ a
-        ≡⟨ cong (λ x → x +ℕ b *ℕ a) (*-commℕ b a) ⟩
-      a *ℕ b +ℕ b *ℕ a
-        ≡⟨ cong (a *ℕ b +ℕ_) (*-commℕ b a) ⟩
-      a *ℕ b +ℕ a *ℕ b
-        ≡⟨ sym (doubleN (a *ℕ b)) ⟩
-      2 *ℕ (a *ℕ b)
-        ∎
+  let
+    a = suc (suc k)
+    b = suc a
+    c = suc b
+    c≤2a : c ≤N 2 *ℕ a
+    c≤2a = k+4≤2k+4 k
+    p1 : b *ℕ c ≤N b *ℕ (2 *ℕ a)
+    p1 = *-monoʳ-≤ b c≤2a
+    p3 : 2 *ℕ (a *ℕ b) ≤N 2 *ℕ (2 ^ b)
+    p3 = *-monoʳ-≤ 2 (prod≤2^ k)
+    step1 : b *ℕ (2 *ℕ a) ≡ 2 *ℕ (a *ℕ b)
+    step1 =
+      begin
+        b *ℕ (2 *ℕ a)
+          ≡⟨ cong (b *ℕ_) (doubleN a) ⟩
+        b *ℕ (a +ℕ a)
+          ≡⟨ *-distribˡ-+ b a a ⟩
+        b *ℕ a +ℕ b *ℕ a
+          ≡⟨ cong (λ x → x +ℕ b *ℕ a) (*-commℕ b a) ⟩
+        a *ℕ b +ℕ b *ℕ a
+          ≡⟨ cong (a *ℕ b +ℕ_) (*-commℕ b a) ⟩
+        a *ℕ b +ℕ a *ℕ b
+          ≡⟨ sym (doubleN (a *ℕ b)) ⟩
+        2 *ℕ (a *ℕ b)
+          ∎
+  in ≤N-trans (≤N-trans p1 (≤N-reflexive step1)) p3
 
 embed-prod< : ∀ a b c → a *ℕ b <N c → embed a * embed b < embed c
 embed-prod< a b c ab<c =
   ≤-<-trans (≤-reflexive (embed-* a b))
             (embed-mono-< {m = a *ℕ b} {n = c} ab<c)
+
+------------------------------------------------------------------------
+-- More Nat arithmetic for CauchyI → WeakCauchy
+--
+-- CauchyI → WeakCauchy 所需的更多自然数算术
+
+four-a : ∀ a → 4 *ℕ a ≡ 2 *ℕ (2 *ℕ a)
+four-a a =
+  begin
+    4 *ℕ a
+      ≡⟨ *-commℕ 4 a ⟩
+    a *ℕ 4
+      ≡⟨ cong (a *ℕ_) (sym (*-commℕ 2 2)) ⟩
+    a *ℕ (2 *ℕ 2)
+      ≡⟨ sym (*-assocℕ a 2 2) ⟩
+    a *ℕ 2 *ℕ 2
+      ≡⟨ cong (_*ℕ 2) (*-commℕ a 2) ⟩
+    2 *ℕ a *ℕ 2
+      ≡⟨ *-commℕ (2 *ℕ a) 2 ⟩
+    2 *ℕ (2 *ℕ a)
+      ∎
+
+sk≡k+1 : ∀ k → suc k ≡ k +ℕ 1
+sk≡k+1 k =
+  begin
+    suc k
+      ≡⟨ cong suc (sym (+-identityʳℕ k)) ⟩
+    suc (k +ℕ 0)
+      ≡⟨ sym (+-suc k 0) ⟩
+    k +ℕ 1
+      ∎
+
+ssk≡k+2 : ∀ k → suc (suc k) ≡ k +ℕ 2
+ssk≡k+2 k =
+  begin
+    suc (suc k)
+      ≡⟨ cong suc (sk≡k+1 k) ⟩
+    suc (k +ℕ 1)
+      ≡⟨ sym (+-suc k 1) ⟩
+    k +ℕ 2
+      ∎
+
+base8<16 : 4 *ℕ 2 <N 16
+base8<16 = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))))
+
+4<2^k+4 : ∀ k → 4 <N 2 ^ suc (suc (suc (suc k)))
+4<2^k+4 k =
+  ≤N-<-trans (m≤m+n 4 k) (n<2^n (suc (suc (suc (suc k)))))
+
+4k+8<2^k+4 : ∀ k →
+  4 *ℕ suc (suc k) <N 2 ^ suc (suc (suc (suc k)))
+4k+8<2^k+4 zero    = base8<16
+4k+8<2^k+4 (suc k) =
+  let
+    r = 2 ^ suc (suc (suc (suc k)))
+    eqL : 4 *ℕ suc (suc (suc k)) ≡ 4 +ℕ 4 *ℕ suc (suc k)
+    eqL = *-suc 4 (suc (suc k))
+    step : 4 *ℕ suc (suc (suc k)) <N r +ℕ r
+    step = ≤N-<-trans (≤N-reflexive eqL)
+                      (+-mono-<N (4<2^k+4 k) (4k+8<2^k+4 k))
+  in subst (λ z → 4 *ℕ suc (suc (suc k)) <N z)
+           (cong (r +ℕ_) (sym (*-identityˡℕ r)))
+           step
+
+n<2+n : ∀ x → x <N x +ℕ 2
+n<2+n x =
+  let
+    eq2 : x +ℕ 2 ≡ suc (suc x)
+    eq2 =
+      begin
+        x +ℕ 2
+          ≡⟨ +-commℕ x 2 ⟩
+        2 +ℕ x
+          ≡⟨⟩
+        suc (suc x)
+        ∎
+  in subst (λ z → suc x ≤N z) (sym eq2) (s≤s (n≤1+n x))
+
+4k+8<4k+10 : ∀ k →
+  4 *ℕ suc (suc k) <N 2 *ℕ (2 *ℕ k +ℕ 5)
+4k+8<4k+10 k =
+  let
+    m = 4 *ℕ suc (suc k)
+    a = suc (suc k)
+    a≡k+2 : a ≡ k +ℕ 2
+    a≡k+2 = ssk≡k+2 k
+    two-a-eq : 2 *ℕ a ≡ 2 *ℕ k +ℕ 4
+    two-a-eq =
+      begin
+        2 *ℕ a
+          ≡⟨ cong (2 *ℕ_) a≡k+2 ⟩
+        2 *ℕ (k +ℕ 2)
+          ≡⟨ *-distribˡ-+ 2 k 2 ⟩
+        2 *ℕ k +ℕ 2 *ℕ 2
+          ≡⟨⟩
+        2 *ℕ k +ℕ 4
+        ∎
+    suc-eq : suc (2 *ℕ a) ≡ 2 *ℕ k +ℕ 5
+    suc-eq =
+      begin
+        suc (2 *ℕ a)
+          ≡⟨ cong suc two-a-eq ⟩
+        suc (2 *ℕ k +ℕ 4)
+          ≡⟨ sym (+-suc (2 *ℕ k) 4) ⟩
+        2 *ℕ k +ℕ 5
+        ∎
+    eq : m +ℕ 2 ≡ 2 *ℕ (2 *ℕ k +ℕ 5)
+    eq =
+      begin
+        4 *ℕ a +ℕ 2
+          ≡⟨ cong (_+ℕ 2) (four-a a) ⟩
+        2 *ℕ (2 *ℕ a) +ℕ 2
+          ≡⟨ +-commℕ (2 *ℕ (2 *ℕ a)) 2 ⟩
+        2 +ℕ 2 *ℕ (2 *ℕ a)
+          ≡⟨ sym (*-suc 2 (2 *ℕ a)) ⟩
+        2 *ℕ suc (2 *ℕ a)
+          ≡⟨ cong (2 *ℕ_) suc-eq ⟩
+        2 *ℕ (2 *ℕ k +ℕ 5)
+        ∎
+  in subst (λ z → m <N z) eq (n<2+n m)
+
+hb-a : ℕ → ℕ
+hb-a k = suc (suc k)
+
+hb-e : ℕ → ℚ
+hb-e k = embed (4 *ℕ hb-a k)
+
+hb-p : ℕ → ℚ
+hb-p k = 2ℚ * embed (2ss k)
+
+hb-eq-2ss : ∀ k → 2ss k ≡ suc (2 *ℕ k +ℕ 3)
+hb-eq-2ss k =
+  begin
+    2ss k
+      ≡⟨ 2ss-eq k ⟩
+    2 *ℕ suc (suc k)
+      ≡⟨ cong (2 *ℕ_) (ssk≡k+2 k) ⟩
+    2 *ℕ (k +ℕ 2)
+      ≡⟨ *-distribˡ-+ 2 k 2 ⟩
+    2 *ℕ k +ℕ 2 *ℕ 2
+      ≡⟨ +-suc (2 *ℕ k) 3 ⟩
+    suc (2 *ℕ k +ℕ 3)
+    ∎
+
+hb-pos-2ss : ∀ k → Positive (embed (2ss k))
+hb-pos-2ss k =
+  positive (subst (λ z → 0ℚ < embed z) (sym (hb-eq-2ss k))
+             (0<embed (2 *ℕ k +ℕ 3)))
+
+hb-p-nz : ∀ k → NonZero (hb-p k)
+hb-p-nz k =
+  pos⇒nonZero (hb-p k)
+    {{pos*pos⇒pos 2ℚ (embed (2ss k)) {{hb-pos-2ss k}}}}
+
+hb-2a≡2ss : ∀ k → 2 *ℕ hb-a k ≡ 2ss k
+hb-2a≡2ss k =
+  begin
+    2 *ℕ hb-a k
+      ≡⟨ cong (2 *ℕ_) (ssk≡k+2 k) ⟩
+    2 *ℕ (k +ℕ 2)
+      ≡⟨ *-distribˡ-+ 2 k 2 ⟩
+    2 *ℕ k +ℕ 2 *ℕ 2
+      ≡⟨ +-suc (2 *ℕ k) 3 ⟩
+    suc (2 *ℕ k +ℕ 3)
+      ≡⟨ sym (hb-eq-2ss k) ⟩
+    2ss k
+    ∎
+
+hb-eq4 : ∀ k → 4 *ℕ hb-a k ≡ 2 *ℕ (2ss k)
+hb-eq4 k =
+  begin
+    4 *ℕ hb-a k
+      ≡⟨ four-a (hb-a k) ⟩
+    2 *ℕ (2 *ℕ hb-a k)
+      ≡⟨ cong (2 *ℕ_) (hb-2a≡2ss k) ⟩
+    2 *ℕ (2ss k)
+    ∎
+
+hb-eqp : ∀ k → hb-p k ≡ hb-e k
+hb-eqp k =
+  begin
+    hb-p k
+      ≡⟨⟩
+    2ℚ * embed (2ss k)
+      ≡⟨ 2*embed (2ss k) ⟩
+    embed (2 *ℕ (2ss k))
+      ≡⟨ cong embed (sym (hb-eq4 k)) ⟩
+    embed (4 *ℕ hb-a k)
+      ≡⟨⟩
+    hb-e k
+      ∎
+
+hb-e-nz : ∀ k → NonZero (hb-e k)
+hb-e-nz k = subst NonZero (hb-eqp k) (hb-p-nz k)
+
+hb-step1 : ∀ k →
+  (1/_ (hb-e k) {{hb-e-nz k}}) + (1/_ (hb-e k) {{hb-e-nz k}})
+    ≡ (1/_ (hb-p k) {{hb-p-nz k}}) + (1/_ (hb-p k) {{hb-p-nz k}})
+hb-step1 k =
+  begin
+    (1/_ (hb-e k) {{hb-e-nz k}}) + (1/_ (hb-e k) {{hb-e-nz k}})
+      ≡⟨ cong₂ _+_ rc rc ⟩
+    (1/_ (hb-p k) {{hb-p-nz k}}) + (1/_ (hb-p k) {{hb-p-nz k}})
+      ∎
+  where
+  rc : (1/_ (hb-e k) {{hb-e-nz k}}) ≡ (1/_ (hb-p k) {{hb-p-nz k}})
+  rc = reciprocal-cong (hb-e k) (hb-p k)
+         {{hb-e-nz k}} {{hb-p-nz k}} (sym (hb-eqp k))
+
+H+H≡budget : ∀ k →
+  (1/_ (embed (4 *ℕ suc (suc k))) {{hb-e-nz k}})
+    + (1/_ (embed (4 *ℕ suc (suc k))) {{hb-e-nz k}})
+    ≡ ε (suc k) * half
+H+H≡budget k =
+  begin
+    (1/_ (embed (4 *ℕ suc (suc k))) {{hb-e-nz k}})
+      + (1/_ (embed (4 *ℕ suc (suc k))) {{hb-e-nz k}})
+      ≡⟨⟩
+    (1/_ (hb-e k) {{hb-e-nz k}}) + (1/_ (hb-e k) {{hb-e-nz k}})
+      ≡⟨ hb-step1 k ⟩
+    (1/_ (hb-p k) {{hb-p-nz k}}) + (1/_ (hb-p k) {{hb-p-nz k}})
+      ≡⟨ halve (embed (2ss k)) {{2ss-nonZero {k}}} {{hb-p-nz k}} ⟩
+    (1/ embed (2ss k)) {{2ss-nonZero {k}}}
+      ≡⟨ sym (εs-half k) ⟩
+    ε (suc k) * half
+      ∎

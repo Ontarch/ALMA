@@ -358,10 +358,7 @@ pos-step1-correct : ∀ {ℓ} {F G : Cosmos ℓ} {m₁ m₂ : F ⇒ℱ G} {e : m
                   → let eqO = onObj-eq e A
                         eqSh = onShape-eq e s
                         S-eq = trans (cong (subst (Shape G) eqO) eqSh) (subst-inv' (Shape G) eqO)
-                        O1 = onObj m₁ A
-                        O2 = onObj m₂ A
                         S1 = onShape m₁ s
-                        S2 = onShape m₂ s
                         P1 = onPos m₁ p
                         P2 = onPos m₂ p
                     in subst (Pos G) S-eq (subst-pos G eqO S1 P1) ≡ P2
@@ -371,7 +368,6 @@ pos-step1-correct {G = G} {m₁ = m₁} {m₂ = m₂} {e = e} {A} {s} {p} =
     eqSh = onShape-eq e s
     S-eq = trans (cong (subst (Shape G) eqO) eqSh) (subst-inv' (Shape G) eqO)
     O1 = onObj m₁ A
-    O2 = onObj m₂ A
     S1 = onShape m₁ s
     S2 = onShape m₂ s
     P1 = onPos m₁ p
@@ -389,7 +385,6 @@ pos-sym-lemma : ∀ {ℓ} {F G : Cosmos ℓ} {m₁ m₂ : F ⇒ℱ G} (e : m₁ 
                                   (subst-pos G (sym (sym (onObj-eq e A))) (onShape m₁ s) (onPos m₁ p))
 pos-sym-lemma {ℓ} {F} {G} {m₁} {m₂} e {A} {s} p =
   let
-    O1 = onObj m₁ A
     O2 = onObj m₂ A
     eqO = onObj-eq e A
     S1 = onShape m₁ s
@@ -845,8 +840,6 @@ combine-unfold-path : ∀ {ℓ} {F G : Cosmos ℓ} {m₁ m₂ m₃ : F ⇒ℱ G}
                    → ∀ {A : Obj F} (s : Shape F A)
                    → let O₁ = onObj m₁ A
                          O₂ = onObj m₂ A
-                         O₃ = onObj m₃ A
-                         S₁ = onShape m₁ s
                          S₂ = onShape m₂ s
                          S₃ = onShape m₃ s
                          eqO₁ = onObj-eq h1 A
@@ -1487,7 +1480,6 @@ module CosmosF-Definition where
                       → Pos-R' A A' R₁ s s' hs (actP (φ x) f s p) (actP (ana α x) f' s' p')
         actP-preserve' A .(cast-obj A) B .(cast-obj B) refl refl f .(cast-hom A B f) s .(cast-shape A s) p p' refl refl hp =
           let
-            eqActS = actS-cong ℓ (Cosmos ℓ) (out (φ x)) (imap-cosmosF φ (α x)) eqF A B f s
             eq1 = actP-cong ℓ (Cosmos ℓ) (out (φ x)) (imap-cosmosF φ (α x)) eqF A B f s p
             eq2 = hp
             eq3 = cong (actP (ana α x) (cast-hom A B f) (cast-shape A s)) eq2

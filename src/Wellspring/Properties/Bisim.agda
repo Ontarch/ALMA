@@ -141,7 +141,6 @@ module _ {ℓ} {F : Cosmos ℓ} {ml : MorphLift F} where
         let
           eq1 = Bisim.shape-eq b1 s
           eq2 = Bisim.shape-eq b2 s
-          eq  = trans eq1 eq2
           pos1 = Bisim.pos-eq b1 s p
           pos2 = Bisim.pos-eq b2 s (subst (Pos F) eq1 p)
           step = trans pos1 pos2
@@ -154,8 +153,6 @@ module _ {ℓ} {F : Cosmos ℓ} {ml : MorphLift F} where
           eq  = trans eq1 eq2
           P : Shape F Bₒ → Set (lsuc ℓ)
           P X = unfold F s ⇒ℱ unfold F X
-          liftF = morphLift ml f s
-          liftG = morphLift ml g s
           liftH = morphLift ml h s
           mor1 = Bisim.morph-bisim b1 s
           mor2 = Bisim.morph-bisim b2 s

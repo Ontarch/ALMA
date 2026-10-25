@@ -8,15 +8,19 @@
 
 module Real.Interval.RegularRep where
 
-open import Data.Nat using (ℕ; zero; suc; _⊔_; _^_; _∸_)
+open import Data.Nat using (ℕ; zero; suc; _⊔_; _^_; _∸_; s≤s)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<N_)
-open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m+[n∸m]≡n; ^-monoʳ-≤)
-  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; +-comm to +-commℕ)
+open import Data.Nat.Properties using
+  (m≤m⊔n; m≤n⊔m; m+[n∸m]≡n; ^-monoʳ-≤; *-monoˡ-≤)
+  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
+  ; +-comm to +-commℕ; *-identityˡ to *-identityˡℕ)
 open import Data.Product using (proj₁; proj₂)
+open import Relation.Binary.PropositionalEquality using (sym)
 open import Data.Rational using (ℚ; _*_; _<_; _≤_; ∣_∣; _-_; positive)
-open import Data.Rational.Properties using (<⇒≤; pos⇒nonNeg; *-monoʳ-≤-nonNeg)
+open import Data.Rational.Properties using
+  (<⇒≤; pos⇒nonNeg; *-monoʳ-≤-nonNeg; <-≤-trans)
 
-open import Real using (CauchySeq; ε; embed)
+open import Real using (CauchySeq; ε; embed; embed-pos→≥1)
 open CauchySeq using (μ)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using
@@ -127,3 +131,23 @@ reg-reg : ∀ r k a b → a ≥N k → b ≥N k →
 reg-reg r k a b a≥k b≥k =
   CauchySeq.cauchy (realI→cauchy r) (suc k) (i r a) (i r b)
     (reg-reg-ia r k a a≥k) (reg-reg-ib r k b b≥k)
+
+------------------------------------------------------------------------
+-- Fold index lower bound
+--
+-- 折叠下标下界
+
+fold≥k+4 : ∀ r k → i r (suc k) ≥N suc (suc (suc (suc k)))
+fold≥k+4 r k =
+  ≤N-trans (s≤s prod) (i≥μ r (suc k))
+  where
+  w0 = width r 0
+  M0 = proj₁ (bound-w w0 (<⇒≤ (0<width r)))
+  w0≤M0 = proj₂ (bound-w w0 (<⇒≤ (0<width r)))
+  M0≥1 : 1 ≤N M0
+  M0≥1 = embed-pos→≥1 M0 (<-≤-trans (0<width r) w0≤M0)
+  n3 = suc (suc (suc k))
+  prod : n3 ≤N M0 *ℕ n3
+  prod =
+    ≤N-trans (≤N-reflexive (sym (*-identityˡℕ n3)))
+             (*-monoˡ-≤ n3 M0≥1)

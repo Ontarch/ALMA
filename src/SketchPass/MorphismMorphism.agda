@@ -47,13 +47,8 @@ record MorphismMorphism {ℓ : Level}
     module CFstruct = ContCatEquivFunctor CF
     module CFobj    = ObjEquivFunctor CFstruct.objEquivFunctor
     module BF       = Functor CFobj.baseFunctor
-    open Unfolding UF renaming (unfoldFunctor to UF-functor)
-    open Unfolding UG renaming (unfoldFunctor to UG-functor)
-    module UF = Functor UF-functor
-    module UG = Functor UG-functor
     module MO       = MorphismObject MO
     module CatF     = Category (ObjEquivCat.cat CEF.base)
-    module CatG     = Category (ObjEquivCat.cat CEG.base)
   field
     -- onPos ∘ actPOf(f) ≡ actPOf(BF.₁ f) ∘ onPos (via shape transport)
     onActP : ∀ {A B} (f : CatF._⇒_ A B) (s : ShapeOf CEF.containerFunctor A)

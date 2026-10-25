@@ -85,8 +85,6 @@ module _ {o ℓ e : Level} {C D : Category o ℓ e} (F : Functor C D) where
     import Categories.Morphism D as MD
     CE = objEquivCatFromIso C
     DE = objEquivCatFromIso D
-    module CE = ObjEquivCat CE
-    module DE = ObjEquivCat DE
   -- Functor F lifts isomorphisms in C to isomorphisms in D
   F-iso : ∀ {A B} → A MC.≅ B → F.₀ A MD.≅ F.₀ B
   F-iso i = record
@@ -108,8 +106,8 @@ module _ {o ℓ e : Level} {C D : Category o ℓ e} (F : Functor C D) where
     ; ≈ₒ-homo        = F-iso
     ; transport-comm = λ eqA eqB {f} →
         let
-          open MC._≅_ eqA renaming (from to frA; to to toA)
-          open MC._≅_ eqB renaming (from to fromB; to to toB)
+          open MC._≅_ eqA renaming (to to toA)
+          open MC._≅_ eqB renaming (from to fromB)
           open D
           open HomReasoning
           open Equiv

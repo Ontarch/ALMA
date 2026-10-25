@@ -89,7 +89,6 @@ comp-nat-shape-eq {F = F} {G} {H} g f {A} {B} h s =
     s3 = ≈M-sym (∘M-assoc {f = fN-A} {g = Gfh} {h = gN-fB})
     s4 = ∘M-resp-≈ˡ {f = fN-A} (gCF.natural (fobj.₁ h))
     s5 = ∘M-assoc {f = fN-A} {g = gN-fA} {h = Hgfh}
-    full = ≈M-trans s1 (≈M-trans s2 (≈M-trans s3 (≈M-trans s4 s5)))
   in
   begin
     shape-eq-from-≈M (ContCatEquivFunctor.natural (compContCatEquivFunctor g f) h) s

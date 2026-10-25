@@ -17,13 +17,13 @@ module SketchPass.Cosmos where
 
 open import Agda.Primitive using (Level; lsuc; _⊔_)
 open import Relation.Binary.PropositionalEquality
-  using (_≡_; refl; sym; trans; cong; cong₂; subst; subst₂; isEquivalence; setoid)
+  using (_≡_; refl; sym; trans; cong; subst; setoid)
 open import Relation.Binary using (Reflexive; Symmetric; Transitive)
 open import Relation.Binary.Bundles using (Setoid)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Data.Product using (proj₁)
 open import Data.Container.Core using (shape)
-open import Function using (id; _∘_; Func)
+open import Function using (_∘_; Func)
 open import Categories.Category using (Category)
 open import Categories.Category.Instance.Sets using (Sets)
 open import Categories.Category.Instance.Setoids using (Setoids)
@@ -86,11 +86,8 @@ mutual
       module FL = CosmosF (out F)
       module GL = CosmosF (out G)
       module CE-F = ContCatEquiv FL.contEquiv
-      module CE-G = ContCatEquiv GL.contEquiv
-      open Unfolding FL.unfoldingCore
-        renaming (unfoldFunctor to UF-functor; unfold-next to UF-next; pos-to-shape to UF-pos-to-shape)
-      open Unfolding GL.unfoldingCore
-        renaming (unfoldFunctor to UG-functor; unfold-next to UG-next; pos-to-shape to UG-pos-to-shape)
+      open Unfolding FL.unfoldingCore renaming (unfold-next to UF-next)
+      open Unfolding GL.unfoldingCore renaming (unfold-next to UG-next)
     field
       contEquivFunctor : ContCatEquivFunctor FL.contEquiv GL.contEquiv
       morphismObj      : MorphismObject contEquivFunctor FL.unfoldingCore GL.unfoldingCore
@@ -214,7 +211,6 @@ StrictSets ℓ = record
 
 -- CosmosF Functor: StrictSets → Setoids
 module CosmosFFunctor {ℓ : Level} where
-  open UnfoldingFunctor
   open CosmosF
   open CosmosMap
   -- Helper: lift plain functions to setoid morphisms

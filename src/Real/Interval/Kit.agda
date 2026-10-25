@@ -423,37 +423,41 @@ strict-recip : (a b : ℚ) → (0<a : 0ℚ < a) → (a<b : a < b) →
   1/_ b {{pos⇒nonZero b {{positive (<-≤-trans 0<a (<⇒≤ a<b))}}}}
   < 1/_ a {{pos⇒nonZero a {{positive 0<a}}}}
 strict-recip a b 0<a a<b =
-  *-cancelˡ-<-nonNeg (a * b)
-    (<-≤-trans (≤-<-trans lhs a<b) rhs)
-  where
-  0<b = <-≤-trans 0<a (<⇒≤ a<b)
-  a-nz = pos⇒nonZero a {{positive 0<a}}
-  b-nz = pos⇒nonZero b {{positive 0<b}}
-  instance
+  let
+    0<b = <-≤-trans 0<a (<⇒≤ a<b)
+    a-nz = pos⇒nonZero a {{positive 0<a}}
+    b-nz = pos⇒nonZero b {{positive 0<b}}
+    ab-pos : Positive (a * b)
     ab-pos = pos*pos⇒pos a {{positive 0<a}} b {{positive 0<b}}
-    ab-nn = pos⇒nonNeg (a * b)
-  lhs : (a * b) * 1/_ b {{b-nz}} ≤ a
-  lhs = ≤-reflexive (begin
-    (a * b) * 1/_ b {{b-nz}}
-      ≡⟨ *-assoc a b _ ⟩
-    a * (b * 1/_ b {{b-nz}})
-      ≡⟨ cong (a *_) (*-inverseʳ b {{b-nz}}) ⟩
-    a * 1ℚ
-      ≡⟨ *-identityʳ a ⟩
-    a
-    ∎)
-  rhs : b ≤ (a * b) * 1/_ a {{a-nz}}
-  rhs = ≤-reflexive (begin
-    b
-      ≡⟨ sym (*-identityʳ b) ⟩
-    b * 1ℚ
-      ≡⟨ cong (b *_) (sym (*-inverseʳ a {{a-nz}})) ⟩
-    b * (a * 1/_ a {{a-nz}})
-      ≡⟨ sym (*-assoc b a (1/_ a {{a-nz}})) ⟩
-    (b * a) * 1/_ a {{a-nz}}
-      ≡⟨ cong (λ z → z * 1/_ a {{a-nz}}) (*-comm b a) ⟩
-    (a * b) * 1/_ a {{a-nz}}
-    ∎)
+    ab-nn : NonNegative (a * b)
+    ab-nn = pos⇒nonNeg (a * b) {{ab-pos}}
+    lhs-eq : (a * b) * 1/_ b {{b-nz}} ≡ a
+    lhs-eq =
+      begin
+        (a * b) * 1/_ b {{b-nz}}
+          ≡⟨ *-assoc a b _ ⟩
+        a * (b * 1/_ b {{b-nz}})
+          ≡⟨ cong (a *_) (*-inverseʳ b {{b-nz}}) ⟩
+        a * 1ℚ
+          ≡⟨ *-identityʳ a ⟩
+        a
+        ∎
+    rhs-eq : b ≡ (a * b) * 1/_ a {{a-nz}}
+    rhs-eq =
+      begin
+        b
+          ≡⟨ sym (*-identityʳ b) ⟩
+        b * 1ℚ
+          ≡⟨ cong (b *_) (sym (*-inverseʳ a {{a-nz}})) ⟩
+        b * (a * 1/_ a {{a-nz}})
+          ≡⟨ sym (*-assoc b a (1/_ a {{a-nz}})) ⟩
+        (b * a) * 1/_ a {{a-nz}}
+          ≡⟨ cong (λ z → z * 1/_ a {{a-nz}}) (*-comm b a) ⟩
+        (a * b) * 1/_ a {{a-nz}}
+        ∎
+  in *-cancelˡ-<-nonNeg (a * b) {{ab-nn}}
+       (<-≤-trans (≤-<-trans (≤-reflexive lhs-eq) a<b)
+                  (≤-reflexive rhs-eq))
 
 ------------------------------------------------------------------------
 -- ε tail selection

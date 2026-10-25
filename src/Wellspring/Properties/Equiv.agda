@@ -72,7 +72,6 @@ sym-sym-eqO {e = e} {A} = sym (sym-sym (onObj-eq e A))
 
 S-eq-correct : ∀ {ℓ} {F G : Cosmos ℓ} {m₁ m₂ : F ⇒ℱ G} {e : m₁ ≃⇒ℱ m₂} {A : Obj F} {s : Shape F A}
              → let eqO = onObj-eq e A
-                   eqSh = onShape-eq e s
                    S1 = onShape m₁ s
                    S2 = onShape m₂ s
                in subst (Shape G) eqO S1 ≡ S2

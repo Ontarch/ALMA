@@ -52,10 +52,6 @@ comp-cong-≃⇒ℱ-aux {ℓ} F G H f1 f2 g1 g2 f-eq g-eq refl .onunfold-eq {A} 
     O1-f = onObj f1 A
     O2-f : Obj G
     O2-f = onObj f2 A
-    eqO-g : onObj g1 O2-f ≡ onObj g2 O2-f
-    eqO-g = onObj-eq g-eq O2-f
-    eqS-g : onShape g1 t2 ≡ subst (Shape H) (sym eqO-g) (onShape g2 t2)
-    eqS-g = onShape-eq g-eq t2
     s1-g : Shape H (onObj g1 O1-f)
     s1-g = onShape g1 t1
     s_mid-g : Shape H (onObj g1 O2-f)
@@ -75,8 +71,6 @@ comp-cong-≃⇒ℱ-aux {ℓ} F G H f1 f2 g1 g2 f-eq g-eq refl .onunfold-eq {A} 
     path-g-H = unfold-onShape-eq g-eq t2
     path-g-total : unfold H s3-g ≡ unfold H s1-g
     path-g-total = trans path-g-H path-f-H
-    P-f : Cosmos ℓ → Set (lsuc ℓ)
-    P-f C = unfold F s ⇒ℱ C
     P-g : Cosmos ℓ → Set (lsuc ℓ)
     P-g C = unfold G t2 ⇒ℱ C
     Q-g : Cosmos ℓ → Set (lsuc ℓ)
@@ -103,12 +97,6 @@ comp-cong-≃⇒ℱ-aux {ℓ} F G H f1 f2 g1 g2 f-eq g-eq refl .onunfold-eq {A} 
                   ≃⇒ℱ
                   subst₂ (λ A B → A ⇒ℱ B) path-f-G path-g-H (onunfold g2 t2)
     g-bisim-comb = ≡-right-≃⇒ℱ g-bisim-trans eqSub-g
-    left-merge : subst (λ C → unfold G t1 ⇒ℱ C) path-f-H (subst Q-g path-f-G (onunfold g1 t2))
-               ≡ subst₂ (λ A B → A ⇒ℱ B) path-f-G path-f-H (onunfold g1 t2)
-    left-merge = subst-source-target≡subst₂ path-f-G path-f-H (onunfold g1 t2)
-    right-merge : subst (λ C → unfold G t1 ⇒ℱ C) path-f-H (subst₂ (λ A B → A ⇒ℱ B) path-f-G path-g-H (onunfold g2 t2))
-                ≡ subst₂ (λ A B → A ⇒ℱ B) path-f-G (trans path-g-H path-f-H) (onunfold g2 t2)
-    right-merge = subst₂-subst-right (onunfold g2 t2) path-f-G path-g-H path-f-H
     g-left-transport : onunfold g1 t1 ≃⇒ℱ subst₂ (λ A B → A ⇒ℱ B) path-f-G path-f-H (onunfold g1 t2)
     g-left-transport =
       let

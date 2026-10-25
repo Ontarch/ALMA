@@ -21,29 +21,36 @@
 
 module Real.Interval.RetractCauchy where
 
-open import Data.Nat using (ℕ; zero; suc; _⊔_; _^_; z≤n; s≤s)
-  renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<N_)
-open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m≤m+n; m≤n+m; n<1+n; n≤1+n; ^-monoʳ-≤)
-  renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl
+open import Data.Nat using (ℕ; suc; _⊔_; _^_; s≤s)
+  renaming (_≤_ to _≤N_; _≥_ to _≥N_; _*_ to _*ℕ_; _<_ to _<N_)
+open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m≤m+n; m≤n+m; n<1+n; ^-monoʳ-≤)
+  renaming (≤-trans to ≤N-trans
            ; ≤-<-trans to ≤N-<-trans; <-≤-trans to <N-≤-trans)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _<_; _≤_; ∣_∣; mkℚ; *<*; 1/_; positive; Positive; NonZero; NonNegative; nonNegative)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _<_; _≤_; ∣_∣; 1/_; positive; Positive; NonZero; NonNegative; nonNegative)
 open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; <-trans
   ; +-mono-<; +-monoʳ-<; +-mono-≤; +-inverseʳ; +-identityˡ; ∣p+q∣≤∣p∣+∣q∣
   ; ∣-p∣≡∣p∣; positive⁻¹; *-inverseʳ; *-inverseˡ
-  ; *-identityʳ; *-identityˡ; *-assoc; *-comm; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg
-  ; pos*pos⇒pos; *-monoˡ-<-pos; *-monoʳ-<-pos
-  ; ≤-total; +-assoc; +-comm)
+  ; *-identityʳ; *-assoc; *-comm; *-monoˡ-≤-nonNeg
+  ; *-monoʳ-<-pos
+  ; +-assoc; +-comm)
   renaming (1/pos⇒pos to pos-recip)
-open import Data.Integer using (+0; +[1+_]; -[1+_]; -<+; +<+)
-open import Data.Integer.Properties using (<-irrefl)
 open import Data.Product using (_,_)
 open import Data.Sum using (inj₁; inj₂)
-open import Relation.Nullary.Negation using (contradiction)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
+
+open import Real using
+  (CauchySeq; ε; 0<ε; embed; _s≈_; _≈_; embed-mono-≤; ε-half)
+open Real.CauchySeq using (f; μ; cauchy)
+open import Real.Interval.Equiv using (_≈ℝ_)
+open import Real.IntervalEquiv using (realI→cauchy; centre; n<2^n)
+open import Real.CauchyToInterval using
+  (cauchy→realI; M; K; centre-cauchy→realI; M≥μK; K≥k)
+open import Real.Regular using (regularize; μr; μr≥k; μr-mono≤)
+open import Real.Interval.Rational using (r≤|r|; negsub)
 
 -- Generic reassociation: a + b + c ≡ b + (a + c), with abstract
 -- operands so no rational normal form is forced.
@@ -56,20 +63,6 @@ reassoc3 a b c = begin
   (b + a) + c
     ≡⟨ +-assoc b a c ⟩
   b + (a + c) ∎
-
-open import Real.Interval.Rational using (negsub)
-open import Real using
-  (CauchySeq; ε; 0<ε; embed; embed-suc-pos; _s≈_; _≈_; ≈-refl; embed-mono-≤; ε-half)
-open Real.CauchySeq using (f; μ; cauchy)
-open import Real.Interval using (RealI)
-open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-refl)
-open import Real.IntervalEquiv using (realI→cauchy; centre; n<2^n)
-open import Real.CauchyToInterval using
-  (cauchy→realI; M; K; centre-cauchy→realI; M≥μK; K≥k; M-mono)
-open import Real.Regular using
-  (regularize; μr; μr≥μ; μr≥k; μr-mono≤)
-open import Real.Interval.Rational using (r≤|r|; negsub)
-open import Real.Interval.Node using (mul-nonNeg)
 
 ------------------------------------------------------------------------
 -- regularize x ≈ x
@@ -226,10 +219,6 @@ private
         pos-ip = pos-recip p {{positive 0<p}}
         pos-iq : Positive iq
         pos-iq = pos-recip q {{positive 0<q}}
-        0<ip : 0ℚ < ip
-        0<ip = positive⁻¹ ip {{pos-ip}}
-        0<iq : 0ℚ < iq
-        0<iq = positive⁻¹ iq {{pos-iq}}
         -- iq*p < iq*q (multiply p<q by positive iq).
         s1 : iq * p < iq * q
         s1 = *-monoʳ-<-pos iq {{pos-iq}} p<q
@@ -308,9 +297,9 @@ p≤0⇒∣p∣≡-p {p} p≤0 = begin
 -- 两个方向的界蕴含绝对界。
 both<⇒abs< : ∀ q e → q < e → - q < e → ∣ q ∣ < e
 both<⇒abs< q e fwd bwd with Data.Rational.Properties.≤-total q 0ℚ
-... | Data.Sum.inj₁ q≤0 =
+... | inj₁ q≤0 =
   ≤-<-trans (≤-reflexive (p≤0⇒∣p∣≡-p q≤0)) bwd
-... | Data.Sum.inj₂ 0≤q =
+... | inj₂ 0≤q =
   ≤-<-trans (≤-reflexive (0≤p⇒∣p∣≡p 0≤q)) fwd
 
 -- ε (K n) + ε (K n) < ε r, given ε (K n) < ε (suc (2 *ℕ r)).
@@ -372,8 +361,6 @@ cauchy→realI-cong {x} {y} p k = Nth , body
   r0 = suc (2 *ℕ suc (2 *ℕ k))
   Nth : ℕ
   Nth = suc (2 *ℕ r0)
-  Nth≥ : Nth ≥N suc (2 *ℕ r0)
-  Nth≥ = ≤N-refl
   core : ∀ n → n ≥N Nth →
     ∣ f x (M x n) - f y (M y n) ∣ < ε k
   core n n≥N =

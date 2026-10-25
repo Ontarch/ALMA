@@ -99,7 +99,6 @@ module UnfoldingSetoid {ℓ : Level} {CE : ContCatEquiv ℓ} where
   open UnfoldingFunctor
   private
     module OE = ObjEquivCat base
-    open Category OE.cat renaming (_⇒_ to _⇒C_)
     ShapeForget : ∀ {s p} → Functor (ContCat s p) (Sets s)
     ShapeForget = record
       { F₀ = λ C → Container.Shape C
@@ -134,7 +133,6 @@ module UnfoldingSetoid {ℓ : Level} {CE : ContCatEquiv ℓ} where
     ; pos-to-shape-eq  = λ _ _ → refl
     ; unfold-next-eq   = λ _ → Setoid.refl X
     }
-    where module X = Setoid X
   ≈U-sym : (X : Setoid (lsuc (lsuc ℓ)) (lsuc (lsuc ℓ))) → Symmetric (_≈U_ X)
   ≈U-sym X (record { unfoldFunctor-eq = refl ; pos-to-shape-eq = pts ; unfold-next-eq = un })
     = record
@@ -142,7 +140,6 @@ module UnfoldingSetoid {ℓ : Level} {CE : ContCatEquiv ℓ} where
     ; pos-to-shape-eq  = λ s p → sym (pts s p)
     ; unfold-next-eq   = λ s → Setoid.sym X (un s)
     }
-    where module X = Setoid X
   ≈U-trans : (X : Setoid (lsuc (lsuc ℓ)) (lsuc (lsuc ℓ))) → Transitive (_≈U_ X)
   ≈U-trans X (record { unfoldFunctor-eq = refl ; pos-to-shape-eq = pts₁ ; unfold-next-eq = un₁ })
              (record { unfoldFunctor-eq = refl ; pos-to-shape-eq = pts₂ ; unfold-next-eq = un₂ })
@@ -151,7 +148,6 @@ module UnfoldingSetoid {ℓ : Level} {CE : ContCatEquiv ℓ} where
     ; pos-to-shape-eq  = λ s p → trans (pts₁ s p) (pts₂ s p)
     ; unfold-next-eq   = λ s → Setoid.trans X (un₁ s) (un₂ s)
     }
-    where module X = Setoid X
   UnfoldingSetoid : Setoid (lsuc (lsuc ℓ)) (lsuc (lsuc ℓ))
                    → Setoid (lsuc (lsuc ℓ)) (lsuc (lsuc ℓ))
   UnfoldingSetoid X = record
@@ -179,8 +175,6 @@ module UnfoldingSetoid {ℓ : Level} {CE : ContCatEquiv ℓ} where
     ; resp-≈ = λ {u₁ u₂} eq → helper eq
     }
     where
-      module X = Setoid X
-      module Y = Setoid Y
       module F = SetoidFunc f
       helper : {u₁ u₂ : Unfolding ℓ CE (Setoid.Carrier X)}
              → _≈U_ X u₁ u₂

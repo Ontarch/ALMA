@@ -705,7 +705,6 @@ broken-internal-non-increasing {env = env} cp broken =
     ¬i>e = broken→¬i>e cp broken
     ¬i≡0 = broken→¬i≡0 cp broken
     i = internal cp
-    e = external cp
     i>0 = ¬zero→suc ¬i≡0
     i≤e = ≮⇒≥-poly ¬i>e
     gain-zero = lemma-positive-i-le-e-feedback-zero i>0 i≤e

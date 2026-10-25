@@ -18,7 +18,7 @@ module SketchPass.MorphismObject where
 open import Agda.Primitive using (Level; lsuc)
 open import Relation.Binary.Structures using (IsEquivalence)
 open import Relation.Binary.PropositionalEquality
-  using (_≡_; refl; sym; trans; cong; module ≡-Reasoning)
+  using (_≡_; sym; cong; module ≡-Reasoning)
 open import Data.Product using (_,_)
 open import Data.Container.Core using (shape)
 open import Categories.Functor using (Functor)
@@ -95,7 +95,6 @@ module _ {ℓ : Level}
   {UH : Unfolding ℓ CEH Z}
   where
   private
-    module CEF = ContCatEquiv CEF
     module CEG = ContCatEquiv CEG
     module CEH = ContCatEquiv CEH
     module CF = ContCatEquivFunctor CF

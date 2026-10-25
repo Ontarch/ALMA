@@ -74,7 +74,6 @@ objEquivCatFromIso C = record
   }
   where
     open Category C
-    open HomReasoning
     open Equiv
     open import Categories.Morphism C using (_≅_; module ≅; ≅-isEquivalence)
     open _≅_

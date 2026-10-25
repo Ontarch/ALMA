@@ -172,16 +172,8 @@ subst-square2 refl r = sym (trans-reflʳ (subst-comp r _))
 comp-unfold-path≡trans : ∀ {ℓ} (F G H : Cosmos ℓ) (f1 f2 : F ⇒ℱ G) (g1 g2 : G ⇒ℱ H)
   (f-eq : f1 ≃⇒ℱ f2) (g-eq : g1 ≃⇒ℱ g2) {A : Obj F} (s : Shape F A)
   → let eqO-f = onObj-eq f-eq A
-        eqS-f = onShape-eq f-eq s
-        t1 = onShape f1 s
         t2 = onShape f2 s
-        O1-f = onObj f1 A
-        O2-f = onObj f2 A
-        eqO-g = onObj-eq g-eq O2-f
-        eqS-g = onShape-eq g-eq t2
-        s1-g = onShape g1 t1
         s_mid-g = onShape g1 t2
-        s3-g = onShape g2 t2
         eqO-g1 = cong (onObj g1) eqO-f
         shape-transport = shape-transport-lemma g1 f-eq s
         path-f-H = trans (subst-unfold H (sym eqO-g1) s_mid-g) (cong (unfold H) (sym shape-transport))
