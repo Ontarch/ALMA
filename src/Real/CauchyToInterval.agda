@@ -1,16 +1,7 @@
 ------------------------------------------------------------------------
 -- Reverse equivalence: Cauchy sequences → nested-interval reals
 --
--- From a Cauchy sequence (f, μ) build a nested-interval real. The k-th
--- interval is centred at f (μ (K k)) with radius δ k, where
--- K k = 2^(k+2) is chosen so the Cauchy error ε (K k) is strictly
--- below δ (suc k). This yields the nesting conditions.
---
 -- 反向等价：柯西序列 → 嵌套区间实数
---
--- 由柯西序列 (f, μ) 构造嵌套区间实数。第 k 层区间以 f (μ (K k))
--- 为中心、以 δ k 为半径，其中 K k = 2^(k+2) 使柯西误差 ε (K k)
--- 严格小于 δ (suc k)。由此得到嵌套条件。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -35,10 +26,11 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (neg-involutive)
 open import Real using (CauchySeq; ε; embed)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
 open import Real.Interval using
-  (RealI; δ; δ-half; negδ<δ; pos-pow; double-half; neg-invol)
+  (RealI; δ; δ-half; negδ<δ; pos-pow; double-half)
 open import Real.Interval.Mul using (cancel-z; le-shift; cancelʳ)
 open import Real.Interval.Node using (mul-nonNeg)
 open import Real.Interval.Rational using (r≤|r|; -r≤|r|; sub-add)
@@ -47,22 +39,23 @@ open import Real.IntervalEquiv using (embed-mono-<; node; centre; n<2^n)
 ------------------------------------------------------------------------
 -- Sampling index and position
 --
--- K n = 2^(n+2). Chosen so ε (K n) < δ (suc n).
+-- K n = 2^(n+2), chosen so ε (K n) < δ (suc n).
 --
 -- 采样下标与位置
 --
--- K n = 2^(n+2)。选它使 ε (K n) < δ (suc n)。
+-- K 取 2 的后继后继次幂，使得相应精度上的 ε 严格小于后继层的 δ。
 
 K : ℕ → ℕ
 K n = 2 ^ suc (suc n)
 
 -- Sampling index: prefix maximum, so M is monotone. This replaces the
--- naive M x n = seq-μ x (K n), which need not be monotone since
--- CauchySeq carries no monotonicity assumption on μ.
+-- naive definition, which need not be monotone since CauchySeq carries
+-- no monotonicity assumption on μ.
 --
--- 采样下标：前缀最大值，使 M 单调。它替代朴素的
--- M x n = seq-μ x (K n)；由于 CauchySeq 未对 μ 作单调性假设，
--- 朴素定义未必单调。
+-- 采样下标
+--
+-- 前缀最大值，从而 M 单调。它替代朴素定义；由于 CauchySeq 未对
+-- μ 作单调性假设，朴素定义未必单调。
 M : CauchySeq → ℕ → ℕ
 M x zero    = seq-μ x (K zero)
 M x (suc n) = M x n ⊔ seq-μ x (K (suc n))
@@ -73,11 +66,10 @@ M x (suc n) = M x n ⊔ seq-μ x (K (suc n))
 centre-c : CauchySeq → ℕ → ℚ
 centre-c x n = seq-f x (M x n)
 
--- seq-μ x (K n) ≤ M x n. Needed so that M x n lies past the modulus
--- seq-μ x (K n).
+-- M dominates the modulus at the sampled precision, so that M x n lies
+-- past seq-μ x (K n).
 --
--- seq-μ x (K n) ≤ M x n。用以说明 M x n 落在模数 seq-μ x (K n)
--- 之后。
+-- M 支配采样精度处的模数，从而 M x n 落在该模数之后。
 μ≤M : (x : CauchySeq) (n : ℕ) → seq-μ x (K n) ≤N M x n
 μ≤M x zero    = ≤N-reflexive refl
 μ≤M x (suc n) = m≤n⊔m (M x n) (seq-μ x (K (suc n)))
@@ -95,11 +87,9 @@ K<sK : (n : ℕ) → K n <N suc (K n)
 K<sK n = s≤s ≤N-refl
 
 ------------------------------------------------------------------------
--- Reciprocal is strictly antitone on positive rationals:
---   0 < a → a < b → 1/b < 1/a.
+-- Strict reciprocal antitonicity on positive rationals
 --
--- 正有理数上倒数严格反单调：
---   0 < a → a < b → 1/b < 1/a。
+-- 正有理数上倒数严格反单调
 
 recip-strict : ∀ {a b : ℚ} (0<a : 0ℚ < a) (a<b : a < b) →
   (1/ b) {{pos⇒nonZero b {{positive (<-≤-trans 0<a (<⇒≤ a<b))}}}}
@@ -173,7 +163,7 @@ module _ (x : CauchySeq) where
 
   -- Adjacent sampled centres are within δ (suc n).
   --
-  -- 相邻采样中心落在 δ (suc n) 内。
+  -- 相邻采样中心落在后继层的二进半径之内。
   cauchy-adj : ∀ n → ∣ a n - a (suc n) ∣ < δ (suc n)
   cauchy-adj n =
     <-trans
@@ -259,7 +249,7 @@ module _ (x : CauchySeq) where
                 neg (an + neg asn)
                   ≡⟨ neg-distrib-+ an (neg asn) ⟩
                 neg an + neg (neg asn)
-                  ≡⟨ cong (neg an +_) (neg-invol asn) ⟩
+                  ≡⟨ cong (neg an +_) (neg-involutive asn) ⟩
                 neg an + asn
                   ≡⟨ +-comm (neg an) asn ⟩
                 asn + neg an
@@ -309,7 +299,7 @@ module _ (x : CauchySeq) where
         where
           sub-neg : ∀ z → z - neg z ≡ z + z
           sub-neg z = begin
-            z - neg z ≡⟨⟩ z + neg (neg z) ≡⟨ cong (z +_) (neg-invol z) ⟩ z + z ∎
+            z - neg z ≡⟨⟩ z + neg (neg z) ≡⟨ cong (z +_) (neg-involutive z) ⟩ z + z ∎
 
       nest3 : (asn + dsn) - (asn - dsn) ≤ (dn + dn) ÷ embed 2
       nest3 =
@@ -332,11 +322,10 @@ module _ (x : CauchySeq) where
             dsn + dsn
               ∎
 
-      -- Convert the RHS from (δ n + δ n) ÷ 2 to
-      -- ((a n + δ n) - (a n - δ n)) ÷ 2.
+      -- Convert the RHS from a power-of-two width at the current level
+      -- to the corresponding difference of endpoints.
       --
-      -- 把右端从 (δ n + δ n) ÷ 2 转成
-      -- ((a n + δ n) - (a n - δ n)) ÷ 2。
+      -- 把右端从当前层的二进宽度转换为对应端点的差。
       nest3' : RealI.u (go (suc n)) - RealI.l (go (suc n))
                  ≤ (RealI.u (go n) - RealI.l (go n)) ÷ embed 2
       nest3' =
@@ -353,9 +342,9 @@ cauchy→realI : CauchySeq → RealI
 cauchy→realI x = go x 0
 
 ------------------------------------------------------------------------
--- node (go x 0) n ≡ go x n
+-- Iterating the successor returns the n-th layer.
 --
--- 迭代后继 n 次后回到 go x n。
+-- 迭代后继 n 次后回到第 n 层。
 
 node-go : (x : CauchySeq) (n : ℕ) → node (go x 0) n ≡ go x n
 node-go x zero    = refl
@@ -363,10 +352,9 @@ node-go x (suc n) = cong RealI.next (node-go x n)
 
 ------------------------------------------------------------------------
 -- Exported lemma: the centre of the n-th layer of cauchy→realI is
--- the sampled centre seq-f x (M x n).
+-- the sampled centre.
 --
--- 导出引理：cauchy→realI 的第 n 层中心就是采样中心
--- seq-f x (M x n)。
+-- 导出引理：cauchy→realI 的第 n 层中心就是采样中心。
 
 centre-cauchy→realI : (x : CauchySeq) (n : ℕ) →
   centre (cauchy→realI x) n ≡ seq-f x (M x n)
@@ -408,9 +396,12 @@ centre-cauchy→realI x n = begin
       ∎
 
 ------------------------------------------------------------------------
--- M 与 K 的模数性质
+-- Modulus lemmas: M dominates the sampled modulus and K dominates the
+-- identity.
 --
--- M 支配 K 处的模数；K 支配恒等。
+-- 模数性质
+--
+-- M 支配采样模数，K 支配恒等。
 
 M≥μK : (x : CauchySeq) (n : ℕ) → M x n ≥ seq-μ x (K n)
 M≥μK x zero    = ≤N-refl

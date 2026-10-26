@@ -1,14 +1,7 @@
 ------------------------------------------------------------------------
 -- Arithmetic on rational intervals
 --
--- Defines 0, 1, addition, negation and subtraction on RealI. Each
--- operation is defined componentwise on the endpoints and next, with
--- nest assembled from the corresponding pointwise inequalities.
---
 -- 有理区间上的算术
---
--- 定义 RealI 上的 0、1、加法、取负与减法。每个运算逐分量定义于端点
--- 与 next 上，nest 由相应的逐点不等式组装。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}

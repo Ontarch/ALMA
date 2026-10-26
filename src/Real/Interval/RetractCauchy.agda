@@ -1,20 +1,7 @@
 ------------------------------------------------------------------------
 -- Cauchy-side round-trip equivalence
 --
---   realI→cauchy (cauchy→realI x) ≈ x
---
--- Arbitrary Cauchy moduli are neither monotone nor identity-dominating,
--- so the proof routes through modulus regularization (Real.Regular):
--- the regularized sequence regularize x is ≈ x, and the conversions
--- respect the two equivalences.
---
 -- 柯西侧往返等价
---
---   realI→cauchy (cauchy→realI x) ≈ x
---
--- 任意柯西模数既不单调也不支配恒等，故证明经模数正规化
--- （Real.Regular）：正规化序列 regularize x 满足 ≈ x，且两种表示
--- 转换保持各自的等价关系。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -55,7 +42,9 @@ open import Real.Interval.Rational using (r≤|r|; negsub)
 -- Generic reassociation: a + b + c ≡ b + (a + c), with abstract
 -- operands so no rational normal form is forced.
 --
--- 泛型重排：a + b + c ≡ b + (a + c)，操作数抽象，不强制有理数归约。
+-- 泛型重排
+--
+-- 操作数抽象，不强制有理数归约。
 reassoc3 : ∀ (a b c : ℚ) → (a + b) + c ≡ b + (a + c)
 reassoc3 a b c = begin
   (a + b) + c
@@ -71,7 +60,7 @@ reassoc3 a b c = begin
 -- identical; the symmetric close relation reduces to the reflexive
 -- case. N = 0 works for every k.
 --
--- regularize x ≈ x
+-- 正规化序列与原序列相等
 --
 -- 两序列共享同一 f，故每个下标处的项完全相同，对称接近关系归约为
 -- 自反情形。对每个 k 取 N = 0。
@@ -88,14 +77,13 @@ regularize≈ x k = 0 , λ n _ →
 ------------------------------------------------------------------------
 -- realI→cauchy respects ≈ℝ
 --
--- f (realI→cauchy x) n = centre x n. The ≈ℝ witness bounds the absolute
--- difference by ε k, which bounds both directed differences, exactly
--- the two components of _s≈_.
+-- The ≈ℝ witness bounds the absolute difference by ε k, which bounds
+-- both directed differences, exactly the two components of _s≈_.
 --
 -- realI→cauchy 保持 ≈ℝ
 --
--- f (realI→cauchy x) n = centre x n。≈ℝ 见证以 ε k 界绝对差，从而
--- 界两个方向的差，恰为 _s≈_ 的两个分量。
+-- ≈ℝ 见证以 ε k 界绝对差，从而界两个方向的差，恰为 _s≈_ 的两个
+-- 分量。
 
 realI→cauchy-cong : ∀ {x y} → x ≈ℝ y → realI→cauchy x ≈ realI→cauchy y
 realI→cauchy-cong {x} {y} p k =
@@ -120,16 +108,15 @@ realI→cauchy-cong {x} {y} p k =
 ------------------------------------------------------------------------
 -- Retract for a sequence with a regular modulus
 --
--- For z = regularize x, the modulus μ z is monotone and dominates the
--- identity. At n ≥ μ z k, both n and M z n are past μ z k (the latter
--- via M z n ≥ μ z (K n) and monotonicity), so the Cauchy condition
--- bounds the sampled centre against the current term.
+-- For the regularized sequence, the modulus is monotone and dominates
+-- the identity. At n ≥ μ z k, both n and M z n are past μ z k (the
+-- latter via M z n ≥ μ z (K n) and monotonicity), so the Cauchy
+-- condition bounds the sampled centre against the current term.
 --
 -- 正规模数序列的往返
 --
--- 对 z = regularize x，模数 μ z 单调且支配恒等。当 n ≥ μ z k 时，
--- n 与 M z n 都越过 μ z k（后者经 M z n ≥ μ z (K n) 与单调性），
--- 故柯西条件界采样中心与当前项之差。
+-- 对正规化序列，模数单调且支配恒等。当 n 越过 μ z k 时，n 与
+-- M z n 也都越过该阈值，故柯西条件界采样中心与当前项之差。
 
 regular-retract : (x : CauchySeq)
   → realI→cauchy (cauchy→realI (regularize x)) ≈ regularize x
@@ -160,12 +147,10 @@ regular-retract x k = μr x k , body
     in (fwd , bwd)
 
 ------------------------------------------------------------------------
--- ε is antitone: b ≤ a → ε a ≤ ε b.
+-- Reciprocal antitonicity for positive rationals
 --
--- ε 反单调：b ≤ a → ε a ≤ ε b。
--- Generic reciprocal antitonicity for positive rationals: p ≤ q → 1/q ≤ 1/p.
--- p and q are abstract here, so multiplication keeps no numerator normal form.
--- 正有理数倒数的反单调性：p ≤ q → 1/q ≤ 1/p。
+-- 正有理数倒数的反单调性
+
 private
   recip-antitone : ∀ (p q : ℚ) → 0ℚ < p → p ≤ q
     → .{{p-nz : NonZero p}} → .{{q-nz : NonZero q}} → (1/ q) ≤ (1/ p)
@@ -206,7 +191,8 @@ private
                  (≤-reflexive (*-identityʳ ip))))))
 
   -- Strict reciprocal antitonicity: 0 < p → p < q → 1/q < 1/p.
-  -- 严格倒数反单调：0 < p → p < q → 1/q < 1/p。
+  --
+  -- 严格倒数反单调
   recip-antitone-strict : ∀ (p q : ℚ)
     → .{{p-nz : NonZero p}} → .{{q-nz : NonZero q}}
     → 0ℚ < p → p < q → (1/ q) {{q-nz}} < (1/ p) {{p-nz}}
@@ -257,9 +243,9 @@ private
   recip-antitone (embed (suc b)) (embed (suc a))
     (positive⁻¹ (embed (suc b))) (embed-mono-≤ (s≤s b≤a))
 
--- Strict antitonicity: b < a → ε a < ε b.
+-- Strict antitonicity of ε.
 --
--- 严格反单调：b < a → ε a < ε b。
+-- ε 严格反单调。
 ε< : ∀ a b → b <N a → ε a < ε b
 ε< a b b<a =
   recip-antitone-strict (embed (suc b)) (embed (suc a))
@@ -269,15 +255,19 @@ private
 -- Absolute value of a non-negative rational is itself.
 --
 -- 非负有理数的绝对值是其自身。
--- Re-export the stdlib absolute-value lemma.
--- 直接复用标准库绝对值引理。
+--
+-- Direct alias of the stdlib lemma.
+--
+-- 直接复用标准库引理。
 0≤p⇒∣p∣≡p : ∀ {p} → 0ℚ ≤ p → ∣ p ∣ ≡ p
 0≤p⇒∣p∣≡p = Data.Rational.Properties.0≤p⇒∣p∣≡p
 
 -- Absolute value of a non-positive rational is its negation, via
 -- ∣-p∣ ≡ ∣p∣ and the non-negative lemma applied to -p.
 --
--- 非正有理数的绝对值是其相反数：经 ∣-p∣ ≡ ∣p∣，对 -p 应用非负引理。
+-- 非正有理数的绝对值是其相反数
+--
+-- 经绝对值对取负不变，对相反数应用非负引理。
 p≤0⇒∣p∣≡-p : ∀ {p} → p ≤ 0ℚ → ∣ p ∣ ≡ - p
 p≤0⇒∣p∣≡-p {p} p≤0 = begin
   ∣ p ∣     ≡⟨ sym (∣-p∣≡∣p∣ p) ⟩
@@ -285,6 +275,7 @@ p≤0⇒∣p∣≡-p {p} p≤0 = begin
   - p ∎
   where
   -- p ≤ 0 implies 0 ≤ -p, by adding -p on the right.
+  --
   -- p ≤ 0 蕴含 0 ≤ -p，在右侧加 -p。
   neg-nonNeg : p ≤ 0ℚ → 0ℚ ≤ - p
   neg-nonNeg p≤0 =
@@ -302,19 +293,19 @@ both<⇒abs< q e fwd bwd with Data.Rational.Properties.≤-total q 0ℚ
 ... | inj₂ 0≤q =
   ≤-<-trans (≤-reflexive (0≤p⇒∣p∣≡p 0≤q)) fwd
 
--- ε (K n) + ε (K n) < ε r, given ε (K n) < ε (suc (2 *ℕ r)).
+-- Doubling the left precision keeps ε below ε r, given the strict
+-- bound from below.
 --
--- 给定 ε (K n) < ε (suc (2 *ℕ r))，有 ε (K n) + ε (K n) < ε r。
+-- 左精度加倍时 ε 仍低于 ε r（前提是严格下界成立）。
 2ε<εr : ∀ r n → ε n < ε (suc (2 *ℕ r)) → ε n + ε n < ε r
 2ε<εr r n d =
   <-≤-trans (+-mono-< d d)
     (≤-reflexive (ε-half r))
 
--- ε n + ε r + ε n < ε k, given ε n + ε n < ε r and
--- r = suc (2 *ℕ suc (2 *ℕ k)).
+-- The three-term bound telescopes below ε k, given the doubled left
+-- bound and the specified reassociation index r.
 --
--- 给定 ε n + ε n < ε r 且 r = suc (2 *ℕ suc (2 *ℕ k))，有
--- ε n + ε r + ε n < ε k。
+-- 三项界在给定左端加倍界与指定重排下标 r 后仍低于 ε k。
 ε3<εk : ∀ r k n → ε n + ε n < ε r →
   r ≡ suc (2 *ℕ suc (2 *ℕ k)) → ε n + ε r + ε n < ε k
 ε3<εk r k n d eq =
@@ -341,18 +332,16 @@ both<⇒abs< q e fwd bwd with Data.Rational.Properties.≤-total q 0ℚ
 ------------------------------------------------------------------------
 -- cauchy→realI respects ≈
 --
--- ε/3 (here ε/3 with two shrinking legs): at level n the centres are
--- f x (M x n) and f y (M y n). Telescoping through a common index
--- c n = M x n ⊔ M y n ⊔ N0, the two outer legs are bounded by ε (K n),
--- the middle by ε r. For n large, 2 ε (K n) < ε r, and
--- 2 ε r = ε (suc(2k)) < ε k.
+-- The proof splits the difference at level n into a telescope through
+-- a common index. The two outer legs are bounded by ε (K n), the
+-- middle by ε r. For n large, 2 ε (K n) < ε r, and
+-- 2 ε r = ε (suc (2k)) < ε k.
 --
 -- cauchy→realI 保持 ≈
 --
--- ε/3 论证（此处为两条收缩腿）：在第 n 层，中心为 f x (M x n) 与
--- f y (M y n)。经公共下标 c n = M x n ⊔ M y n ⊔ N0 望远镜，两条外腿
--- 以 ε (K n) 界，中腿以 ε r 界。n 足够大时 2 ε (K n) < ε r，且
--- 2 ε r = ε (suc(2k)) < ε k。
+-- 在第 n 层把差值拆成经公共下标的望远镜：两条外腿以 ε (K n) 界，
+-- 中腿以 ε r 界。n 足够大时两倍外腿界低于 ε r，而两倍 ε r 又低于
+-- ε k。
 
 cauchy→realI-cong : ∀ {x y} → x ≈ y → cauchy→realI x ≈ℝ cauchy→realI y
 cauchy→realI-cong {x} {y} p k = Nth , body
@@ -439,19 +428,14 @@ cauchy→realI-cong {x} {y} p k = Nth , body
 ------------------------------------------------------------------------
 -- Final Cauchy-side round-trip
 --
---   realI→cauchy (cauchy→realI x) ≈ x
---
--- Route through z = regularize x:
---   cauchy→realI x ≈ℝ cauchy→realI z   (cauchy→realI-cong, x ≈ z)
---   realI→cauchy (...) ≈ realI→cauchy (cauchy→realI z)  (realI→cauchy-cong)
---   realI→cauchy (cauchy→realI z) ≈ z   (regular-retract)
---   z ≈ x                               (regularize≈)
+-- Route through a regularized sequence z = regularize x, chaining:
+-- cauchy→realI-cong, realI→cauchy-cong, regular-retract, regularize≈.
 --
 -- 最终柯西侧往返
 --
---   realI→cauchy (cauchy→realI x) ≈ x
---
--- 经 z = regularize x 转接（链见上）。
+-- 经正规化序列 z = regularize x 转接，依次串联
+-- cauchy→realI-cong、realI→cauchy-cong、regular-retract 与
+-- regularize≈。
 
 realI→cauchy-retract : (x : CauchySeq)
   → realI→cauchy (cauchy→realI x) ≈ x

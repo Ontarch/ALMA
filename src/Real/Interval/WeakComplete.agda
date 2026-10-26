@@ -1,14 +1,7 @@
 ------------------------------------------------------------------------
 -- Weak completeness of real intervals
 --
--- Completeness of real intervals under the weakest (full-metric) Cauchy
--- condition: every WeakCauchy sequence of RealI converges to its
--- diagonal limit.
---
 -- 实数区间的弱完备性
---
--- 最弱（全度量）柯西条件下实数区间的完备性：每个 WeakCauchy 的
--- RealI 序列收敛到其对角极限。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -38,14 +31,14 @@ open import Relation.Binary.PropositionalEquality using
 open ≡-Reasoning
 
 open import Real using
-  (CauchySeq; ε; embed; embed-suc-pos; reciprocal-cong; 0<embed; 1/embed; embed-+-hom)
+  (CauchySeq; ε; half; embed; embed-suc-pos; reciprocal-cong; 0<embed; 1/embed; embed-+-hom)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (centre)
-open import Real.Interval.Kit using (tri-diff)
+open import Real.Interval.Kit using (strict-recip; tri-diff)
 open import Real.CauchyToInterval using (cauchy→realI; centre-cauchy→realI; M; K; K≥k)
 open import Real.Interval.WeakArith using
-  (half; h; h-mono; h≡suc2c; h≥2k; h+1; h+1≡suc; h+1≥2*suc; 2ss; 2ss-nonZero
-  ; εs-half; 2ss2a≡4a; strict-recip; recip-antitone-≤; base-bound; prod≤2^
+  (h; h-mono; h≡suc2c; h≥2k; h+1; h+1≡suc; h+1≥2*suc; 2ss; 2ss-nonZero
+  ; εs-half; 2ss2a≡4a; recip-antitone-≤; base-bound; prod≤2^
   ; embed-prod<; cancel-*; doubleN; diff-neg)
 open import Real.Interval.RegularRep using (reg; reg-reg)
 
@@ -59,7 +52,7 @@ open import Real.Interval.RegularRep using (reg; reg-reg)
 -- 最弱（全度量）柯西条件
 --
 -- 每个精度 k 存在索引 N，使得对所有 n,m ≥ N，在后继精度处的正则
--- 代表落在 ε (suc k) / 2 内。
+-- 代表落在给定半 ε 误差内。
 
 WeakCauchy : (ℕ → RealI) → Set
 WeakCauchy f = ∀ k → Σ ℕ (λ N →
@@ -146,13 +139,15 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
   -- h k = 2k + 1; b k = reg (f (n (h k))) (h k).
   --
   -- 对角：有理柯西序列
+  --
+  -- 取递增下标上的正则代表，作为对角序列的项。
 
   b : ℕ → ℚ
   b k = reg (f (n (h k))) (h k)
 
   -- n (h k) ≥ rawWit (2k), since h k = 2k + 1 ≥ 2k.
   --
-  -- n (h k) ≥ rawWit (2k)，因 h k = 2k + 1 ≥ 2k。
+  -- n (h k) 不小于 rawWit (2k)，因 h k = 2k + 1 ≥ 2k。
   n-h≥raw : ∀ k → n (h k) ≥N rawWit (2 *ℕ k)
   n-h≥raw k =
     ≤N-trans (monoWit≥raw (h k) (2 *ℕ k) (h≥2k k))
@@ -168,6 +163,8 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
     let pa = n (h a); pc = n (h c)
         ra = f pa; rc = f pc
         -- Thresholds: pa ≥ rawWit (2a); pc ≥ pa ≥ rawWit (2a).
+        --
+        -- 阈值：pa ≥ rawWit (2a)；pc ≥ pa ≥ rawWit (2a)。
         pa≥raw : pa ≥N rawWit (2 *ℕ a)
         pa≥raw = n-h≥raw a
         pc≥pa : pc ≥N pa
@@ -176,6 +173,8 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
         pc≥raw = ≤N-trans pa≥raw pc≥pa
         -- Cross at precision 2a (= h a ∸ 1):
         -- reg ra (h a) vs reg rc (h a), budget ε (h a) * half.
+        --
+        -- 精度 2a 处的交叉项：以 ε (h a) * half 为预算。
         crossRaw : ∣ reg ra (h a) - reg rc (h a) ∣ < ε (h a) * half
         crossRaw =
           subst (λ i → ∣ reg ra i - reg rc i ∣ < ε i * half)
@@ -183,10 +182,14 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
                 (proj₂ (w (2 *ℕ a)) pa pc pa≥raw pc≥raw)
         -- Tail (reg-reg): reg rc (h a) → reg rc (h c) = b c,
         -- budget ε (suc (h a)).
+        --
+        -- 尾部（reg-reg）：以 ε (suc (h a)) 为预算。
         tail : ∣ reg rc (h a) - reg rc (h c) ∣ < ε (suc (h a))
         tail = reg-reg rc (h a) (h a) (h c) ≤N-refl
                           (h-mono a c a≤c)
         -- Bounds: crossB = 1/embed (4a+4), tailB = 1/embed (2a+3).
+        --
+        -- 两侧的显式界。
         crossB = 1/ embed (4 *ℕ suc a)
         tailB = 1/ embed (suc (h+1 a))
         crossEq : ε (h a) * half ≡ crossB
@@ -222,16 +225,23 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
         tail' = subst (λ z → ∣ reg rc (h a) - b c ∣ < z)
                       tailEq tail
         -- Triangle: b a = reg ra (h a), via reg rc (h a), to b c.
+        --
+        -- 三角不等式：经 rc 在 h a 处的正则代表从 b a 走到 b c。
         tri : ∣ b a - b c ∣ < crossB + tailB
         tri = ≤-<-trans (tri-diff (b a) (reg rc (h a)) (b c))
                         (+-mono-< cross tail')
         -- a ≥ k: 4a+4 ≥ 4k+4 and 2a+3 ≥ 2k+3, so the sum is bounded
         -- by the base-bound LHS, which is < ε k.
+        --
+        -- 由 a ≥ k 得两分母均单调增长，总和被 base-bound 的左端控制，
+        -- 而后者小于 ε k。
         4a≥4k : 4 *ℕ suc a ≥N 4 *ℕ suc k
         4a≥4k = *-monoʳ-≤ 4 (s≤s a≥k)
         t2a≥t2k : suc (h+1 a) ≥N suc (2 *ℕ suc k)
         t2a≥t2k = s≤s (h+1≥2*suc a k a≥k)
         -- 4·suc k = suc (k + (k + (suc k + (suc k + 0)))) (stdlib form).
+        --
+        -- 4·suc k 与标准库形式一致。
         pos4k : 0ℚ < embed (4 *ℕ suc k)
         pos4k = 0<embed (k +ℕ (suc k +ℕ (suc k +ℕ (suc k +ℕ 0))))
         sum≤ : crossB + tailB ≤
@@ -279,9 +289,9 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
     where
     j = K (suc k)
 
-    -- K is increasing: K n ≤ K (suc n).
+    -- K is increasing.
     --
-    -- K 单调：K n ≤ K (suc n)。
+    -- K 单调不减。
     K-inc : ∀ n → K n ≤N K (suc n)
     K-inc n =
       ≤N-trans (m≤m+n (K n) (K n))
@@ -289,7 +299,7 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
 
     -- M b-seq n ≡ K n: the modulus is the identity and K is increasing.
     --
-    -- M b-seq n ≡ K n：模数为恒等，且 K 单调。
+    -- 折叠模数恒等于 K，因模数为恒等且 K 单调。
     M-id : ∀ n → M b-seq n ≡ K n
     M-id zero    = refl
     M-id (suc n) =
@@ -322,14 +332,14 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
 
     -- Anchor index pa = n (h j), with pa ≥ rawWit (2j).
     --
-    -- 锚点下标 pa = n (h j)，满足 pa ≥ rawWit (2j)。
+    -- 锚点下标 pa 位于阈值 rawWit (2j) 之后。
     pa = n (h j)
     pa≥raw : pa ≥N rawWit (2 *ℕ j)
     pa≥raw = n-h≥raw j
 
-    -- Convergence threshold: n ≥ rawWit (2j).
+    -- Convergence threshold.
     --
-    -- 收敛阈值：n ≥ rawWit (2j)。
+    -- 收敛阈值。
     N = rawWit (2 *ℕ j)
 
     m+1≡suc : (suc (suc k)) +ℕ 1 ≡ suc (suc (suc k))
@@ -348,14 +358,14 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
 
           -- Segment 1 (reg-reg): A → B, budget ε (suc(suc k)).
           --
-          -- 第一段（reg-reg）：A → B，预算 ε (suc(suc k))。
+          -- 第一段（reg-reg）：预算 ε (suc(suc k))。
           seg1 : ∣ A - B ∣ < ε (suc (suc k))
           seg1 = reg-reg (f n) (suc k) (suc k) (h j) ≤N-refl hj≥sk
 
           -- Segment 2 (cross): B vs C at precision h j, budget
           -- ε(h j)*half.
           --
-          -- 第二段（cross）：B 与 C 在精度 h j 处，预算 ε(h j)*half。
+          -- 第二段（cross）：精度 h j 处的预算 ε(h j)*half。
           crossRaw : ∣ B - C ∣ < ε (h j) * half
           crossRaw =
             subst (λ i → ∣ reg (f n) i - reg (f pa) i ∣ < ε i * half)
@@ -379,17 +389,17 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
           seg2 : ∣ B - C ∣ < crossB
           seg2 = subst (λ z → ∣ B - C ∣ < z) crossEq crossRaw
 
-          -- Triangle: ∣ A - C ∣ < ε (suc(suc k)) + crossB.
+          -- Triangle: the total difference is below the sum of the two
+          -- segment budgets.
           --
-          -- 三角不等式：∣ A - C ∣ < ε (suc(suc k)) + crossB。
+          -- 三角不等式：总差不超过两段预算之和。
           tri : ∣ A - C ∣ < ε (suc (suc k)) + crossB
           tri = ≤-<-trans (tri-diff A B C) (+-mono-< seg1 seg2)
 
           -- Rational scaffolding:
           --   x = k+2, y = k+3, t = 1/((k+2)(k+3)).
           --
-          -- 有理脚手架：
-          --   x = k+2，y = k+3，t = 1/((k+2)(k+3))。
+          -- 有理脚手架：x、y 为相邻的两个嵌入，t 为其乘积的倒数。
           x : ℚ
           x = embed (suc (suc k))
 
@@ -478,11 +488,9 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
           j<4sj : j <N 4 *ℕ suc j
           j<4sj = <-≤N-trans (n<1+n j) (m≤n*m (suc j) 4)
 
-          -- crossB < t (strict reciprocals):
-          --   x*y < embed(4·suc j), so 1/embed(4·suc j) < 1/(x*y).
+          -- crossB < t (strict reciprocals).
           --
-          -- crossB < t（严格倒数）：
-          --   x*y < embed(4·suc j)，故 1/embed(4·suc j) < 1/(x*y)。
+          -- 由严格倒数反单调得 crossB < t。
           ab<4sj : (suc (suc k)) *ℕ (suc (suc (suc k))) <N 4 *ℕ suc j
           ab<4sj = ≤N-<-trans (prod≤2^ k) j<4sj
           x*y<4sj : x * y < embed (4 *ℕ suc j)

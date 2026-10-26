@@ -9,14 +9,13 @@
 module Real.Interval where
 
 open import Data.Nat using (ℕ; suc; _^_)
-open import Data.Integer using (-[1+_]; +[1+_]; +0)
 open import Data.Nat.Coprimality using (1-coprimeTo)
   renaming (sym to coprime-sym)
 open import Data.Nat.Properties using (m^n≢0)
 open import Data.Product using (_,_; _×_)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _*_; Positive; NonZero)
-open import Data.Rational.Base using (mkℚ; _÷_; _-_) renaming (-_ to neg)
+open import Data.Rational.Base using (_÷_; _-_) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (mkℚ+-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; ≤-reflexive; ≤-refl
   ; ≤-trans; <⇒≤; <-trans; +-mono-≤; +-mono-<-≤; +-identityʳ
@@ -26,6 +25,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; cong; cong₂; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (neg-involutive)
 open import Real using (embed; 2ℚ; 2*embed; halve; reciprocal-cong; 2ℚ≡1+1)
 
 ------------------------------------------------------------------------
@@ -53,9 +53,9 @@ pos-pow k =
     {{m^n≢0 2 (suc k)}}
     {c = coprime-sym (1-coprimeTo (2 ^ suc k))}
 
--- Summable dyadic tolerance δ k = 1 / 2^(k+1).
+-- Summable dyadic tolerance.
 --
--- 可求和二进容差 δ k = 1 / 2^(k+1)。
+-- 可求和的二进容差。
 δ : ℕ → ℚ
 δ k =
   Data.Rational.Base.1/_ (embed (2 ^ suc k))
@@ -85,9 +85,9 @@ mutual
     RealI.u next ≤ u ×
     RealI.u next - RealI.l next ≤ (u - l) ÷ embed 2
 
--- 2 δ(suc k) ≡ δ k, via the halving lemma with m = embed (2^(k+1)).
+-- Doubling a successor-level tolerance recovers the current level.
 --
--- 2 δ(suc k) ≡ δ k，经 m = embed (2^(k+1)) 的减半引理。
+-- 后继层容差加倍回到当前层。
 δ-half : ∀ k → δ (suc k) + δ (suc k) ≡ δ k
 δ-half k =
   let m = embed (2 ^ suc k)
@@ -117,9 +117,9 @@ mutual
        δ k
        ∎
 
--- -δ k < δ k, from δ k positive.
+-- Negated tolerance sits strictly below the positive one.
 --
--- -δ k < δ k，由 δ k 为正推出。
+-- 取负后的容差严格低于正容差。
 negδ<δ : ∀ k → neg (δ k) < δ k
 negδ<δ k =
   let p : 0ℚ < δ k
@@ -132,9 +132,9 @@ negδ<δ k =
       n = subst (λ z → z < 0ℚ) (+-identityˡ (neg (δ k))) b
   in <-trans n p
 
--- δ (suc k) ≤ δ k, from δ-half and positivity.
+-- Tolerances decrease along the successor direction.
 --
--- δ (suc k) ≤ δ k，由 δ-half 与正性推出。
+-- 容差沿后继方向递减。
 δs≤δ : ∀ k → δ (suc k) ≤ δ k
 δs≤δ k =
   let d = δ (suc k)
@@ -144,26 +144,9 @@ negδ<δ k =
       sum = subst (λ z → z ≤ d + d) (+-identityʳ d) d0
   in ≤-trans sum (≤-reflexive (δ-half k))
 
--- Double negation of the additive inverse is identity.
+-- Shift cancellation in a difference.
 --
--- 加法逆元的双重取负为恒等。
-neg-invol : ∀ x → neg (neg x) ≡ x
-neg-invol (mkℚ -[1+ n ] d c) = refl
-neg-invol (mkℚ +[1+ n ] d c) = refl
-neg-invol (mkℚ +0 d c) =
-  let s : neg (mkℚ +0 d c) ≡ mkℚ +0 d c
-      s = refl
-  in begin
-       neg (neg (mkℚ +0 d c))
-         ≡⟨ cong neg s ⟩
-       neg (mkℚ +0 d c)
-         ≡⟨ s ⟩
-       mkℚ +0 d c
-       ∎
-
--- Shift cancellation: (a + c) - (b + c) ≡ a - b.
---
--- 平移消去：(a + c) - (b + c) ≡ a - b。
+-- 差值中的平移消去。
 sub-cancel : (a b c : ℚ) → (a + c) - (b + c) ≡ a + neg b
 sub-cancel a b c = begin
   (a + c) - (b + c)
@@ -191,9 +174,9 @@ sub-cancel a b c = begin
     a + (neg b + (c + neg c))
     ∎
 
--- Double halving: (x + x) ÷ embed 2 ≡ x.
+-- Halving a doubled value returns it.
 --
--- 双重减半：(x + x) ÷ embed 2 ≡ x。
+-- 加倍后再减半回到原值。
 double-half : (x : ℚ) → (x + x) ÷ embed 2 ≡ x
 double-half x = begin
   (x + x) ÷ embed 2
@@ -237,9 +220,9 @@ double-half x = begin
     x
     ∎
 
--- Canonical dyadic nested intervals around a rational centre q.
+-- Canonical dyadic nested intervals around a rational centre.
 --
--- 有理中心 q 周围的典范二进嵌套区间。
+-- 有理中心周围的典范二进嵌套区间。
 dyadic : (q : ℚ) (k : ℕ) → RealI
 dyadic q k .RealI.l = neg (δ k) + q
 dyadic q k .RealI.u = δ k + q
@@ -259,7 +242,7 @@ dyadic q k .RealI.nest =
         (dₖ + q) - (neg dₖ + q)
           ≡⟨ sub-cancel dₖ (neg dₖ) q ⟩
         dₖ + neg (neg dₖ)
-          ≡⟨ cong (λ z → dₖ + z) (neg-invol dₖ) ⟩
+          ≡⟨ cong (λ z → dₖ + z) (neg-involutive dₖ) ⟩
         dₖ + dₖ
         ∎
       rhs : ((δₖ + q) - (neg δₖ + q)) ÷ embed 2 ≡ δₖ
@@ -269,7 +252,7 @@ dyadic q k .RealI.nest =
                   (sub-cancel δₖ (neg δₖ) q) ⟩
         (δₖ + neg (neg δₖ)) ÷ embed 2
           ≡⟨ cong (λ z → (δₖ + z) ÷ embed 2)
-                  (neg-invol δₖ) ⟩
+                  (neg-involutive δₖ) ⟩
         (δₖ + δₖ) ÷ embed 2
           ≡⟨ double-half δₖ ⟩
         δₖ

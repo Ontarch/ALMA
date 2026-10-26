@@ -1,7 +1,14 @@
 ------------------------------------------------------------------------
 -- Additive group laws for RealI
 --
+-- Every law is proved via ≈ℝ-of-eq: addition and negation act
+-- componentwise on centres, so both sides have pointwise equal centres
+-- and the convergence engine trivialises.
+--
 -- RealI 的加法群律
+--
+-- 每个定律都经 ≈ℝ-of-eq 证明：加法与取负对中心逐分量作用，故等式
+-- 两侧中心逐点相等，收敛引擎退化为平凡。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -16,24 +23,13 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; cong; sym; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (neg-involutive)
 open import Real.IntervalEquiv using (centre)
-open import Real.Interval using (RealI; neg-invol)
+open import Real.Interval using (RealI)
 open import Real.Interval.Arith using (0ℝ; _+ℝ_; negℝ; _-ℝ_)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Kit using (≈ℝ-of-eq)
 open import Real.Interval.Node using (centre-add; centre-neg; centre-0ℝ)
-
-------------------------------------------------------------------------
--- RealI carries an abelian group structure up to _≈ℝ_
---
--- Every law here is proved via ≈ℝ-of-eq: addition and negation act
--- componentwise on centres, so the two sides of each equation have
--- pointwise equal centres and the convergence engine trivialises.
---
--- RealI 在 _≈ℝ_ 意义下构成阿贝尔群
---
--- 此处每个定律都经 ≈ℝ-of-eq 证明：加法与取负对中心逐分量作用，故
--- 等式两侧中心逐点相等，收敛引擎退化为平凡。
 
 -- Associativity
 --
@@ -157,7 +153,7 @@ negℝ-negℝ x = ≈ℝ-of-eq _ _ λ n →
     neg (centre (negℝ x) n)
   ≡⟨ cong neg (centre-neg x n) ⟩
     neg (neg (centre x n))
-  ≡⟨ neg-invol (centre x n) ⟩
+  ≡⟨ neg-involutive (centre x n) ⟩
     centre x n
   ∎
 

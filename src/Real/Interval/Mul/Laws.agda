@@ -21,6 +21,7 @@ open import Relation.Binary.PropositionalEquality using
 open ≡-Reasoning
 
 open import Base.RationalRing using (*ʳ-sub)
+open import Real using (half)
 open import Real.Interval using (RealI)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_)
 open import Real.Interval.Mul using (_*ℝ_; le-addˡ; le-addʳ)
@@ -34,14 +35,14 @@ open import Real.Interval.Node using
   ; width-sum-rec; width-x-sum; prod-rec; mul-nonNeg; add2-nonNeg
   ; 0≤width-n; recipPow2≤1)
 open import Real.Interval.Kit using
-  (half; ≈ℝ-of-rec; half-drop; tri-diff; abs-swap; 2*2n≡4n
+  (≈ℝ-of-rec; half-drop; tri-diff; abs-swap; 2*2n≡4n
   ; n≤2n; 2n≤4n; 0≤recipPow2; two-half; *-mono-≤-nonNeg)
 open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
 
 ------------------------------------------------------------------------
 -- Commutativity: auxiliary lemmas
 --
--- 乘法交换：辅助引理
+-- 交换律：辅助引理
 
 comm-swap-rewrite : (x y : RealI) (n : ℕ) →
   ∣ centre x (2 ℕ* n) * centre y (2 ℕ* n) - centre (y *ℝ x) n ∣
@@ -74,7 +75,7 @@ comm-sum-eq x y n = begin
 ------------------------------------------------------------------------
 -- Commutativity
 --
--- 乘法交换
+-- 交换律
 
 *ℝ-comm : (x y : RealI) → x *ℝ y ≈ℝ y *ℝ x
 *ℝ-comm x y =
@@ -495,7 +496,7 @@ distribʳ-rec3 x y z n =
 ------------------------------------------------------------------------
 -- Associativity: private module with all helpers
 --
--- 结合律：收集全部助手的私有模块
+-- 结合律：收集全部辅助引理的私有模块
 
 module AssocCore (x y z : RealI) where
   Mx My Mz : ℚ

@@ -8,32 +8,26 @@
 
 module Real.Interval.Bounded where
 
-open import Data.Nat using (ℕ; z≤n; s≤s)
-open import Data.Integer using (+<+)
-open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; ∣_∣; _≤_; _<_; -_)
-open import Data.Rational.Base using (*<*)
+open import Data.Nat using (ℕ; z≤n)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; ∣_∣; _≤_; -_)
 open import Data.Rational.Properties using
   (+-mono-≤; +-identityˡ; +-identityʳ; +-comm; ≤-refl; ≤-trans; ≤-reflexive
-  ; <⇒≤; 0≤∣p∣; ∣p∣≡p∨∣p∣≡-p; neg-antimono-≤; module ≤-Reasoning)
+  ; 0≤∣p∣; ∣p∣≡p∨∣p∣≡-p; neg-antimono-≤; module ≤-Reasoning)
 open ≤-Reasoning
 open import Data.Product using (Σ; _,_; _×_)
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (sym)
 
+open import Base.RationalRing using (0≤1)
 open import Real.Interval using (RealI)
-open import Real.Interval.Order using (l; u; l-mono'; u-mono')
+open import Real.IntervalEquiv using (l; u)
+open import Real.Interval.Order using (l-mono'; u-mono')
 open import Real.Interval.Rational using (r≤|r|; -r≤|r|)
 
 ------------------------------------------------------------------------
 -- Numerical constants and monotonicity helpers
 --
--- 数值常量与单调性助手
-
-0<1 : 0ℚ < 1ℚ
-0<1 = *<* (+<+ (s≤s z≤n))
-
-0≤1 : 0ℚ ≤ 1ℚ
-0≤1 = <⇒≤ 0<1
+-- 数值常量与单调性辅助引理
 
 m≤m+nℚ : ∀ m n → 0ℚ ≤ n → m ≤ m + n
 m≤m+nℚ m n 0≤n = begin

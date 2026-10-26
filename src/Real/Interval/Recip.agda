@@ -35,22 +35,23 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (neg-involutive)
 open import Real using
-  (CauchySeq; ε; embed; embed-suc-pos; embed-*-hom; 0≤embed)
+  (CauchySeq; ε; embed-mono-≤; embed; embed-suc-pos; embed-*-hom; 0≤embed)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
 open import Real.Interval using (RealI; δ; δ-pos)
 open import Real.IntervalEquiv using
-  (l; u; l-mono; centre-l; bound-w; realI→cauchy; embed-mono-<; n<2^n; suc∸1)
+  (l; u; l-mono; centre-l; bound-w; realI→cauchy; embed-mono-<; n<2^n)
 open import Real.CauchyToInterval using (cauchy→realI; recip-strict; K)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.Arith using (0ℝ; negℝ)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.ArithLaws using (negℝ-0ℝ)
 open import Real.Interval.Kit using
-  (*-mono-≤-nonNeg; recip-antitone; n≤2n; embed-mono-≤)
+  (*-mono-≤-nonNeg; recip-antitone; n≤2n)
 open import Real.Interval.Node using (u-dyadic)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
-open import Base.RationalRing using (neg-involutive)
+open import Real.Interval.Rational using (suc∸1)
 
 ------------------------------------------------------------------------
 -- Common denominator
@@ -60,7 +61,7 @@ open import Base.RationalRing using (neg-involutive)
 --
 -- 公共分母
 --
--- 把两个倒数之差写成 (B − A) 乘以 A * B 的倒数。
+-- 把两个倒数之差通分成公共分母 A * B。
 
 module InvSubAux (A B : ℚ) {{A-nz : NonZero A}} {{B-nz : NonZero B}}
   {{AB-nz : NonZero (A * B)}} where
@@ -120,7 +121,7 @@ inv-sub A B = InvSubAux.proof A B
 --
 -- 零区间实数的上界
 --
--- 在精度 K 下，0ℝ 的上界恰好是 δ K。
+-- 在精度 K 下，零区间实数的上界等于该层的二进半径。
 u-0ℝ : (K : ℕ) → u 0ℝ K ≡ δ K
 u-0ℝ K = trans (u-dyadic 0ℚ K) (+-identityʳ (δ K))
 
@@ -132,7 +133,7 @@ u-0ℝ K = trans (u-dyadic 0ℚ K) (+-identityʳ (δ K))
 --
 -- 正 Cauchy 序列
 --
--- 一个 Cauchy 序列是正的，如果它最终被一个严格正的有理数作为下界。
+-- 一个 Cauchy 序列是正的，如果它最终有一个严格正的有理数作为下界。
 
 record PosCauchy : Set₁ where
   field
@@ -201,7 +202,7 @@ recip-modulus b 0<b k =
 --
 -- recip-modulus 的规格
 --
--- 证明所选的模数 M 满足所需的不等式：ε M < b² * ε k。
+-- 证明所选模数满足所需的不等式。
 
 module RecipModulusSpecAux (b : ℚ) (0<b : 0ℚ < b) (k : ℕ) where
   open RecipModAux b 0<b k
@@ -285,8 +286,7 @@ recip-modulus-spec b 0<b k = RecipModulusSpecAux.goal b 0<b k
 --
 -- 正 Cauchy 序列的倒数
 --
--- 从正 Cauchy 序列构造其倒数 Cauchy 序列，利用倒数差的代数恒等式
--- 来建立柯西条件。
+-- 从正 Cauchy 序列构造其倒数 Cauchy 序列，并建立柯西条件。
 
 module RecipCauchyAux (pc : PosCauchy) where
   x    = PosCauchy.seq pc

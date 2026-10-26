@@ -30,7 +30,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; cong; sym; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Real using (CauchySeq; embed; embed-suc-pos)
+open import Real using (CauchySeq; embed-mono-≤; half; embed; embed-suc-pos)
 open CauchySeq renaming (f to seq-f)
 open import Real.Interval using (RealI)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; negℝ)
@@ -40,7 +40,7 @@ open import Real.IntervalEquiv using
   (l; u; centre; width; centre-diff; bound-w; recipPow2; μx-dom)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.Kit using
-  (half; 0≤half; *-mono-≤-nonNeg; embed-mono-≤; recipPow2-bound;
+  (0≤half; *-mono-≤-nonNeg; recipPow2-bound;
    recip-antitone; tri-diff)
 open import Real.Interval.Node using (centre-1ℝ; 0≤width-n; width-rec)
 open import Real.Interval.Mul.Core using (term1)
@@ -437,7 +437,7 @@ module ReciprocalSetup (x : RealI) (0<x : 0ℝ <ℝ x) where
 --
 -- 主定理
 --
--- 正实数的倒数与自身相乘近似等于 1。
+-- 正区间实数与其倒数之积近似等于 1。
 
 *ℝ-inverse-pos : (x : RealI) (0<x : 0ℝ <ℝ x)
                → x *ℝ recipℝ x 0<x ≈ℝ 1ℝ

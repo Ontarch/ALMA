@@ -1,11 +1,7 @@
 ------------------------------------------------------------------------
 -- Completeness of real intervals
 --
--- Proves completeness of RealI under the Cauchy condition.
---
 -- 实数区间的完备性
---
--- 证明 RealI 在柯西条件下的完备性。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -23,12 +19,12 @@ open import Data.Rational.Properties using
    positive⁻¹)
 open import Relation.Binary.PropositionalEquality using (_≡_; sym; subst)
 
-open import Real using (CauchySeq; ε; 0<ε)
+open import Real using (CauchySeq; half; ε; 0<ε)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (width; centre; centre-diff)
 open import Real.CauchyToInterval using
   (cauchy→realI; M; centre-cauchy→realI; K; M≥μK; K≥k)
-open import Real.Interval.Kit using (half; 0<half; two-half; tri-diff)
+open import Real.Interval.Kit using (0<half; two-half; tri-diff)
 
 ------------------------------------------------------------------------
 -- ε-half

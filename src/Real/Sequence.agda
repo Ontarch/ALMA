@@ -29,9 +29,8 @@ open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
 --
 -- 在 ℕ 上实例化 E-M 骨架
 --
--- 确定性后继边：A i = ℚ，E i a y = y ≡ suc i。
--- 原生 E-M 互模拟 _≈M_ 逐点比较树，即序列的命题相等；
--- 柯西度量等价 _≈_ 严格更粗。
+-- 取确定性后继边族：A 为常数 ℚ，E 表示后继关系。原生 E-M 互模拟
+-- 逐点比较树，即序列的命题相等；柯西度量等价则严格更粗。
 
 -- Deterministic successor edge family
 --
@@ -66,9 +65,10 @@ extract : (i : ℕ) {r : ℕ} (t : SeqTree r) → ℚ
 extract zero    t = here t
 extract (suc i) {r} t = extract i (below t (suc r) refl)
 
--- Round trip: extract i (mkTree r f) = f (r + i).
+-- Round trip: extracting a term from a function tree returns the
+-- corresponding function value.
 --
--- 往返：extract i (mkTree r f) = f (r + i)。
+-- 往返：从树中抽取的项等于对应位置的函数值。
 extract∘mkTree : ∀ i r f → extract i {r} (mkTree r f) ≡ f (r + i)
 extract∘mkTree zero r f = cong f (sym (+-identityʳ r))
 extract∘mkTree (suc i) r f =

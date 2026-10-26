@@ -37,8 +37,8 @@ open import Real.Interval.Reasoning using (begin≤_; begin<_; _≤∎; _≤⟨_
 --
 -- 正则下标
 --
--- 把 realI→cauchy r 的模数在后继层折叠为运行最大值，
--- 使 i r k ≥ μ (suc k)。
+-- 把 realI→cauchy r 的模数在后继层折叠为运行最大值，使下标始终
+-- 不小于对应后继层的模数。
 
 i : RealI → ℕ → ℕ
 i r zero    = μ (realI→cauchy r) (suc zero)
@@ -66,7 +66,7 @@ i≤ r k a le with i-step r k (a ∸ k)
 --
 -- 正则有理代表
 --
--- reg r k = centre r (i r k)。
+-- 取正则下标处的中心值。
 
 reg : RealI → ℕ → ℚ
 reg r t = centre r (i r t)
@@ -79,7 +79,7 @@ reg r t = centre r (i r t)
 --
 -- 正则下标处的宽度
 --
--- width r (i r k) < ε (suc k)，在折叠精度处由 frac-strict 得出。
+-- 在折叠精度处由 frac-strict 得到所要求的宽度界。
 
 width-i-M : (r : RealI) → ℕ
 width-i-M r = proj₁ (bound-w (width r 0) (<⇒≤ (0<width r)))

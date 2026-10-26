@@ -1,15 +1,7 @@
 ------------------------------------------------------------------------
 -- Rational lemmas for real-interval arithmetic
 --
--- Negation, subtraction, min/max, absolute-value bounds, and fraction
--- comparison with a general denominator, used by the interval modules.
--- The min/max lattice is derived from the rational order and is used to
--- bound interval endpoints via mag.
---
 -- 实区间算术所需的有理引理
---
--- 取负、减法、min/max 与绝对值界，以及一般分母的分数比较，供区间各
--- 模块使用。min/max 格结构由有理序导出，并通过 mag 界定区间端点。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -38,7 +30,7 @@ open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 
-open import Real.Interval using (neg-invol)
+open import Base.RationalRing using (neg-involutive)
 
 ------------------------------------------------------------------------
 -- Order reflection
@@ -47,7 +39,7 @@ open import Real.Interval using (neg-invol)
 --
 -- 序反射
 --
--- 由 ¬ (a < b) 经三歧性得 b ≤ a。
+-- 由三歧性把严格比较的否定转为反向的非严格比较。
 
 ¬<⇒≥ : ∀ {a b : ℚ} → ¬ (a < b) → b ≤ a
 ¬<⇒≥ {a} {b} ¬a<b with <-cmp a b
@@ -62,7 +54,7 @@ open import Real.Interval using (neg-invol)
 --
 -- 正差
 --
--- a < b 蕴含 0 < b − a。
+-- 由 a < b 得正差。
 
 pos-diff : ∀ a b → a < b → 0ℚ < b - a
 pos-diff a b a<b =
@@ -114,7 +106,7 @@ negsub x y = begin
   neg (x + neg y)
     ≡⟨ neg-distrib-+ x (neg y) ⟩
   neg x + neg (neg y)
-    ≡⟨ cong (λ z → neg x + z) (neg-invol y) ⟩
+    ≡⟨ cong (λ z → neg x + z) (neg-involutive y) ⟩
   neg x + y
     ≡⟨ +-comm (neg x) y ⟩
   y + neg x
@@ -127,7 +119,7 @@ neg-sub a b = begin
   neg a - neg b
     ≡⟨ refl ⟩
   neg a + neg (neg b)
-    ≡⟨ cong (λ z → neg a + z) (neg-invol b) ⟩
+    ≡⟨ cong (λ z → neg a + z) (neg-involutive b) ⟩
   neg a + b
     ≡⟨ +-comm (neg a) b ⟩
   b + neg a
@@ -282,7 +274,7 @@ r≤|r| r with ∣p∣≡p∨∣p∣≡-p r
     0≤-r = subst (λ z → 0ℚ ≤ z) |r|≡-r (0≤∣p∣ r)
 
     r≤0 : r ≤ 0ℚ
-    r≤0 = subst (λ z → z ≤ 0ℚ) (neg-invol r) (neg-antimono-≤ 0≤-r)
+    r≤0 = subst (λ z → z ≤ 0ℚ) (neg-involutive r) (neg-antimono-≤ 0≤-r)
 
     r≤-r : r ≤ neg r
     r≤-r = ≤-trans r≤0 0≤-r
@@ -308,7 +300,7 @@ mag-≤ {l} {u} {x} l≤x x≤u with ∣p∣≡p∨∣p∣≡-p x
     0≤-x = subst (λ z → 0ℚ ≤ z) |x|≡-x (0≤∣p∣ x)
 
     x≤0 : x ≤ 0ℚ
-    x≤0 = subst (λ z → z ≤ 0ℚ) (neg-invol x) (neg-antimono-≤ 0≤-x)
+    x≤0 = subst (λ z → z ≤ 0ℚ) (neg-involutive x) (neg-antimono-≤ 0≤-x)
 
     l≤0 : l ≤ 0ℚ
     l≤0 = ≤-trans l≤x x≤0
@@ -328,8 +320,8 @@ mag-≤ {l} {u} {x} l≤x x≤u with ∣p∣≡p∨∣p∣≡-p x
 --
 -- 一般分母的分数比较
 --
--- 若 N * (k+1) < (suc d) * 2^t，则 N / (suc d * 2^t) < 1/(k+1)。
--- 它推广了 IntervalEquiv 的 fracL-strict，后者是 d = 0 的特例。
+-- 若整数交叉相乘条件成立，则上述分数不等式成立。它推广了
+-- IntervalEquiv 的 fracL-strict，后者是 d = 0 的特例。
 
 0<2^t : (t : ℕ) → 0 <ℕ 2 ^ t
 0<2^t zero    = s≤s z≤n
@@ -337,7 +329,7 @@ mag-≤ {l} {u} {x} l≤x x≤u with ∣p∣≡p∨∣p∣≡-p x
 
 -- suc (n ∸ 1) ≡ n for n > 0.
 --
--- 当 n > 0 时，suc (n ∸ 1) ≡ n。
+-- 当 n > 0 时结论成立。
 suc∸1 : {n : ℕ} → 0 <ℕ n → suc (n ∸ 1) ≡ n
 suc∸1 {n} 0<n = begin
   suc (n ∸ 1)
@@ -350,6 +342,8 @@ suc∸1 {n} 0<n = begin
   ∎
 
 -- 0 < (suc d) * 2^t.
+--
+-- (suc d) * 2^t 为正。
 0<sucd*2^t : (d t : ℕ) → 0 <ℕ suc d *ℕ 2 ^ t
 0<sucd*2^t d t = ℕP.≤-trans (0<2^t t) (ℕP.m≤n*m (2 ^ t) (suc d))
 
@@ -357,17 +351,16 @@ suc∸1 {n} 0<n = begin
 -- mkℚᵘ's second argument is denominator - 1, so to get denominator
 -- (suc d) * 2^t we pass (suc d) * 2^t ∸ 1.
 --
--- 原始组合分数 N / (suc d * 2^t)。
--- mkℚᵘ 的第二参数是分母减一，故要得分母 (suc d) * 2^t，
--- 传入 (suc d) * 2^t ∸ 1。
+-- 原始组合分数。
+-- mkℚᵘ 的第二参数是分母减一，故传入相应的减一值。
 rawComb : (N d t : ℕ) → ℚᵘ
 rawComb N d t = mkℚᵘ (+ N) (suc d *ℕ 2 ^ t ∸ 1)
 
 -- Raw right-hand side 1/(suc k).
 -- mkℚᵘ (+ 1) k has denominator suc k, hence value 1/(suc k).
 --
--- 原始右端 1/(suc k)。
--- mkℚᵘ (+ 1) k 的分母为 suc k，故值为 1/(suc k)。
+-- 原始右端。
+-- mkℚᵘ (+ 1) k 的分母为 suc k。
 rawR : (k : ℕ) → ℚᵘ
 rawR k = mkℚᵘ (+ 1) k
 
@@ -398,7 +391,7 @@ rawCross N d k t h =
 
 -- If N * (k+1) < (suc d) * 2^t then N / (suc d * 2^t) < 1/(k+1).
 --
--- 若 N * (k+1) < (suc d) * 2^t，则 N / (suc d * 2^t) < 1/(k+1)。
+-- 若整数交叉相乘条件成立，则分数不等式成立。
 comb-strict : (N d k t : ℕ) →
   N *ℕ suc k <ℕ suc d *ℕ 2 ^ t →
   combFrac N d t < fromℚᵘ (rawR k)

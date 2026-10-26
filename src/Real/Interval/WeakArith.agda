@@ -17,86 +17,22 @@ open import Data.Nat.Properties using
   ; +-identityʳ to +-identityʳℕ; *-identityʳ to *-identityʳℕ; *-identityˡ to *-identityˡℕ
   ; +-mono-< to +-mono-<N; ≤-<-trans to ≤N-<-trans)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; positive; Positive; NonZero; NonNegative)
-open import Data.Rational.Base using (1/_; *<*; -_)
-open import Data.Integer using (+<+)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; positive; Positive; NonZero)
+open import Data.Rational.Base using (1/_; -_)
 open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; ≤-<-trans; <-≤-trans; +-mono-<; +-mono-≤-<
-  ; +-identityʳ; +-identityˡ; +-assoc; +-inverseˡ; neg-distrib-+; pos⇒nonNeg
-  ; pos⇒nonZero; pos*pos⇒pos; *-inverseʳ; *-inverseˡ; *-assoc; *-comm
-  ; *-identityˡ; *-identityʳ; <⇒≤; *-distribʳ-+; +-comm; *-cancelˡ-<-nonNeg)
+  ; +-identityʳ; neg-distrib-+; pos⇒nonZero; pos*pos⇒pos; *-inverseʳ; +-comm
+  ; *-inverseˡ; *-assoc; *-comm; *-identityˡ; *-identityʳ; <⇒≤; *-distribʳ-+)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (0<1; neg-involutive)
 open import Real using
-  (ε; embed; embed-suc-nonZero; 2ℚ; 2*embed; halve; 0<embed; reciprocal-cong
-  ; 1/embed; embed-mono-<; embed-mono-≤; embed-+-hom; embed-*)
+  (ε; embed; half; embed-suc-nonZero; 2ℚ; 2*embed; halve; embed-*; 0<embed
+  ; reciprocal-cong; 1/embed; embed-mono-<; embed-mono-≤; embed-+-hom)
 open import Real.IntervalEquiv using (recipPow2; n<2^n)
-
-------------------------------------------------------------------------
--- Half and its NonZero proof
---
--- 二分之一及其非零证明
-
-embed2-nonZero : NonZero (embed 2)
-embed2-nonZero = embed-suc-nonZero {1}
-
-half : ℚ
-half = (1/ embed 2) {{embed2-nonZero}}
-
-------------------------------------------------------------------------
--- Basic rational facts
---
--- 基本有理事实
-
-0<1-ℚ : 0ℚ < 1ℚ
-0<1-ℚ = *<* (+<+ (s≤s z≤n))
-
-------------------------------------------------------------------------
--- Strict reciprocal antitonicity
---
--- 严格倒数反单调
-
-strict-recip : (a b : ℚ) → (0<a : 0ℚ < a) → (a<b : a < b) →
-  1/_ b {{pos⇒nonZero b {{positive (<-≤-trans 0<a (<⇒≤ a<b))}}}}
-  < 1/_ a {{pos⇒nonZero a {{positive 0<a}}}}
-strict-recip a b 0<a a<b =
-  let
-    0<b = <-≤-trans 0<a (<⇒≤ a<b)
-    a-nz = pos⇒nonZero a {{positive 0<a}}
-    b-nz = pos⇒nonZero b {{positive 0<b}}
-    ab-pos : Positive (a * b)
-    ab-pos = pos*pos⇒pos a {{positive 0<a}} b {{positive 0<b}}
-    ab-nn : NonNegative (a * b)
-    ab-nn = pos⇒nonNeg (a * b) {{ab-pos}}
-    lhs-eq : (a * b) * 1/_ b {{b-nz}} ≡ a
-    lhs-eq =
-      begin
-        (a * b) * 1/_ b {{b-nz}}
-          ≡⟨ *-assoc a b _ ⟩
-        a * (b * 1/_ b {{b-nz}})
-          ≡⟨ cong (a *_) (*-inverseʳ b {{b-nz}}) ⟩
-        a * 1ℚ
-          ≡⟨ *-identityʳ a ⟩
-        a
-        ∎
-    rhs-eq : b ≡ (a * b) * 1/_ a {{a-nz}}
-    rhs-eq =
-      begin
-        b
-          ≡⟨ sym (*-identityʳ b) ⟩
-        b * 1ℚ
-          ≡⟨ cong (b *_) (sym (*-inverseʳ a {{a-nz}})) ⟩
-        b * (a * 1/_ a {{a-nz}})
-          ≡⟨ sym (*-assoc b a (1/_ a {{a-nz}})) ⟩
-        (b * a) * 1/_ a {{a-nz}}
-          ≡⟨ cong (λ z → z * 1/_ a {{a-nz}}) (*-comm b a) ⟩
-        (a * b) * 1/_ a {{a-nz}}
-        ∎
-  in *-cancelˡ-<-nonNeg (a * b) {{ab-nn}}
-       (<-≤-trans (≤-<-trans (≤-reflexive lhs-eq) a<b)
-                  (≤-reflexive rhs-eq))
+open import Real.Interval.Kit using (strict-recip)
 
 ------------------------------------------------------------------------
 -- Product of reciprocals and cancellation
@@ -196,7 +132,7 @@ cancel-* x y =
 ------------------------------------------------------------------------
 -- Index function h k = 2k + 1
 --
--- 索引函数 h k = 2k + 1
+-- 索引函数 h
 
 h : ℕ → ℕ
 h zero    = 1
@@ -233,7 +169,7 @@ h≥2k (suc k) =
 ------------------------------------------------------------------------
 -- Index function h+1 k = 2k + 2
 --
--- 索引函数 h+1 k = 2k + 2
+-- 索引函数 h+1
 
 h+1 : ℕ → ℕ
 h+1 zero    = 2
@@ -574,9 +510,9 @@ half*recipPow2 n =
     ∎
 
 ------------------------------------------------------------------------
--- 4·embed
+-- 4-fold embedding
 --
--- 4·embed
+-- 四倍嵌入
 
 4*embed-2*2n≡4n : ∀ n → 2 *ℕ (2 *ℕ n) ≡ 4 *ℕ n
 4*embed-2*2n≡4n n =
@@ -603,23 +539,7 @@ half*recipPow2 n =
 ------------------------------------------------------------------------
 -- Negation and difference helpers
 --
--- 取负与差助手
-
-neg-neg : ∀ p → - (- p) ≡ p
-neg-neg p =
-  begin
-    - (- p)
-      ≡⟨ sym (+-identityʳ (- (- p))) ⟩
-    - (- p) + 0ℚ
-      ≡⟨ cong (λ x → - (- p) + x) (sym (+-inverseˡ p)) ⟩
-    - (- p) + (- p + p)
-      ≡⟨ sym (+-assoc (- (- p)) (- p) p) ⟩
-    (- (- p) + - p) + p
-      ≡⟨ cong (λ x → x + p) (+-inverseˡ (- p)) ⟩
-    0ℚ + p
-      ≡⟨ +-identityˡ p ⟩
-    p
-      ∎
+-- 取负与差辅助引理
 
 diff-neg : ∀ x y → - (x - y) ≡ y - x
 diff-neg x y =
@@ -627,7 +547,7 @@ diff-neg x y =
     - (x - y)
       ≡⟨ neg-distrib-+ x (- y) ⟩
     - x + - (- y)
-      ≡⟨ cong (λ z → - x + z) (neg-neg y) ⟩
+      ≡⟨ cong (λ z → - x + z) (neg-involutive y) ⟩
     - x + y
       ≡⟨ +-comm (- x) y ⟩
     y + - x
@@ -657,7 +577,7 @@ x<2x x 0<x =
 x<x+1 : ∀ x → x < x + 1ℚ
 x<x+1 x =
   subst (λ z → z < x + 1ℚ) (+-identityʳ x)
-    (+-mono-≤-< (≤-refl {x = x}) 0<1-ℚ)
+    (+-mono-≤-< (≤-refl {x = x}) 0<1)
 
 ------------------------------------------------------------------------
 -- Generic bound for a positive rational u

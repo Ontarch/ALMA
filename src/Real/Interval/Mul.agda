@@ -417,7 +417,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
   ----------------------------------------------------------------------
   -- Bound on the width
   --
-  -- B = U_X · w_Y + U_Y · w_X.
+  --   B = U_X · w_Y + U_Y · w_X
   --
   -- hi4 − lo4 ≤ B: the difference of any two corners is bounded by B,
   -- so every corner lies below lo4 + B. B ≤ 2 (hi4 − lo4): take the
@@ -425,8 +425,6 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
   -- other interval.
   --
   -- 宽度的界
-  --
-  -- B = U_X · w_Y + U_Y · w_X。
   --
   -- hi4 − lo4 ≤ B：任意两角之差不超过 B，故四角皆被 lo4 + B 盖住。
   -- B ≤ 2 (hi4 − lo4)：取 |·| 最大的端点，与另一区间的两端作积。

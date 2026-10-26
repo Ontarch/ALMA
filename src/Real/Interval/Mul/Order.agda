@@ -1,15 +1,7 @@
 ------------------------------------------------------------------------
 -- Multiplication and order on intervals
 --
--- Order-theoretic properties of interval multiplication: a positive
--- factor preserves strict order and a product of positive intervals is
--- positive. Also covers the compatibility of approximate equality with
--- strict order, and the interaction of negation with multiplication.
---
 -- 区间乘法与序
---
--- 区间乘法的序论性质：正因子保持严格序，正区间之积为正。还包括近似
--- 相等与严格序的兼容性，以及否定与乘法的交互。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -34,8 +26,9 @@ open import Relation.Binary.PropositionalEquality using
 open import Relation.Binary.PropositionalEquality.Properties using (module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Real using (embed; ε; embed-suc-pos; ε-half)
-open import Real.Interval using (RealI; δ; δ-pos; pos-pow; neg-invol)
+open import Base.RationalRing using (neg-involutive)
+open import Real using (embed; ε; half; embed-mono-≤; embed-suc-pos; ε-half)
+open import Real.Interval using (RealI; δ; δ-pos; pos-pow)
 open import Real.IntervalEquiv using (node; l; u; centre; l-mono)
 open import Real.Interval.Arith using (0ℝ; _+ℝ_; _-ℝ_; negℝ)
 open import Real.Interval.Mul using (_*ℝ_; nn)
@@ -48,9 +41,14 @@ open import Real.Interval.ArithLaws using
   (x-ℝx; +ℝ-assoc; +ℝ-inverseʳ; +ℝ-identityˡ; +ℝ-identityʳ)
 open import Real.Interval.Mul.Laws using (*ℝ-distribʳ-+)
 open import Real.Interval.Kit using
-  (half; n≤2n; *-mono-≤-nonNeg; recip-antitone; embed-mono-≤; ≈ℝ-of-eq)
+  (n≤2n; *-mono-≤-nonNeg; recip-antitone; ≈ℝ-of-eq)
 open import Real.Interval.Rational using
   (min; max; min-le; sub-add; max-neg; min-neg; min-min-swap; max-max-swap)
+
+------------------------------------------------------------------------
+-- Auxiliary lemmas
+--
+-- 辅助引理
 
 private
   0<2^n-ℕ : ∀ n → 0 <ℕ 2 ^ n
@@ -178,8 +176,13 @@ private
   neg-flip : ∀ {x y : ℚ} → neg x < neg y → y < x
   neg-flip {x} {y} h =
     subst₂ _<_
-      (neg-invol y) (neg-invol x)
+      (neg-involutive y) (neg-involutive x)
       (neg-antimono-< {neg x} {neg y} h)
+
+------------------------------------------------------------------------
+-- Approximate equality and negation
+--
+-- 近似相等与否定
 
 ≈-neg : {x y : RealI} → x ≈ℝ y → negℝ x ≈ℝ negℝ y
 ≈-neg {x} {y} p k =
@@ -217,6 +220,11 @@ private
   a ≈ℝ a' → a' <ℝ b' → b' ≈ℝ b → a <ℝ b
 ≈-<-trans-helper {a} {a'} {b'} {b} a≈a' a'<b' b'≈b =
   ≈-<-respʳ b'≈b (≈-<-resp (≈ℝ-sym a≈a') a'<b')
+
+------------------------------------------------------------------------
+-- Negation commutes with multiplication
+--
+-- 否定与乘法交换
 
 private
   neg-max-min : ∀ La Ua Lb Ub →
@@ -364,6 +372,11 @@ negℝ-*ℝ x y = ≈ℝ-of-eq _ _ centre-eq
                      ≡ centre ((negℝ x) *ℝ y) n
     centre-eq n = cong₂ (λ a b → (a + b) * half) (l-eq n) (u-eq n)
 
+------------------------------------------------------------------------
+-- Addition is compatible with approximate equality
+--
+-- 加法与近似相等相容
+
 +ℝ-cong : {x x' y y' : RealI} → x ≈ℝ x' → y ≈ℝ y' →
           x +ℝ y ≈ℝ x' +ℝ y'
 +ℝ-cong {x} {x'} {y} {y'} x≈x' y≈y' k =
@@ -400,6 +413,11 @@ negℝ-*ℝ x y = ≈ℝ-of-eq _ _ centre-eq
     in subst (λ z → ∣ z ∣ < ε k) (sym eq)
          (subst (λ z → ∣ (cx - cx') + (cy - cy') ∣ < z) cc
                 (≤-<-trans bound (+-mono-< d1 d2)))
+
+------------------------------------------------------------------------
+-- Positivity of product
+--
+-- 乘积的正性
 
 pos*pos : (a b : RealI) → 0ℝ <ℝ a → 0ℝ <ℝ b → 0ℝ <ℝ a *ℝ b
 pos*pos a b (n , δn<lan) (m , δm<lbm) = K , goal
@@ -479,6 +497,11 @@ pos*pos a b (n , δn<lan) (m , δm<lbm) = K , goal
     goal = subst (λ z → z < l (a *ℝ b) K) (sym (u-dyadic-0 K))
              (subst (λ z → δ K < z) (sym l-prod)
                     (<-≤-trans δK<LM LM≤la'lb'))
+
+------------------------------------------------------------------------
+-- Strict order is preserved by multiplication
+--
+-- 乘法保持严格序
 
 <-*mono : (x y z : RealI) → x <ℝ y → 0ℝ <ℝ z → x *ℝ z <ℝ y *ℝ z
 <-*mono x y z x<y 0<z =

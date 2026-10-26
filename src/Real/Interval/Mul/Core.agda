@@ -1,12 +1,7 @@
 ------------------------------------------------------------------------
 -- Core lemmas for multiplication laws of RealI
 --
--- Shared foundations for the commutative / distributive / associative
--- laws.
---
 -- RealI 乘法律的核心引理
---
--- 交换 / 分配 / 结合律共享的基础。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -29,8 +24,9 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; trans; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Real using (embed; 2ℚ; telescope)
-open import Real.Interval using (RealI; neg-invol)
+open import Base.RationalRing using (neg-involutive)
+open import Real using (embed; half; 2ℚ; telescope)
+open import Real.Interval using (RealI)
 open import Real.Interval.Mul using
   (_*ℝ_; 0≤diff; cancelʳ; sub-mono)
 import Real.Interval.Mul as MUL
@@ -40,7 +36,7 @@ open import Real.IntervalEquiv using
 open import Real.Interval.Rational using
   (min; max; max-eq; min-eq; sub-add; negsub)
 open import Real.Interval.Kit using
-  (half; *-mono-≤-nonNeg; add-self; 2ℚ*half≡1; 0≤half; half≤1; 0≤recipPow2)
+  (*-mono-≤-nonNeg; add-self; 2ℚ*half≡1; 0≤half; half≤1; 0≤recipPow2)
 open import Real.Interval.Node using
   (node-*ℝ; width-rec; mul-pair; mul-nonNeg; 0≤width-n; recipPow2≤1; rr≤r)
 open import Base.RationalRing using (*ʳ-sub; +interchange)
@@ -68,7 +64,7 @@ abs-≤ {t} {C} h1 h2 with ∣p∣≡p∨∣p∣≡-p t
       ∣ t ∣
         ≈⟨ e ⟩
       neg t
-        ≤⟨ subst (λ z → neg t ≤ z) (neg-invol C) (neg-antimono-≤ h1) ⟩
+        ≤⟨ subst (λ z → neg t ≤ z) (neg-involutive C) (neg-antimono-≤ h1) ⟩
       C
       ≤∎
 
@@ -100,7 +96,7 @@ le-of-diff {a} {b} 0≤ = begin≤
 ------------------------------------------------------------------------
 -- Half-scale estimates
 --
--- 二分之一尺度估计
+-- 半尺度估计
 
 half*half≤half : half * half ≤ half
 half*half≤half = begin≤
@@ -158,7 +154,7 @@ final-alg S D E = begin
 --
 -- 中心核心
 --
--- centre-*ℝ≤ 的助手。
+-- centre-*ℝ≤ 的辅助引理。
 
 module CentreCore (x y : RealI) (n : ℕ) where
   X : RealI
@@ -498,7 +494,7 @@ centre-*ℝ≤ x y n = CentreCore.proof x y n
 ------------------------------------------------------------------------
 -- Generic convergence helpers
 --
--- 通用收敛助手
+-- 通用收敛辅助引理
 
 centre-mag : (x : RealI) →
   Σ ℚ (λ M → 0ℚ ≤ M × (∀ n → ∣ centre x n ∣ ≤ M))
@@ -551,13 +547,7 @@ telesc2 p p' q q' = sym (begin
 ------------------------------------------------------------------------
 -- Closed-form bound on the centre error of multiplication
 --
--- |centre (x *ℝ R) n - centre x (2n) * centre R (2n)|
---   ≤ (width x 0 * width R 0 * half) * recipPow2 n.
---
 -- 乘法中心误差的闭式界
---
--- |centre (x *ℝ R) n - centre x (2n) * centre R (2n)|
---   ≤ (width x 0 * width R 0 * half) * recipPow2 n。
 
 term1-raw-eq : (w0 wR0 r : ℚ) →
   (w0 * r) * (wR0 * r) ≡ w0 * wR0 * (r * r)

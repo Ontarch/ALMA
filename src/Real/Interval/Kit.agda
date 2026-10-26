@@ -14,10 +14,9 @@ open import Data.Nat.Properties using (*-suc; m≤m+n; ^-monoʳ-≤)
   renaming (≤-trans to ≤-transℕ; ≤-reflexive to ≤-reflexiveℕ
   ; *-assoc to *-assocℕ; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
 import Data.Nat.Properties as ℕP
-open import Data.Integer using (+≤+; +<+) renaming (+_ to +ℤ_)
 import Data.Integer.Properties as ℤP
 open import Data.Product using (_,_; Σ; proj₁; proj₂)
-open import Data.Rational.Base using (1/_; _÷_; *≤*; *<*; positive)
+open import Data.Rational.Base using (1/_; _÷_; positive)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _≤_; _<_; ∣_∣; nonNegative; NonZero
   ; Positive; NonNegative)
@@ -31,23 +30,14 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (0<1)
 open import Real using
-  (embed; 2ℚ; 2ℚ≡1+1; ε; 0<ε; embed-suc-pos; 0<embed; telescope)
-open import Real.Interval using (RealI; pos-pow)
+  (embed; half; embed2-nonZero; 2ℚ; 2ℚ≡1+1; ε; 0<ε; embed-mono-≤; embed-suc-pos
+  ; 0<embed; telescope)
+open import Real.Interval using (RealI)
 open import Real.Interval.Equiv using (_≈ℝ_)
-open import Real.IntervalEquiv using
-  (centre; recipPow2; bound-w; frac-strict; B<2^sucB; suc∸1; 0<2^n; negsub)
-
-------------------------------------------------------------------------
--- Half and its NonZero instance
---
--- 二分之一及其非零实例
-
-embed2-nz : NonZero (embed 2)
-embed2-nz = pos⇒nonZero (embed 2) {{pos-pow 0}}
-
-half : ℚ
-half = Data.Rational.Base.1/_ (embed 2) {{embed2-nz}}
+open import Real.IntervalEquiv using (centre; recipPow2; bound-w; frac-strict; B<2^sucB)
+open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub)
 
 ------------------------------------------------------------------------
 -- Convergence engines
@@ -84,17 +74,6 @@ half = Data.Rational.Base.1/_ (embed 2) {{embed2-nz}}
   in subst (λ z → z < ε k) (sym abs0) (0<ε k)
 
 ------------------------------------------------------------------------
--- ℚ embedding monotonicity
---
--- ℚ 嵌入保序
-
-embed-mono-≤ : ∀ {n m : ℕ} → n ≤ℕ m → embed n ≤ embed m
-embed-mono-≤ {n} {m} n≤m =
-  *≤* (ℤP.≤-trans (ℤP.≤-reflexive (ℤP.*-identityʳ (+ℤ n)))
-       (ℤP.≤-trans (+≤+ n≤m)
-                   (ℤP.≤-reflexive (sym (ℤP.*-identityʳ (+ℤ m))))))
-
-------------------------------------------------------------------------
 -- recipPow2 basics
 --
 -- recipPow2 基础
@@ -102,7 +81,7 @@ embed-mono-≤ {n} {m} n≤m =
 embed-suc∸1 : ∀ k → embed (suc (2 ^ k ∸ 1)) ≡ embed (2 ^ k)
 embed-suc∸1 k = begin
   embed (suc (2 ^ k ∸ 1))
-    ≡⟨ cong embed (suc∸1 (0<2^n k)) ⟩
+    ≡⟨ cong embed (suc∸1 (0<2^t k)) ⟩
   embed (2 ^ k)
   ∎
 
@@ -120,8 +99,6 @@ embed-suc∸1 k = begin
 -- 0 < a ≤ b ⟹ 1/b ≤ 1/a
 --
 -- 倒数反单调
---
--- 0 < a ≤ b ⟹ 1/b ≤ 1/a
 
 recip-antitone : ∀ {a b : ℚ} (0<a : 0ℚ < a) (a≤b : a ≤ b) →
    1/_ (b) {{pos⇒nonZero b {{positive (<-≤-trans 0<a a≤b)}}}}
@@ -178,8 +155,6 @@ recipPow2-mono {n} {m} n≤m =
 -- n ≤ 2n ≤ 4n
 --
 -- 自然数不等式
---
--- n ≤ 2n ≤ 4n
 
 n+n≡2n : ∀ n → n +ℕ n ≡ 2 ℕ* n
 n+n≡2n n =
@@ -300,7 +275,7 @@ add-self W =
 2ℚ*half≡1 : 2ℚ * half ≡ 1ℚ
 2ℚ*half≡1 = begin
   2ℚ * half
-    ≡⟨ *-inverseʳ (embed 2) {{embed2-nz}} ⟩
+    ≡⟨ *-inverseʳ (embed 2) {{embed2-nonZero}} ⟩
   1ℚ
   ∎
 
@@ -343,17 +318,6 @@ half-drop : ∀ {a b : ℚ} → 0ℚ ≤ a → a ≤ b → a * half ≤ b
 half-drop {a} {b} 0≤a a≤b =
   ≤-trans (*-mono-≤-nonNeg 0≤a a≤b 0≤half half≤1)
           (≤-reflexive (*-identityʳ b))
-
-------------------------------------------------------------------------
--- Positivity basics
---
--- 正性基础
-
-0<1 : 0ℚ < 1ℚ
-0<1 = *<* (+<+ (s≤s z≤n))
-
-0≤1 : 0ℚ ≤ 1ℚ
-0≤1 = <⇒≤ 0<1
 
 ------------------------------------------------------------------------
 -- Positivity of B + 1

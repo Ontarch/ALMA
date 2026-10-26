@@ -123,6 +123,8 @@ Abbott, Michael, Thorsten Altenkirch, and Neil Ghani. 2005. "Containers: Constru
 
 Baars, Bernard J. 1989. *A Cognitive Theory of Consciousness*. Cambridge: Cambridge University Press.
 
+Bishop, Errett, and Douglas Bridges. 1985. *Constructive Analysis*. Grundlehren der mathematischen Wissenschaften 279. Berlin: Springer. https://doi.org/10.1007/978-3-642-61667-9.
+
 Bohr, Niels. 1935. "Can Quantum-Mechanical Description of Physical Reality Be Considered Complete?" *Physical Review* 48, no. 8: 696–702. https://doi.org/10.1103/PhysRev.48.696.
 
 Chalmers, David John. 1995. "Facing Up to the Problem of Consciousness." *Journal of Consciousness Studies* 2, no. 3: 200–209.

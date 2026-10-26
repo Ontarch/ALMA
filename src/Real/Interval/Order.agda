@@ -32,20 +32,9 @@ open import Relation.Binary.Definitions using (Tri; tri<; tri≈; tri>)
 open import Real using (embed; reciprocal-cong; embed-suc-pos)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using
-  (node; width; width-n; recipPow2; bound-w; embed-mono-<; n<2^n; suc∸1; 0<2^n; pos-2^t)
-open import Real.Interval.Rational using (¬<⇒≥; pos-diff)
+  (l; u; node; width; width-n; recipPow2; bound-w; embed-mono-<; n<2^n; pos-2^t)
+open import Real.Interval.Rational using (¬<⇒≥; suc∸1; 0<2^t; pos-diff)
 open import Real.Interval.Reasoning
-
-------------------------------------------------------------------------
--- Bounds of the n-th node
---
--- 第 n 个节点的上下界
-
-l : RealI → ℕ → ℚ
-l r n = RealI.l (node r n)
-
-u : RealI → ℕ → ℚ
-u r n = RealI.u (node r n)
 
 ------------------------------------------------------------------------
 -- Strict order
@@ -183,10 +172,10 @@ u-mono' r {n} {m} n≤m =
 --
 -- 余传递
 --
--- 由 x < z 可判定 x < y 或 y < z。设 d = l z n − u x n > 0 为分离
--- 层级的间隙。经 bound-w 选取 N 使 y 在 N 处的宽度低于 d；于是在
--- 层级 m = n + N 两择一穷尽：若二者皆不成立，则 y 在 m 处的宽度将
--- 不低于 d，与 width-ym < d 矛盾。
+-- 由 x < z 可判定 x < y 或 y < z。设分离层级的间隙为 d > 0。经
+-- bound-w 选取 N 使 y 在 N 处的宽度低于 d；于是在层级 m 两择一
+-- 穷尽：若二者皆不成立，则 y 在 m 处的宽度将不低于 d，与
+-- width-ym < d 矛盾。
 
 <-cotrans : ∀ {x y z} → x <ℝ z → (x <ℝ y) ⊎ (y <ℝ z)
 <-cotrans {x} {y} {z} (n , uxn<lzn) = go
@@ -297,7 +286,7 @@ u-mono' r {n} {m} n≤m =
       reciprocal-cong (embed (suc (2 ^ N ∸ 1))) (embed (2 ^ N))
         {{pos⇒nonZero (embed (suc (2 ^ N ∸ 1))) {{embed-suc-pos}}}}
         {{eN-nz}}
-        (cong embed (suc∸1 (0<2^n N)))
+        (cong embed (suc∸1 (0<2^t N)))
 
     width-yN-≤ : width y N ≤ w0 * inv2N
     width-yN-≤ =

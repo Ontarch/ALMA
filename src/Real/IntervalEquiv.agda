@@ -1,24 +1,7 @@
 ------------------------------------------------------------------------
 -- Representation equivalence
 --
--- From nested-interval reals to Cauchy reals. A nested-interval real
--- determines a Cauchy sequence: take the centre of each successive
--- interval. The interval lengths shrink by at least half at every
--- step, so the centres are Cauchy; the carried modulus is constructed
--- by the Archimedean property of the dyadic scale.
---
--- This is one direction of the representation equivalence between the
--- coinductive interval real and the Cauchy real (both carried instances
--- of ℝ).
---
 -- 表示等价
---
--- 从嵌套区间实数到柯西实数。嵌套区间实数确定一条柯西序列：取每个相继
--- 区间的中心。区间长度每步至少减半，故中心序列是柯西的；携带模数由
--- 二进刻度的阿基米德性质构造。
---
--- 这是余归纳区间实数与柯西实数表示等价的一个方向（二者都是携带型 ℝ
--- 的实例）。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -28,7 +11,7 @@ module Real.IntervalEquiv where
 open import Data.Integer using (+_; -[1+_]; +[1+_]; +0)
 import Data.Integer.Properties
 open import Data.Nat using
-  (ℕ; zero; suc; _≥_; _^_; z≤n; _∸_; s≤s)
+  (ℕ; zero; suc; _≥_; _^_; z≤n; s≤s)
   renaming (_+_ to _+N_; _≤_ to _≤N_; _<_ to _<N_; _*_ to _ℕ*_)
 open import Data.Nat.Properties using
   (*-comm; *-suc; n≤1+n; *-mono-≤) renaming (≤-trans to ≤ℕ-trans; ≤-refl to ≤ℕ-refl)
@@ -38,12 +21,12 @@ open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; ∣_∣; NonZero; Positive; nonNegative; NonNegative)
-open import Data.Rational.Base using (mkℚ; _÷_) renaming (-_ to neg)
+open import Data.Rational.Base using (mkℚ; _÷_)
 open import Data.Rational.Properties using
   (≤-reflexive; ≤-refl; ≤-trans; <⇒≤; <-≤-trans; +-inverseʳ; *-inverseʳ; *-inverseˡ
   ; *-assoc; *-identityˡ; *-identityʳ; pos⇒nonZero; 1/pos⇒pos; pos⇒nonNeg)
 open import Data.Rational.Unnormalised.Base
-  using (ℚᵘ; mkℚᵘ; _≃_; *≡*; *<*) renaming (_<_ to _<ᵘ_)
+  using (ℚᵘ; mkℚᵘ; _≃_; *<*) renaming (_<_ to _<ᵘ_)
 open import Data.Rational.Unnormalised.Properties
   using (≃-reflexive; <-respˡ-≃; <-respʳ-≃)
 open import Relation.Binary.PropositionalEquality using
@@ -53,6 +36,7 @@ open import Real using
   (CauchySeq; ε; embed; 2ℚ≡1+1; 2*embed; embed-suc-pos; embed-pos→≥1)
 open CauchySeq
 open import Real.Interval using (RealI; pos-pow)
+open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub; flip-≃)
 
 -- Iterate the nested-interval successor.
 --
@@ -167,30 +151,19 @@ posPow2 : (n : ℕ) → Positive (pow2 n)
 posPow2 zero    = record { }
 posPow2 (suc n) = pos-pow n
 
-0<2^n : (n : ℕ) → 0 <N 2 ^ n
-0<2^n zero    = s≤s z≤n
-0<2^n (suc n) = ℕP.≤-trans (s≤s z≤n) (ℕP.*-monoʳ-≤ 2 (0<2^n n))
-
--- suc (n ∸ 1) ≡ n for n > 0.
+-- Denominator identity for the dyadic scale.
 --
--- 当 n > 0 时，suc (n ∸ 1) ≡ n。
-suc∸1 : {n : ℕ} → 0 <N n → suc (n ∸ 1) ≡ n
-suc∸1 {n} 0<n =
-  trans (ℕP.+-comm 1 (n ∸ 1))
-        (ℕP.m∸n+n≡m 0<n)
-
--- Denominator identity: (2^n) * 2 = 2^(suc n).
---
--- 分母恒等式：(2^n) * 2 = 2^(suc n)。
+-- 二进刻度的分母恒等式。
 denom-eq : (n : ℕ) → pow2 n * pow2 1 ≡ pow2 (suc n)
 denom-eq n =
   trans (Data.Rational.Properties.*-comm (pow2 n) (embed 2))
         (2*embed (2 ^ n))
 
--- Reciprocal of a power of two: 1 / 2^n, written as 1/embed (suc d)
--- with d = 2^n ∸ 1 so that it matches the prod-eq normalizer.
+-- Reciprocal of a power of two, written in the normalized form
+-- 1/embed (suc d) with d = 2^n ∸ 1, so it matches the prod-eq
+-- normalizer.
 --
--- 二的幂的倒数：1 / 2^n，写作 1/embed (suc d)，d = 2^n ∸ 1，
+-- 二的幂的倒数，写作规范化形式 1/embed (suc d)，d = 2^n ∸ 1，
 -- 以便与 prod-eq 归一化器对齐。
 recipPow2 : ℕ → ℚ
 recipPow2 n =
@@ -246,11 +219,11 @@ width-n r (suc n) =
             ab2 : S * hs ≡ 1ℚ
             ab2 = *-inverseʳ S {{pos⇒nonZero S {{embed-suc-pos}}}}
             A≡ : A ≡ pow2 n
-            A≡ = cong embed (suc∸1 (0<2^n n))
+            A≡ = cong embed (suc∸1 (0<2^t n))
             B≡ : B ≡ pow2 1
-            B≡ = cong embed (suc∸1 (0<2^n 1))
+            B≡ = cong embed (suc∸1 (0<2^t 1))
             S≡ : S ≡ pow2 (suc n)
-            S≡ = cong embed (suc∸1 (0<2^n (suc n)))
+            S≡ = cong embed (suc∸1 (0<2^t (suc n)))
             prod≡S : prod ≡ S
             prod≡S = begin
               A * B
@@ -280,9 +253,9 @@ width-n r (suc n) =
         in ≤-trans s41 (≤-reflexive s42)
   in ≤-trans step1 (≤-trans step2 (≤-trans step3 step4))
 
--- The centre lies inside the interval: l ≤ centre.
+-- The centre lies at or above the lower endpoint.
 --
--- 中心落在区间内：l ≤ centre。
+-- 中心不低于下端点。
 centre-l : (r : RealI) (n : ℕ) → l r n ≤ centre r n
 centre-l r n =
   let open ≡-Reasoning
@@ -330,9 +303,9 @@ centre-l r n =
       lhs = sym chain
   in ≤-trans (≤-reflexive lhs) mono
 
--- The centre lies inside the interval: centre ≤ u.
+-- The centre lies at or below the upper endpoint.
 --
--- 中心落在区间内：centre ≤ u。
+-- 中心不高于上端点。
 centre-u : (r : RealI) (n : ℕ) → centre r n ≤ u r n
 centre-u r n =
   let open ≡-Reasoning
@@ -389,9 +362,9 @@ l-step r = proj₁ (RealI.nest r)
 u-step : (r : RealI) → RealI.u (RealI.next r) ≤ RealI.u r
 u-step r = proj₁ (proj₂ (RealI.nest r))
 
--- Iterated monotonicity: n ≤ m implies l n ≤ l m.
+-- Iterated monotonicity of the lower endpoint.
 --
--- 迭代单调性：n ≤ m 蕴含 l n ≤ l m。
+-- 下端点的迭代单调性。
 l-mono0 : (r : RealI) (m : ℕ) → RealI.l r ≤ RealI.l (node r m)
 l-mono0 r zero    = ≤-refl
 l-mono0 r (suc m) = ≤-trans (l-mono0 r m) (l-step (node r m))
@@ -425,9 +398,10 @@ centre-in-l r {n} {m} p = ≤-trans (l-mono r p) (centre-l r m)
 centre-in-u : (r : RealI) {n m : ℕ} → n ≤N m → centre r m ≤ u r n
 centre-in-u r {n} {m} p = ≤-trans (centre-u r m) (u-mono r p)
 
--- z := x - y lies inside [ -(u-l), u-l ].
+-- The difference of two interval points is bounded above by the
+-- interval width.
 --
--- z := x - y 落在 [ -(u-l), u-l ] 内。
+-- 区间内两元素之差被区间宽度上界。
 diff+ : {x y l u : ℚ} →
   l ≤ x → x ≤ u → l ≤ y → y ≤ u → (x - y) ≤ (u - l)
 diff+ {x} {y} {l} {u} lx xu ly yu =
@@ -443,23 +417,9 @@ negneg (mkℚ -[1+ n ] d c) = refl
 negneg (mkℚ +[1+ n ] d c) = refl
 negneg (mkℚ +0 d c) = refl
 
-negsub : ∀ x y → Data.Rational.Base.- (x - y) ≡ y - x
-negsub x y =
-  begin
-    Data.Rational.Base.- (x - y)
-  ≡⟨ refl ⟩
-    Data.Rational.Base.- (x + Data.Rational.Base.- y)
-  ≡⟨ Data.Rational.Properties.neg-distrib-+ x (Data.Rational.Base.- y) ⟩
-    neg x + Data.Rational.Base.- (Data.Rational.Base.- y)
-  ≡⟨ cong (λ z → neg x + z) (negneg y) ⟩
-    neg x + y
-  ≡⟨ Data.Rational.Properties.+-comm (Data.Rational.Base.- x) y ⟩
-    y + neg x
-  ≡⟨ refl ⟩
-    y - x
-  ∎
-  where open Relation.Binary.PropositionalEquality.≡-Reasoning
-
+-- The negation of a difference is bounded by the interval width.
+--
+-- 差之取负被区间宽度上界。
 diff- : {x y l u : ℚ} →
   l ≤ x → x ≤ u → l ≤ y → y ≤ u → Data.Rational.Base.- (x - y) ≤ (u - l)
 diff- {x} {y} {l} {u} lx xu ly yu =
@@ -468,9 +428,9 @@ diff- {x} {y} {l} {u} lx xu ly yu =
            (Data.Rational.Properties.+-mono-≤ (≤-refl {u})
               (Data.Rational.Properties.neg-antimono-≤ lx)))
 
--- Two points inside [l, u] differ by at most the width.
+-- Two points inside an interval differ by at most its width.
 --
--- [l, u] 内两点之差至多为宽度。
+-- 区间内两点之差至多为该区间宽度。
 bounded-diff : {x y l u : ℚ} →
   l ≤ x → x ≤ u → l ≤ y → y ≤ u → ∣ x - y ∣ ≤ u - l
 bounded-diff {x} {y} {l} {u} lx xu ly yu
@@ -480,18 +440,19 @@ bounded-diff {x} {y} {l} {u} lx xu ly yu
 ...  | inj₂ abs≡ =
   ≤-trans (≤-reflexive abs≡) (diff- lx xu ly yu)
 
--- Centres of two levels both reachable from t differ by at most width t.
+-- The difference of two reachable centres is bounded by the width at
+-- the shallower level.
 --
--- 从 t 可达的两层之中心，其差至多为 width t。
+-- 两个可达中心之差被较浅层的宽度上界。
 centre-diff : (r : RealI) (t a b : ℕ) →
   t ≤N a → t ≤N b → ∣ centre r a - centre r b ∣ ≤ width r t
 centre-diff r t a b ta tb =
   bounded-diff (centre-in-l r ta) (centre-in-u r ta)
                (centre-in-l r tb) (centre-in-u r tb)
 
--- And width r t ≤ width-n r t.
+-- Combined with the geometric bound.
 --
--- 且 width r t ≤ width-n r t。
+-- 与几何界合并。
 centre-diff≤ : (r : RealI) (t a b : ℕ) →
   t ≤N a → t ≤N b → ∣ centre r a - centre r b ∣ ≤ width-nV r t
 centre-diff≤ r t a b ta tb =
@@ -536,9 +497,9 @@ pow≤ n =
 1≤2^n zero    = Data.Nat.Properties.≤-refl
 1≤2^n (suc n) = Data.Nat.Properties.≤-trans (1≤2^n n) (pow≤ n)
 
--- 1/q ≤ 1 whenever 1 ≤ q.
+-- Positivity from being at least one.
 --
--- 当 1 ≤ q 时，1/q ≤ 1。
+-- 大于等于一时为正。
 1≤⇒Positive : (q : ℚ) → 1ℚ ≤ q → Positive q
 1≤⇒Positive q 1≤q =
   Data.Rational.Base.positive
@@ -581,9 +542,9 @@ nonNeg-embed zero    = nonNegative (≤-refl)
 nonNeg-embed (suc n) =
   pos⇒nonNeg (embed (suc n)) {{embed-suc-pos}}
 
--- embed M ÷ embed (suc d) ≤ embed M.
+-- A natural-number embed divided by another is bounded by itself.
 --
--- embed M ÷ embed (suc d) ≤ embed M。
+-- 一个自然数 embed 除以另一个自然数 embed 后仍不超过自身。
 frac≤ : (M d : ℕ) →
   let p = embed M
       q = embed (suc d)
@@ -609,9 +570,9 @@ frac≤ M d =
     ∎
   where open Data.Rational.Properties.≤-Reasoning
 
--- The product embed M * (1/embed (suc d)) reduces to normalize M (suc d).
+-- Normalization identity for the dyadic product.
 --
--- 乘积 embed M * (1/embed (suc d)) 归约为 normalize M (suc d)。
+-- 二进乘积的归一化恒等式。
 prod-eq : (M d : ℕ) →
   embed M * Data.Rational.Base.1/_ (embed (suc d))
               {{pos⇒nonZero (embed (suc d)) {{embed-suc-pos}}}}
@@ -621,9 +582,9 @@ prod-eq M d =
     (Data.Integer.Properties.*-identityʳ (+ M))
     (Data.Nat.Properties.*-identityˡ (suc d))
 
--- The literal fraction mkℚ (+M) d equals the normalized product.
+-- The literal fraction equals the normalized product.
 --
--- 字面分式 mkℚ (+M) d 等于规范化乘积。
+-- 字面分式等于规范化乘积。
 frac-term-eq : (M d : ℕ) → .(c : Coprime M (suc d)) →
   mkℚ (+ M) d c
   ≡ embed M * Data.Rational.Base.1/_ (embed (suc d))
@@ -631,35 +592,35 @@ frac-term-eq : (M d : ℕ) → .(c : Coprime M (suc d)) →
 frac-term-eq M d c =
   trans (sym (Data.Rational.Properties.normalize-coprime c)) (sym (prod-eq M d))
 
--- Any nonnegative rational w is bounded by embed of a natural.
+-- Any nonnegative rational is bounded by an embed of a natural.
 --
--- 任何非负有理数 w 都被某个自然数的 embed 上界。
+-- 任何非负有理数都被某个自然数的 embed 上界。
 bound-w : (w : ℚ) → 0ℚ ≤ w → Σ ℕ (λ M → w ≤ embed M)
 bound-w (mkℚ (+ M) d c) _ =
   M , (≤-trans (≤-reflexive (frac-term-eq M d c)) (frac≤ M d))
 bound-w (mkℚ -[1+ n ] d c) (Data.Rational.Base.*≤* le) with le
 ... | ()
 
--- 2^n < 2^(suc n) strictly.
+-- Strict growth of the dyadic scale.
 --
--- 2^n < 2^(suc n)，严格。
+-- 二进刻度的严格增长。
 pow< : (n : ℕ) → 2 ^ n <N 2 ^ suc n
 pow< n =
   Data.Nat.Properties.<-≤-trans
-    (Data.Nat.Properties.m<n+m (2 ^ n) {n = 2 ^ n} (0<2^n n))
+    (Data.Nat.Properties.m<n+m (2 ^ n) {n = 2 ^ n} (0<2^t n))
     (Data.Nat.Properties.≤-reflexive (qq n))
 
 -- n < 2^n for every natural n.
 --
--- 对每个自然数 n，n < 2^n。
+-- 对每个自然数都有 n 小于相应的二次幂。
 n<2^n : (n : ℕ) → n <N 2 ^ n
 n<2^n zero    = s≤s z≤n
 n<2^n (suc n) =
   Data.Nat.Properties.≤-<-trans (n<2^n n) (pow< n)
 
--- B < 2^(suc B), giving a strict modulus.
+-- A strict exponential bound, giving a strict modulus.
 --
--- B < 2^(suc B)，给出严格模数。
+-- 严格的指数上界，由此给出严格模数。
 B<2^sucB : (B : ℕ) → B <N 2 ^ suc B
 B<2^sucB B =
   Data.Nat.Properties.<-trans (n<2^n B) (pow< B)
@@ -679,7 +640,7 @@ embed-mono-< {m} {n} h =
           (sym (Data.Integer.Properties.*-identityʳ (+ n)))))
 
 pos-2^t : (t : ℕ) → Positive (embed (2 ^ t))
-pos-2^t t = Data.Rational.Base.positive (embed-mono-< (0<2^n t))
+pos-2^t t = Data.Rational.Base.positive (embed-mono-< (0<2^t t))
 
 recip2^t : (t : ℕ) → ℚ
 recip2^t = recipPow2
@@ -697,16 +658,13 @@ nz-2^t : (t : ℕ) → Data.Nat.NonZero (2 ^ t)
 nz-2^t t =
   Data.Nat.≢-nonZero
     (Relation.Binary.PropositionalEquality.≢-sym
-       (Data.Nat.Properties.<⇒≢ (0<2^n t)))
+       (Data.Nat.Properties.<⇒≢ (0<2^t t)))
 
 fracL : (M t : ℕ) → ℚ
 fracL M t = Data.Rational.fromℚᵘ (rawL M t)
 
 prod≡fracL : (M t : ℕ) → embed M * recip2^t t ≡ fracL M t
 prod≡fracL M t = prod-eq M (2 ^ t Data.Nat.∸ 1)
-
-flip-≃ : {a b : ℚᵘ} → _≃_ a b → _≃_ b a
-flip-≃ (*≡* e) = *≡* (sym e)
 
 fracL-strict : (M k t : ℕ) →
   (M ℕ* suc k) <N 2 ^ t →
@@ -734,7 +692,7 @@ fracL-strict M k t h =
       suc d
         ≡⟨ Data.Nat.Properties.+-comm 1 d ⟩
       d +N 1
-        ≡⟨ Data.Nat.Properties.m∸n+n≡m (0<2^n t) ⟩
+        ≡⟨ Data.Nat.Properties.m∸n+n≡m (0<2^t t) ⟩
       2 ^ t
       ∎
     rawCross :
@@ -754,9 +712,9 @@ fracL-strict M k t h =
         (Data.Integer.Properties.≤-reflexive
            (sym (Data.Integer.Properties.*-identityˡ (+ suc d))))
 
--- embed M * (1/embed (2^t)) < 1/embed (suc k) whenever M*(suc k) < 2^t.
+-- Dyadic error bound, stated through the strict power comparison.
 --
--- 当 M*(suc k) < 2^t 时，embed M * (1/embed (2^t)) < 1/embed (suc k)。
+-- 二进误差界，通过严格幂比较给出。
 frac-strict : (M k t : ℕ) →
   (M ℕ* suc k) <N 2 ^ t →
   embed M * recip2^t t < recip-suc k
@@ -765,9 +723,9 @@ frac-strict M k t h =
     (Data.Rational.Properties.≤-reflexive (prod≡fracL M t))
     (fracL-strict M k t h)
 
--- 0 < width r 0 (the initial interval is non-degenerate).
+-- Initial width is strictly positive.
 --
--- 0 < width r 0（初始区间非退化）。
+-- 初始宽度严格为正。
 0<width : (r : RealI) → 0ℚ < width r 0
 0<width r =
   Data.Rational.Properties.≤-<-trans
@@ -776,10 +734,10 @@ frac-strict M k t h =
     (Data.Rational.Properties.+-mono-<-≤
        (RealI.lo r) (Data.Rational.Properties.≤-refl))
 
--- The carried modulus construction: the centre of each nested interval
--- is a Cauchy sequence.
+-- The carried modulus construction: successive interval centres form
+-- a Cauchy sequence.
 --
--- 携带模数构造：每个嵌套区间的中心构成柯西序列。
+-- 携带模数构造：相继的区间中心构成柯西序列。
 realI→cauchy : RealI → CauchySeq
 realI→cauchy r = record
   { f = centre r
@@ -821,9 +779,14 @@ realI→cauchy r = record
            (frac-strict M k t (B<2^sucB (M ℕ* suc k))))
 
 ------------------------------------------------------------------------
--- realI→cauchy 的携带模数不小于下标
+-- The carried modulus dominates the index
 --
--- μ k = suc (M * suc k)，初始宽度 w0 严格为正，故 bound-w 给出
+-- μ k = suc (M * suc k). The initial width w0 is strictly positive, so
+-- bound-w yields M ≥ 1, hence μ k ≥ k.
+--
+-- 携带模数支配下标
+--
+-- μ k = suc (M * suc k)。初始宽度 w0 严格为正，故 bound-w 给出
 -- M ≥ 1，从而 μ k ≥ k。
 
 μx-dom : (r : RealI) (k : ℕ) → μ (realI→cauchy r) k ≥ k

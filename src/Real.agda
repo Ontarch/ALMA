@@ -1,12 +1,7 @@
 ------------------------------------------------------------------------
 -- Constructive Cauchy reals
 --
--- Cauchy sequences of rationals with an explicit modulus of
--- convergence, quotiented by a symmetric pair of inequalities.
---
 -- 构造性柯西实数
---
--- 带显式收敛模数的有理柯西序列，按对称双不等式商除。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -49,7 +44,7 @@ open ≡-Reasoning
 --
 -- 精度层
 --
--- ε k = 1 / (k + 1)。第 k 层柯西条件要求逼近到 1/(k+1) 以内。
+-- 第 k 层柯西条件要求逼近到 1/(k+1) 以内。
 --
 -- 将 ℕ 嵌入 ℚ 为规范化分数 n/1，直接用底层构造器构造，
 -- 使倒数 1/(suc n) 可定义性归约（无 gcd 判定项）。
@@ -57,15 +52,15 @@ open ≡-Reasoning
 embed : ℕ → ℚ
 embed n = mkℚ (+ n) 0 (coprime-sym (1-coprimeTo n))
 
--- ε k = 1/(k+1) is the k-th Cauchy precision.
+-- The k-th Cauchy precision.
 --
--- ε k = 1/(k+1) 为第 k 层柯西精度。
+-- 第 k 层柯西精度。
 ε : ℕ → ℚ
 ε k = 1/ embed (suc k)
 
--- embed (suc n) is positive, hence nonzero.
+-- The embedding of a successor is positive, hence nonzero.
 --
--- embed (suc n) 为正，故非零。
+-- 后继的嵌入为正，故非零。
 embed-suc-pos : ∀ {n} → Positive (embed (suc n))
 embed-suc-pos {n} =
   mkℚ+-pos (suc n) 1 {c = coprime-sym (1-coprimeTo (suc n))}
@@ -78,7 +73,7 @@ instance
 -- 2ℚ * embed n reduces via the fraction congruence (no sign
 -- wrapper). It equals 1 + 1.
 --
--- 有理数 2，直接用底层构造器构造，使 2ℚ * embed n 经分数同余归约；
+-- 有理数 2，直接用底层构造器构造，使乘法经分数同余归约；
 -- 它等于 1 + 1。
 2ℚ : ℚ
 2ℚ = embed 2
@@ -86,9 +81,9 @@ instance
 2ℚ≡1+1 : 2ℚ ≡ 1ℚ + 1ℚ
 2ℚ≡1+1 = sym (normalize-coprime (coprime-sym (1-coprimeTo 2)))
 
--- Numerator arithmetic: (+2) · (+n) = +(2n).
+-- Numerator arithmetic for doubling.
 --
--- 分子算术：(+2) · (+n) = +(2n)。
+-- 分子层面的加倍算术。
 num-2 : ∀ n → (+ 2) ℤ* (+ n) ≡ + (2 ℕ* n)
 num-2 n = +◃n≡+n (2 ℕ* n)
 
@@ -97,11 +92,22 @@ num-2 n = +◃n≡+n (2 ℕ* n)
   trans (/-cong (num-2 n) refl)
         (normalize-coprime (coprime-sym (1-coprimeTo (2 ℕ* n))))
 
--- suc (suc (2*k)) = 2 * suc k.
+-- The half-precision denominator is twice the full-precision one.
 --
 -- 半精度分母等于全精度分母的两倍。
 den-2 : ∀ k → suc (suc (2 ℕ* k)) ≡ 2 ℕ* suc k
 den-2 k = sym (*-suc 2 k)
+
+------------------------------------------------------------------------
+-- Half and its NonZero instance
+--
+-- 二分之一及其非零实例
+
+embed2-nonZero : NonZero (embed 2)
+embed2-nonZero = pos⇒nonZero (embed 2) {{embed-suc-pos {1}}}
+
+half : ℚ
+half = 1/_ (embed 2) {{embed2-nonZero}}
 
 ------------------------------------------------------------------------
 -- Cauchy sequence record
@@ -131,8 +137,7 @@ open CauchySeq
 --
 -- 对称接近关系
 --
--- q1 ≈[k] q2 当且仅当两个方向都在 ε k 以内：
---   (q1 - q2) < ε k 且  (q2 - q1) < ε k
+-- 当且仅当两个方向都在 ε k 以内时，称两点在第 k 层对称接近。
 -- 这按构造就是对称的——无绝对值、无 subst。
 
 _s≈_ : ℚ → ℚ → ℕ → Set
@@ -146,19 +151,15 @@ _s≈_ q1 q2 k = (q1 + (- q2)) < ε k × (q2 + (- q1)) < ε k
 --
 -- setoid 等价
 --
--- x ≈ y iff 对每个 k，最终 x n 与 y n 在 ε k 内对称接近。
+-- x 与 y 等价当且仅当对每个 k，最终 x n 与 y n 在 ε k 内对称接近。
 
 _≈_ : Rel CauchySeq lzero
 _≈_ x y = ∀ k → Σ ℕ (λ N → ∀ n → n ≥ N → _s≈_ (f x n) (f y n) k)
 
 ------------------------------------------------------------------------
--- ε is positive
+-- Positivity of the k-th precision
 --
--- ε k = (+1)/(suc k) is positive by construction.
---
--- ε 为正
---
--- ε k = (+1)/(suc k) 按构造为正。
+-- 第 k 层精度的正性
 
 0<ε : ∀ k → 0ℚ < ε k
 0<ε k =
@@ -168,11 +169,11 @@ _≈_ x y = ∀ k → Σ ℕ (λ N → ∀ n → n ≥ N → _s≈_ (f x n) (f y
 ------------------------------------------------------------------------
 -- Telescoping lemma
 --
--- (a + (-b)) + (b + (-c)) ≡ a + (-c): the middle terms cancel.
+-- The two-step difference telescopes, with the middle term cancelling.
 --
 -- 望远镜消去引理
 --
--- (a + (-b)) + (b + (-c)) ≡ a + (-c)：中间项 b 与 -b 相消。
+-- 两步差通过望远镜方式消去中间项，只剩下首尾之差。
 
 telescope : ∀ a b c → (a + (- b)) + (b + (- c)) ≡ a + (- c)
 telescope a b c = begin
@@ -190,13 +191,12 @@ telescope a b c = begin
 ------------------------------------------------------------------------
 -- Halving lemma
 --
--- 1/(2m) + 1/(2m) = 1/m. Two approximations at half tolerance add
--- to the full tolerance. Pure field algebra over ℚ.
+-- Two approximations at half tolerance add to the full tolerance.
+-- Pure field algebra over ℚ.
 --
 -- 折半引理
 --
--- 1/(2m) + 1/(2m) = 1/m。半精度容差两次相加即全精度容差。
--- 纯 ℚ 域代数。
+-- 两份半精度容差相加即全精度容差；纯 ℚ 域代数。
 
 halve : ∀ m {{_ : NonZero m}} {{_ : NonZero (2ℚ * m)}} →
        (1/ (2ℚ * m)) + (1/ (2ℚ * m)) ≡ 1/ m
@@ -259,17 +259,12 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
 ------------------------------------------------------------------------
 -- ε halving
 --
--- ε(suc(2k)) + ε(suc(2k)) = ε k.
---
--- ε(suc(2k)) = 1/embed(suc(suc(2k))) = 1/(2·embed(suc k)),
--- so two copies add to 1/embed(suc k) = ε k.
+-- Two successor-level precisions at the halved index add to the
+-- current level's precision.
 --
 -- ε 折半
 --
--- ε(suc(2k)) + ε(suc(2k)) = ε k。
---
--- ε(suc(2k)) = 1/embed(suc(suc(2k))) = 1/(2·embed(suc k))，
--- 两份相加得 1/embed(suc k) = ε k。
+-- 在半索引处的两份后继精度相加，回到当前精度。
 
 1/embed : ∀ n → 1/ embed (suc n) ≡ ε n
 1/embed n = refl
@@ -317,13 +312,12 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
 ------------------------------------------------------------------------
 -- Reflexivity
 --
--- Take N = μ x k. For n ≥ μ x k, the Cauchy condition gives
--- |f x n - f x n| < ε k, which implies both directions are close.
+-- Take N = μ x k. For n ≥ μ x k, the Cauchy condition implies both
+-- directions of the symmetric close relation.
 --
 -- 自反性
 --
--- 取 N = μ x k。n ≥ μ x k 时，柯西条件给出 |f x n - f x n| < ε k，
--- 蕴含两个方向都接近。
+-- 取 N = μ x k。n ≥ μ x k 时，由柯西条件即得对称接近的两个方向。
 
 ≈-refl : ∀ {x} → x ≈ x
 ≈-refl {x} k = μ x k , λ n n≥N →
@@ -408,12 +402,12 @@ trans-one-dir a b c {k} d1 d2 =
 ------------------------------------------------------------------------
 -- ℚ embedding
 --
--- Embed a rational q as the constant Cauchy sequence f n = q, with
--- modulus μ k = 0 (all terms are identical).
+-- Embed a rational as the constant Cauchy sequence, with modulus
+-- everywhere zero (all terms are identical).
 --
 -- ℚ 嵌入
 --
--- 将有理数 q 嵌入为常柯西序列 f n = q，模数 μ k = 0（所有项相同）。
+-- 将有理数嵌入为常柯西序列，模数处处为零（所有项相同）。
 
 const : ℚ → CauchySeq
 const q = record

@@ -22,13 +22,13 @@ open ≡-Reasoning
 
 open import Real.IntervalEquiv using
   (node; l; u; centre; width; width-n; 0<width; recipPow2)
-open import Real using (embed; 2ℚ; 2ℚ≡1+1)
+open import Real using (embed; 2ℚ; 2ℚ≡1+1; embed2-nonZero; half)
 open import Real.Interval using (RealI; dyadic; δ)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; div-add)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Rational using (sub-add)
 open import Real.Interval.Kit using
-  (embed2-nz; half; recipPow2-mono; n≤2n; n≤4n; *-mono-≤-nonNeg; 0≤recipPow2)
+  (recipPow2-mono; n≤2n; n≤4n; *-mono-≤-nonNeg; 0≤recipPow2)
 open import Base.RationalRing using (+interchange)
 open import Real.Interval.Reasoning
 
@@ -173,7 +173,7 @@ centre-1ℝ n =
     (1ℚ + 1ℚ) * half
       ≡⟨ cong (_* half) (sym 2ℚ≡1+1) ⟩
     2ℚ * half
-      ≡⟨ *-inverseʳ (embed 2) {{embed2-nz}} ⟩
+      ≡⟨ *-inverseʳ (embed 2) {{embed2-nonZero}} ⟩
     1ℚ
       ∎
 
@@ -184,7 +184,7 @@ centre-1ℝ n =
 --
 -- node 与 *ℝ 交换
 --
--- 两级跳跃：node (x *ℝ y) n = node x (2n) *ℝ node y (2n)。
+-- 两级跳跃。
 
 node-*ℝ : (x y : RealI) (n : ℕ) →
   node (x *ℝ y) n ≡ node x (2 ℕ* n) *ℝ node y (2 ℕ* n)
@@ -202,9 +202,9 @@ node-*ℝ x y (suc n) =
       ∎
 
 ------------------------------------------------------------------------
--- Private algebraic helpers
+-- Algebraic helpers
 --
--- 私有代数助手
+-- 代数辅助引理
 
 mul-pair : ∀ a b h → (a * h) * (b * h) ≡ (a * b) * (h * h)
 mul-pair a b h = begin

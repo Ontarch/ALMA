@@ -25,16 +25,29 @@ open import Relation.Binary.PropositionalEquality using
 open ≡-Reasoning
 
 open import Real using
-  (ε; embed; 2ℚ; 2*embed; halve; reciprocal-cong; 0<embed; embed-mono-<)
+  (ε; embed; half; 2ℚ; 2*embed; halve; reciprocal-cong; 0<embed; embed-mono-<)
 open import Real.IntervalEquiv using
   (centre; width; width-n; recipPow2; centre-diff)
-open import Real.Interval.Kit using (0<recipPow2; tri-diff)
+open import Real.Interval.Kit using (0<recipPow2; strict-recip; tri-diff)
 open import Real.Interval.RegularRep using (i; reg; fold≥k+4)
 open import Real.Interval.WeakArith using
-  (half; half*recipPow2; 2ss; 2ss-eq; εs-half; strict-recip; 4k+8<2^k+4
+  (half*recipPow2; 2ss; 2ss-eq; εs-half; 4k+8<2^k+4
   ; 4k+8<4k+10; H+H≡budget)
 open import Real.Interval.Complete using (CauchyI)
 open import Real.Interval.WeakComplete using (WeakCauchy)
+
+------------------------------------------------------------------------
+-- Every fixed-precision Cauchy sequence is a full-metric Cauchy
+-- sequence
+--
+-- The proof splits the difference of two regular representatives through
+-- their respective centres, bounding each segment against a common
+-- threshold t = k+4.
+--
+-- 每个固定精度柯西序列都是全度量柯西序列
+--
+-- 证明将两个正则代表之差经各自中心拆分，对每段以公共阈值 t = k+4
+-- 作界。
 
 CauchyI→WeakCauchy : ∀ {f} → CauchyI f → WeakCauchy f
 CauchyI→WeakCauchy {f} cf k = N , step

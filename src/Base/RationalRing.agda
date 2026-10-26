@@ -8,12 +8,27 @@
 
 module Base.RationalRing where
 
-open import Data.Rational using (0ℚ; 1ℚ; _+_; _*_; _-_; -_)
+open import Data.Integer using (+<+)
+open import Data.Nat using (s≤s; z≤n)
+open import Data.Rational using (0ℚ; 1ℚ; _+_; _*_; _-_; -_; _<_; _≤_)
+open import Data.Rational.Base using (*<*)
 open import Data.Rational.Properties using
   (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-comm; *-identityˡ
-  ; *-zeroˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*)
+  ; *-zeroˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*
+  ; <⇒≤)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+
+------------------------------------------------------------------------
+-- Basic constants
+--
+-- 基本常量
+
+0<1 : 0ℚ < 1ℚ
+0<1 = *<* (+<+ (s≤s z≤n))
+
+0≤1 : 0ℚ ≤ 1ℚ
+0≤1 = <⇒≤ 0<1
 
 ------------------------------------------------------------------------
 -- Negation
@@ -21,6 +36,8 @@ open import Relation.Binary.PropositionalEquality using
 -- 取负
 
 -- -(-x) = x.
+--
+-- 双重取负为恒等。
 neg-involutive : ∀ x → - (- x) ≡ x
 neg-involutive x = let open ≡-Reasoning in begin
   - (- x)
@@ -36,6 +53,8 @@ neg-involutive x = let open ≡-Reasoning in begin
   x ∎
 
 -- (-x)(-y) = xy.
+--
+-- 两个取负相乘得到原乘积。
 neg-neg-mul : ∀ x y → (- x) * (- y) ≡ x * y
 neg-neg-mul x y = let open ≡-Reasoning in begin
   (- x) * (- y)
@@ -47,20 +66,23 @@ neg-neg-mul x y = let open ≡-Reasoning in begin
   x * y ∎
 
 -- (-x)(-x) = x*x.
+--
+-- 取负不改变平方。
 neg-neg-square : ∀ x → (- x) * (- x) ≡ x * x
 neg-neg-square x = neg-neg-mul x x
 
 -- x * (-y) = -(x*y). The direction is opposite to stdlib's
 -- neg-distribʳ-*.
 --
--- x * (-y) = -(x*y)。方向与 stdlib 的 neg-distribʳ-* 相反。
+-- 右侧乘以取负可将取负外提；方向与标准库引理 neg-distribʳ-* 相反。
 n*ʳ : ∀ x y → x * (- y) ≡ - (x * y)
 n*ʳ x y = sym (neg-distribʳ-* x y)
 
 -- (-x) * y = -(x*y). The direction is opposite to stdlib's
 -- neg-distribˡ-*, hence sym.
 --
--- (-x) * y = -(x*y)。方向与 stdlib 的 neg-distribˡ-* 相反，故需要 sym。
+-- 左侧乘以取负可将取负外提；方向与标准库引理 neg-distribˡ-* 相反，
+-- 因此使用 sym。
 n*ˡ : ∀ x y → (- x) * y ≡ - (x * y)
 n*ˡ x y = sym (neg-distribˡ-* x y)
 
@@ -70,6 +92,8 @@ n*ˡ x y = sym (neg-distribˡ-* x y)
 -- 加法重排
 
 -- (a + b) + (c + d) = (a + c) + (b + d).
+--
+-- 交换内层两个加项后四项和不变。
 +interchange : ∀ a b c d → (a + b) + (c + d) ≡ (a + c) + (b + d)
 +interchange a b c d = let open ≡-Reasoning in begin
   (a + b) + (c + d)
@@ -85,6 +109,8 @@ n*ˡ x y = sym (neg-distribˡ-* x y)
   (a + c) + (b + d) ∎
 
 -- ((p + q) + r) + s = p + (q + (r + s)).
+--
+-- 将左倾的四项和重组为右结合。
 flat4 : ∀ p q r s → ((p + q) + r) + s ≡ p + (q + (r + s))
 flat4 p q r s = let open ≡-Reasoning in begin
   ((p + q) + r) + s
@@ -94,6 +120,8 @@ flat4 p q r s = let open ≡-Reasoning in begin
   p + (q + (r + s)) ∎
 
 -- (-t + -t) + (t + t) = 0.
+--
+-- 取负对与正对相消。
 cancel-pair : ∀ t → (- t + - t) + (t + t) ≡ 0ℚ
 cancel-pair t = let open ≡-Reasoning in begin
   (- t + - t) + (t + t)
@@ -114,6 +142,8 @@ cancel-pair t = let open ≡-Reasoning in begin
 -- 平方
 
 -- (x + y)² = x² + y² + (x*y + x*y).
+--
+-- 和之平方展开：拆成两个平方加上两个交叉项。
 sq+ : ∀ x y → (x + y) * (x + y) ≡
               x * x + (y * y + (x * y + x * y))
 sq+ x y = let open ≡-Reasoning in begin
@@ -132,6 +162,8 @@ sq+ x y = let open ≡-Reasoning in begin
   x * x + (y * y + (x * y + x * y)) ∎
 
 -- (x - y)² = x² + y² - (x*y + x*y).
+--
+-- 差之平方展开：与和的情形相同，交叉项取负。
 sq- : ∀ x y → (x - y) * (x - y) ≡
               x * x + (y * y + (- (x * y) + - (x * y)))
 sq- x y = let open ≡-Reasoning in begin
@@ -146,6 +178,8 @@ sq- x y = let open ≡-Reasoning in begin
   x * x + (y * y + (- (x * y) + - (x * y))) ∎
 
 -- (xy)² = x²y².
+--
+-- 乘积的平方等于平方的乘积。
 sq-comm : ∀ x y → (x * y) * (x * y) ≡ (x * x) * (y * y)
 sq-comm x y = let open ≡-Reasoning in begin
   (x * y) * (x * y)
@@ -161,6 +195,8 @@ sq-comm x y = let open ≡-Reasoning in begin
   (x * x) * (y * y) ∎
 
 -- (ac)(bd) = (ad)(bc).
+--
+-- 通过重排四个因子，交叉乘积 (ac)(bd) 与 (ad)(bc) 相等。
 cross-eq : ∀ a b c d → (a * c) * (b * d) ≡ (a * d) * (b * c)
 cross-eq a b c d = trans canon₁ (sym canon₂)
   where
@@ -229,6 +265,8 @@ flip3 s x y = let open ≡-Reasoning in begin
 -- 混合符号与减法
 
 -- (x - y) * z = x*z - y*z.
+--
+-- 右乘减法的分配。
 *ʳ-sub : ∀ x y z → (x - y) * z ≡ x * z - y * z
 *ʳ-sub x y z = let open ≡-Reasoning in begin
   (x - y) * z
@@ -238,6 +276,8 @@ flip3 s x y = let open ≡-Reasoning in begin
   x * z - y * z ∎
 
 -- x * (y - z) = x*y - x*z.
+--
+-- 左乘减法的分配。
 *ˡ-sub : ∀ x y z → x * (y - z) ≡ x * y - x * z
 *ˡ-sub x y z = let open ≡-Reasoning in begin
   x * (y - z)
@@ -247,6 +287,8 @@ flip3 s x y = let open ≡-Reasoning in begin
   x * y - x * z ∎
 
 -- X - (Y + Z) = (X - Y) - Z.
+--
+-- 嵌套减法：减去和即反复减法。
 sub-+-assoc : ∀ X Y Z → X - (Y + Z) ≡ (X - Y) - Z
 sub-+-assoc X Y Z = let open ≡-Reasoning in begin
   X - (Y + Z)
@@ -261,6 +303,8 @@ sub-+-assoc X Y Z = let open ≡-Reasoning in begin
 -- 四项归组
 
 -- (x₁ + y₁) + (x₂ + y₂) = (x₁ + x₂) + (y₁ + y₂).
+--
+-- 将两对按首项与次项重新归组。
 pairs2 : ∀ x₁ x₂ y₁ y₂ →
          (x₁ + y₁) + (x₂ + y₂) ≡ (x₁ + x₂) + (y₁ + y₂)
 pairs2 x₁ x₂ y₁ y₂ = +interchange x₁ y₁ x₂ y₂
@@ -311,6 +355,8 @@ rev4 X Y U V = let open ≡-Reasoning in begin
   ((V + U) + Y) + X ∎
 
 -- -(((a + b) + -c) + -d) = ((-a + -b) + c) + d.
+--
+-- 对带符号的四项和整体取负会将所有符号翻转。
 neg4 : ∀ a b c d →
        - (((a + b) + - c) + - d) ≡ ((- a + - b) + c) + d
 neg4 a b c d = let open ≡-Reasoning in begin
@@ -347,6 +393,8 @@ foldNeg x y = let open ≡-Reasoning in begin
 -- 数乘重排
 
 -- s*(r*x) = r*(s*x).
+--
+-- 数乘因子之间可交换顺序。
 swap-scalar : ∀ {r} s x → (s * (r * x)) ≡ r * (s * x)
 swap-scalar {r} s x = let open ≡-Reasoning in begin
   s * (r * x)
@@ -358,10 +406,14 @@ swap-scalar {r} s x = let open ≡-Reasoning in begin
   r * (s * x) ∎
 
 -- (r*x)*z = r*(x*z).
+--
+-- 将数乘因子右结合进乘积。
 front : ∀ {r} z x → (r * x) * z ≡ r * (x * z)
 front {r} z x = *-assoc r x z
 
 -- (s*(r*x))*z = r*((s*x)*z).
+--
+-- 在乘积内交换外层与内层数乘因子。
 frontS : ∀ {r} s z x → (s * (r * x)) * z ≡ r * ((s * x) * z)
 frontS {r} s z x = let open ≡-Reasoning in begin
   (s * (r * x)) * z
@@ -371,10 +423,14 @@ frontS {r} s z x = let open ≡-Reasoning in begin
   r * ((s * x) * z) ∎
 
 -- -(r*x) = r*(-x).
+--
+-- 取负与数乘可交换。
 front-neg : ∀ {r} x → - (r * x) ≡ r * (- x)
 front-neg {r} x = neg-distribʳ-* r x
 
 -- -((s*(r*x))*z) = r*(-((s*x)*z)).
+--
+-- 通过两个数乘因子与一个因子的乘积进行取负。
 front-negS : ∀ {r} s z x →
              - ((s * (r * x)) * z) ≡ r * (- ((s * x) * z))
 front-negS {r} s z x = let open ≡-Reasoning in begin
@@ -390,6 +446,9 @@ front-negS {r} s z x = let open ≡-Reasoning in begin
 factor2 : ∀ {r} x y → r * x + r * (- y) ≡ r * (x + - y)
 factor2 {r} x y = sym (*-distribˡ-+ r x (- y))
 
+-- Factor r out of a four-term signed sum.
+--
+-- 从四项带符号和里提出 r。
 factor4 : ∀ {r} x y z w →
           (((r * x + r * y) + r * (- z)) + r * (- w))
           ≡ r * (((x + y) + - z) + - w)
@@ -410,6 +469,8 @@ factor4 {r} x y z w = let open ≡-Reasoning in begin
 -- 单位/零规范化
 
 -- 1*k - 0*k = k.
+--
+-- 乘以一减去乘以零仍为原值。
 norm1 : ∀ k → 1ℚ * k + - (0ℚ * k) ≡ k
 norm1 k = let open ≡-Reasoning in begin
   1ℚ * k + - (0ℚ * k)
@@ -421,6 +482,8 @@ norm1 k = let open ≡-Reasoning in begin
   k ∎
 
 -- 0 + (0 + (0 + k)) = k.
+--
+-- 三层零相加仍为原值。
 norm-tail : ∀ k → 0ℚ + (0ℚ + (0ℚ + k)) ≡ k
 norm-tail k = let open ≡-Reasoning in begin
   0ℚ + (0ℚ + (0ℚ + k))

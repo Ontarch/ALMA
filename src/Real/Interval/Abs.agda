@@ -142,7 +142,7 @@ abs-width-mid {l} {u} l≤0 0≤u =
 ------------------------------------------------------------------------
 -- Helpers for abs-width≤
 --
--- abs-width≤ 的助手
+-- abs-width≤ 的辅助引理
 
 abs-width≤-mid-h1 : ∀ {l u : ℚ} → l ≤ 0ℚ → u ≤ u - l
 abs-width≤-mid-h1 {l} {u} l≤0 =
@@ -169,7 +169,7 @@ abs-width≤-mid-h2 {l} {u} 0≤u =
 ------------------------------------------------------------------------
 -- Helpers for abs-width≥
 --
--- abs-width≥ 的助手
+-- abs-width≥ 的辅助引理
 
 abs-width≥-0≤diff : ∀ {a b : ℚ} → a ≤ b → 0ℚ ≤ b - a
 abs-width≥-0≤diff {a} {b} a≤b =
@@ -313,7 +313,7 @@ abs-lo< {l} {u} l<u with ≤-total l 0ℚ | ≤-total u 0ℚ
 ------------------------------------------------------------------------
 -- Nest helpers
 --
--- nest 助手
+-- nest 的辅助引理
 
 abs-nest1 : ∀ {l u l₂ u₂ : ℚ} → l ≤ l₂ → u₂ ≤ u →
   max (max l (neg u)) 0ℚ ≤ max (max l₂ (neg u₂)) 0ℚ

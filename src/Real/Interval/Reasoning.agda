@@ -16,7 +16,7 @@ open import Relation.Binary.PropositionalEquality using (_≡_)
 ------------------------------------------------------------------------
 -- Equational reasoning syntax for _≤_ and _<_ on ℚ
 --
---  ℚ 上 _≤_ 与 _<_ 的等式链式推理语法
+-- ℚ 上 _≤_ 与 _<_ 的链式推理语法
 
 infix 1 begin≤_ begin<_
 infixr 2 _≈⟨_⟩_ _≤⟨_⟩_ _≤⟨_⟩<_ _<⟨_⟩<_ _<⟨_⟩≤[_]

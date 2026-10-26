@@ -27,18 +27,18 @@ open import Real.Interval.Kit using (≈ℝ-of-rec)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 
 ------------------------------------------------------------------------
--- Interval side: cauchy→realI (realI→cauchy x) ≈ℝ x
+-- Interval side
 --
--- The centre of the rebuilt interval at level n is the sampled centre
--- of the Cauchy sequence r = realI→cauchy x at index M r n, which is
--- centre x (M r n). Since M r n ≥ n, the two centres differ by at most
--- the width at level n, bounded by w0 · recipPow2 n.
+-- The rebuilt interval is equivalent to the original. At level n its
+-- centre is the sampled centre of r = realI→cauchy x at index M r n,
+-- which is centre x (M r n). Since M r n ≥ n, the two centres differ
+-- by at most the width at level n, bounded by w0 · recipPow2 n.
 --
--- 区间侧：cauchy→realI (realI→cauchy x) ≈ℝ x
+-- 区间侧
 --
--- 重建区间第 n 层中心是柯西序列 r = realI→cauchy x 在下标 M r n 处
--- 的采样中心，即 centre x (M r n)。因 M r n ≥ n，两中心之差至多为
--- 第 n 层宽度，以 w0 · recipPow2 n 为界。
+-- 重建区间与原区间等价。第 n 层中心取柯西序列 r 在相应折叠下标处的
+-- 采样中心；该下标不小于 n，故两中心之差不超过第 n 层宽度，并以
+-- w0 · recipPow2 n 为界。
 
 cauchy→realI-retract : (x : RealI)
                      → cauchy→realI (realI→cauchy x) ≈ℝ x

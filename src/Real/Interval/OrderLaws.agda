@@ -31,15 +31,16 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Real using (embed; ε; embed-suc-pos)
-open import Real.Interval using (RealI; neg-invol)
+open import Base.RationalRing using (neg-involutive)
+open import Real using (embed; ε; half; embed-suc-pos)
+open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using
   (node; l; u; centre; width; width-n; width-1step; centre-l; centre-u; u-mono
   ; l-mono; recipPow2; bound-w; n<2^n; embed-mono-<; 0<width)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.Kit using
-  (half; 0<half; half≤1; two-half; half+half≡1; 0<recipPow2; embed-suc∸1)
+  (0<half; half≤1; two-half; half+half≡1; 0<recipPow2; embed-suc∸1)
 open import Real.Interval.Node using (l-hom; u-hom; l-neg; u-neg)
 open import Real.Interval.Mul using (le-shift)
 open import Real.Interval.Arith using (_+ℝ_; _-ℝ_; negℝ)
@@ -58,7 +59,7 @@ open import Real.Interval.Rational using (r≤|r|)
 --
 -- RealI 上 _<ℝ_ 与 _≈ℝ_ 的基本序论事实：任意正有理数下方有 ε 与
 -- 宽度，宽度随深度递减，上界 u ≤ centre + width，序与近似相等的
--- 相容性，以及序在加法、否定与减法下的单调性。
+-- 相容性，以及序在加法、取负与减法下的单调性。
 
 eps-below : (b : ℚ) → 0ℚ < b → Σ ℕ (λ k → ε k < b)
 eps-below b 0<b = M , goal
@@ -202,11 +203,11 @@ width-below r b 0<b = M , result
     step2 : w0 * em-inv < (embed (2 ^ M) * b) * em-inv
     step2 = *-monoˡ-<-pos em-inv {{positive 0<em-inv}} w0<em-b
 
-    -- recipPow2 m = 1 / embed (suc (2^m ∸ 1)) and the denominator
-    -- equals embed (2^m), so embed (2^m) * em-inv ≡ 1.
+    -- The denominator of recipPow2 m equals embed (2^m), so
+    -- embed (2^m) * em-inv ≡ 1.
     --
-    -- recipPow2 m = 1 / embed (suc (2^m ∸ 1))，其分母等于
-    -- embed (2^m)，故 embed (2^m) * em-inv ≡ 1。
+    -- recipPow2 m 的分母等于 embed (2^m)，故
+    -- embed (2^m) * em-inv ≡ 1。
     s : ℚ
     s = embed (suc (2 ^ M ∸ 1))
 
@@ -320,7 +321,7 @@ u≤c+w r k =
       0ℚ + neg (neg b)
       ≡⟨ +-identityˡ (neg (neg b)) ⟩
       neg (neg b)
-      ≡⟨ neg-invol b ⟩
+      ≡⟨ neg-involutive b ⟩
       b ∎
 
 1<2 : 1ℚ < embed 2
@@ -437,7 +438,7 @@ half+half²<1 =
       centre y m + neg (centre x m)
       ≡⟨ +-comm (centre y m) (neg (centre x m)) ⟩
       neg (centre x m) + centre y m
-      ≡⟨ cong (neg (centre x m) +_) (sym (neg-invol (centre y m))) ⟩
+      ≡⟨ cong (neg (centre x m) +_) (sym (neg-involutive (centre y m))) ⟩
       neg (centre x m) + neg (neg (centre y m))
       ≡⟨ sym (neg-distrib-+ (centre x m) (neg (centre y m))) ⟩
       neg (centre x m + neg (centre y m))
