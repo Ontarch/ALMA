@@ -11,7 +11,7 @@ module Real.Interval.WeakArith where
 open import Data.Nat using (ℕ; zero; suc; _∸_; _^_; s≤s; z≤n)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<N_)
 open import Data.Nat.Properties using
-  (m≤m+n; m≤n+m; m+[n∸m]≡n; n≤1+n; +-suc; *-suc; *-monoʳ-≤; *-mono-≤; *-distribˡ-+)
+  (m≤m+n; m≤n+m; m+[n∸m]≡n; n≤1+n; +-suc; *-suc; *-monoʳ-≤; *-distribˡ-+)
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
   ; +-comm to +-commℕ; +-assoc to +-assocℕ; *-assoc to *-assocℕ; *-comm to *-commℕ
   ; +-identityʳ to +-identityʳℕ; *-identityʳ to *-identityʳℕ; *-identityˡ to *-identityˡℕ
@@ -31,7 +31,7 @@ open import Base.RationalRing using (0<1; neg-involutive)
 open import Real using
   (ε; embed; half; embed-suc-nonZero; 2ℚ; 2*embed; halve; embed-*; 0<embed
   ; reciprocal-cong; 1/embed; embed-mono-<; embed-mono-≤; embed-+-hom)
-open import Real.IntervalEquiv using (recipPow2; n<2^n)
+open import Real.IntervalEquiv using (recipPow2; n<2^n; 1≤2^n)
 open import Real.Interval.Kit using (strict-recip)
 
 ------------------------------------------------------------------------
@@ -448,10 +448,6 @@ double-recip k =
 
 1≤2N : 1 ≤N 2
 1≤2N = s≤s z≤n
-
-1≤2^n : ∀ k → 1 ≤N 2 ^ k
-1≤2^n zero    = ≤N-refl
-1≤2^n (suc k) = *-mono-≤ 1≤2N (1≤2^n k)
 
 suc-pow-∸1 : ∀ k → suc (2 ^ k ∸ 1) ≡ 2 ^ k
 suc-pow-∸1 k = m+[n∸m]≡n (1≤2^n k)

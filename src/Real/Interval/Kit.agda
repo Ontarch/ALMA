@@ -41,7 +41,7 @@ open import Real using
 open import Real.Interval using (RealI)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using
-  (centre; recipPow2; bound-w; frac-strict; B<2^sucB; n<2^n)
+  (centre; recipPow2; bound-w; frac-strict; B<2^sucB; n<2^n; 1≤2^n)
 open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub)
 
 ------------------------------------------------------------------------
@@ -210,7 +210,7 @@ n≤4n n = ≤-transℕ (n≤2n n) (2n≤4n n)
 --
 -- 阿基米德收尾
 --
--- C · recipPow2 n 最终小于 ε k。
+-- 几何衰减项最终落在给定精度之下。
 
 recipPow2-bound : (C : ℚ) → 0ℚ ≤ C → (k : ℕ) →
   Σ ℕ (λ N → ∀ n → N ≤ℕ n → C * recipPow2 n < ε k)
@@ -572,9 +572,9 @@ neg-of-nonpos {x} x≤0 =
       rhs = +-identityˡ (neg x)
   in subst (λ z → 0ℚ ≤ z) rhs step1
 
--- x ≤ 0 implies |x| = neg x.
+-- The absolute value of a nonpositive rational is its negation.
 --
--- x ≤ 0 蕴含 |x| = neg x。
+-- 非正数的绝对值等于其相反数。
 npos⇒∣p∣≡neg : {x : ℚ} → x ≤ 0ℚ → ∣ x ∣ ≡ neg x
 npos⇒∣p∣≡neg {x} x≤0 =
   begin ∣ x ∣
@@ -818,10 +818,6 @@ recipPow2-mul a b =
 n≤suc : (n : ℕ) → n ≤ℕ suc n
 n≤suc zero = z≤n
 n≤suc (suc n) = s≤s (n≤suc n)
-
-1≤2^n : (n : ℕ) → 1 ≤ℕ 2 ^ n
-1≤2^n zero = s≤s z≤n
-1≤2^n (suc n) = ≤-transℕ (1≤2^n n) (^-monoʳ-≤ 2 (n≤suc n))
 
 recipPow2-n≤1 : (n : ℕ) → recipPow2 n ≤ 1ℚ
 recipPow2-n≤1 n =

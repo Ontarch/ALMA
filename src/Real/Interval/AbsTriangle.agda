@@ -10,36 +10,30 @@ module Real.Interval.AbsTriangle where
 
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
-open import Data.Nat using (ℕ; zero; suc; _^_; _∸_; _⊔_; z≤n; s≤s)
-  renaming (_+_ to _+N_; _≤_ to _≤N_)
-open import Data.Nat.Properties as NP using ()
-  renaming (≤-<-trans to ≤N-<-trans; ≤-trans to ≤N-trans)
+open import Data.Nat using (ℕ; suc; _⊔_) renaming (_+_ to _+N_; _≤_ to _≤N_)
+open import Data.Nat.Properties using (m≤n⊔m; m≤m⊔n; +-suc; +-identityʳ)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; _≥_; ∣_∣; NonZero; Positive; positive)
-  renaming (-_ to neg)
-open import Data.Rational.Base as QB using (1/_)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; _≥_; ∣_∣; positive) renaming (-_ to neg)
+open import Data.Rational.Base using (nonNegative)
 open import Data.Rational.Properties as QP using
-  (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; <-trans; +-mono-≤; +-mono-<-≤; +-comm
-  ; +-assoc; +-identityˡ; +-inverseʳ; +-inverseˡ; *-assoc; *-comm; *-identityˡ
-  ; *-identityʳ; *-inverseˡ; *-inverseʳ; *-distribʳ-+; *-distribˡ-+
-  ; pos⇒nonZero; positive⁻¹; pos⇒nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣p-q∣≤∣p∣+∣q∣
-  ; 0≤∣p∣; 0≤p⇒∣p∣≡p; ∣-p∣≡∣p∣; *-monoˡ-≤-nonNeg; ≤-total; <-cmp
-  ; neg-distrib-+; neg-antimono-≤; neg-antimono-<; ∣p*q∣≡∣p∣*∣q∣)
+  (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; +-mono-≤; +-mono-<-≤; +-comm; +-assoc
+  ; +-identityˡ; +-inverseʳ; +-inverseˡ; *-assoc; *-identityˡ; *-identityʳ
+  ; *-distribʳ-+; *-distribˡ-+; pos⇒nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣p-q∣≤∣p∣+∣q∣
+  ; 0≤∣p∣; 0≤p⇒∣p∣≡p; ∣-p∣≡∣p∣; *-monoˡ-≤-nonNeg; ≤-total; neg-distrib-+
+  ; neg-antimono-≤; neg-antimono-<; ∣p*q∣≡∣p∣*∣q∣)
 open import Function.Base using (case_of_)
-open import Relation.Nullary.Negation using (contradiction)
-open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Base.RationalRing using (+interchange)
-open import Real using (embed; half; embed-mono-<)
+open import Real using (embed; half; 2ℚ≡1+1)
 open import Real.Interval using (RealI; δ; δ-pos; dyadic)
 open import Real.Interval.Arith using (0ℝ; _+ℝ_; negℝ)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using
   (l; u; centre; width; width-n; centre-l; centre-u; l-mono; u-mono; node
-  ; recipPow2; n<2^n; node-suc)
+  ; recipPow2; node-suc)
 open import Real.Interval.Node using
   (centre-add; 0≤width-n; l-hom; u-hom; l-neg; u-neg)
 open import Real.Interval.Abs using
@@ -48,90 +42,16 @@ open import Real.Interval.Rational using (max; ≤maxʳ; max≤)
 open import Real.Interval.Kit using
   (≈ℝ-of-rec; half+half≡1; 0≤recipPow2; recipPow2-mul; recipPow2-n≤1
   ; recipPow2-≤; halveQ; half≥0'; halveQ-mono; 0≤halveQ; halveQ-distrib
-  ; halveQ-neg; x≤∣x∣; same⇒diff0; 0≤diff; move-≤; move-≤-back
-  ; npos⇒∣p∣≡neg; tail-bound; neg-neg)
+  ; halveQ-neg; x≤∣x∣; same⇒diff0; 0≤diff; move-≤; move-≤-back; neg-of-nonpos
+  ; npos⇒∣p∣≡neg; tail-bound; neg-neg; 0<embed2)
 open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
 open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
 
 ------------------------------------------------------------------------
--- Small rational utilities
+-- The absolute value of [l, u] versus the absolute value of its centre
 --
--- 小的有理数工具
+-- ∣[l,u]∣ 的中心与 [l,u] 中心的绝对值之差不超过区间宽度。
 
--- 0 < 1ℚ (the rational unit is positive).
---
--- 0 < 1ℚ（有理数单位为正）。
-0<1Q : 0ℚ < 1ℚ
-0<1Q = positive⁻¹ 1ℚ
-
--- embed 2 ≡ 1ℚ + 1ℚ.
---
--- embed 2 等于 1ℚ + 1ℚ。
-2ℚ≡1+1 : embed 2 ≡ 1ℚ + 1ℚ
-2ℚ≡1+1 = refl
-0<embed2 : 0ℚ < embed 2
-0<embed2 = embed-mono-< (s≤s z≤n)
-0<embed3 : 0ℚ < embed 3
-0<embed3 = <-trans 0<embed2 (embed-mono-< (s≤s (s≤s (s≤s z≤n))))
-
--- The reciprocal of a positive rational is positive.
---
--- 正有理数的倒数为正。
-inv-pos : (e : ℚ) → {{e-pos : Positive e}} →
-  Positive ((1/_) e {{pos⇒nonZero e {{e-pos}}}})
-inv-pos e {{e-pos}} with <-cmp 0ℚ ((1/_) e {{pos⇒nonZero e {{e-pos}}}})
-... | tri< 0<ie _ _ = positive 0<ie
-... | tri≈ _ 0≡ie _ =
-  let ie = (1/_) e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie≡1 : e * ie ≡ 1ℚ
-      e·ie≡1 = *-inverseʳ e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie≡0 : e * ie ≡ 0ℚ
-      e·ie≡0 =
-        begin e * ie
-          ≡⟨ cong (e *_) (sym 0≡ie) ⟩ e * 0ℚ
-          ≡⟨ QP.*-zeroʳ e ⟩ 0ℚ ∎
-      1≡0 : 1ℚ ≡ 0ℚ
-      1≡0 = trans (sym e·ie≡1) e·ie≡0
-      0<0 : 0ℚ < 0ℚ
-      0<0 = subst (λ z → 0ℚ < z) 1≡0 0<1Q
-  in contradiction 0<0 (QP.<-irrefl refl)
-... | tri> _ _ ie<0 =
-  let ie = (1/_) e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie≡1 : e * ie ≡ 1ℚ
-      e·ie≡1 = *-inverseʳ e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie<0 : e * ie < 0ℚ
-      e·ie<0 =
-        let step : e * ie < e * 0ℚ
-            step = QP.*-monoʳ-<-pos e {{e-pos}} ie<0
-            e0≡0 : e * 0ℚ ≡ 0ℚ
-            e0≡0 = QP.*-zeroʳ e
-        in subst (λ z → e * ie < z) e0≡0 step
-      1<0 : 1ℚ < 0ℚ
-      1<0 = subst (λ z → z < 0ℚ) e·ie≡1 e·ie<0
-  in contradiction 1<0 (QP.<-asym 0<1Q)
-
--- Negation of a nonpositive rational is nonnegative.
---
--- 非正有理数的取负非负。
-neg-of-nonpos : {x : ℚ} → x ≤ 0ℚ → 0ℚ ≤ neg x
-neg-of-nonpos {x} x≤0 =
-  let step : x + neg x ≤ 0ℚ + neg x
-      step = +-mono-≤ x≤0 ≤-refl
-      lhs0 : x + neg x ≡ 0ℚ
-      lhs0 = +-inverseʳ x
-      step1 : 0ℚ ≤ 0ℚ + neg x
-      step1 = subst (λ z → z ≤ 0ℚ + neg x) lhs0 step
-      rhs  : 0ℚ + neg x ≡ neg x
-      rhs  = +-identityˡ (neg x)
-  in subst (λ z → 0ℚ ≤ z) rhs step1
-
--- centre of ∣[l,u]∣ versus ∣centre of [l,u]∣
---
--- The two differ by at most the width u - l.
---
--- ∣[l,u]∣ 的中心与 [l,u] 中心的绝对值
---
--- 二者之差至多为区间宽度。
 abs-centre-≤ : (l u : ℚ) (l≤u : l ≤ u) →
   ∣ halveQ (absLo l u + absHi l u) - ∣ halveQ (l + u) ∣ ∣ ≤ u - l
 abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
@@ -270,14 +190,13 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
 ------------------------------------------------------------------------
 -- Triangle inequality at the centre level
 --
--- The centre of the absolute value of a sum interval is at most the sum
--- of the centres of the summands' absolute values plus twice the sum of
--- the interval widths.
+-- The centre of the absolute value of a sum interval is bounded by the
+-- sum of the summands' absolute-value centres plus twice the sum of the
+-- widths.
 --
 -- 中心层的三角不等式
 --
--- 和区间的绝对值的中心，至多为各加子绝对值的中心之和加上区间宽度
--- 之和的两倍。
+-- 和区间绝对值的中心，被各加子绝对值中心之和加上两倍宽度和界住。
 
 abs-centre-triangle :
   (l1 u1 l2 u2 : ℚ) (l1≤u1 : l1 ≤ u1) (l2≤u2 : l2 ≤ u2) →
@@ -449,27 +368,16 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
            in subst (λ z → A ≤ z) (sym t6right) t6
      in move-≤-back t6'
 
--- recipPow2 as the reciprocal of a power of two
+-- Non-strict order from a recursive centre bound.
 --
--- recipPow2 写成二的幂的倒数
-nz2n : (n : ℕ) → NonZero (embed (2 ^ n))
-nz2n n = pos⇒nonZero (embed (2 ^ n))
-  {{positive (embed-mono-< (≤N-<-trans z≤n (n<2^n n)))}}
-
-nzSuc : (n : ℕ) → NonZero (embed (suc (2 ^ n ∸ 1)))
-nzSuc n = pos⇒nonZero (embed (suc (2 ^ n ∸ 1)))
-  {{positive (embed-mono-< (s≤s z≤n))}}
-
--- Non-strict order from a recursive centre bound
---
--- If the centre gap is bounded by a decaying geometric series, then
--- A ≤ℝ B.  Contrapositively, B < A would give a fixed positive gap
--- between the lower endpoint of A and the upper endpoint of B at some
--- level, which the decaying bound cannot match.
+-- If the centre gap is bounded by a decaying geometric series at every
+-- level, then A ≤ℝ B.  Contrapositively, B < A gives a fixed positive
+-- gap between A's lower endpoint and B's upper endpoint at some level,
+-- which the decaying bound cannot match.
 --
 -- 由递归中心界得到非严格序
 --
--- 若中心差对每个层级都被同一个几何衰减界控制，则该非严格序成立。
+-- 若中心差在每一层都被同一个几何衰减界控制，则该非严格序成立。
 -- 反证：B < A 会在某一层给出 A 的下端点与 B 的上端点之间固定的
 -- 正间隙，而衰减界无法与之匹配。
 ≤ℝ-of-rec : (A B : RealI) (C : ℚ) → 0ℚ ≤ C →
@@ -489,9 +397,9 @@ nzSuc n = pos⇒nonZero (embed (suc (2 ^ n ∸ 1)))
       h2 = proj₂ tb
       m = n0 ⊔ m0
       m0≤m : m0 ≤N m
-      m0≤m = NP.m≤n⊔m n0 m0
+      m0≤m = m≤n⊔m n0 m0
       m≥n0 : n0 ≤N m
-      m≥n0 = NP.m≤m⊔n n0 m0
+      m≥n0 = m≤m⊔n n0 m0
       cA≥l0 : centre A m ≥ l A n0
       cA≥l0 =
         let p : l A n0 ≤ l A m
@@ -514,15 +422,15 @@ nzSuc n = pos⇒nonZero (embed (suc (2 ^ n ∸ 1)))
          dd = QP.≤-<-trans diff≥d upper
      in QP.<-irrefl refl dd
 
--- node-dyadic: node (dyadic q k) n ≡ dyadic q (k + n)
+-- Nesting a dyadic interval n times yields the dyadic at depth k + n.
 --
--- 嵌套一个 dyadic n 次，得到深度 k+n 的 dyadic。
+-- 嵌套 dyadic n 次后得到深度为 k + n 的 dyadic。
 node-dyadic : (q : ℚ) (k n : ℕ) → node (dyadic q k) n ≡ dyadic q (k +N n)
 node-dyadic q k 0 =
   begin node (dyadic q k) 0
     ≡⟨ refl ⟩
   dyadic q k
-    ≡⟨ cong (dyadic q) (sym (NP.+-identityʳ k)) ⟩
+    ≡⟨ cong (dyadic q) (sym (+-identityʳ k)) ⟩
   dyadic q (k +N 0) ∎
 node-dyadic q k (suc n) =
   begin node (dyadic q k) (suc n)
@@ -532,12 +440,12 @@ node-dyadic q k (suc n) =
   node (dyadic q (suc k)) n
     ≡⟨ node-dyadic q (suc k) n ⟩
   dyadic q (suc k +N n)
-    ≡⟨ cong (dyadic q) (sym (NP.+-suc k n)) ⟩
+    ≡⟨ cong (dyadic q) (sym (+-suc k n)) ⟩
   dyadic q (k +N suc n) ∎
 
--- l 0ℝ n ≡ neg (δ n)
+-- The lower endpoint of 0ℝ at level n is the negated dyadic tolerance.
 --
--- 0ℝ 在第 n 层的下端点为 neg(δ n)
+-- 0ℝ 在第 n 层的下端点是取负的二进容差。
 l0ℝ : (n : ℕ) → l 0ℝ n ≡ neg (δ n)
 l0ℝ n =
   let eq : node 0ℝ n ≡ dyadic 0ℚ n
@@ -568,10 +476,10 @@ labs-nonneg x (suc n) =
 ------------------------------------------------------------------------
 -- Nonnegativity
 --
--- The lower endpoint of the absolute value is absLo, which is a max
--- with 0 and hence is at least 0.  If the absolute value were below
--- 0ℝ, its upper endpoint would be below the lower endpoint of 0ℝ,
--- which is negative, contradicting the nonnegativity of its endpoints.
+-- The lower endpoint of the absolute value is a max with 0, hence at
+-- least 0.  If the absolute value were below 0ℝ, its upper endpoint
+-- would be below the (negative) lower endpoint of 0ℝ, contradicting
+-- the nonnegativity of its endpoints.
 --
 -- 非负性
 --
@@ -600,84 +508,14 @@ abs-nonneg x (n , h) =
          dd = QP.≤-<-trans u≥0 u<0
      in QP.<-irrefl refl dd
 
--- add-right: |a| ≤ k → |b| ≤ l → |a + b| ≤ k + l
+------------------------------------------------------------------------
+-- Toolkit lemmas for the norm development
 --
--- 1≤⇒inv≤1: 0 < e → 1 ≤ e → 1/e ≤ 1
---
--- 两项绝对值误差合并。
---
--- 不小于 1 的正数，其倒数不大于 1。
-1≤⇒inv≤1 : {e : ℚ} ⦃ _ : NonZero e ⦄ → 0ℚ < e → 1ℚ ≤ e → (1/_) e ≤ 1ℚ
-1≤⇒inv≤1 {e} 0e p =
-  let inv = (1/_) e {{pos⇒nonZero e {{positive 0e}}}}
-      pinv : Positive inv
-      pinv = inv-pos e {{positive 0e}}
-      q : inv * 1ℚ ≤ inv * e
-      q = *-monoˡ-≤-nonNeg inv {{pos⇒nonNeg inv {{pinv}}}} p
-      e1 : inv * e ≡ 1ℚ
-      e1 = *-inverseˡ e {{pos⇒nonZero e {{positive 0e}}}}
-      q1 : inv * 1ℚ ≤ 1ℚ
-      q1 = subst (λ z → inv * 1ℚ ≤ z) e1 q
-  in subst (λ z → z ≤ 1ℚ) (*-identityʳ inv) q1
+-- 范数开发所需的工具引理
 
--- n≤suc: n ≤ suc n
+-- The absolute value walks two interval layers per step.
 --
--- 自然数随后继不减。
-n≤suc : (n : ℕ) → n ≤N suc n
-n≤suc zero = z≤n
-n≤suc (suc n) = s≤s (n≤suc n)
-
--- 1≤2^n: 1 ≤ 2^n
---
--- 二的正整数次幂不小于 1。
-1≤2^n : (n : ℕ) → 1 ≤N 2 ^ n
-1≤2^n zero = s≤s z≤n
-1≤2^n (suc n) =
-  ≤N-trans (1≤2^n n) (NP.^-monoʳ-≤ 2 (n≤suc n))
-
--- recip-*-hom: 1/(a * b) ≡ 1/a * 1/b
---
--- 倒数对乘法的分解。
-recip-*-hom : (a b : ℚ) ⦃ na : NonZero a ⦄ ⦃ nb : NonZero b ⦄
-  ⦃ nab : NonZero (a * b) ⦄ →
-  (1/_) (a * b) ≡ (1/_) a * (1/_) b
-recip-*-hom a b ⦃ na ⦄ ⦃ nb ⦄ ⦃ nab ⦄ =
-  let ia = (1/_) a
-      ib = (1/_) b
-      x = ia * ib
-      p : x * (a * b) ≡ 1ℚ
-      p =
-        begin (ia * ib) * (a * b)
-          ≡⟨ *-assoc ia ib (a * b) ⟩
-        ia * (ib * (a * b))
-          ≡⟨ cong (ia *_) (sym (*-assoc ib a b)) ⟩
-        ia * ((ib * a) * b)
-          ≡⟨ cong (ia *_) (cong (λ z → z * b) (*-comm ib a)) ⟩
-        ia * ((a * ib) * b)
-          ≡⟨ cong (ia *_) (*-assoc a ib b) ⟩
-        ia * (a * (ib * b))
-          ≡⟨ sym (*-assoc ia a (ib * b)) ⟩
-        (ia * a) * (ib * b)
-          ≡⟨ cong₂ (λ u v → u * v) (*-inverseˡ a) (*-inverseˡ b) ⟩
-        1ℚ ∎
-      q : x ≡ (1/_) (a * b)
-      q =
-        begin x
-          ≡⟨ sym (*-identityʳ x) ⟩
-        x * 1ℚ
-          ≡⟨ cong (x *_) (sym (*-inverseʳ (a * b) ⦃ nab ⦄)) ⟩
-        x * ((a * b) * (1/_) (a * b))
-          ≡⟨ sym (*-assoc x (a * b) ((1/_) (a * b))) ⟩
-        (x * (a * b)) * (1/_) (a * b)
-          ≡⟨ cong (λ z → z * (1/_) (a * b)) p ⟩
-        1ℚ * (1/_) (a * b)
-          ≡⟨ *-identityˡ ((1/_) (a * b)) ⟩
-        (1/_) (a * b) ∎
-  in sym q
-
--- node-abs: node ∣ x ∣ n ≡ ∣ node x (2n) ∣
---
--- 绝对值每走一步，底层区间走两步，故第 n 层绝对值对应第 2n 层区间。
+-- 绝对值每走一步，底层区间走两步。
 node-abs : (x : RealI) (n : ℕ) → node ∣ x ∣ℝ n ≡ ∣ node x (n +N n) ∣ℝ
 node-abs x 0 =
   begin node ∣ x ∣ℝ 0
@@ -685,7 +523,7 @@ node-abs x 0 =
   ∣ x ∣ℝ
     ≡⟨ refl ⟩
   ∣ node x 0 ∣ℝ
-    ≡⟨ cong ∣_∣ℝ (cong (node x) (sym (NP.+-identityʳ 0))) ⟩
+    ≡⟨ cong ∣_∣ℝ (cong (node x) (sym (+-identityʳ 0))) ⟩
   ∣ node x (0 +N 0) ∣ℝ ∎
 node-abs x (suc n) =
   begin node ∣ x ∣ℝ (suc n)
@@ -701,7 +539,7 @@ node-abs x (suc n) =
        node (RealI.next x) (suc (n +N n))
          ≡⟨ sym (node-suc x (suc (n +N n))) ⟩
        node x (suc (suc (n +N n)))
-         ≡⟨ cong (node x) (sym (cong suc (NP.+-suc n n))) ⟩
+         ≡⟨ cong (node x) (sym (cong suc (+-suc n n))) ⟩
        node x ((suc n) +N (suc n)) ∎) ⟩
   ∣ node x ((suc n) +N (suc n)) ∣ℝ ∎
 
@@ -721,9 +559,10 @@ u-abs-node x n =
       e = node-abs x n
   in subst (λ z → RealI.u z ≡ absHi (l x (n +N n)) (u x (n +N n))) (sym e) refl
 
--- centre-abs-node: centre ∣ x ∣ n = halve (absLo (l x 2n) (u x 2n) + absHi ...)
+-- The centre of the n-th absolute-value layer is determined by the
+-- endpoints of the 2n-th interval layer.
 --
--- 第 n 层绝对值的中心，由第 2n 层区间端点给出。
+-- 第 n 层绝对值的中心，由第 2n 层区间的端点决定。
 centre-abs-node : (x : RealI) (n : ℕ) →
   centre ∣ x ∣ℝ n ≡
   halveQ (absLo (l x (n +N n)) (u x (n +N n)) +
@@ -742,7 +581,7 @@ centre-abs-node x n =
 -- At level n the centre gap is bounded by twice the sum of the widths,
 -- which decays geometrically.  The bound is fed to ≤ℝ-of-rec.
 --
--- 三角不等式：∣ x + y ∣ ≤ℝ ∣ x ∣ + ∣ y ∣
+-- 三角不等式
 --
 -- 在第 n 层，中心差被宽度之和的两倍界住，该界几何衰减，交给
 -- ≤ℝ-of-rec。
@@ -825,11 +664,11 @@ abs-triangle x y =
                         s : r * r ≤ r
                         s =
                           subst (λ z → r * r ≤ z) (*-identityʳ r)
-                            (*-monoˡ-≤-nonNeg r {{QB.nonNegative 0≤r}}
+                            (*-monoˡ-≤-nonNeg r {{nonNegative 0≤r}}
                               (recipPow2-n≤1 n))
                     in QP.≤-trans (≤-reflexive e) s
                 in ≤-trans p (*-monoˡ-≤-nonNeg (width x 0)
-                                {{QB.nonNegative (0≤width-n x 0)}} q)
+                                {{nonNegative (0≤width-n x 0)}} q)
             w2d≤ : width y nn ≤ width y 0 * recipPow2 n
             w2d≤ =
               let p : width y nn ≤ width y 0 * recipPow2 nn
@@ -844,11 +683,11 @@ abs-triangle x y =
                         s : r * r ≤ r
                         s =
                           subst (λ z → r * r ≤ z) (*-identityʳ r)
-                            (*-monoˡ-≤-nonNeg r {{QB.nonNegative 0≤r}}
+                            (*-monoˡ-≤-nonNeg r {{nonNegative 0≤r}}
                               (recipPow2-n≤1 n))
                     in QP.≤-trans (≤-reflexive e) s
               in ≤-trans p (*-monoˡ-≤-nonNeg (width y 0)
-                              {{QB.nonNegative (0≤width-n y 0)}} q)
+                              {{nonNegative (0≤width-n y 0)}} q)
             wsum≤ : (u1d - l1d) + (u2d - l2d) ≤ s0 * recipPow2 n
             wsum≤ =
               let p : width x nn + width y nn ≤
@@ -905,13 +744,12 @@ abs-centre-even-helper A B C =
 ------------------------------------------------------------------------
 -- Evenness at the centre level
 --
--- The centre of the absolute value of a negated interval and the centre
--- of the absolute value of the original interval differ by at most
--- twice the width.
+-- The centres of the absolute values of a negated interval and the
+-- original interval differ by at most twice the width.
 --
 -- 中心层的偶性
 --
--- 取负区间的绝对值的中心与原区间绝对值的中心之差至多为宽度的两倍。
+-- 取负区间绝对值的中心与原区间绝对值的中心之差至多为宽度的两倍。
 
 abs-centre-even : (l u : ℚ) (l≤u : l ≤ u) →
   let A = halveQ (absLo (neg u) (neg l) + absHi (neg u) (neg l))
@@ -1063,9 +901,9 @@ abs-centre-even l u l≤u =
   in main
 
 ------------------------------------------------------------------------
--- Evenness: ∣ negℝ x ∣ ≈ℝ ∣ x ∣
+-- Evenness
 --
--- 偶性：∣ negℝ x ∣ ≈ℝ ∣ x ∣
+-- 偶性
 
 abs-even : (x : RealI) → ∣ negℝ x ∣ℝ ≈ℝ ∣ x ∣ℝ
 abs-even x =
@@ -1117,7 +955,7 @@ abs-even x =
                   q = recipPow2-≤ n
               in ≤-trans p
                    (*-monoˡ-≤-nonNeg (width x 0)
-                      {{QB.nonNegative (0≤width-n x 0)}} q)
+                      {{nonNegative (0≤width-n x 0)}} q)
             double≤ : embed 2 * (u0 - l0) ≤
                       embed 2 * (width x 0 * recipPow2 n)
             double≤ = *-monoˡ-≤-nonNeg (embed 2)
