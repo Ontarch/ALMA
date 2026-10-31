@@ -18,14 +18,15 @@ module Physics.Newton.QuadraticBilinear where
 
 open import Data.Rational using (_+_; _*_; -_)
 open import Data.Rational.Properties using
-  (+-assoc; *-distribˡ-+; *-distribʳ-+; neg-distrib-+)
+  (+-assoc; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; *-assoc; neg-distribʳ-*)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; trans; cong; cong₂; sym; module ≡-Reasoning)
+open ≡-Reasoning
 
 open import Physics.Newton.Quadratic using
   (obs; bracket; add; scale; twoℚ; fourℚ; mkObs)
 open import Base.RationalRing using
-  (pairs2; pairs4; front; frontS; front-neg; factor2; factor4; front-negS)
+  (+interchange; pairs4; frontS; factor4; front-negS)
 
 ------------------------------------------------------------------------
 -- Local helpers
@@ -38,7 +39,7 @@ private
   -- 把形如 s*((u+v))*z 的加项拆成 s*u*z + s*v*z。
   splitSZ : ∀ s z u v →
             (s * (u + v)) * z ≡ (s * u) * z + (s * v) * z
-  splitSZ s z u v = let open ≡-Reasoning in begin
+  splitSZ s z u v = begin
     (s * (u + v)) * z
     ≡⟨ cong (λ t → t * z) (*-distribˡ-+ s u v) ⟩
     (s * u + s * v) * z
@@ -50,7 +51,7 @@ private
   -- 把 -((u+v)*z) 拆成 -(u*z) + -(v*z)。
   splitNeg : ∀ z u v →
              - ((u + v) * z) ≡ - (u * z) + - (v * z)
-  splitNeg z u v = let open ≡-Reasoning in begin
+  splitNeg z u v = begin
     - ((u + v) * z)
     ≡⟨ cong -_ (*-distribʳ-+ z u v) ⟩
     - (u * z + v * z)
@@ -59,7 +60,7 @@ private
 
   splitNegSZ : ∀ s z u v →
                - ((s * (u + v)) * z) ≡ - ((s * u) * z) + - ((s * v) * z)
-  splitNegSZ s z u v = let open ≡-Reasoning in begin
+  splitNegSZ s z u v = begin
     - ((s * (u + v)) * z)
     ≡⟨ cong -_ (splitSZ s z u v) ⟩
     - ((s * u) * z + (s * v) * z)
@@ -91,8 +92,7 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
   V₁ = twoℚ * e * F;    V₁' = twoℚ * e' * F
   V₂ = - (twoℚ * f * E); V₂' = - (twoℚ * f' * E)
 
-  c-c = let open ≡-Reasoning
-            c₁ = a * B; c₁' = a' * B
+  c-c = let c₁ = a * B; c₁' = a' * B
         in begin
     (a + a') * B + - ((b + b') * A)
     ≡⟨ cong₂ (λ X Y → X + - Y)
@@ -101,11 +101,10 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     ≡⟨ cong ((c₁ + c₁') +_)
             (neg-distrib-+ (b * A) (b' * A)) ⟩
     (c₁ + c₁') + (- (b * A) + - (b' * A))
-    ≡⟨ pairs2 c₁ (- (b * A)) c₁' (- (b' * A)) ⟩
+    ≡⟨ +interchange c₁ c₁' (- (b * A)) (- (b' * A)) ⟩
     (c₁ + - (b * A)) + (c₁' + - (b' * A)) ∎
 
-  q-c = let open ≡-Reasoning
-            u1 = (a + a') * E
+  q-c = let u1 = (a + a') * E
             u2 = twoℚ * (d + d') * B
             u3 = - ((e + e') * A)
             u4 = - (twoℚ * (b + b') * D)
@@ -128,8 +127,7 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     ≡⟨ pairs4 x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ ⟩
       ((((x₁ + x₂) + x₃) + x₄) + (((y₁ + y₂) + y₃) + y₄)) ∎
 
-  p-c = let open ≡-Reasoning
-            u1 = twoℚ * (a + a') * F
+  p-c = let u1 = twoℚ * (a + a') * F
             u2 = (e + e') * B
             u3 = - ((b + b') * E)
             u4 = - (twoℚ * (f + f') * A)
@@ -152,7 +150,7 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     ≡⟨ pairs4 X₁ X₂ X₃ X₄ Y₁ Y₂ Y₃ Y₄ ⟩
       ((((X₁ + X₂) + X₃) + X₄) + (((Y₁ + Y₂) + Y₃) + Y₄)) ∎
 
-  d-c = let open ≡-Reasoning in begin
+  d-c = begin
     twoℚ * (d + d') * E + - (twoℚ * (e + e') * D)
     ≡⟨ cong₂ (λ X Y → X + - Y)
              (splitSZ twoℚ E d d') (splitSZ twoℚ D e e') ⟩
@@ -160,10 +158,10 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     ≡⟨ cong ((Z₁ + Z₁') +_)
             (neg-distrib-+ ((twoℚ * e) * D) ((twoℚ * e') * D)) ⟩
     (Z₁ + Z₁') + (Z₂ + Z₂')
-    ≡⟨ pairs2 Z₁ Z₂ Z₁' Z₂' ⟩
+    ≡⟨ +interchange Z₁ Z₁' Z₂ Z₂' ⟩
     (Z₁ + Z₂) + (Z₁' + Z₂') ∎
 
-  e-c = let open ≡-Reasoning in begin
+  e-c = begin
     fourℚ * (d + d') * F + - (fourℚ * (f + f') * D)
     ≡⟨ cong₂ (λ X Y → X + - Y)
              (splitSZ fourℚ F d d') (splitSZ fourℚ D f f') ⟩
@@ -171,10 +169,10 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     ≡⟨ cong ((W₁ + W₁') +_)
             (neg-distrib-+ ((fourℚ * f) * D) ((fourℚ * f') * D)) ⟩
     (W₁ + W₁') + (W₂ + W₂')
-    ≡⟨ pairs2 W₁ W₂ W₁' W₂' ⟩
+    ≡⟨ +interchange W₁ W₁' W₂ W₂' ⟩
     (W₁ + W₂) + (W₁' + W₂') ∎
 
-  f-c = let open ≡-Reasoning in begin
+  f-c = begin
     twoℚ * (e + e') * F + - (twoℚ * (f + f') * E)
     ≡⟨ cong₂ (λ X Y → X + - Y)
              (splitSZ twoℚ F e e') (splitSZ twoℚ E f f') ⟩
@@ -182,7 +180,7 @@ bracket-addˡ (obs _ a b d e f) (obs _ a' b' d' e' f')
     ≡⟨ cong ((V₁ + V₁') +_)
             (neg-distrib-+ ((twoℚ * f) * E) ((twoℚ * f') * E)) ⟩
     (V₁ + V₁') + (V₂ + V₂')
-    ≡⟨ pairs2 V₁ V₂ V₁' V₂' ⟩
+    ≡⟨ +interchange V₁ V₁' V₂ V₂' ⟩
     (V₁ + V₂) + (V₁' + V₂') ∎
 
 ------------------------------------------------------------------------
@@ -195,24 +193,23 @@ bracket-scaleˡ : ∀ r f g →
 bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
   mkObs c-c q-c p-c d-c e-c f-c
   where
-  c-c = let open ≡-Reasoning in begin
+  c-c = begin
     (r * a) * B + - ((r * b) * A)
-    ≡⟨ cong₂ (λ X Y → X + - Y) (front {r} B a) (front {r} A b) ⟩
+    ≡⟨ cong₂ (λ X Y → X + - Y) (*-assoc r a B) (*-assoc r b A) ⟩
     r * (a * B) + - (r * (b * A))
-    ≡⟨ cong (r * (a * B) +_) (front-neg {r} (b * A)) ⟩
+    ≡⟨ cong (r * (a * B) +_) (neg-distribʳ-* r (b * A)) ⟩
     r * (a * B) + r * (- (b * A))
-    ≡⟨ factor2 {r} (a * B) (b * A) ⟩
+    ≡⟨ sym (*-distribˡ-+ r (a * B) (- (b * A))) ⟩
     r * (a * B + - (b * A)) ∎
 
-  q-c = let open ≡-Reasoning
-            u1 = (r * a) * E
+  q-c = let u1 = (r * a) * E
             u2 = (twoℚ * (r * d)) * B
             u3 = - ((r * e) * A)
             u4 = - ((twoℚ * (r * b)) * D)
-            p3 = trans (cong -_ (front {r} A e)) (front-neg {r} (e * A))
+            p3 = trans (cong -_ (*-assoc r e A)) (neg-distribʳ-* r (e * A))
         in begin
       (((u1 + u2) + u3) + u4)
-    ≡⟨ cong (λ t → (((t + u2) + u3) + u4)) (front {r} E a) ⟩
+    ≡⟨ cong (λ t → (((t + u2) + u3) + u4)) (*-assoc r a E) ⟩
       (((r * (a * E) + u2) + u3) + u4)
     ≡⟨ cong (λ t → (((r * (a * E) + t) + u3) + u4))
             (frontS {r} twoℚ B d) ⟩
@@ -227,19 +224,18 @@ bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
     ≡⟨ factor4 {r} (a * E) (twoℚ * d * B) (e * A) (twoℚ * b * D) ⟩
       r * (((a * E + twoℚ * d * B) + - (e * A)) + - (twoℚ * b * D)) ∎
 
-  p-c = let open ≡-Reasoning
-            u1 = (twoℚ * (r * a)) * F
+  p-c = let u1 = (twoℚ * (r * a)) * F
             u2 = (r * e) * B
             u3 = - ((r * b) * E)
             u4 = - ((twoℚ * (r * f)) * A)
-            p3 = trans (cong -_ (front {r} E b)) (front-neg {r} (b * E))
+            p3 = trans (cong -_ (*-assoc r b E)) (neg-distribʳ-* r (b * E))
         in begin
       (((u1 + u2) + u3) + u4)
     ≡⟨ cong (λ t → (((t + u2) + u3) + u4))
             (frontS {r} twoℚ F a) ⟩
       (((r * (twoℚ * a * F) + u2) + u3) + u4)
     ≡⟨ cong (λ t → (((r * (twoℚ * a * F) + t) + u3) + u4))
-            (front {r} B e) ⟩
+            (*-assoc r e B) ⟩
       (((r * (twoℚ * a * F) + r * (e * B)) + u3) + u4)
     ≡⟨ cong (λ t → (((r * (twoℚ * a * F) + r * (e * B)) + t) + u4)) p3 ⟩
       (((r * (twoℚ * a * F) + r * (e * B)) + r * (- (b * E))) + u4)
@@ -251,35 +247,35 @@ bracket-scaleˡ r (obs _ a b d e f) (obs _ A B D E F) =
     ≡⟨ factor4 {r} (twoℚ * a * F) (e * B) (b * E) (twoℚ * f * A) ⟩
       r * (((twoℚ * a * F + e * B) + - (b * E)) + - (twoℚ * f * A)) ∎
 
-  d-c = let open ≡-Reasoning in begin
+  d-c = begin
     (twoℚ * (r * d)) * E + - ((twoℚ * (r * e)) * D)
     ≡⟨ cong₂ (λ X Y → X + - Y)
              (frontS {r} twoℚ E d) (frontS {r} twoℚ D e) ⟩
     r * (twoℚ * d * E) + - (r * (twoℚ * e * D))
     ≡⟨ cong (r * (twoℚ * d * E) +_)
-            (front-neg {r} (twoℚ * e * D)) ⟩
+            (neg-distribʳ-* r (twoℚ * e * D)) ⟩
     r * (twoℚ * d * E) + r * (- (twoℚ * e * D))
-    ≡⟨ factor2 {r} (twoℚ * d * E) (twoℚ * e * D) ⟩
+    ≡⟨ sym (*-distribˡ-+ r (twoℚ * d * E) (- (twoℚ * e * D))) ⟩
     r * (twoℚ * d * E + - (twoℚ * e * D)) ∎
 
-  e-c = let open ≡-Reasoning in begin
+  e-c = begin
     (fourℚ * (r * d)) * F + - ((fourℚ * (r * f)) * D)
     ≡⟨ cong₂ (λ X Y → X + - Y)
              (frontS {r} fourℚ F d) (frontS {r} fourℚ D f) ⟩
     r * (fourℚ * d * F) + - (r * (fourℚ * f * D))
     ≡⟨ cong (r * (fourℚ * d * F) +_)
-            (front-neg {r} (fourℚ * f * D)) ⟩
+            (neg-distribʳ-* r (fourℚ * f * D)) ⟩
     r * (fourℚ * d * F) + r * (- (fourℚ * f * D))
-    ≡⟨ factor2 {r} (fourℚ * d * F) (fourℚ * f * D) ⟩
+    ≡⟨ sym (*-distribˡ-+ r (fourℚ * d * F) (- (fourℚ * f * D))) ⟩
     r * (fourℚ * d * F + - (fourℚ * f * D)) ∎
 
-  f-c = let open ≡-Reasoning in begin
+  f-c = begin
     (twoℚ * (r * e)) * F + - ((twoℚ * (r * f)) * E)
     ≡⟨ cong₂ (λ X Y → X + - Y)
              (frontS {r} twoℚ F e) (frontS {r} twoℚ E f) ⟩
     r * (twoℚ * e * F) + - (r * (twoℚ * f * E))
     ≡⟨ cong (r * (twoℚ * e * F) +_)
-            (front-neg {r} (twoℚ * f * E)) ⟩
+            (neg-distribʳ-* r (twoℚ * f * E)) ⟩
     r * (twoℚ * e * F) + r * (- (twoℚ * f * E))
-    ≡⟨ factor2 {r} (twoℚ * e * F) (twoℚ * f * E) ⟩
+    ≡⟨ sym (*-distribˡ-+ r (twoℚ * e * F) (- (twoℚ * f * E))) ⟩
     r * (twoℚ * e * F + - (twoℚ * f * E)) ∎

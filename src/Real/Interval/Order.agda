@@ -21,7 +21,7 @@ open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Rational.Properties using
   (+-mono-≤; neg-antimono-≤; *-assoc; *-comm; *-inverseʳ; *-inverseˡ; *-identityˡ
   ; *-identityʳ; *-zeroˡ; *-monoʳ-≤-nonNeg; *-monoˡ-<-pos; ≤-reflexive; ≤-trans
-  ; <⇒≤; ≤-<-trans; pos⇒nonZero; pos⇒nonNeg; 1/pos⇒pos; <-cmp)
+  ; <⇒≤; ≤-<-trans; pos⇒nonZero; pos⇒nonNeg; 1/pos⇒pos; <-cmp; ≮⇒≥)
   renaming (<-trans to <-transℚ; <-irrefl to <-irreflℚ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; sym; subst; module ≡-Reasoning)
@@ -29,11 +29,11 @@ open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (Tri; tri<; tri≈; tri>)
 
-open import Real using (embed; reciprocal-cong; embed-suc-pos)
+open import Real using (embed; reciprocal-cong; embed-suc-pos; embed-mono-<)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using
-  (l; u; node; width; width-n; recipPow2; bound-w; embed-mono-<; n<2^n; pos-2^t)
-open import Real.Interval.Rational using (¬<⇒≥; suc∸1; 0<2^t; pos-diff)
+  (l; u; node; width; width-n; recipPow2; bound-w; n<2^n; pos-2^t)
+open import Real.Interval.Rational using (suc∸1; 0<2^t; pos-diff)
 open import Real.Interval.Reasoning
 
 ------------------------------------------------------------------------
@@ -323,10 +323,10 @@ u-mono' r {n} {m} n≤m =
     absurd ¬uym<lzm ¬uxm<lym =
       let
         lzm≤uym : lzm ≤ uym
-        lzm≤uym = ¬<⇒≥ ¬uym<lzm
+        lzm≤uym = ≮⇒≥ ¬uym<lzm
 
         lym≤uxm : lym ≤ uxm
-        lym≤uxm = ¬<⇒≥ ¬uxm<lym
+        lym≤uxm = ≮⇒≥ ¬uxm<lym
 
         width-ym≥d : d ≤ uym - lym
         width-ym≥d =

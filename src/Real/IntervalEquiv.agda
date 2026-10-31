@@ -10,8 +10,7 @@ module Real.IntervalEquiv where
 
 open import Data.Integer using (+_; -[1+_]; +[1+_]; +0)
 import Data.Integer.Properties
-open import Data.Nat using
-  (ℕ; zero; suc; _≥_; _^_; z≤n; s≤s)
+open import Data.Nat using (ℕ; zero; suc; _≥_; _^_; z≤n; s≤s)
   renaming (_+_ to _+N_; _≤_ to _≤N_; _<_ to _<N_; _*_ to _ℕ*_)
 open import Data.Nat.Properties using
   (*-comm; *-suc; n≤1+n; *-mono-≤) renaming (≤-trans to ≤ℕ-trans; ≤-refl to ≤ℕ-refl)
@@ -20,23 +19,27 @@ open import Data.Nat.Coprimality using (Coprime)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; ∣_∣; NonZero; Positive; nonNegative; NonNegative)
+  (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _-_; _*_; ∣_∣; NonZero; Positive; nonNegative
+  ; NonNegative)
 open import Data.Rational.Base using (mkℚ; _÷_)
 open import Data.Rational.Properties using
-  (≤-reflexive; ≤-refl; ≤-trans; <⇒≤; <-≤-trans; +-inverseʳ; *-inverseʳ; *-inverseˡ
-  ; *-assoc; *-identityˡ; *-identityʳ; pos⇒nonZero; 1/pos⇒pos; pos⇒nonNeg)
-open import Data.Rational.Unnormalised.Base
-  using (ℚᵘ; mkℚᵘ; _≃_; *<*) renaming (_<_ to _<ᵘ_)
-open import Data.Rational.Unnormalised.Properties
-  using (≃-reflexive; <-respˡ-≃; <-respʳ-≃)
+  (≤-reflexive; ≤-refl; ≤-trans; <⇒≤; <-≤-trans; +-inverseʳ; *-inverseʳ
+  ; *-inverseˡ; *-assoc; *-identityˡ; *-identityʳ; pos⇒nonZero; 1/pos⇒pos
+  ; pos⇒nonNeg)
+open import Data.Rational.Unnormalised.Base using
+  (ℚᵘ; mkℚᵘ; _≃_; *<*) renaming (_<_ to _<ᵘ_)
+open import Data.Rational.Unnormalised.Properties using
+  (≃-reflexive; <-respˡ-≃; <-respʳ-≃)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; trans; sym; cong; module ≡-Reasoning)
 
 open import Real using
-  (CauchySeq; ε; embed; 2ℚ≡1+1; 2*embed; embed-suc-pos; embed-pos→≥1)
+  (CauchySeq; ε; embed; 2ℚ≡1+1; 2*embed; embed-suc-pos; embed-pos→≥1
+  ; embed-mono-<)
 open CauchySeq
 open import Real.Interval using (RealI; pos-pow)
-open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub; flip-≃)
+open import Real.Interval.Rational using
+  (suc∸1; 0<2^t; negsub; flip-≃)
 
 -- Iterate the nested-interval successor.
 --
@@ -624,20 +627,6 @@ n<2^n (suc n) =
 B<2^sucB : (B : ℕ) → B <N 2 ^ suc B
 B<2^sucB B =
   Data.Nat.Properties.<-trans (n<2^n B) (pow< B)
-
--- embed preserves strict inequalities.
---
--- embed 保持严格不等式。
-embed-mono-< : ∀ {m n} → m <N n → embed m < embed n
-embed-mono-< {m} {n} h =
-  Data.Rational.Base.*<*
-    (Data.Integer.Properties.<-≤-trans
-       (Data.Integer.Properties.≤-<-trans
-          (Data.Integer.Properties.≤-reflexive
-             (Data.Integer.Properties.*-identityʳ (+ m)))
-          (Data.Integer.+<+ h))
-       (Data.Integer.Properties.≤-reflexive
-          (sym (Data.Integer.Properties.*-identityʳ (+ n)))))
 
 pos-2^t : (t : ℕ) → Positive (embed (2 ^ t))
 pos-2^t t = Data.Rational.Base.positive (embed-mono-< (0<2^t t))

@@ -14,7 +14,7 @@ open import Data.Sum using (inj₁; inj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; _+_; _-_; _*_; _≤_; ∣_∣) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (≤-refl; ≤-reflexive; +-mono-≤; +-assoc; +-comm; +-identityˡ
+  (≤-refl; ≤-reflexive; +-mono-≤; +-assoc; +-comm; +-identityˡ; ≮⇒≥
   ; +-identityʳ; +-inverseˡ; +-inverseʳ; *-distribʳ-+; neg-antimono-≤; neg-distrib-+
   ; ∣p∣≡p∨∣p∣≡-p)
 open import Relation.Nullary using (¬_)
@@ -32,7 +32,6 @@ open import Real.Interval.Order using (_<ℝ_; <-irrefl; <-trans; <-cotrans)
 open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
 open import Real.Interval.Node using (0≤width-n; centre-add; centre-neg)
 open import Real.Interval.Kit using (≈ℝ-of-rec; ≈ℝ-of-eq)
-open import Real.Interval.Rational using (¬<⇒≥)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-sub)
 open import Real.Interval.Mul.Order using (≈-<-respʳ)
 open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
@@ -153,10 +152,10 @@ module AntisymAux (x y : RealI)
   (x≤y : x ≤ℝ y) (y≤x : y ≤ℝ x) where
 
   gap1 : ∀ n → l x n ≤ u y n
-  gap1 n = ¬<⇒≥ (λ hyp → x≤y (n , hyp))
+  gap1 n = ≮⇒≥ (λ hyp → x≤y (n , hyp))
 
   gap2 : ∀ n → l y n ≤ u x n
-  gap2 n = ¬<⇒≥ (λ hyp → y≤x (n , hyp))
+  gap2 n = ≮⇒≥ (λ hyp → y≤x (n , hyp))
 
   -- Forward centre difference bound.
   --

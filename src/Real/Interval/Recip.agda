@@ -37,18 +37,18 @@ open ≡-Reasoning
 
 open import Base.RationalRing using (neg-involutive)
 open import Real using
-  (CauchySeq; ε; embed-mono-≤; embed; embed-suc-pos; embed-*-hom; 0≤embed)
+  (CauchySeq; ε; embed-mono-≤; embed; embed-suc-pos; embed-*-hom; 0≤embed; embed-mono-<)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
 open import Real.Interval using (RealI; δ; δ-pos)
 open import Real.IntervalEquiv using
-  (l; u; l-mono; centre-l; bound-w; realI→cauchy; embed-mono-<; n<2^n)
-open import Real.CauchyToInterval using (cauchy→realI; recip-strict; K)
+  (l; u; l-mono; centre-l; bound-w; realI→cauchy; n<2^n)
+open import Real.CauchyToInterval using (cauchy→realI; K)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.Arith using (0ℝ; negℝ)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.ArithLaws using (negℝ-0ℝ)
 open import Real.Interval.Kit using
-  (*-mono-≤-nonNeg; recip-antitone; n≤2n)
+  (*-mono-≤-nonNeg; recip-antitone; n≤2n; strict-recip)
 open import Real.Interval.Node using (u-dyadic)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 open import Real.Interval.Rational using (suc∸1)
@@ -268,7 +268,7 @@ module RecipModulusSpecAux (b : ℚ) (0<b : 0ℚ < b) (k : ℕ) where
   M<sM = embed-mono-< (s≤s (≤ℕ-refl {M}))
 
   strict : ε M < (1/ embed M) {{eM-nz}}
-  strict = recip-strict eM>0 M<sM
+  strict = strict-recip (embed M) (embed (suc M)) eM>0 M<sM
 
   goal : ε M < bsq * ε k
   goal = <-≤-trans strict key3

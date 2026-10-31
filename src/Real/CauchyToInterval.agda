@@ -14,27 +14,25 @@ import Data.Nat.Properties as ℕP
 open import Data.Nat.Properties using
   (m≤m⊔n; m≤n⊔m; ^-monoʳ-≤; m≤n+m) renaming (≤-refl to ≤N-refl; ≤-trans to ≤N-trans; ≤-reflexive to ≤N-reflexive)
 open import Data.Product using (_,_)
-open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; NonNegative; NonZero; positive; nonNegative)
+open import Data.Rational using (ℚ; 0ℚ; _+_; _-_; _<_; _≤_; ∣_∣)
 open import Data.Rational.Base using (1/_; _÷_) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseʳ; +-inverseˡ; neg-distrib-+
-  ; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; <-trans; +-mono-≤
-  ; +-mono-<-≤; *-inverseʳ; pos⇒nonZero; positive⁻¹; *-cancelˡ-<-nonNeg
-  ; *-assoc; *-comm; *-identityʳ; *-identityˡ)
+  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseʳ; +-inverseˡ
+  ; neg-distrib-+; ≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-trans
+  ; +-mono-≤; +-mono-<-≤; pos⇒nonZero; positive⁻¹)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; sym; subst; subst₂; module ≡-Reasoning)
+  (_≡_; refl; cong; cong₂; sym; trans; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (neg-involutive)
-open import Real using (CauchySeq; ε; embed)
+open import Base.RationalRing using (neg-involutive; +interchange; telescope)
+open import Real using (CauchySeq; ε; embed; embed-mono-<)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
 open import Real.Interval using
   (RealI; δ; δ-half; negδ<δ; pos-pow; double-half)
 open import Real.Interval.Mul using (cancel-z; le-shift; cancelʳ)
-open import Real.Interval.Node using (mul-nonNeg)
 open import Real.Interval.Rational using (r≤|r|; -r≤|r|; sub-add)
-open import Real.IntervalEquiv using (embed-mono-<; node; centre; n<2^n)
+open import Real.IntervalEquiv using (node; centre; n<2^n)
+open import Real.Interval.Kit using (strict-recip)
 
 ------------------------------------------------------------------------
 -- Sampling index and position
@@ -80,9 +78,15 @@ centre-c x n = seq-f x (M x n)
 M-mono : (x : CauchySeq) (n : ℕ) → M x n ≤N M x (suc n)
 M-mono x n = m≤m⊔n (M x n) (seq-μ x (K (suc n)))
 
+-- The modulus at level n is dominated by M at level n+1.
+--
+-- 第 n 层模数被 M 在第 n+1 层支配。
 μ≤M-suc : (x : CauchySeq) (n : ℕ) → seq-μ x (K n) ≤N M x (suc n)
 μ≤M-suc x n = ≤N-trans (μ≤M x n) (M-mono x n)
 
+-- The sampling index is strictly below its successor.
+--
+-- 采样下标严格小于其后继。
 K<sK : (n : ℕ) → K n <N suc (K n)
 K<sK n = s≤s ≤N-refl
 
@@ -91,63 +95,17 @@ K<sK n = s≤s ≤N-refl
 --
 -- 正有理数上倒数严格反单调
 
-recip-strict : ∀ {a b : ℚ} (0<a : 0ℚ < a) (a<b : a < b) →
-  (1/ b) {{pos⇒nonZero b {{positive (<-≤-trans 0<a (<⇒≤ a<b))}}}}
-  <
-  (1/ a) {{pos⇒nonZero a {{positive 0<a}}}}
-recip-strict {a} {b} 0<a a<b =
-  *-cancelˡ-<-nonNeg (a * b) {{c-nn}}
-    (subst₂ _<_
-      (sym eq1) (sym eq2)
-      a<b)
-  where
-    0<b : 0ℚ < b
-    0<b = <-≤-trans 0<a (<⇒≤ a<b)
-
-    c-nn : NonNegative (a * b)
-    c-nn = nonNegative (mul-nonNeg (<⇒≤ 0<a) (<⇒≤ 0<b))
-
-    a-nz : NonZero a
-    a-nz = pos⇒nonZero a {{positive 0<a}}
-    b-nz : NonZero b
-    b-nz = pos⇒nonZero b {{positive 0<b}}
-
-    eq1 : (a * b) * ((1/ b) {{b-nz}}) ≡ a
-    eq1 = begin
-      (a * b) * ((1/ b) {{b-nz}})
-        ≡⟨ *-assoc a b ((1/ b) {{b-nz}}) ⟩
-      a * (b * ((1/ b) {{b-nz}}))
-        ≡⟨ cong (a *_) (*-inverseʳ b {{b-nz}}) ⟩
-      a * 1ℚ
-        ≡⟨ *-identityʳ a ⟩
-      a
-      ∎
-
-    eq2 : (a * b) * ((1/ a) {{a-nz}}) ≡ b
-    eq2 = begin
-      (a * b) * ((1/ a) {{a-nz}})
-        ≡⟨ *-assoc a b ((1/ a) {{a-nz}}) ⟩
-      a * (b * ((1/ a) {{a-nz}}))
-        ≡⟨ cong (a *_) (*-comm b ((1/ a) {{a-nz}})) ⟩
-      a * (((1/ a) {{a-nz}}) * b)
-        ≡⟨ sym (*-assoc a ((1/ a) {{a-nz}}) b) ⟩
-      (a * ((1/ a) {{a-nz}})) * b
-        ≡⟨ cong (_* b) (*-inverseʳ a {{a-nz}}) ⟩
-      1ℚ * b
-        ≡⟨ *-identityˡ b ⟩
-      b
-      ∎
-
 δ-suc≡ : ∀ n → δ (suc n)
   ≡ (1/ (embed (K n))) {{pos⇒nonZero (embed (K n)) {{pos-pow (suc n)}}}}
 δ-suc≡ n = refl
 
+-- The sampled precision is strictly below the successor tolerance.
+--
+-- 采样精度严格低于后继层容差。
 ε-K<δ-suc : ∀ n → ε (K n) < δ (suc n)
 ε-K<δ-suc n =
   subst (λ z → ε (K n) < z) (sym (δ-suc≡ n))
-    (recip-strict
-      {a = embed (K n)}
-      {b = embed (suc (K n))}
+    (strict-recip (embed (K n)) (embed (suc (K n)))
       (positive⁻¹ (embed (K n)) {{pos-pow (suc n)}})
       (embed-mono-< (K<sK n)))
 
@@ -171,6 +129,9 @@ module _ (x : CauchySeq) where
         (μ≤M x n) (μ≤M-suc x n))
       (ε-K<δ-suc n)
 
+  -- A difference of successive tolerances equals the successor tolerance.
+  --
+  -- 相邻容差之差等于后继容差。
   dn-dsn≡dsn : ∀ n → δ n - δ (suc n) ≡ δ (suc n)
   dn-dsn≡dsn n = begin
     δ n - δ (suc n)
@@ -180,49 +141,20 @@ module _ (x : CauchySeq) where
     δ (suc n)
       ∎
 
-  sub-shift : ∀ a b c d → a - b ≤ c - d → a - c ≤ b - d
-  sub-shift a b c d h =
+  -- Rearranging a difference inequality.
+  --
+  -- 重排差值不等式。
+  sub-shift : ∀ x y z w → x - y ≤ z - w → x - z ≤ y - w
+  sub-shift x y z w h =
     subst₂ _≤_
-      lhs-eq
-      rhs-eq
-      (+-mono-≤ h (≤-refl {b - c}))
-    where
-      lhs-eq : (a - b) + (b - c) ≡ a - c
-      lhs-eq = begin
-        (a - b) + (b - c)
-          ≡⟨⟩
-        (a + neg b) + (b + neg c)
-          ≡⟨ +-assoc a (neg b) (b + neg c) ⟩
-        a + (neg b + (b + neg c))
-          ≡⟨ cong (a +_) (sym (+-assoc (neg b) b (neg c))) ⟩
-        a + ((neg b + b) + neg c)
-          ≡⟨ cong (a +_) (cong (_+ neg c) (+-inverseˡ b)) ⟩
-        a + (0ℚ + neg c)
-          ≡⟨ cong (a +_) (+-identityˡ (neg c)) ⟩
-        a + neg c
-          ≡⟨⟩
-        a - c
-        ∎
+      (telescope x y z)
+      (trans (+-comm (z - w) (y - z)) (telescope y z w))
+      (+-mono-≤ h (≤-refl {y - z}))
 
-      rhs-eq : (c - d) + (b - c) ≡ b - d
-      rhs-eq = begin
-        (c - d) + (b - c)
-          ≡⟨⟩
-        (c + neg d) + (b + neg c)
-          ≡⟨ +-comm (c + neg d) (b + neg c) ⟩
-        (b + neg c) + (c + neg d)
-          ≡⟨ +-assoc b (neg c) (c + neg d) ⟩
-        b + (neg c + (c + neg d))
-          ≡⟨ cong (b +_) (sym (+-assoc (neg c) c (neg d))) ⟩
-        b + ((neg c + c) + neg d)
-          ≡⟨ cong (b +_) (cong (_+ neg d) (+-inverseˡ c)) ⟩
-        b + (0ℚ + neg d)
-          ≡⟨ cong (b +_) (+-identityˡ (neg d)) ⟩
-        b + neg d
-          ≡⟨⟩
-        b - d
-        ∎
-
+  -- The nested-interval real built from the sampled centres and the
+  -- dyadic tolerances.
+  --
+  -- 由采样中心与二进容差构造的嵌套区间实数。
   go : ℕ → RealI
   RealI.l (go n)  = a n - δ n
   RealI.u (go n)  = a n + δ n
@@ -288,6 +220,9 @@ module _ (x : CauchySeq) where
                 ∎
         in subst (λ z → asn + dsn ≤ z) eq h2
 
+      -- A sum minus the corresponding difference equals the doubled second term.
+      --
+      -- 和减去差等于第二项的两倍。
       diff-sum : ∀ x y → (x + y) - (x - y) ≡ y + y
       diff-sum x y = begin
         (x + y) - (x - y)
@@ -298,8 +233,7 @@ module _ (x : CauchySeq) where
           0ℚ + (y + y) ≡⟨ +-identityˡ (y + y) ⟩ y + y ∎
         where
           sub-neg : ∀ z → z - neg z ≡ z + z
-          sub-neg z = begin
-            z - neg z ≡⟨⟩ z + neg (neg z) ≡⟨ cong (z +_) (neg-involutive z) ⟩ z + z ∎
+          sub-neg z = cong (z +_) (neg-involutive z)
 
       nest3 : (asn + dsn) - (asn - dsn) ≤ (dn + dn) ÷ embed 2
       nest3 =
@@ -381,31 +315,23 @@ centre-cauchy→realI x n = begin
     cancel-dn : ∀ a d → (a - d) + (a + d) ≡ a + a
     cancel-dn a d = begin
       (a - d) + (a + d)
-        ≡⟨ +-assoc a (neg d) (a + d) ⟩
-      a + (neg d + (a + d))
-        ≡⟨ cong (a +_) (sym (+-assoc (neg d) a d)) ⟩
-      a + ((neg d + a) + d)
-        ≡⟨ cong (a +_) (cong (_+ d) (+-comm (neg d) a)) ⟩
-      a + ((a + neg d) + d)
-        ≡⟨ cong (a +_) (+-assoc a (neg d) d) ⟩
-      a + (a + (neg d + d))
-        ≡⟨ cong (a +_) (cong (a +_) (+-inverseˡ d)) ⟩
-      a + (a + 0ℚ)
-        ≡⟨ cong (a +_) (+-identityʳ a) ⟩
+        ≡⟨ refl ⟩
+      (a + neg d) + (a + d)
+        ≡⟨ +interchange a (neg d) a d ⟩
+      (a + a) + (neg d + d)
+        ≡⟨ cong ((a + a) +_) (+-inverseˡ d) ⟩
+      (a + a) + 0ℚ
+        ≡⟨ +-identityʳ (a + a) ⟩
       a + a
       ∎
 
 ------------------------------------------------------------------------
--- Modulus lemmas: M dominates the sampled modulus and K dominates the
--- identity.
+-- Modulus lemmas
 --
 -- 模数性质
+
+-- The sampling index dominates the identity.
 --
--- M 支配采样模数，K 支配恒等。
-
-M≥μK : (x : CauchySeq) (n : ℕ) → M x n ≥ seq-μ x (K n)
-M≥μK x zero    = ≤N-refl
-M≥μK x (suc n) = m≤n⊔m (M x n) (seq-μ x (K (suc n)))
-
+-- 采样下标支配恒等。
 K≥k : (k : ℕ) → K k ≥ k
 K≥k k = ≤N-trans (ℕP.<⇒≤ (n<2^n k)) (^-monoʳ-≤ 2 (m≤n+m k 2))

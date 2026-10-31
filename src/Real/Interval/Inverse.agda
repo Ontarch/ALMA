@@ -52,7 +52,7 @@ open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.Recip using
   (recipℝ; recipℝ'; recipCauchy; realI→posCauchy; PosCauchy; recip-modulus
   ; embed-n≥2b²; 2n*b²≤4^n; recip-modulus-≥2n)
-open import Real.CauchyToInterval using (M; K; M≥μK; centre-cauchy→realI)
+open import Real.CauchyToInterval using (M; K; μ≤M; centre-cauchy→realI)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 open import Real.Interval.Reasoning.Equiv
 
@@ -234,7 +234,7 @@ module ReciprocalSetup (x : RealI) (0<x : 0ℝ <ℝ x) where
   Mcs≥2n n n≥N =
     ≤ℕ-trans (≤ℕ-trans (recip-modulus-≥2n-inst n n≥N)
                        (μx-dom x r))
-             (M≥μK cs (2 ℕ* n))
+             (μ≤M cs (2 ℕ* n))
     where
       r = recip-modulus b 0<b (K (2 ℕ* n))
 

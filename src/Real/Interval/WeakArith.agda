@@ -30,7 +30,7 @@ open ≡-Reasoning
 open import Base.RationalRing using (0<1; neg-involutive)
 open import Real using
   (ε; embed; half; embed-suc-nonZero; 2ℚ; 2*embed; halve; embed-*; 0<embed
-  ; reciprocal-cong; 1/embed; embed-mono-<; embed-mono-≤; embed-+-hom)
+  ; reciprocal-cong; embed-mono-<; embed-mono-≤; embed-+-hom)
 open import Real.IntervalEquiv using (recipPow2; n<2^n; 1≤2^n)
 open import Real.Interval.Kit using (strict-recip)
 
@@ -437,7 +437,7 @@ double-recip k =
       + (1/ (2ℚ * embed (suc k))) {{nz-2p}}
       ≡⟨ halve (embed (suc k)) {{nz-p}} {{nz-2p}} ⟩
     (1/ embed (suc k)) {{nz-p}}
-      ≡⟨ 1/embed k ⟩
+      ≡⟨ refl ⟩
     ε k
       ∎
 
@@ -654,10 +654,8 @@ base-go k u 0<u u≡ e2u e4u enx =
     eq2 = reciprocal-cong next (embed (suc (2 *ℕ suc k)))
             {{nz-nx}} {{nz-Enx}} enx
     eq3 : c ≡ ε k
-    eq3 = trans
-            (reciprocal-cong u (embed (suc k))
-              {{nz-u}} {{embed-suc-nonZero {k}}} u≡)
-            (1/embed k)
+    eq3 = reciprocal-cong u (embed (suc k))
+            {{nz-u}} {{embed-suc-nonZero {k}}} u≡
     s1 = subst (λ x → x + b < c) eq1 gen
     s2 = subst (λ x → (1/ embed (4 *ℕ suc k)) {{nz-E4}} + x < c) eq2 s1
     s3 = subst (λ x → (1/ embed (4 *ℕ suc k)) {{nz-E4}}

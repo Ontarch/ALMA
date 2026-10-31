@@ -10,17 +10,19 @@ module Real.Interval.AbsTriangle where
 
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
-open import Data.Nat using (ℕ; suc; _⊔_) renaming (_+_ to _+N_; _≤_ to _≤N_)
+open import Data.Nat using (ℕ; suc)
+  renaming (_⊔_ to _⊔N_; _+_ to _+N_; _≤_ to _≤N_)
 open import Data.Nat.Properties using (m≤n⊔m; m≤m⊔n; +-suc; +-identityʳ)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; _≥_; ∣_∣; positive) renaming (-_ to neg)
+  (ℚ; 0ℚ; 1ℚ; _⊔_; _+_; _-_; _*_; _≤_; _<_; _≥_; ∣_∣; positive)
+  renaming (-_ to neg)
 open import Data.Rational.Base using (nonNegative)
 open import Data.Rational.Properties as QP using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; +-mono-≤; +-mono-<-≤; +-comm; +-assoc
   ; +-identityˡ; +-inverseʳ; +-inverseˡ; *-assoc; *-identityˡ; *-identityʳ
   ; *-distribʳ-+; *-distribˡ-+; pos⇒nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣p-q∣≤∣p∣+∣q∣
   ; 0≤∣p∣; 0≤p⇒∣p∣≡p; ∣-p∣≡∣p∣; *-monoˡ-≤-nonNeg; ≤-total; neg-distrib-+
-  ; neg-antimono-≤; neg-antimono-<; ∣p*q∣≡∣p∣*∣q∣)
+  ; neg-antimono-≤; neg-antimono-<; ∣p*q∣≡∣p∣*∣q∣; p≤q⊔p; ⊔-lub)
 open import Function.Base using (case_of_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
@@ -38,7 +40,6 @@ open import Real.Interval.Node using
   (centre-add; 0≤width-n; l-hom; u-hom; l-neg; u-neg)
 open import Real.Interval.Abs using
   (∣_∣ℝ; absLo; absHi; lo-pos; hi-pos; lo-neg; hi-neg; lo-mid)
-open import Real.Interval.Rational using (max; ≤maxʳ; max≤)
 open import Real.Interval.Kit using
   (≈ℝ-of-rec; half+half≡1; 0≤recipPow2; recipPow2-mul; recipPow2-n≤1
   ; recipPow2-≤; halveQ; half≥0'; halveQ-mono; 0≤halveQ; halveQ-distrib
@@ -118,13 +119,13 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
           p≥0 = 0≤u
           q≥0 = neg-of-nonpos l≤0
           lp = lo-mid l≤0 p≥0
-          A≡ : halveQ (absLo l u + absHi l u) ≡ halveQ (max p q)
+          A≡ : halveQ (absLo l u + absHi l u) ≡ halveQ (p ⊔ q)
           A≡ = begin
             halveQ (absLo l u + absHi l u)
               ≡⟨ cong (λ z → halveQ (z + absHi l u)) lp ⟩
             halveQ (0ℚ + absHi l u)
               ≡⟨ cong halveQ (+-identityˡ (absHi l u)) ⟩
-            halveQ (max p q) ∎
+            halveQ (p ⊔ q) ∎
           s≡ : l + u ≡ p - q
           s≡ = begin l + u
             ≡⟨ +-comm l u ⟩ u + l
@@ -141,8 +142,8 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
             ∣ p - q ∣ * half
               ≡⟨ refl ⟩
             halveQ ∣ p - q ∣ ∎
-          max≤pq : max p q ≤ p + q
-          max≤pq = max≤ (begin≤ p
+          max≤pq : p ⊔ q ≤ p + q
+          max≤pq = ⊔-lub (begin≤ p
                           ≤⟨ ≤-reflexive (sym (QP.+-identityʳ p)) ⟩ p + 0ℚ
                           ≤⟨ +-mono-≤ (≤-refl {p}) q≥0 ⟩ p + q ≤∎)
                         (begin≤ q
@@ -154,13 +155,13 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
             ≤⟨ ∣p-q∣≤∣p∣+∣q∣ p q ⟩ ∣ p ∣ + ∣ q ∣
             ≤⟨ ≤-reflexive (cong₂ _+_ (0≤p⇒∣p∣≡p p≥0) (0≤p⇒∣p∣≡p q≥0)) ⟩
             p + q ≤∎
-          0≤max : 0ℚ ≤ max p q
+          0≤max : 0ℚ ≤ p ⊔ q
           0≤max = begin≤ 0ℚ
             ≤⟨ q≥0 ⟩ q
-            ≤⟨ ≤maxʳ p q ⟩ max p q ≤∎
-          bound : ∣ halveQ (max p q) - halveQ ∣ p - q ∣ ∣ ≤ p + q
+            ≤⟨ p≤q⊔p p q ⟩ p ⊔ q ≤∎
+          bound : ∣ halveQ (p ⊔ q) - halveQ ∣ p - q ∣ ∣ ≤ p + q
           bound =
-            let a = halveQ (max p q)
+            let a = halveQ (p ⊔ q)
                 b = halveQ ∣ p - q ∣
                 s1 : ∣ a ∣ + ∣ b ∣ ≤ a + b
                 s1 = ≤-reflexive
@@ -177,10 +178,10 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
                        ≡⟨ *-identityʳ x ⟩ x ∎
             in ≤-trans (∣p-q∣≤∣p∣+∣q∣ a b)
                        (≤-trans s1 (≤-trans s2 s3))
-          eq : halveQ (absLo l u + absHi l u) ≡ halveQ (max p q)
+          eq : halveQ (absLo l u + absHi l u) ≡ halveQ (p ⊔ q)
           eq = A≡
           X = halveQ (absLo l u + absHi l u)
-          Y = halveQ (max p q)
+          Y = halveQ (p ⊔ q)
           Z = ∣ halveQ (l + u) ∣
           W = halveQ ∣ p - q ∣
           diff-eq : ∣ X - Z ∣ ≡ ∣ Y - W ∣
@@ -368,7 +369,8 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
            in subst (λ z → A ≤ z) (sym t6right) t6
      in move-≤-back t6'
 
--- Non-strict order from a recursive centre bound.
+------------------------------------------------------------------------
+-- Non-strict order from a recursive centre bound
 --
 -- If the centre gap is bounded by a decaying geometric series at every
 -- level, then A ≤ℝ B.  Contrapositively, B < A gives a fixed positive
@@ -395,7 +397,7 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
       tb = tail-bound C 0≤C d 0<d
       m0 = proj₁ tb
       h2 = proj₂ tb
-      m = n0 ⊔ m0
+      m = n0 ⊔N m0
       m0≤m : m0 ≤N m
       m0≤m = m≤n⊔m n0 m0
       m≥n0 : n0 ≤N m
@@ -461,7 +463,8 @@ l0ℝ n =
         in e)
 
 labs-nonneg : (x : RealI) (n : ℕ) → 0ℚ ≤ RealI.l (node ∣ x ∣ℝ n)
-labs-nonneg x 0 = ≤maxʳ (max (RealI.l x) (neg (RealI.u x))) 0ℚ
+labs-nonneg x 0 =
+  p≤q⊔p (RealI.l x ⊔ neg (RealI.u x)) 0ℚ
 labs-nonneg x (suc n) =
   let nx = RealI.next (RealI.next x)
       eq : node ∣ x ∣ℝ (suc n) ≡ node ∣ nx ∣ℝ n

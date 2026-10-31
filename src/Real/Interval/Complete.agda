@@ -23,7 +23,7 @@ open import Real using (CauchySeq; half; ε; 0<ε)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (width; centre; centre-diff)
 open import Real.CauchyToInterval using
-  (cauchy→realI; M; centre-cauchy→realI; K; M≥μK; K≥k)
+  (cauchy→realI; M; centre-cauchy→realI; K; μ≤M; K≥k)
 open import Real.Interval.Kit using (0<half; two-half; tri-diff)
 
 ------------------------------------------------------------------------
@@ -174,7 +174,7 @@ complete f cf k = N , proof
 
     j≥μk : j ≥ μ k
     j≥μk = ≤ℕ-trans (μ-mono k (K k) (K≥k k))
-                    (M≥μK cs k)
+                    (μ≤M cs k)
 
     centre-L : centre L k ≡ centre (f j) j
     centre-L = centre-cauchy→realI cs k

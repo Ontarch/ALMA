@@ -34,10 +34,10 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (0<1)
+open import Base.RationalRing using (0<1; telescope)
 open import Real using
   (embed; half; embed2-nonZero; 2ℚ; 2ℚ≡1+1; ε; 0<ε; embed-mono-≤; embed-suc-pos
-  ; 0<embed; telescope; embed-mono-<; reciprocal-cong; embed-*-hom)
+  ; 0<embed; embed-mono-<; reciprocal-cong; embed-*-hom)
 open import Real.Interval using (RealI)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using

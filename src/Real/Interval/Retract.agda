@@ -22,7 +22,7 @@ open import Real.Interval.Node using (0≤width-n)
 open import Real.IntervalEquiv using
   (realI→cauchy; μx-dom; centre; width; recipPow2; centre-diff≤)
 open import Real.CauchyToInterval using
-  (cauchy→realI; M; K; M≥μK; K≥k; centre-cauchy→realI)
+  (cauchy→realI; M; K; μ≤M; K≥k; centre-cauchy→realI)
 open import Real.Interval.Kit using (≈ℝ-of-rec)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 
@@ -59,7 +59,7 @@ cauchy→realI-retract x = ≈ℝ-of-rec y x w0 0≤w0 bound
   Mn≥n : ∀ n → n ≤N M r n
   Mn≥n n =
     ≤N-trans (K≥k n)
-    (≤N-trans (μx-dom x (K n)) (M≥μK r n))
+    (≤N-trans (μx-dom x (K n)) (μ≤M r n))
 
   eq : ∀ n → centre y n ≡ centre x (M r n)
   eq n = trans (centre-cauchy→realI r n) refl

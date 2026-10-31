@@ -8,19 +8,19 @@
 
 module Real.Interval.Mul.Order where
 
-open import Data.Nat using
-  (ℕ; zero; suc; _⊔_; _^_; s≤s; z≤n; _≥_)
-  renaming (_≤_ to _≤ℕ_; _<_ to _<ℕ_; _+_ to _+ℕ_; _*_ to _ℕ*_)
+open import Data.Nat using (ℕ; zero; suc; _^_; s≤s; z≤n; _≥_)
+  renaming (_⊔_ to _⊔ℕ_; _≤_ to _≤ℕ_; _<_ to _<ℕ_; _+_ to _+ℕ_; _*_ to _ℕ*_)
 open import Data.Nat.Properties using
   (m≤m⊔n; m≤n⊔m; *-suc; m<m+n; m≤m+n; ^-monoʳ-≤; *-monoʳ-≤)
   renaming (≤-trans to ≤ℕ-trans; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Rational using
-  (ℚ; 0ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; positive) renaming (-_ to neg)
+  (ℚ; 0ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _<_; _≤_; ∣_∣; positive) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-identityʳ; neg-distrib-+; neg-distribˡ-*; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans
-  ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; pos*pos⇒pos; positive⁻¹; ∣-p∣≡∣p∣
-  ; ∣p+q∣≤∣p∣+∣q∣; neg-antimono-<; +-mono-<)
+  (+-identityʳ; neg-distrib-+; neg-distribˡ-*; ≤-trans; <⇒≤; ≤-<-trans
+  ; <-≤-trans; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; pos*pos⇒pos; positive⁻¹
+  ; ∣-p∣≡∣p∣; ∣p+q∣≤∣p∣+∣q∣; neg-antimono-<; +-mono-<; p≤q⇒p⊓q≡p
+  ; ⊓-comm; ⊔-comm)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; cong; cong₂; sym; subst; subst₂)
 open import Relation.Binary.PropositionalEquality.Properties using (module ≡-Reasoning)
@@ -42,8 +42,7 @@ open import Real.Interval.ArithLaws using
 open import Real.Interval.Mul.Laws using (*ℝ-distribʳ-+)
 open import Real.Interval.Kit using
   (n≤2n; *-mono-≤-nonNeg; recip-antitone; ≈ℝ-of-eq)
-open import Real.Interval.Rational using
-  (min; max; min-le; sub-add; max-neg; min-neg; min-min-swap; max-max-swap)
+open import Real.Interval.Rational using (sub-add; max-neg; min-neg)
 
 ------------------------------------------------------------------------
 -- Auxiliary lemmas
@@ -105,27 +104,27 @@ private
       (embed-mono-≤ (^-monoʳ-≤ 2 (s≤s j≤K)))
 
   neg-max4 : ∀ a b c d →
-    neg (max (max a b) (max c d))
-    ≡ min (min (neg a) (neg b)) (min (neg c) (neg d))
+    neg (((a ⊔ b) ⊔ (c ⊔ d)))
+    ≡ ((neg a ⊓ neg b) ⊓ (neg c ⊓ neg d))
   neg-max4 a b c d =
     begin
-      neg (max (max a b) (max c d))
-    ≡⟨ sym (min-neg (max a b) (max c d)) ⟩
-      min (neg (max a b)) (neg (max c d))
-    ≡⟨ sym (cong₂ min (min-neg a b) (min-neg c d)) ⟩
-      min (min (neg a) (neg b)) (min (neg c) (neg d))
+      neg (((a ⊔ b) ⊔ (c ⊔ d)))
+    ≡⟨ sym (min-neg (a ⊔ b) (c ⊔ d)) ⟩
+      neg (a ⊔ b) ⊓ neg (c ⊔ d)
+    ≡⟨ sym (cong₂ _⊓_ (min-neg a b) (min-neg c d)) ⟩
+      (neg a ⊓ neg b) ⊓ (neg c ⊓ neg d)
     ∎
 
   neg-min4 : ∀ a b c d →
-    neg (min (min a b) (min c d))
-    ≡ max (max (neg a) (neg b)) (max (neg c) (neg d))
+    neg (((a ⊓ b) ⊓ (c ⊓ d)))
+    ≡ ((neg a ⊔ neg b) ⊔ (neg c ⊔ neg d))
   neg-min4 a b c d =
     begin
-      neg (min (min a b) (min c d))
-    ≡⟨ sym (max-neg (min a b) (min c d)) ⟩
-      max (neg (min a b)) (neg (min c d))
-    ≡⟨ sym (cong₂ max (max-neg a b) (max-neg c d)) ⟩
-      max (max (neg a) (neg b)) (max (neg c) (neg d))
+      neg (((a ⊓ b) ⊓ (c ⊓ d)))
+    ≡⟨ sym (max-neg (a ⊓ b) (c ⊓ d)) ⟩
+      neg (a ⊓ b) ⊔ neg (c ⊓ d)
+    ≡⟨ sym (cong₂ _⊔_ (max-neg a b) (max-neg c d)) ⟩
+      (neg a ⊔ neg b) ⊔ (neg c ⊔ neg d)
     ∎
 
   l-prod-pos : (a b : RealI) →
@@ -144,12 +143,12 @@ private
                 {{nn (≤-trans 0≤La (<⇒≤ (RealI.lo a)))}}
                 (<⇒≤ (RealI.lo b))
     in   begin
-            min (min c1 c2) (min c3 c4)
-          ≡⟨ cong (λ z → min z (min c3 c4)) (min-le c1≤c2) ⟩
-            min c1 (min c3 c4)
-          ≡⟨ cong (min c1) (min-le c3≤c4) ⟩
-            min c1 c3
-          ≡⟨ min-le c1≤c3 ⟩
+            (c1 ⊓ c2) ⊓ (c3 ⊓ c4)
+          ≡⟨ cong (λ z → z ⊓ (c3 ⊓ c4)) (p≤q⇒p⊓q≡p c1≤c2) ⟩
+            c1 ⊓ (c3 ⊓ c4)
+          ≡⟨ cong (c1 ⊓_) (p≤q⇒p⊓q≡p c3≤c4) ⟩
+            c1 ⊓ c3
+          ≡⟨ p≤q⇒p⊓q≡p c1≤c3 ⟩
             c1
           ∎
 
@@ -228,49 +227,41 @@ private
 
 private
   neg-max-min : ∀ La Ua Lb Ub →
-    neg (max (max (La * Lb) (La * Ub)) (max (Ua * Lb) (Ua * Ub)))
-    ≡ min (min ((neg Ua) * Lb) ((neg Ua) * Ub))
-          (min ((neg La) * Lb) ((neg La) * Ub))
+    neg (((La * Lb) ⊔ (La * Ub)) ⊔ ((Ua * Lb) ⊔ (Ua * Ub)))
+    ≡ (((neg Ua * Lb) ⊓ (neg Ua * Ub)) ⊓ ((neg La * Lb) ⊓ (neg La * Ub)))
   neg-max-min La Ua Lb Ub =
     begin
-      neg (max (max (La * Lb) (La * Ub)) (max (Ua * Lb) (Ua * Ub)))
+      neg (((La * Lb) ⊔ (La * Ub)) ⊔ ((Ua * Lb) ⊔ (Ua * Ub)))
     ≡⟨ neg-max4 (La * Lb) (La * Ub) (Ua * Lb) (Ua * Ub) ⟩
-      min (min (neg (La * Lb)) (neg (La * Ub)))
-          (min (neg (Ua * Lb)) (neg (Ua * Ub)))
-    ≡⟨ cong₂ (λ p q → min p q)
-            (cong₂ (λ p q → min p q)
+      (neg (La * Lb) ⊓ neg (La * Ub)) ⊓ (neg (Ua * Lb) ⊓ neg (Ua * Ub))
+    ≡⟨ cong₂ _⊓_
+            (cong₂ _⊓_
                     (neg-distribˡ-* La Lb) (neg-distribˡ-* La Ub))
-            (cong₂ (λ p q → min p q)
+            (cong₂ _⊓_
                     (neg-distribˡ-* Ua Lb) (neg-distribˡ-* Ua Ub)) ⟩
-      min (min ((neg La) * Lb) ((neg La) * Ub))
-          (min ((neg Ua) * Lb) ((neg Ua) * Ub))
-    ≡⟨ min-min-swap ((neg La) * Lb) ((neg La) * Ub)
-                    ((neg Ua) * Lb) ((neg Ua) * Ub) ⟩
-      min (min ((neg Ua) * Lb) ((neg Ua) * Ub))
-          (min ((neg La) * Lb) ((neg La) * Ub))
+      ((neg La * Lb) ⊓ (neg La * Ub)) ⊓ ((neg Ua * Lb) ⊓ (neg Ua * Ub))
+    ≡⟨ ⊓-comm (((neg La) * Lb) ⊓ ((neg La) * Ub))
+                (((neg Ua) * Lb) ⊓ ((neg Ua) * Ub)) ⟩
+      ((neg Ua * Lb) ⊓ (neg Ua * Ub)) ⊓ ((neg La * Lb) ⊓ (neg La * Ub))
     ∎
 
   neg-min-max : ∀ La Ua Lb Ub →
-    neg (min (min (La * Lb) (La * Ub)) (min (Ua * Lb) (Ua * Ub)))
-    ≡ max (max ((neg Ua) * Lb) ((neg Ua) * Ub))
-          (max ((neg La) * Lb) ((neg La) * Ub))
+    neg (((La * Lb) ⊓ (La * Ub)) ⊓ ((Ua * Lb) ⊓ (Ua * Ub)))
+    ≡ (((neg Ua * Lb) ⊔ (neg Ua * Ub)) ⊔ ((neg La * Lb) ⊔ (neg La * Ub)))
   neg-min-max La Ua Lb Ub =
     begin
-      neg (min (min (La * Lb) (La * Ub)) (min (Ua * Lb) (Ua * Ub)))
+      neg (((La * Lb) ⊓ (La * Ub)) ⊓ ((Ua * Lb) ⊓ (Ua * Ub)))
     ≡⟨ neg-min4 (La * Lb) (La * Ub) (Ua * Lb) (Ua * Ub) ⟩
-      max (max (neg (La * Lb)) (neg (La * Ub)))
-          (max (neg (Ua * Lb)) (neg (Ua * Ub)))
-    ≡⟨ cong₂ (λ p q → max p q)
-            (cong₂ (λ p q → max p q)
+      (neg (La * Lb) ⊔ neg (La * Ub)) ⊔ (neg (Ua * Lb) ⊔ neg (Ua * Ub))
+    ≡⟨ cong₂ _⊔_
+            (cong₂ _⊔_
                     (neg-distribˡ-* La Lb) (neg-distribˡ-* La Ub))
-            (cong₂ (λ p q → max p q)
+            (cong₂ _⊔_
                     (neg-distribˡ-* Ua Lb) (neg-distribˡ-* Ua Ub)) ⟩
-      max (max ((neg La) * Lb) ((neg La) * Ub))
-          (max ((neg Ua) * Lb) ((neg Ua) * Ub))
-    ≡⟨ max-max-swap ((neg La) * Lb) ((neg La) * Ub)
-                    ((neg Ua) * Lb) ((neg Ua) * Ub) ⟩
-      max (max ((neg Ua) * Lb) ((neg Ua) * Ub))
-          (max ((neg La) * Lb) ((neg La) * Ub))
+      ((neg La * Lb) ⊔ (neg La * Ub)) ⊔ ((neg Ua * Lb) ⊔ (neg Ua * Ub))
+    ≡⟨ ⊔-comm (((neg La) * Lb) ⊔ ((neg La) * Ub))
+                (((neg Ua) * Lb) ⊔ ((neg Ua) * Ub)) ⟩
+      ((neg Ua * Lb) ⊔ (neg Ua * Ub)) ⊔ ((neg La * Lb) ⊔ (neg La * Ub))
     ∎
 
 negℝ-*ℝ : (x y : RealI) → negℝ (x *ℝ y) ≈ℝ (negℝ x) *ℝ y
@@ -286,39 +277,35 @@ negℝ-*ℝ x y = ≈ℝ-of-eq _ _ centre-eq
 
         LHS-unfold :
           RealI.l (node (negℝ (x *ℝ y)) n)
-          ≡ neg (max (max (La * Lb) (La * Ub)) (max (Ua * Lb) (Ua * Ub)))
+          ≡ neg (((La * Lb) ⊔ (La * Ub)) ⊔ ((Ua * Lb) ⊔ (Ua * Ub)))
         LHS-unfold =
           begin
             RealI.l (node (negℝ (x *ℝ y)) n)
           ≡⟨ cong RealI.l (node-negℝ (x *ℝ y) n) ⟩
             RealI.l (negℝ (node (x *ℝ y) n))
           ≡⟨ cong (λ Z → neg (RealI.u Z)) (node-*ℝ x y n) ⟩
-            neg (max (max (La * Lb) (La * Ub)) (max (Ua * Lb) (Ua * Ub)))
+            neg (((La * Lb) ⊔ (La * Ub)) ⊔ ((Ua * Lb) ⊔ (Ua * Ub)))
           ∎
 
         RHS-unfold :
           RealI.l (node ((negℝ x) *ℝ y) n)
-          ≡ min (min ((neg Ua) * Lb) ((neg Ua) * Ub))
-                (min ((neg La) * Lb) ((neg La) * Ub))
+          ≡ ((neg Ua * Lb) ⊓ (neg Ua * Ub)) ⊓ ((neg La * Lb) ⊓ (neg La * Ub))
         RHS-unfold =
           begin
             RealI.l (node ((negℝ x) *ℝ y) n)
           ≡⟨ cong RealI.l (node-*ℝ (negℝ x) y n) ⟩
             RealI.l (node (negℝ x) (2 ℕ* n) *ℝ node y (2 ℕ* n))
-          ≡⟨ cong₂ (λ p q → min (min (p * Lb) (p * Ub))
-                              (min (q * Lb) (q * Ub)))
+          ≡⟨ cong₂ (λ p q → ((p * Lb) ⊓ (p * Ub)) ⊓ ((q * Lb) ⊓ (q * Ub)))
                   (cong RealI.l (node-negℝ x (2 ℕ* n)))
                   (cong RealI.u (node-negℝ x (2 ℕ* n))) ⟩
-            min (min ((neg Ua) * Lb) ((neg Ua) * Ub))
-                (min ((neg La) * Lb) ((neg La) * Ub))
+            ((neg Ua * Lb) ⊓ (neg Ua * Ub)) ⊓ ((neg La * Lb) ⊓ (neg La * Ub))
           ∎
       in  begin
             RealI.l (node (negℝ (x *ℝ y)) n)
           ≡⟨ LHS-unfold ⟩
-            neg (max (max (La * Lb) (La * Ub)) (max (Ua * Lb) (Ua * Ub)))
+            neg (((La * Lb) ⊔ (La * Ub)) ⊔ ((Ua * Lb) ⊔ (Ua * Ub)))
           ≡⟨ neg-max-min La Ua Lb Ub ⟩
-            min (min ((neg Ua) * Lb) ((neg Ua) * Ub))
-                (min ((neg La) * Lb) ((neg La) * Ub))
+            ((neg Ua * Lb) ⊓ (neg Ua * Ub)) ⊓ ((neg La * Lb) ⊓ (neg La * Ub))
           ≡˘⟨ RHS-unfold ⟩
             RealI.l (node ((negℝ x) *ℝ y) n)
           ∎
@@ -333,37 +320,33 @@ negℝ-*ℝ x y = ≈ℝ-of-eq _ _ centre-eq
 
         LHS-unfold :
           RealI.u (node (negℝ (x *ℝ y)) n)
-          ≡ neg (min (min (La * Lb) (La * Ub)) (min (Ua * Lb) (Ua * Ub)))
+          ≡ neg (((La * Lb) ⊓ (La * Ub)) ⊓ ((Ua * Lb) ⊓ (Ua * Ub)))
         LHS-unfold = begin
           RealI.u (node (negℝ (x *ℝ y)) n)
             ≡⟨ cong RealI.u (node-negℝ (x *ℝ y) n) ⟩
           RealI.u (negℝ (node (x *ℝ y) n))
             ≡⟨ cong (λ Z → neg (RealI.l Z)) (node-*ℝ x y n) ⟩
-          neg (min (min (La * Lb) (La * Ub)) (min (Ua * Lb) (Ua * Ub)))
+          neg (((La * Lb) ⊓ (La * Ub)) ⊓ ((Ua * Lb) ⊓ (Ua * Ub)))
             ∎
 
         RHS-unfold :
           RealI.u (node ((negℝ x) *ℝ y) n)
-          ≡ max (max ((neg Ua) * Lb) ((neg Ua) * Ub))
-                (max ((neg La) * Lb) ((neg La) * Ub))
+          ≡ ((neg Ua * Lb) ⊔ (neg Ua * Ub)) ⊔ ((neg La * Lb) ⊔ (neg La * Ub))
         RHS-unfold = begin
           RealI.u (node ((negℝ x) *ℝ y) n)
             ≡⟨ cong RealI.u (node-*ℝ (negℝ x) y n) ⟩
           RealI.u (node (negℝ x) (2 ℕ* n) *ℝ node y (2 ℕ* n))
-            ≡⟨ cong₂ (λ p q → max (max (p * Lb) (p * Ub))
-                                  (max (q * Lb) (q * Ub)))
+            ≡⟨ cong₂ (λ p q → ((p * Lb) ⊔ (p * Ub)) ⊔ ((q * Lb) ⊔ (q * Ub)))
                      (cong RealI.l (node-negℝ x (2 ℕ* n)))
                      (cong RealI.u (node-negℝ x (2 ℕ* n))) ⟩
-          max (max ((neg Ua) * Lb) ((neg Ua) * Ub))
-              (max ((neg La) * Lb) ((neg La) * Ub))
+          ((neg Ua * Lb) ⊔ (neg Ua * Ub)) ⊔ ((neg La * Lb) ⊔ (neg La * Ub))
             ∎
       in begin
           RealI.u (node (negℝ (x *ℝ y)) n)
             ≡⟨ LHS-unfold ⟩
-          neg (min (min (La * Lb) (La * Ub)) (min (Ua * Lb) (Ua * Ub)))
+          neg (((La * Lb) ⊓ (La * Ub)) ⊓ ((Ua * Lb) ⊓ (Ua * Ub)))
             ≡⟨ neg-min-max La Ua Lb Ub ⟩
-          max (max ((neg Ua) * Lb) ((neg Ua) * Ub))
-              (max ((neg La) * Lb) ((neg La) * Ub))
+          ((neg Ua * Lb) ⊔ (neg Ua * Ub)) ⊔ ((neg La * Lb) ⊔ (neg La * Ub))
             ≡⟨ sym RHS-unfold ⟩
           RealI.u (node ((negℝ x) *ℝ y) n)
             ∎
@@ -384,7 +367,7 @@ negℝ-*ℝ x y = ≈ℝ-of-eq _ _ centre-eq
     fine = suc (2 ℕ* k)
     N1 , h1 = x≈x' fine
     N2 , h2 = y≈y' fine
-    N  = N1 ⊔ N2
+    N  = N1 ⊔ℕ N2
   in N , λ n n≥N →
     let
       n≥N1 = ≤ℕ-trans (m≤m⊔n N1 N2) n≥N
@@ -444,16 +427,16 @@ pos*pos a b (n , δn<lan) (m , δm<lbm) = K , goal
     δj<LM = ≤-<-trans (δ≤ε j) (proj₂ (eps-below (L * M) 0<LM))
 
     K : ℕ
-    K = j ⊔ n ⊔ m
+    K = j ⊔ℕ n ⊔ℕ m
 
     K≥j : K ≥ j
-    K≥j = ≤ℕ-trans (m≤m⊔n j n) (m≤m⊔n (j ⊔ n) m)
+    K≥j = ≤ℕ-trans (m≤m⊔n j n) (m≤m⊔n (j ⊔ℕ n) m)
 
     K≥n : K ≥ n
-    K≥n = ≤ℕ-trans (m≤n⊔m j n) (m≤m⊔n (j ⊔ n) m)
+    K≥n = ≤ℕ-trans (m≤n⊔m j n) (m≤m⊔n (j ⊔ℕ n) m)
 
     K≥m : K ≥ m
-    K≥m = m≤n⊔m (j ⊔ n) m
+    K≥m = m≤n⊔m (j ⊔ℕ n) m
 
     δK<LM : δ K < L * M
     δK<LM = ≤-<-trans (δ-mono K≥j) δj<LM

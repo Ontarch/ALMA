@@ -9,7 +9,7 @@
 module Real.Interval.Mul where
 
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣; NonNegative; positive
+  (ℚ; 0ℚ; 1ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _≤_; _<_; ∣_∣; NonNegative; positive
   ; nonNegative; nonPositive)
 open import Data.Rational.Base using (_÷_; 1/_) renaming (-_ to neg)
 open import Data.Product using (_,_; proj₁; proj₂)
@@ -22,7 +22,8 @@ open import Data.Rational.Properties using
   ; <-≤-trans; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonPos
   ; *-monoˡ-≤-nonPos; pos*pos⇒pos; positive⁻¹; <-cmp; *-identityˡ; *-inverseʳ
   ; *-zeroʳ; ∣p*q∣≡∣p∣*∣q∣; ∣p∣≡p∨∣p∣≡-p; ∣-p∣≡∣p∣; 0≤∣p∣
-  ; 0≤p⇒∣p∣≡p; 1/pos⇒pos)
+  ; 0≤p⇒∣p∣≡p; 1/pos⇒pos; p⊓q≤p; p⊓q≤q; p≤p⊔q; p≤q⊔p; p≤q⇒p⊔q≡q
+  ; p≥q⇒p⊔q≡p; ⊓-glb; ⊔-lub; ⊔-mono-≤)
   renaming (<-irrefl to <-irreflℚ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
@@ -34,8 +35,7 @@ open import Real using (embed; 2ℚ; embed-suc-pos)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (bounded-diff; mono-half)
 open import Real.Interval.Rational using
-  (pos-diff; sub-add; negsub; min; max; min≤ˡ; min≤ʳ; ≤maxˡ; ≤maxʳ; max≤; ≤min
-  ; max-mono; max-le; max-ge; mag; mag-≤; r≤|r|; cong-plus)
+  (pos-diff; sub-add; negsub; mag; mag-≤; r≤|r|)
 open import Real.Interval.Kit using (add-self)
 open import Real.Interval.Reasoning
 
@@ -48,7 +48,7 @@ nn : ∀ {p : ℚ} → 0ℚ ≤ p → NonNegative p
 nn = nonNegative
 
 0≤mag : ∀ a b → 0ℚ ≤ mag a b
-0≤mag a b = ≤-trans (0≤∣p∣ a) (≤maxˡ ∣ a ∣ ∣ b ∣)
+0≤mag a b = ≤-trans (0≤∣p∣ a) (p≤p⊔q ∣ a ∣ ∣ b ∣)
 
 0≤diff : ∀ {a b : ℚ} → a ≤ b → 0ℚ ≤ b - a
 0≤diff {a} {b} a≤b =
@@ -105,9 +105,9 @@ sub-swap {x} {y} {z} h =
 
 mag-le : ∀ {l u l' u' : ℚ} → l ≤ l' → l' ≤ u' → u' ≤ u → mag l' u' ≤ mag l u
 mag-le {l} {u} {l'} {u'} l≤l' l'≤u' u'≤u =
-  ≤-trans (max-mono (mag-≤ l≤l' (≤-trans l'≤u' u'≤u))
+  ≤-trans (⊔-mono-≤ (mag-≤ l≤l' (≤-trans l'≤u' u'≤u))
                     (mag-≤ (≤-trans l≤l' l'≤u') u'≤u))
-          (≤-reflexive (max-ge {a = mag l u} {b = mag l u} ≤-refl))
+          (≤-reflexive (p≥q⇒p⊔q≡p {p = mag l u} {q = mag l u} ≤-refl))
 
 -- Split on the sign of x; both sign branches are named arguments
 -- rather than a with-clause at each use site.
@@ -130,7 +130,7 @@ split-prod a a' b b' =
   sym
     (begin
        a * (b - b') + (a - a') * b'
-     ≡⟨ cong-plus s1 s2 ⟩
+     ≡⟨ cong₂ _+_ s1 s2 ⟩
        (a * b + neg (a * b')) + (a * b' + neg (a' * b'))
      ≡⟨ sym (+-assoc (a * b + neg (a * b')) (a * b') (neg (a' * b'))) ⟩
        ((a * b + neg (a * b')) + a * b') + neg (a' * b')
@@ -271,32 +271,32 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
   c4 = ux * uy
 
   lo4 hi4 : ℚ
-  lo4 = min (min c1 c2) (min c3 c4)
-  hi4 = max (max c1 c2) (max c3 c4)
+  lo4 = (c1 ⊓ c2) ⊓ (c3 ⊓ c4)
+  hi4 = (c1 ⊔ c2) ⊔ (c3 ⊔ c4)
 
   lo4≤c1 : lo4 ≤ c1
-  lo4≤c1 = ≤-trans (min≤ˡ (min c1 c2) (min c3 c4)) (min≤ˡ c1 c2)
+  lo4≤c1 = ≤-trans (p⊓q≤p (c1 ⊓ c2) (c3 ⊓ c4)) (p⊓q≤p c1 c2)
 
   lo4≤c2 : lo4 ≤ c2
-  lo4≤c2 = ≤-trans (min≤ˡ (min c1 c2) (min c3 c4)) (min≤ʳ c1 c2)
+  lo4≤c2 = ≤-trans (p⊓q≤p (c1 ⊓ c2) (c3 ⊓ c4)) (p⊓q≤q c1 c2)
 
   lo4≤c3 : lo4 ≤ c3
-  lo4≤c3 = ≤-trans (min≤ʳ (min c1 c2) (min c3 c4)) (min≤ˡ c3 c4)
+  lo4≤c3 = ≤-trans (p⊓q≤q (c1 ⊓ c2) (c3 ⊓ c4)) (p⊓q≤p c3 c4)
 
   lo4≤c4 : lo4 ≤ c4
-  lo4≤c4 = ≤-trans (min≤ʳ (min c1 c2) (min c3 c4)) (min≤ʳ c3 c4)
+  lo4≤c4 = ≤-trans (p⊓q≤q (c1 ⊓ c2) (c3 ⊓ c4)) (p⊓q≤q c3 c4)
 
   c1≤hi4 : c1 ≤ hi4
-  c1≤hi4 = ≤-trans (≤maxˡ c1 c2) (≤maxˡ (max c1 c2) (max c3 c4))
+  c1≤hi4 = ≤-trans (p≤p⊔q c1 c2) (p≤p⊔q (c1 ⊔ c2) (c3 ⊔ c4))
 
   c2≤hi4 : c2 ≤ hi4
-  c2≤hi4 = ≤-trans (≤maxʳ c1 c2) (≤maxˡ (max c1 c2) (max c3 c4))
+  c2≤hi4 = ≤-trans (p≤q⊔p c1 c2) (p≤p⊔q (c1 ⊔ c2) (c3 ⊔ c4))
 
   c3≤hi4 : c3 ≤ hi4
-  c3≤hi4 = ≤-trans (≤maxˡ c3 c4) (≤maxʳ (max c1 c2) (max c3 c4))
+  c3≤hi4 = ≤-trans (p≤p⊔q c3 c4) (p≤q⊔p (c1 ⊔ c2) (c3 ⊔ c4))
 
   c4≤hi4 : c4 ≤ hi4
-  c4≤hi4 = ≤-trans (≤maxʳ c3 c4) (≤maxʳ (max c1 c2) (max c3 c4))
+  c4≤hi4 = ≤-trans (p≤q⊔p c3 c4) (p≤q⊔p (c1 ⊔ c2) (c3 ⊔ c4))
 
   lo4≤hi4 : lo4 ≤ hi4
   lo4≤hi4 = ≤-trans lo4≤c1 c1≤hi4
@@ -457,7 +457,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
             a * b ≤ lo4 + B
   corner≤ {a} {b} l≤a a≤u l'≤b b≤u' =
     le-shift {x = a * b} {y = B} {z = lo4}
-             (≤min (≤min g1 g2) (≤min g3 g4))
+             (⊓-glb (⊓-glb g1 g2) (⊓-glb g3 g4))
     where
       g1 : a * b - B ≤ c1
       g1 = sub-swap {x = a * b} {y = c1} {z = B}
@@ -479,7 +479,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
   spanB : hi4 - lo4 ≤ B
   spanB =
     ≤-trans (sub-mono {a = hi4} {b = lo4 + B} {c = lo4}
-              (max≤ (max≤ h1 h2) (max≤ h3 h4)))
+              (⊔-lub (⊔-lub h1 h2) (⊔-lub h3 h4)))
             (≤-reflexive (cancel-z lo4 B))
     where
       h1 : c1 ≤ lo4 + B
@@ -564,7 +564,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
         begin≤
           mag lx ux * (uy - ly)
             ≈⟨ cong (λ z → z * (uy - ly))
-                    (max-ge {a = ∣ lx ∣} {b = ∣ ux ∣} |ux|≤|lx|) ⟩
+                    (p≥q⇒p⊔q≡p {p = ∣ lx ∣} {q = ∣ ux ∣} |ux|≤|lx|) ⟩
           ∣ lx ∣ * (uy - ly)
             ≈⟨ sym (trans (cong ∣_∣ c1-c2≡)
                     (trans (∣p*q∣≡∣p∣*∣q∣ lx (ly - uy))
@@ -577,7 +577,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
         begin≤
           mag lx ux * (uy - ly)
             ≈⟨ cong (λ z → z * (uy - ly))
-                    (max-le {a = ∣ lx ∣} {b = ∣ ux ∣} |lx|≤|ux|) ⟩
+                    (p≤q⇒p⊔q≡q {p = ∣ lx ∣} {q = ∣ ux ∣} |lx|≤|ux|) ⟩
           ∣ ux ∣ * (uy - ly)
             ≈⟨ sym (trans (cong ∣_∣ c3-c4≡)
                     (trans (∣p*q∣≡∣p∣*∣q∣ ux (ly - uy))
@@ -596,7 +596,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
         begin≤
           mag ly uy * (ux - lx)
             ≈⟨ trans (cong (λ z → z * (ux - lx))
-                           (max-ge {a = ∣ ly ∣} {b = ∣ uy ∣} |uy|≤|ly|))
+                           (p≥q⇒p⊔q≡p {p = ∣ ly ∣} {q = ∣ uy ∣} |uy|≤|ly|))
                      (*-comm ∣ ly ∣ (ux - lx)) ⟩
           (ux - lx) * ∣ ly ∣
             ≈⟨ sym (trans (cong ∣_∣ c1-c3≡)
@@ -610,7 +610,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
         begin≤
           mag ly uy * (ux - lx)
             ≈⟨ trans (cong (λ z → z * (ux - lx))
-                           (max-le {a = ∣ ly ∣} {b = ∣ uy ∣} |ly|≤|uy|))
+                           (p≤q⇒p⊔q≡q {p = ∣ ly ∣} {q = ∣ uy ∣} |ly|≤|uy|))
                      (*-comm ∣ uy ∣ (ux - lx)) ⟩
           (ux - lx) * ∣ uy ∣
             ≈⟨ sym (trans (cong ∣_∣ c2-c4≡)
@@ -630,11 +630,11 @@ infixl 7 _*ℝ_
 
 _*ℝ_ : RealI → RealI → RealI
 RealI.l (x *ℝ y) =
-  min (min (RealI.l x * RealI.l y) (RealI.l x * RealI.u y))
-      (min (RealI.u x * RealI.l y) (RealI.u x * RealI.u y))
+  ((RealI.l x * RealI.l y) ⊓ (RealI.l x * RealI.u y))
+    ⊓ ((RealI.u x * RealI.l y) ⊓ (RealI.u x * RealI.u y))
 RealI.u (x *ℝ y) =
-  max (max (RealI.l x * RealI.l y) (RealI.l x * RealI.u y))
-      (max (RealI.u x * RealI.l y) (RealI.u x * RealI.u y))
+  ((RealI.l x * RealI.l y) ⊔ (RealI.l x * RealI.u y))
+    ⊔ ((RealI.u x * RealI.l y) ⊔ (RealI.u x * RealI.u y))
 RealI.lo (x *ℝ y) = lo<hi
   where
 
@@ -821,25 +821,25 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
 
     nest1 : S.lo4 ≤ D.lo4
     nest1 =
-      ≤min (≤min (S.lo4≤prod {a = lx'} {b = ly'}
-                    lx≤lx' lx'≤ux ly≤ly' ly'≤uy)
-                 (S.lo4≤prod {a = lx'} {b = uy'}
-                    lx≤lx' lx'≤ux ly≤uy' uy'≤uy))
-           (≤min (S.lo4≤prod {a = ux'} {b = ly'}
-                    lx≤ux' ux'≤ux ly≤ly' ly'≤uy)
-                 (S.lo4≤prod {a = ux'} {b = uy'}
-                    lx≤ux' ux'≤ux ly≤uy' uy'≤uy))
+      ⊓-glb (⊓-glb (S.lo4≤prod {a = lx'} {b = ly'}
+                      lx≤lx' lx'≤ux ly≤ly' ly'≤uy)
+                   (S.lo4≤prod {a = lx'} {b = uy'}
+                      lx≤lx' lx'≤ux ly≤uy' uy'≤uy))
+            (⊓-glb (S.lo4≤prod {a = ux'} {b = ly'}
+                      lx≤ux' ux'≤ux ly≤ly' ly'≤uy)
+                   (S.lo4≤prod {a = ux'} {b = uy'}
+                      lx≤ux' ux'≤ux ly≤uy' uy'≤uy))
 
     nest2 : D.hi4 ≤ S.hi4
     nest2 =
-      max≤ (max≤ (S.prod≤hi4 {a = lx'} {b = ly'}
-                    lx≤lx' lx'≤ux ly≤ly' ly'≤uy)
-                 (S.prod≤hi4 {a = lx'} {b = uy'}
-                    lx≤lx' lx'≤ux ly≤uy' uy'≤uy))
-           (max≤ (S.prod≤hi4 {a = ux'} {b = ly'}
-                    lx≤ux' ux'≤ux ly≤ly' ly'≤uy)
-                 (S.prod≤hi4 {a = ux'} {b = uy'}
-                    lx≤ux' ux'≤ux ly≤uy' uy'≤uy))
+      ⊔-lub (⊔-lub (S.prod≤hi4 {a = lx'} {b = ly'}
+                      lx≤lx' lx'≤ux ly≤ly' ly'≤uy)
+                   (S.prod≤hi4 {a = lx'} {b = uy'}
+                      lx≤lx' lx'≤ux ly≤uy' uy'≤uy))
+            (⊔-lub (S.prod≤hi4 {a = ux'} {b = ly'}
+                      lx≤ux' ux'≤ux ly≤ly' ly'≤uy)
+                   (S.prod≤hi4 {a = ux'} {b = uy'}
+                      lx≤ux' ux'≤ux ly≤uy' uy'≤uy))
 
     h : ℚ
     h = 1/ embed 2
@@ -933,7 +933,7 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
       (U * wY + Uy * wX) * (h * h)
         ≡⟨ *-distribʳ-+ (h * h) (U * wY) (Uy * wX) ⟩
       (U * wY) * (h * h) + (Uy * wX) * (h * h)
-        ≡⟨ cong-plus (*-assoc U wY (h * h)) (*-assoc Uy wX (h * h)) ⟩
+        ≡⟨ cong₂ _+_ (*-assoc U wY (h * h)) (*-assoc Uy wX (h * h)) ⟩
       U * (wY * (h * h)) + Uy * (wX * (h * h))
       ∎)
 

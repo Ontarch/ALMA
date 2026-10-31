@@ -48,8 +48,8 @@ open import Real.Interval.Embed using (0ℝ<ℝ1ℝ)
 open import Real.Interval.Recip using
   (recipℝ; recipℝ'; recipCauchy; realI→posCauchy; PosCauchy; u-0ℝ)
 open import Real.CauchyToInterval using
-  (cauchy→realI; M; node-go; recip-strict)
-open import Real.Interval.Kit using (recip-antitone)
+  (cauchy→realI; M; node-go)
+open import Real.Interval.Kit using (recip-antitone; strict-recip)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.Reasoning.Equiv
 
@@ -308,7 +308,7 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
   U<e2n = ≤-<-trans U≤eMw (embed-mono-< Mw<2^n)
 
   inv< : iB < iU
-  inv< = recip-strict 0<U U<e2n
+  inv< = strict-recip U (embed (2 ^ n)) 0<U U<e2n
 
   den-eq : embed (2 ^ suc n) ≡ A * B
   den-eq = trans (cong embed (sym (2*2^n≡ n))) (embed-*-hom 2 (2 ^ n))

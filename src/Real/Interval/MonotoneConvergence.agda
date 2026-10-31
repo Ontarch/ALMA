@@ -23,7 +23,7 @@ open import Data.Rational using
 open import Data.Rational.Base using (_÷_; 1/_)
 open import Data.Rational.Properties using
   (≤-refl; ≤-trans; ≤-reflexive; <⇒≤; ≤-<-trans; +-mono-≤; +-assoc; +-comm
-  ; +-identityˡ; +-identityʳ; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; *-assoc
+  ; +-identityˡ; +-identityʳ; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; *-assoc; ≮⇒≥
   ; *-identityʳ; *-identityˡ; *-inverseʳ; *-inverseˡ; *-distribʳ-+; *-distribˡ-+
   ; neg-distrib-+; neg-distribˡ-*; pos⇒nonNeg; pos⇒nonZero; *-monoˡ-<-pos
   ; +-inverseʳ; +-inverseˡ; nonNegative⁻¹; neg-antimono-≤; module ≤-Reasoning)
@@ -53,7 +53,7 @@ open import Real.Interval.RegularRep using (reg; i; width-i; fold≥k+4)
 open import Real.Interval.OrderLe using
   (≤ℝ-refl; ≤ℝ-trans; ≤ℝ-resp-≈; <⇒≤ℝ; <-≤ℝ-trans)
 open import Real.Interval.Mul.Order using (≈-<-respʳ)
-open import Real.Interval.Rational using (suc∸1; 0<2^t; ¬<⇒≥)
+open import Real.Interval.Rational using (suc∸1; 0<2^t)
 open import Real.Interval.WeakArith using (recip-antitone; recip-antitone-≤)
 open import Real.Interval.Node using (u-dyadic; l-dyadic)
 
@@ -432,7 +432,6 @@ module _ {f : ℕ → RealI}
         nzB = pos⇒nonZero (embed b) {{pos-2^t (suc t)}}
         inv = recip-antitone-≤ a b 0<a a≤b {{nzA}} {{nzB}}
         lhs = ≤-refl
-        -- ε t * half = 1/embed (suc t) * 1/embed 2 = 1/embed a.
         rhs : 1/ (embed a) ≤ ε t * half
         rhs =
           let p = embed (suc t)
@@ -708,7 +707,7 @@ module _ {f : ℕ → RealI}
   -- 非严格上界：序列项不超过上端点嵌入时，其下端点受控。
   l≤b : (x : RealI) (b : ℚ) (m : ℕ) → x ≤ℝ embedℚ b → l x m ≤ b + δ m
   l≤b x b m x≤b =
-    ¬<⇒≥ (λ h →
+    ≮⇒≥ (λ h →
       let e : u (embedℚ b) m ≡ b + δ m
           e = trans (u-dyadic b m) (+-comm (δ m) b)
           w : u (embedℚ b) m < l x m
@@ -721,7 +720,7 @@ module _ {f : ℕ → RealI}
   -- 非严格下界：下端点嵌入不超过序列项时，序列项上端点受控。
   a≤u : (x : RealI) (a : ℚ) (m : ℕ) → embedℚ a ≤ℝ x → a - δ m ≤ u x m
   a≤u x a m a≤x =
-    ¬<⇒≥ (λ h →
+    ≮⇒≥ (λ h →
       let e : l (embedℚ a) m ≡ a - δ m
           e = trans (l-dyadic a m) (+-comm (neg (δ m)) a)
           w : u x m < l (embedℚ a) m

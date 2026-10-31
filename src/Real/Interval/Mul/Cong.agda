@@ -29,14 +29,14 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (0<1; 0≤1)
+open import Base.RationalRing using (0<1; 0≤1; telescope)
 open import Real using
-  (ε; 0<ε; half; telescope; embed; embed-mono-≤; embed-suc-nonZero; 0<embed; embed-*)
+  (ε; 0<ε; half; embed; embed-mono-≤; embed-suc-nonZero; 0<embed; embed-*; embed-mono-<)
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Bounded using (bounded)
 open import Real.IntervalEquiv using
-  (centre; width; centre-l; centre-u; recipPow2; embed-mono-<)
+  (centre; width; centre-l; centre-u; recipPow2)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Kit using
   (0≤half; two-half; n+n≡2n; recipPow2-bound; *-mono-≤-nonNeg; tri-diff; abs-swap

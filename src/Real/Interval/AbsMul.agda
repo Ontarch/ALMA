@@ -24,6 +24,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (telescope)
 open import Real using (half)
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using (_*ℝ_)
@@ -81,49 +82,27 @@ mul2eq (suc k) =
       main = trans step step2
   in subst (λ t → t ≡ suc k +N suc k) (sym (*-suc 2 k)) main
 
--- Two adjacent differences combine into a single difference.
---
--- 相邻差合并：中间项抵消。
-step-diff : (x y z : ℚ) → (x - y) + (y - z) ≡ x - z
-step-diff x y z =
-  begin (x - y) + (y - z)
-    ≡⟨ refl ⟩
-  (x + neg y) + (y + neg z)
-    ≡⟨ sym (+-assoc (x + neg y) y (neg z)) ⟩
-  ((x + neg y) + y) + neg z
-    ≡⟨ cong (_+ neg z)
-       (begin (x + neg y) + y
-         ≡⟨ +-assoc x (neg y) y ⟩
-       x + (neg y + y)
-         ≡⟨ cong (x +_) (QP.+-inverseˡ y) ⟩
-       x + 0ℚ
-         ≡⟨ +-identityʳ x ⟩
-       x ∎) ⟩
-  x + neg z
-    ≡⟨ refl ⟩
-  x - z ∎
-
--- Telescope the outer difference into a right-nested sum of
+-- Expand-diff the outer difference into a right-nested sum of
 -- consecutive differences.
 --
 -- 望远镜和：首尾差等于相邻差之和（右结合）。
-telescope : (a0 a1 a2 a3 a4 a5 : ℚ) →
+expand-diff : (a0 a1 a2 a3 a4 a5 : ℚ) →
   a0 - a5 ≡
   (a0 - a1) + ((a1 - a2) + ((a2 - a3) + ((a3 - a4) + (a4 - a5))))
-telescope a0 a1 a2 a3 a4 a5 =
+expand-diff a0 a1 a2 a3 a4 a5 =
   begin a0 - a5
-    ≡⟨ sym (step-diff a0 a1 a5) ⟩
+    ≡⟨ sym (telescope a0 a1 a5) ⟩
   (a0 - a1) + (a1 - a5)
     ≡⟨ cong ((a0 - a1) +_)
        (begin a1 - a5
-         ≡⟨ sym (step-diff a1 a2 a5) ⟩
+         ≡⟨ sym (telescope a1 a2 a5) ⟩
        (a1 - a2) + (a2 - a5)
          ≡⟨ cong ((a1 - a2) +_)
             (begin a2 - a5
-              ≡⟨ sym (step-diff a2 a3 a5) ⟩
+              ≡⟨ sym (telescope a2 a3 a5) ⟩
             (a2 - a3) + (a3 - a5)
               ≡⟨ cong ((a2 - a3) +_)
-                 (sym (step-diff a3 a4 a5)) ⟩
+                 (sym (telescope a3 a4 a5)) ⟩
             (a2 - a3) + ((a3 - a4) + (a4 - a5)) ∎) ⟩
        (a1 - a2) + ((a2 - a3) + ((a3 - a4) + (a4 - a5))) ∎) ⟩
   (a0 - a1) + ((a1 - a2) + ((a2 - a3) + ((a3 - a4) + (a4 - a5)))) ∎
@@ -154,7 +133,7 @@ chain5 : (a0 a1 a2 a3 a4 a5 k1 k2 k3 k4 k5 : ℚ) →
   ∣ a0 - a5 ∣ ≤ k1 + (k2 + (k3 + (k4 + k5)))
 chain5 a0 a1 a2 a3 a4 a5 k1 k2 k3 k4 k5 p1 p2 p3 p4 p5 =
   subst (λ z → ∣ z ∣ ≤ k1 + (k2 + (k3 + (k4 + k5))))
-    (sym (telescope a0 a1 a2 a3 a4 a5))
+    (sym (expand-diff a0 a1 a2 a3 a4 a5))
     (add5 p1 p2 p3 p4 p5)
 
 ------------------------------------------------------------------------

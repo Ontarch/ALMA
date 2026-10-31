@@ -29,13 +29,14 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
+open import Base.RationalRing using (telescope)
 open import Real using
-  (CauchySeq; ε; 0<ε; embed; _s≈_; _≈_; embed-mono-≤; ε-half)
+  (CauchySeq; ε; 0<ε; embed; _s≈_; _≈_; embed-mono-≤; ε-half; embed-mono-<)
 open Real.CauchySeq using (f; μ; cauchy)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using (realI→cauchy; centre; n<2^n)
 open import Real.CauchyToInterval using
-  (cauchy→realI; M; K; centre-cauchy→realI; M≥μK; K≥k)
+  (cauchy→realI; M; K; centre-cauchy→realI; μ≤M; K≥k)
 open import Real.Regular using (regularize; μr; μr≥k; μr-mono≤)
 open import Real.Interval.Rational using (r≤|r|; negsub)
 
@@ -133,7 +134,7 @@ regular-retract x k = μr x k , body
         k≤Kn = ≤N-trans k≤n (K≥k n)
         M≥ : M z n ≥N μr x k
         M≥ = ≤N-trans (μr-mono≤ x k (K n) k≤Kn)
-               (M≥μK z n)
+               (μ≤M z n)
         d : ∣ f z (M z n) - f z n ∣ < ε k
         d = Real.CauchySeq.cauchy z k (M z n) n M≥ n≥N
         q = f z (M z n) - f z n
@@ -250,7 +251,7 @@ private
 ε< a b b<a =
   recip-antitone-strict (embed (suc b)) (embed (suc a))
     (positive⁻¹ (embed (suc b)))
-    (Real.IntervalEquiv.embed-mono-< (s≤s b<a))
+    (embed-mono-< (s≤s b<a))
 
 -- Absolute value of a non-negative rational is itself.
 --
@@ -363,14 +364,14 @@ cauchy→realI-cong {x} {y} p k = Nth , body
         c≥N0 : c ≥N N0
         c≥N0 = m≤n⊔m (M x n ⊔ M y n) N0
         c≥μxKn : c ≥N μ x (K n)
-        c≥μxKn = ≤N-trans (M≥μK x n) c≥Mx
+        c≥μxKn = ≤N-trans (μ≤M x n) c≥Mx
         c≥μyKn : c ≥N μ y (K n)
-        c≥μyKn = ≤N-trans (M≥μK y n) c≥My
+        c≥μyKn = ≤N-trans (μ≤M y n) c≥My
         -- Outer legs.
         leg1 : ∣ f x (M x n) - f x c ∣ < ε (K n)
-        leg1 = cauchy x (K n) (M x n) c (M≥μK x n) c≥μxKn
+        leg1 = cauchy x (K n) (M x n) c (μ≤M x n) c≥μxKn
         leg3 : ∣ f y c - f y (M y n) ∣ < ε (K n)
-        leg3 = cauchy y (K n) c (M y n) c≥μyKn (M≥μK y n)
+        leg3 = cauchy y (K n) c (M y n) c≥μyKn (μ≤M y n)
         -- Middle leg.
         fwd , bwd = w0 c c≥N0
         bwd' : - (f x c - f y c) < ε r
@@ -382,9 +383,9 @@ cauchy→realI-cong {x} {y} p k = Nth , body
         b = f x c - f y c
         d = f y c - f y (M y n)
         ab-eq : a + b ≡ f x (M x n) - f y c
-        ab-eq = Real.telescope (f x (M x n)) (f x c) (f y c)
+        ab-eq = telescope (f x (M x n)) (f x c) (f y c)
         t1 : (f x (M x n) - f y c) + d ≡ f x (M x n) - f y (M y n)
-        t1 = Real.telescope (f x (M x n)) (f y c) (f y (M y n))
+        t1 = telescope (f x (M x n)) (f y c) (f y (M y n))
         abd-eq : (a + b) + d ≡ f x (M x n) - f y (M y n)
         abd-eq = trans (cong (λ v → v + d) ab-eq) t1
         abs1 : ∣ a + b ∣ ≤ ∣ a ∣ + ∣ b ∣

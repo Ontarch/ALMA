@@ -15,37 +15,26 @@ open import Data.Nat using
   (ℕ; zero; suc; z≤n; s≤s; _^_; _∸_) renaming (_+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<ℕ_)
 import Data.Nat.Properties as ℕP
 open import Data.Rational using
-  (ℚ; 0ℚ; _+_; _-_; _<_; _≤_; ∣_∣; fromℚᵘ; toℚᵘ) renaming (-_ to neg)
+  (ℚ; 0ℚ; _⊓_; _⊔_; _+_; _-_; _<_; _≤_; ∣_∣; fromℚᵘ; toℚᵘ)
+  renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-inverseʳ; neg-distrib-+; +-mono-<-≤; ≤-refl; ≤-reflexive
-  ; <⇒≤; <-cmp; ≤-trans; ≤-antisym; neg-antimono-≤; 0≤∣p∣
-  ; ∣-p∣≡∣p∣; ∣p∣≡p∨∣p∣≡-p; 0≤p⇒∣p∣≡p; toℚᵘ-cancel-<; toℚᵘ-fromℚᵘ)
+  (+-comm; +-inverseʳ; neg-distrib-+; +-mono-<-≤; ≤-refl; <⇒≤; <-cmp; ≤-trans
+  ; ≤-antisym; neg-antimono-≤; 0≤∣p∣; ∣-p∣≡∣p∣; ∣p∣≡p∨∣p∣≡-p
+  ; 0≤p⇒∣p∣≡p; toℚᵘ-cancel-<; toℚᵘ-fromℚᵘ; p⊓q≤p; p⊓q≤q; p≤p⊔q; p≤q⊔p
+  ; p≤q⇒p⊓q≡p; p≥q⇒p⊓q≡q; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p; ⊓-glb; ⊔-lub; ⊓-sel; ⊔-sel)
 open import Data.Rational.Unnormalised.Base
   using (ℚᵘ; mkℚᵘ; _≃_; *≡*; *<*) renaming (_<_ to _<ᵘ_)
 open import Data.Rational.Unnormalised.Properties using (<-respˡ-≃; <-respʳ-≃)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
+open import Function.Base using (case_of_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; sym; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
 
-open import Base.RationalRing using (neg-involutive)
-
-------------------------------------------------------------------------
--- Order reflection
---
--- From ¬ (a < b) conclude b ≤ a, by trichotomy.
---
--- 序反射
---
--- 由三歧性把严格比较的否定转为反向的非严格比较。
-
-¬<⇒≥ : ∀ {a b : ℚ} → ¬ (a < b) → b ≤ a
-¬<⇒≥ {a} {b} ¬a<b with <-cmp a b
-... | tri< a<b _ _ = ⊥-elim (¬a<b a<b)
-... | tri≈ _ a≡b _ = ≤-reflexive (sym a≡b)
-... | tri> _ _ b<a = <⇒≤ b<a
+open import Base.RationalRing using (neg-involutive; +interchange)
+open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 
 ------------------------------------------------------------------------
 -- Positive difference
@@ -65,37 +54,19 @@ pos-diff a b a<b =
 ------------------------------------------------------------------------
 -- Algebra of subtraction
 --
--- rearrange regroups a four-term sum; sub-add distributes subtraction
--- over addition; negsub and neg-sub flip differences; cong-plus and
--- cong-minus are explicit two-argument congruences.
+-- sub-add distributes subtraction over addition; negsub and neg-sub
+-- flip differences.
 --
 -- 减法代数
 --
--- rearrange 重排四项和；sub-add 把减法分配到加法；negsub 与 neg-sub
--- 翻转差；cong-plus 与 cong-minus 是显式的双参数同余。
-
-rearrange : ∀ a b c d
-  → (a + b) + (neg c + neg d) ≡ (a + neg c) + (b + neg d)
-rearrange a b c d = begin
-  (a + b) + (neg c + neg d)
-    ≡⟨ sym (+-assoc (a + b) (neg c) (neg d)) ⟩
-  ((a + b) + neg c) + neg d
-    ≡⟨ cong (λ z → z + neg d) (+-assoc a b (neg c)) ⟩
-  (a + (b + neg c)) + neg d
-    ≡⟨ cong (λ z → (a + z) + neg d) (+-comm b (neg c)) ⟩
-  (a + (neg c + b)) + neg d
-    ≡⟨ cong (λ z → z + neg d) (sym (+-assoc a (neg c) b)) ⟩
-  ((a + neg c) + b) + neg d
-    ≡⟨ +-assoc (a + neg c) b (neg d) ⟩
-  (a + neg c) + (b + neg d)
-  ∎
+-- sub-add 把减法分配到加法；negsub 与 neg-sub 翻转差。
 
 sub-add : (a b c d : ℚ) → (a + b) - (c + d) ≡ (a - c) + (b - d)
 sub-add a b c d = begin
   (a + b) - (c + d)
     ≡⟨ cong (λ z → (a + b) + z) (neg-distrib-+ c d) ⟩
   (a + b) + (neg c + neg d)
-    ≡⟨ rearrange a b c d ⟩
+    ≡⟨ +interchange a b (neg c) (neg d) ⟩
   (a - c) + (b - d)
   ∎
 
@@ -127,189 +98,122 @@ neg-sub a b = begin
   b - a
   ∎
 
-cong-plus : ∀ {a a' b b' : ℚ} → a ≡ a' → b ≡ b' → a + b ≡ a' + b'
-cong-plus {a} {a'} {b} {b'} e1 e2 = begin
-  a + b
-    ≡⟨ cong (λ z → z + b) e1 ⟩
-  a' + b
-    ≡⟨ cong (λ z → a' + z) e2 ⟩
-  a' + b'
-  ∎
+------------------------------------------------------------------------
+-- Trichotomy elimination
+--
+-- From a proof of each of the three cases, build a proof of P.
+--
+-- 三歧性消去
+--
+-- 由三种情形的证明构造 P 的证明。
 
-cong-minus : ∀ {a a' b b' : ℚ} → a ≡ a' → b ≡ b' → a - b ≡ a' - b'
-cong-minus {a} {a'} {b} {b'} e1 e2 = begin
-  a - b
-    ≡⟨ cong (λ z → z - b) e1 ⟩
-  a' - b
-    ≡⟨ cong (λ z → a' - z) e2 ⟩
-  a' - b'
-  ∎
+tri-elim : ∀ {P : Set} (a b : ℚ)
+  → (a < b → P) → (a ≡ b → P) → (b < a → P) → P
+tri-elim a b lt eq gt =
+  case <-cmp a b of λ where
+    (tri< a<b _ _) → lt a<b
+    (tri≈ _ a≡b _) → eq a≡b
+    (tri> _ _ b<a) → gt b<a
 
 ------------------------------------------------------------------------
 -- Minimum and maximum
 --
 -- 最小值与最大值
 
-min : ℚ → ℚ → ℚ
-min a b with <-cmp a b
-... | tri< _ _ _ = a
-... | tri≈ _ _ _ = a
-... | tri> _ _ _ = b
-
-max : ℚ → ℚ → ℚ
-max a b with <-cmp a b
-... | tri< _ _ _ = b
-... | tri≈ _ _ _ = a
-... | tri> _ _ _ = a
-
-min≤ˡ : ∀ a b → min a b ≤ a
-min≤ˡ a b with <-cmp a b
-... | tri< _ _ _ = ≤-refl
-... | tri≈ _ _ _ = ≤-refl
-... | tri> _ _ b<a = <⇒≤ b<a
-
-min≤ʳ : ∀ a b → min a b ≤ b
-min≤ʳ a b with <-cmp a b
-... | tri< a<b _ _ = <⇒≤ a<b
-... | tri≈ _ a≡b _ = ≤-reflexive a≡b
-... | tri> _ _ _ = ≤-refl
-
-≤maxˡ : ∀ a b → a ≤ max a b
-≤maxˡ a b with <-cmp a b
-... | tri< a<b _ _ = <⇒≤ a<b
-... | tri≈ _ _ _ = ≤-refl
-... | tri> _ _ _ = ≤-refl
-
-≤maxʳ : ∀ a b → b ≤ max a b
-≤maxʳ a b with <-cmp a b
-... | tri< _ _ _ = ≤-refl
-... | tri≈ _ a≡b _ = ≤-reflexive (sym a≡b)
-... | tri> _ _ b<a = <⇒≤ b<a
-
-min<max : ∀ a b → ¬ (a ≡ b) → min a b < max a b
-min<max a b a≠b with <-cmp a b
-... | tri< a<b _ _ = a<b
-... | tri≈ _ a≡b _ = ⊥-elim (a≠b a≡b)
-... | tri> _ _ b<a = b<a
-
-------------------------------------------------------------------------
--- min/max interaction with the order
---
--- 极值与序的交互
-
-max-eq : ∀ a b → max a b ≡ a ⊎ max a b ≡ b
-max-eq a b with <-cmp a b
-... | tri< _ _ _ = inj₂ refl
-... | tri≈ _ _ _ = inj₁ refl
-... | tri> _ _ _ = inj₁ refl
-
-min-eq : ∀ a b → min a b ≡ a ⊎ min a b ≡ b
-min-eq a b with <-cmp a b
-... | tri< _ _ _ = inj₁ refl
-... | tri≈ _ _ _ = inj₁ refl
-... | tri> _ _ _ = inj₂ refl
-
-max-le : ∀ {a b : ℚ} → a ≤ b → max a b ≡ b
-max-le {a} {b} a≤b with <-cmp a b
-... | tri< _ _ _ = refl
-... | tri≈ _ a≡b _ = a≡b
-... | tri> ¬a<b _ _ = ≤-antisym a≤b (¬<⇒≥ ¬a<b)
-
-max-ge : ∀ {a b : ℚ} → b ≤ a → max a b ≡ a
-max-ge {a} {b} b≤a with <-cmp a b
-... | tri< a<b _ _ = sym (≤-antisym (<⇒≤ a<b) b≤a)
-... | tri≈ _ _ _ = refl
-... | tri> _ _ _ = refl
-
-min-le : ∀ {a b : ℚ} → a ≤ b → min a b ≡ a
-min-le {a} {b} a≤b with <-cmp a b
-... | tri< _ _ _ = refl
-... | tri≈ _ _ _ = refl
-... | tri> ¬a<b _ _ = ≤-antisym (¬<⇒≥ ¬a<b) a≤b
-
-min-ge : ∀ {a b : ℚ} → b ≤ a → min a b ≡ b
-min-ge {a} {b} b≤a with <-cmp a b
-... | tri< a<b _ _ = ≤-antisym (<⇒≤ a<b) b≤a
-... | tri≈ _ a≡b _ = a≡b
-... | tri> _ _ _ = refl
-
-max≤ : ∀ {a b c : ℚ} → a ≤ c → b ≤ c → max a b ≤ c
-max≤ {a} {b} {c} a≤c b≤c with <-cmp a b
-... | tri< _ _ _ = b≤c
-... | tri≈ _ _ _ = a≤c
-... | tri> _ _ _ = a≤c
-
-≤min : ∀ {a b c : ℚ} → a ≤ b → a ≤ c → a ≤ min b c
-≤min {a} {b} {c} a≤b a≤c with <-cmp b c
-... | tri< _ _ _ = a≤b
-... | tri≈ _ _ _ = a≤b
-... | tri> _ _ _ = a≤c
-
-max-mono : ∀ {a b c d : ℚ} → a ≤ c → b ≤ d → max a b ≤ max c d
-max-mono {a} {b} {c} {d} a≤c b≤d =
-  max≤ (≤-trans a≤c (≤maxˡ c d)) (≤-trans b≤d (≤maxʳ c d))
-
-min-mono : ∀ {a b c d : ℚ} → a ≤ c → b ≤ d → min a b ≤ min c d
-min-mono {a} {b} {c} {d} a≤c b≤d =
-  ≤min (≤-trans (min≤ˡ a b) a≤c) (≤-trans (min≤ʳ a b) b≤d)
+min<max : ∀ a b → ¬ (a ≡ b) → a ⊓ b < a ⊔ b
+min<max a b a≠b = tri-elim a b
+  (λ a<b →
+     subst₂ _<_
+       (sym (p≤q⇒p⊓q≡p (<⇒≤ a<b)))
+       (sym (p≤q⇒p⊔q≡q (<⇒≤ a<b)))
+       a<b)
+  (λ a≡b → ⊥-elim (a≠b a≡b))
+  (λ b<a →
+     subst₂ _<_
+       (sym (p≥q⇒p⊓q≡q (<⇒≤ b<a)))
+       (sym (p≥q⇒p⊔q≡p (<⇒≤ b<a)))
+       b<a)
 
 ------------------------------------------------------------------------
 -- Absolute value and magnitude bounds
 --
--- r≤|r| and -r≤|r| are the two elementary absolute-value bounds; mag
--- combines them into max |l| |u| and mag-≤ shows |x| ≤ mag l u for any
--- x in [l, u].
+-- The two elementary absolute-value bounds state that both r and -r
+-- are at most |r|. The magnitude combines the endpoint absolute values
+-- into their maximum, and mag-≤ shows that any point inside an interval
+-- is bounded by that maximum.
 --
 -- 绝对值与量级界
 --
--- r≤|r| 与 -r≤|r| 是两条基本绝对值界；mag 合并为 max |l| |u|，
--- mag-≤ 表明 [l, u] 中任意 x 满足 |x| ≤ mag l u。
+-- 两条基本绝对值界给出 r 与 -r 都不超过 |r|；mag 将端点绝对值
+-- 合并为上确界，mag-≤ 表明区间内任意点的绝对值不超过该上确界。
 
 r≤|r| : ∀ r → r ≤ ∣ r ∣
-r≤|r| r with ∣p∣≡p∨∣p∣≡-p r
-... | inj₁ |r|≡r = ≤-reflexive (sym |r|≡r)
-... | inj₂ |r|≡-r = subst (λ z → r ≤ z) (sym |r|≡-r) r≤-r
-  where
-    0≤-r : 0ℚ ≤ neg r
-    0≤-r = subst (λ z → 0ℚ ≤ z) |r|≡-r (0≤∣p∣ r)
+r≤|r| r =
+  let
+    helper : ∣ r ∣ ≡ r ⊎ ∣ r ∣ ≡ neg r → r ≤ ∣ r ∣
+    helper = λ where
+      (inj₁ |r|≡r) → begin≤
+        r      ≈⟨ sym |r|≡r ⟩
+        ∣ r ∣  ≤∎
+      (inj₂ |r|≡-r) →
+        let
+          0≤-r : 0ℚ ≤ neg r
+          0≤-r = subst (λ z → 0ℚ ≤ z) |r|≡-r (0≤∣p∣ r)
 
-    r≤0 : r ≤ 0ℚ
-    r≤0 = subst (λ z → z ≤ 0ℚ) (neg-involutive r) (neg-antimono-≤ 0≤-r)
-
-    r≤-r : r ≤ neg r
-    r≤-r = ≤-trans r≤0 0≤-r
+          r≤0 : r ≤ 0ℚ
+          r≤0 = subst (λ z → z ≤ 0ℚ) (neg-involutive r) (neg-antimono-≤ 0≤-r)
+        in begin≤
+          r      ≤⟨ r≤0 ⟩
+          0ℚ     ≤⟨ 0≤-r ⟩
+          neg r  ≈⟨ sym |r|≡-r ⟩
+          ∣ r ∣  ≤∎
+  in helper (∣p∣≡p∨∣p∣≡-p r)
 
 -r≤|r| : ∀ r → neg r ≤ ∣ r ∣
 -r≤|r| r = subst (λ z → neg r ≤ z) (∣-p∣≡∣p∣ r) (r≤|r| (neg r))
 
+-- The magnitude of an interval is the maximum of its endpoint
+-- absolute values.
+--
+-- 区间量级为其端点绝对值的最大值。
 mag : ℚ → ℚ → ℚ
-mag l u = max ∣ l ∣ ∣ u ∣
+mag l u = ∣ l ∣ ⊔ ∣ u ∣
 
 mag-≤ : ∀ {l u x : ℚ} → l ≤ x → x ≤ u → ∣ x ∣ ≤ mag l u
-mag-≤ {l} {u} {x} l≤x x≤u with ∣p∣≡p∨∣p∣≡-p x
-... | inj₁ |x|≡x =
-      ≤-trans (≤-reflexive |x|≡x)
-      (≤-trans x≤u
-      (≤-trans (r≤|r| u) (≤maxʳ ∣ l ∣ ∣ u ∣)))
-... | inj₂ |x|≡-x =
-      ≤-trans (≤-reflexive |x|≡-x)
-      (≤-trans (neg-antimono-≤ l≤x)
-      (≤-trans (≤-reflexive (sym |l|≡-l)) (≤maxˡ ∣ l ∣ ∣ u ∣)))
-  where
-    0≤-x : 0ℚ ≤ neg x
-    0≤-x = subst (λ z → 0ℚ ≤ z) |x|≡-x (0≤∣p∣ x)
+mag-≤ {l} {u} {x} l≤x x≤u =
+  let
+    helper : ∣ x ∣ ≡ x ⊎ ∣ x ∣ ≡ neg x → ∣ x ∣ ≤ mag l u
+    helper = λ where
+      (inj₁ |x|≡x) → begin≤
+        ∣ x ∣          ≈⟨ |x|≡x ⟩
+        x              ≤⟨ x≤u ⟩
+        u              ≤⟨ r≤|r| u ⟩
+        ∣ u ∣          ≤⟨ p≤q⊔p ∣ l ∣ ∣ u ∣ ⟩
+        ∣ l ∣ ⊔ ∣ u ∣  ≤∎
+      (inj₂ |x|≡-x) →
+        let
+          0≤-x : 0ℚ ≤ neg x
+          0≤-x = subst (λ z → 0ℚ ≤ z) |x|≡-x (0≤∣p∣ x)
 
-    x≤0 : x ≤ 0ℚ
-    x≤0 = subst (λ z → z ≤ 0ℚ) (neg-involutive x) (neg-antimono-≤ 0≤-x)
+          x≤0 : x ≤ 0ℚ
+          x≤0 = subst (λ z → z ≤ 0ℚ) (neg-involutive x) (neg-antimono-≤ 0≤-x)
 
-    l≤0 : l ≤ 0ℚ
-    l≤0 = ≤-trans l≤x x≤0
+          l≤0 : l ≤ 0ℚ
+          l≤0 = ≤-trans l≤x x≤0
 
-    0≤-l : 0ℚ ≤ neg l
-    0≤-l = neg-antimono-≤ l≤0
+          0≤-l : 0ℚ ≤ neg l
+          0≤-l = neg-antimono-≤ l≤0
 
-    |l|≡-l : ∣ l ∣ ≡ neg l
-    |l|≡-l = subst (λ z → z ≡ neg l) (∣-p∣≡∣p∣ l) (0≤p⇒∣p∣≡p {neg l} 0≤-l)
+          |l|≡-l : ∣ l ∣ ≡ neg l
+          |l|≡-l = subst (λ z → z ≡ neg l) (∣-p∣≡∣p∣ l)
+                      (0≤p⇒∣p∣≡p {neg l} 0≤-l)
+        in begin≤
+          ∣ x ∣          ≈⟨ |x|≡-x ⟩
+          neg x          ≤⟨ neg-antimono-≤ l≤x ⟩
+          neg l          ≈⟨ sym |l|≡-l ⟩
+          ∣ l ∣          ≤⟨ p≤p⊔q ∣ l ∣ ∣ u ∣ ⟩
+          ∣ l ∣ ⊔ ∣ u ∣  ≤∎
+  in helper (∣p∣≡p∨∣p∣≡-p x)
 
 ------------------------------------------------------------------------
 -- Fraction comparison with a general denominator
@@ -341,9 +245,9 @@ suc∸1 {n} 0<n = begin
   n
   ∎
 
--- 0 < (suc d) * 2^t.
+-- The product of a successor and a power of two is positive.
 --
--- (suc d) * 2^t 为正。
+-- 后继与二的幂的乘积为正。
 0<sucd*2^t : (d t : ℕ) → 0 <ℕ suc d *ℕ 2 ^ t
 0<sucd*2^t d t = ℕP.≤-trans (0<2^t t) (ℕP.m≤n*m (2 ^ t) (suc d))
 
@@ -411,56 +315,50 @@ comb-strict N d k t h =
      in p2)
 
 ------------------------------------------------------------------------
--- min/max rearrangement and negation interaction
+-- Negation of min/max
 --
--- 极值重排与取负交互
+-- 取负下的 min/max
 
-min-swap : ∀ a b → min a b ≡ min b a
-min-swap a b = ≤-antisym
-  (≤min (min≤ʳ a b) (min≤ˡ a b))
-  (≤min (min≤ʳ b a) (min≤ˡ b a))
-
-max-swap : ∀ a b → max a b ≡ max b a
-max-swap a b = ≤-antisym
-  (max≤ (≤maxʳ b a) (≤maxˡ b a))
-  (max≤ (≤maxʳ a b) (≤maxˡ a b))
-
-min-min-swap : ∀ a b c d →
-  min (min a b) (min c d) ≡ min (min c d) (min a b)
-min-min-swap a b c d = min-swap (min a b) (min c d)
-
-max-max-swap : ∀ a b c d →
-  max (max a b) (max c d) ≡ max (max c d) (max a b)
-max-max-swap a b c d = max-swap (max a b) (max c d)
-
-min-neg : ∀ a b → min (neg a) (neg b) ≡ neg (max a b)
+min-neg : ∀ a b → (neg a) ⊓ (neg b) ≡ neg (a ⊔ b)
 min-neg a b = ≤-antisym upper lower
   where
-    lower : neg (max a b) ≤ min (neg a) (neg b)
-    lower = ≤min (neg-antimono-≤ (≤maxˡ a b))
-                 (neg-antimono-≤ (≤maxʳ a b))
+    lower : neg (a ⊔ b) ≤ (neg a) ⊓ (neg b)
+    lower = ⊓-glb (neg-antimono-≤ (p≤p⊔q a b))
+                  (neg-antimono-≤ (p≤q⊔p a b))
 
-    upper : min (neg a) (neg b) ≤ neg (max a b)
-    upper with max-eq a b
-    ... | inj₁ max≡a =
-          subst (λ z → min (neg a) (neg b) ≤ neg z) (sym max≡a)
-                (min≤ˡ (neg a) (neg b))
-    ... | inj₂ max≡b =
-          subst (λ z → min (neg a) (neg b) ≤ neg z) (sym max≡b)
-                (min≤ʳ (neg a) (neg b))
+    upper : (neg a) ⊓ (neg b) ≤ neg (a ⊔ b)
+    upper =
+      let
+        helper : a ⊔ b ≡ a ⊎ a ⊔ b ≡ b → (neg a) ⊓ (neg b) ≤ neg (a ⊔ b)
+        helper = λ where
+          (inj₁ max≡a) → begin≤
+            (neg a) ⊓ (neg b)  ≤⟨ p⊓q≤p (neg a) (neg b) ⟩
+            neg a              ≈⟨ cong neg (sym max≡a) ⟩
+            neg (a ⊔ b)        ≤∎
+          (inj₂ max≡b) → begin≤
+            (neg a) ⊓ (neg b)  ≤⟨ p⊓q≤q (neg a) (neg b) ⟩
+            neg b              ≈⟨ cong neg (sym max≡b) ⟩
+            neg (a ⊔ b)        ≤∎
+      in helper (⊔-sel a b)
 
-max-neg : ∀ a b → max (neg a) (neg b) ≡ neg (min a b)
+max-neg : ∀ a b → (neg a) ⊔ (neg b) ≡ neg (a ⊓ b)
 max-neg a b = ≤-antisym upper lower
   where
-    upper : max (neg a) (neg b) ≤ neg (min a b)
-    upper = max≤ (neg-antimono-≤ (min≤ˡ a b))
-                 (neg-antimono-≤ (min≤ʳ a b))
+    upper : (neg a) ⊔ (neg b) ≤ neg (a ⊓ b)
+    upper = ⊔-lub (neg-antimono-≤ (p⊓q≤p a b))
+                  (neg-antimono-≤ (p⊓q≤q a b))
 
-    lower : neg (min a b) ≤ max (neg a) (neg b)
-    lower with min-eq a b
-    ... | inj₁ min≡a =
-          subst (λ z → neg z ≤ max (neg a) (neg b)) (sym min≡a)
-                (≤maxˡ (neg a) (neg b))
-    ... | inj₂ min≡b =
-          subst (λ z → neg z ≤ max (neg a) (neg b)) (sym min≡b)
-                (≤maxʳ (neg a) (neg b))
+    lower : neg (a ⊓ b) ≤ (neg a) ⊔ (neg b)
+    lower =
+      let
+        helper : a ⊓ b ≡ a ⊎ a ⊓ b ≡ b → neg (a ⊓ b) ≤ (neg a) ⊔ (neg b)
+        helper = λ where
+          (inj₁ min≡a) → begin≤
+            neg (a ⊓ b)        ≈⟨ cong neg min≡a ⟩
+            neg a              ≤⟨ p≤p⊔q (neg a) (neg b) ⟩
+            (neg a) ⊔ (neg b)  ≤∎
+          (inj₂ min≡b) → begin≤
+            neg (a ⊓ b)        ≈⟨ cong neg min≡b ⟩
+            neg b              ≤⟨ p≤q⊔p (neg a) (neg b) ⟩
+            (neg a) ⊔ (neg b)  ≤∎
+      in helper (⊓-sel a b)

@@ -34,6 +34,9 @@ begin< x<y = x<y
 _≈⟨_⟩_ : ∀ (x {y z} : ℚ) → x ≡ y → y ≤ z → x ≤ z
 x ≈⟨ p ⟩ q = ≤-trans (≤-reflexive p) q
 
+-- Basic chain step and terminal.
+--
+-- 基本链步骤与终点。
 _≤⟨_⟩_ : ∀ (x {y z} : ℚ) → x ≤ y → y ≤ z → x ≤ z
 x ≤⟨ p ⟩ q = ≤-trans p q
 

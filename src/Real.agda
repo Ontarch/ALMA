@@ -10,8 +10,10 @@ module Real where
 
 open import Agda.Primitive using (lzero)
 open import Data.Empty using (⊥-elim)
-open import Data.Integer using (+_; +<+; +≤+) renaming (_*_ to _ℤ*_; _+_ to _ℤ+_)
+open import Data.Integer.Base using (+_; +<+; +≤+) renaming (_*_ to _ℤ*_; _+_ to _ℤ+_)
 open import Data.Integer.Properties using (+◃n≡+n)
+  renaming (*-identityʳ to ℤ*-identityʳ; ≤-<-trans to ℤ≤-<-trans
+  ; ≤-trans to ℤ≤-trans; <-≤-trans to ℤ<-≤-trans; ≤-reflexive to ℤ≤-reflexive)
 open import Data.Nat using (ℕ; zero; _≥_; _⊔_; suc; s≤s; z≤n)
   renaming (_+_ to _+ℕ_; _*_ to _ℕ*_; _≤_ to _≤ℕ_; _<_ to _<ℕ_)
 open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; ≤-trans; *-suc)
@@ -22,15 +24,16 @@ open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _/_; _≤_; ∣_∣; _<_; NonZero; Positive)
 open import Data.Rational.Base using (1/_; mkℚ; *<*; *≤*)
 open import Data.Rational.Properties using
-  (0≤p⇒∣p∣≡p; +-inverseʳ; ≤-refl; ≤-reflexive; +-assoc; positive⁻¹
-  ; pos⇒nonZero; normalize-coprime; /-cong; +-inverseˡ; +-identityʳ
-  ; ≤-<-trans; +-mono-<; *-inverseʳ; *-assoc; *-comm; *-identityˡ
-  ; *-identityʳ; *-distribʳ-+; mkℚ+-pos; <⇒≤; <-irrefl)
+  (0≤p⇒∣p∣≡p; +-inverseʳ; ≤-refl; ≤-reflexive; positive⁻¹; pos⇒nonZero
+  ; normalize-coprime; /-cong; ≤-<-trans; +-mono-<; *-inverseʳ; *-assoc; *-comm
+  ; *-identityˡ; *-identityʳ; *-distribʳ-+; mkℚ+-pos; 1/pos⇒pos; <⇒≤; <-irrefl)
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Structures using (IsEquivalence)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; trans; subst; sym; module ≡-Reasoning)
 open ≡-Reasoning
+
+open import Base.RationalRing using (telescope)
 
 ------------------------------------------------------------------------
 -- Precision level
@@ -92,9 +95,10 @@ num-2 n = +◃n≡+n (2 ℕ* n)
   trans (/-cong (num-2 n) refl)
         (normalize-coprime (coprime-sym (1-coprimeTo (2 ℕ* n))))
 
--- The half-precision denominator is twice the full-precision one.
+-- The denominator at the half index is twice the denominator at the
+-- current index.
 --
--- 半精度分母等于全精度分母的两倍。
+-- 半索引处的分母是当前索引处分母的两倍。
 den-2 : ∀ k → suc (suc (2 ℕ* k)) ≡ 2 ℕ* suc k
 den-2 k = sym (*-suc 2 k)
 
@@ -164,34 +168,12 @@ _≈_ x y = ∀ k → Σ ℕ (λ N → ∀ n → n ≥ N → _s≈_ (f x n) (f y
 0<ε : ∀ k → 0ℚ < ε k
 0<ε k =
   positive⁻¹ (ε k)
-    {{mkℚ+-pos 1 (suc k) {c = 1-coprimeTo (suc k)}}}
-
-------------------------------------------------------------------------
--- Telescoping lemma
---
--- The two-step difference telescopes, with the middle term cancelling.
---
--- 望远镜消去引理
---
--- 两步差通过望远镜方式消去中间项，只剩下首尾之差。
-
-telescope : ∀ a b c → (a + (- b)) + (b + (- c)) ≡ a + (- c)
-telescope a b c = begin
-  (a + (- b)) + (b + (- c))
-    ≡⟨ sym (+-assoc (a + (- b)) b (- c)) ⟩
-  ((a + (- b)) + b) + (- c)
-    ≡⟨ cong (λ v → v + (- c)) (+-assoc a (- b) b) ⟩
-  (a + ((- b) + b)) + (- c)
-    ≡⟨ cong (λ v → v + (- c)) (cong (λ v → a + v) (+-inverseˡ b)) ⟩
-  (a + 0ℚ) + (- c)
-    ≡⟨ cong (λ v → v + (- c)) (+-identityʳ a) ⟩
-  a + (- c)
-  ∎
+    {{1/pos⇒pos (embed (suc k)) {{embed-suc-pos {k}}}}}
 
 ------------------------------------------------------------------------
 -- Halving lemma
 --
--- Two approximations at half tolerance add to the full tolerance.
+-- Two approximations at half precision add to the full precision.
 -- Pure field algebra over ℚ.
 --
 -- 折半引理
@@ -266,9 +248,6 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
 --
 -- 在半索引处的两份后继精度相加，回到当前精度。
 
-1/embed : ∀ n → 1/ embed (suc n) ≡ ε n
-1/embed n = refl
-
 ε-half : ∀ k → ε (suc (2 ℕ* k)) + ε (suc (2 ℕ* k)) ≡ ε k
 ε-half k =
   let m = embed (suc k)
@@ -288,25 +267,15 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
       t : ℚ
       t = 1/ (2ℚ * m)
       l1 : t ≡ ε (suc (2 ℕ* k))
-      l1 = begin
-        t
-          ≡⟨ reciprocal-cong (2ℚ * m) b e2m ⟩
-        1/ b
-          ≡⟨ sym (1/embed (suc (2 ℕ* k))) ⟩
-        ε (suc (2 ℕ* k))
-        ∎
-      l2 : 1/ m ≡ ε k
-      l2 = 1/embed k
+      l1 = reciprocal-cong (2ℚ * m) b e2m
       h : t + t ≡ 1/ m
       h = halve m
   in begin
     ε (suc (2 ℕ* k)) + ε (suc (2 ℕ* k))
       ≡⟨ cong (λ r → r + r) (sym l1) ⟩
     t + t
-      ≡⟨ subst (λ r → t + t ≡ r) l2 h ⟩
+      ≡⟨ h ⟩
     1/ m
-      ≡⟨ l2 ⟩
-    ε k
     ∎
 
 ------------------------------------------------------------------------
@@ -434,10 +403,10 @@ num-add : ∀ m n → (+ m ℤ* + 1 ℤ+ + n ℤ* + 1) ≡ + (m +ℕ n)
 num-add m n = begin
   (+ m ℤ* + 1 ℤ+ + n ℤ* + 1)
     ≡⟨ cong (λ z → z ℤ+ (+ n ℤ* + 1))
-             (Data.Integer.Properties.*-identityʳ (+ m)) ⟩
+             (ℤ*-identityʳ (+ m)) ⟩
   (+ m ℤ+ + n ℤ* + 1)
     ≡⟨ cong (λ z → (+ m) ℤ+ z)
-             (Data.Integer.Properties.*-identityʳ (+ n)) ⟩
+             (ℤ*-identityʳ (+ n)) ⟩
   (+ m ℤ+ + n)
     ≡⟨⟩
   + (m +ℕ n)
@@ -489,20 +458,20 @@ embed-pos→≥1 (suc m) _  = s≤s z≤n
 
 embed-mono-< : ∀ {m n} → m <ℕ n → embed m < embed n
 embed-mono-< {m} {n} h =
-  *<* (Data.Integer.Properties.<-≤-trans
-       (Data.Integer.Properties.≤-<-trans
-          (Data.Integer.Properties.≤-reflexive
-             (Data.Integer.Properties.*-identityʳ (+ m)))
+  *<* (ℤ<-≤-trans
+       (ℤ≤-<-trans
+          (ℤ≤-reflexive
+             (ℤ*-identityʳ (+ m)))
           (+<+ h))
-       (Data.Integer.Properties.≤-reflexive
-          (sym (Data.Integer.Properties.*-identityʳ (+ n)))))
+       (ℤ≤-reflexive
+          (sym (ℤ*-identityʳ (+ n)))))
 
 embed-mono-≤ : ∀ {m n} → m ≤ℕ n → embed m ≤ embed n
 embed-mono-≤ {m} {n} h =
-  *≤* (Data.Integer.Properties.≤-trans
-       (Data.Integer.Properties.≤-reflexive
-          (Data.Integer.Properties.*-identityʳ (+ m)))
-       (Data.Integer.Properties.≤-trans
+  *≤* (ℤ≤-trans
+       (ℤ≤-reflexive
+          (ℤ*-identityʳ (+ m)))
+       (ℤ≤-trans
           (+≤+ h)
-          (Data.Integer.Properties.≤-reflexive
-             (sym (Data.Integer.Properties.*-identityʳ (+ n))))))
+          (ℤ≤-reflexive
+             (sym (ℤ*-identityʳ (+ n))))))

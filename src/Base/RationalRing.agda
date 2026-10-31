@@ -8,25 +8,29 @@
 
 module Base.RationalRing where
 
-open import Data.Integer using (+<+)
-open import Data.Nat using (s≤s; z≤n)
 open import Data.Rational using (0ℚ; 1ℚ; _+_; _*_; _-_; -_; _<_; _≤_)
-open import Data.Rational.Base using (*<*)
 open import Data.Rational.Properties using
-  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-comm; *-identityˡ
-  ; *-zeroˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; neg-distribˡ-*; neg-distribʳ-*
-  ; <⇒≤)
+  (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-comm
+  ; *-identityˡ; *-zeroˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+
+  ; neg-distribˡ-*; neg-distribʳ-*; <⇒≤; positive⁻¹)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+open ≡-Reasoning
 
 ------------------------------------------------------------------------
--- Basic constants
+-- Unit and zero constants
 --
--- 基本常量
+-- 单位与零常量
 
+-- The rational unit is positive.
+--
+-- 有理数单位为正。
 0<1 : 0ℚ < 1ℚ
-0<1 = *<* (+<+ (s≤s z≤n))
+0<1 = positive⁻¹ 1ℚ
 
+-- The rational unit is nonnegative.
+--
+-- 有理数单位非负。
 0≤1 : 0ℚ ≤ 1ℚ
 0≤1 = <⇒≤ 0<1
 
@@ -35,11 +39,11 @@ open import Relation.Binary.PropositionalEquality using
 --
 -- 取负
 
--- -(-x) = x.
+-- Double negation is the identity.
 --
 -- 双重取负为恒等。
 neg-involutive : ∀ x → - (- x) ≡ x
-neg-involutive x = let open ≡-Reasoning in begin
+neg-involutive x = begin
   - (- x)
   ≡⟨ sym (+-identityʳ (- (- x))) ⟩
   - (- x) + 0ℚ
@@ -52,11 +56,11 @@ neg-involutive x = let open ≡-Reasoning in begin
   ≡⟨ +-identityˡ x ⟩
   x ∎
 
--- (-x)(-y) = xy.
+-- The product of two negations is the original product.
 --
 -- 两个取负相乘得到原乘积。
 neg-neg-mul : ∀ x y → (- x) * (- y) ≡ x * y
-neg-neg-mul x y = let open ≡-Reasoning in begin
+neg-neg-mul x y = begin
   (- x) * (- y)
   ≡⟨ sym (neg-distribˡ-* x (- y)) ⟩
   - (x * (- y))
@@ -65,37 +69,22 @@ neg-neg-mul x y = let open ≡-Reasoning in begin
   ≡⟨ neg-involutive (x * y) ⟩
   x * y ∎
 
--- (-x)(-x) = x*x.
+-- Negation does not change the square.
 --
 -- 取负不改变平方。
 neg-neg-square : ∀ x → (- x) * (- x) ≡ x * x
 neg-neg-square x = neg-neg-mul x x
-
--- x * (-y) = -(x*y). The direction is opposite to stdlib's
--- neg-distribʳ-*.
---
--- 右侧乘以取负可将取负外提；方向与标准库引理 neg-distribʳ-* 相反。
-n*ʳ : ∀ x y → x * (- y) ≡ - (x * y)
-n*ʳ x y = sym (neg-distribʳ-* x y)
-
--- (-x) * y = -(x*y). The direction is opposite to stdlib's
--- neg-distribˡ-*, hence sym.
---
--- 左侧乘以取负可将取负外提；方向与标准库引理 neg-distribˡ-* 相反，
--- 因此使用 sym。
-n*ˡ : ∀ x y → (- x) * y ≡ - (x * y)
-n*ˡ x y = sym (neg-distribˡ-* x y)
 
 ------------------------------------------------------------------------
 -- Additive rearrangement
 --
 -- 加法重排
 
--- (a + b) + (c + d) = (a + c) + (b + d).
+-- Swapping the inner two summands leaves a four-term sum unchanged.
 --
 -- 交换内层两个加项后四项和不变。
 +interchange : ∀ a b c d → (a + b) + (c + d) ≡ (a + c) + (b + d)
-+interchange a b c d = let open ≡-Reasoning in begin
++interchange a b c d = begin
   (a + b) + (c + d)
   ≡⟨ +-assoc a b (c + d) ⟩
   a + (b + (c + d))
@@ -108,45 +97,55 @@ n*ˡ x y = sym (neg-distribˡ-* x y)
   ≡⟨ sym (+-assoc a c (b + d)) ⟩
   (a + c) + (b + d) ∎
 
--- ((p + q) + r) + s = p + (q + (r + s)).
+-- Reassociate a left-leaning four-term sum into right-nested form.
 --
 -- 将左倾的四项和重组为右结合。
 flat4 : ∀ p q r s → ((p + q) + r) + s ≡ p + (q + (r + s))
-flat4 p q r s = let open ≡-Reasoning in begin
+flat4 p q r s = begin
   ((p + q) + r) + s
   ≡⟨ +-assoc (p + q) r s ⟩
   (p + q) + (r + s)
   ≡⟨ +-assoc p q (r + s) ⟩
   p + (q + (r + s)) ∎
 
--- (-t + -t) + (t + t) = 0.
+-- A negated pair cancels against the corresponding positive pair.
 --
 -- 取负对与正对相消。
 cancel-pair : ∀ t → (- t + - t) + (t + t) ≡ 0ℚ
-cancel-pair t = let open ≡-Reasoning in begin
+cancel-pair t = begin
   (- t + - t) + (t + t)
-  ≡⟨ +-assoc (- t) (- t) (t + t) ⟩
-  - t + ((- t) + (t + t))
-  ≡⟨ cong (- t +_) (sym (+-assoc (- t) t t)) ⟩
-  - t + (((- t) + t) + t)
-  ≡⟨ cong (- t +_) (cong₂ _+_ (+-inverseˡ t) refl) ⟩
-  - t + (0ℚ + t)
-  ≡⟨ cong (- t +_) (+-identityˡ t) ⟩
-  - t + t
-  ≡⟨ +-inverseˡ t ⟩
+  ≡⟨ cong (_+ (t + t)) (sym (neg-distrib-+ t t)) ⟩
+  (- (t + t)) + (t + t)
+  ≡⟨ +-inverseˡ (t + t) ⟩
   0ℚ ∎
+
+-- Two adjacent differences combine into a single difference, with the
+-- middle term cancelling.
+--
+-- 相邻差合并：中间项抵消。
+telescope : ∀ a b c → (a + (- b)) + (b + (- c)) ≡ a + (- c)
+telescope a b c = begin
+  (a + (- b)) + (b + (- c))
+  ≡⟨ +-assoc a (- b) (b + (- c)) ⟩
+  a + ((- b) + (b + (- c)))
+  ≡⟨ cong (a +_) (sym (+-assoc (- b) b (- c))) ⟩
+  a + (((- b) + b) + (- c))
+  ≡⟨ cong (a +_) (cong (_+ (- c)) (+-inverseˡ b)) ⟩
+  a + (0ℚ + (- c))
+  ≡⟨ cong (a +_) (+-identityˡ (- c)) ⟩
+  a + (- c) ∎
 
 ------------------------------------------------------------------------
 -- Squares
 --
 -- 平方
 
--- (x + y)² = x² + y² + (x*y + x*y).
+-- Square of a sum: two squares plus two cross terms.
 --
 -- 和之平方展开：拆成两个平方加上两个交叉项。
 sq+ : ∀ x y → (x + y) * (x + y) ≡
               x * x + (y * y + (x * y + x * y))
-sq+ x y = let open ≡-Reasoning in begin
+sq+ x y = begin
   (x + y) * (x + y)
   ≡⟨ *-distribʳ-+ (x + y) x y ⟩
   x * (x + y) + y * (x + y)
@@ -161,12 +160,12 @@ sq+ x y = let open ≡-Reasoning in begin
   ≡⟨ cong (x * x +_) (+-comm (x * y + x * y) (y * y)) ⟩
   x * x + (y * y + (x * y + x * y)) ∎
 
--- (x - y)² = x² + y² - (x*y + x*y).
+-- Square of a difference: as for sums, but the cross terms are negated.
 --
 -- 差之平方展开：与和的情形相同，交叉项取负。
 sq- : ∀ x y → (x - y) * (x - y) ≡
               x * x + (y * y + (- (x * y) + - (x * y)))
-sq- x y = let open ≡-Reasoning in begin
+sq- x y = begin
   (x - y) * (x - y)
   ≡⟨ refl ⟩
   (x + (- y)) * (x + (- y))
@@ -174,14 +173,15 @@ sq- x y = let open ≡-Reasoning in begin
   x * x + ((- y) * (- y) + (x * (- y) + x * (- y)))
   ≡⟨ cong (x * x +_)
           (cong₂ _+_ (neg-neg-square y)
-                     (cong₂ _+_ (n*ʳ x y) (n*ʳ x y))) ⟩
+                     (cong₂ _+_ (sym (neg-distribʳ-* x y))
+                                (sym (neg-distribʳ-* x y)))) ⟩
   x * x + (y * y + (- (x * y) + - (x * y))) ∎
 
--- (xy)² = x²y².
+-- The square of a product is the product of the squares.
 --
 -- 乘积的平方等于平方的乘积。
 sq-comm : ∀ x y → (x * y) * (x * y) ≡ (x * x) * (y * y)
-sq-comm x y = let open ≡-Reasoning in begin
+sq-comm x y = begin
   (x * y) * (x * y)
   ≡⟨ *-assoc x y (x * y) ⟩
   x * (y * (x * y))
@@ -194,14 +194,14 @@ sq-comm x y = let open ≡-Reasoning in begin
   ≡⟨ sym (*-assoc x x (y * y)) ⟩
   (x * x) * (y * y) ∎
 
--- (ac)(bd) = (ad)(bc).
+-- By rearranging the four factors, the two cross products are equal.
 --
--- 通过重排四个因子，交叉乘积 (ac)(bd) 与 (ad)(bc) 相等。
+-- 通过重排四个因子，两个交叉乘积相等。
 cross-eq : ∀ a b c d → (a * c) * (b * d) ≡ (a * d) * (b * c)
 cross-eq a b c d = trans canon₁ (sym canon₂)
   where
   canon₁ : (a * c) * (b * d) ≡ (a * b) * (c * d)
-  canon₁ = let open ≡-Reasoning in begin
+  canon₁ = begin
     (a * c) * (b * d)
     ≡⟨ *-assoc a c (b * d) ⟩
     a * (c * (b * d))
@@ -214,7 +214,7 @@ cross-eq a b c d = trans canon₁ (sym canon₂)
     ≡⟨ sym (*-assoc a b (c * d)) ⟩
     (a * b) * (c * d) ∎
   canon₂ : (a * d) * (b * c) ≡ (a * b) * (c * d)
-  canon₂ = let open ≡-Reasoning in begin
+  canon₂ = begin
     (a * d) * (b * c)
     ≡⟨ *-assoc a d (b * c) ⟩
     a * (d * (b * c))
@@ -233,7 +233,7 @@ cross-eq a b c d = trans canon₁ (sym canon₂)
 --
 -- 供 Rotation / Gaussian 使用的混合积律。
 swap-mid : ∀ x y z w → (x * y) * (z * w) ≡ (x * z) * (y * w)
-swap-mid x y z w = let open ≡-Reasoning in begin
+swap-mid x y z w = begin
   (x * y) * (z * w)
   ≡⟨ *-assoc x y (z * w) ⟩
   x * (y * (z * w))
@@ -250,7 +250,7 @@ swap-mid x y z w = let open ≡-Reasoning in begin
 --
 -- 翻转左结合三元乘积的后两个因子。
 flip3 : ∀ s x y → (s * x) * y ≡ (s * y) * x
-flip3 s x y = let open ≡-Reasoning in begin
+flip3 s x y = begin
   (s * x) * y
   ≡⟨ *-assoc s x y ⟩
   s * (x * y)
@@ -264,33 +264,33 @@ flip3 s x y = let open ≡-Reasoning in begin
 --
 -- 混合符号与减法
 
--- (x - y) * z = x*z - y*z.
+-- Right distributivity of multiplication over subtraction.
 --
 -- 右乘减法的分配。
 *ʳ-sub : ∀ x y z → (x - y) * z ≡ x * z - y * z
-*ʳ-sub x y z = let open ≡-Reasoning in begin
+*ʳ-sub x y z = begin
   (x - y) * z
   ≡⟨ *-distribʳ-+ z x (- y) ⟩
   x * z + (- y) * z
-  ≡⟨ cong (x * z +_) (n*ˡ y z) ⟩
+  ≡⟨ cong (x * z +_) (sym (neg-distribˡ-* y z)) ⟩
   x * z - y * z ∎
 
--- x * (y - z) = x*y - x*z.
+-- Left distributivity of multiplication over subtraction.
 --
 -- 左乘减法的分配。
 *ˡ-sub : ∀ x y z → x * (y - z) ≡ x * y - x * z
-*ˡ-sub x y z = let open ≡-Reasoning in begin
+*ˡ-sub x y z = begin
   x * (y - z)
   ≡⟨ *-distribˡ-+ x y (- z) ⟩
   x * y + x * (- z)
-  ≡⟨ cong (x * y +_) (n*ʳ x z) ⟩
+  ≡⟨ cong (x * y +_) (sym (neg-distribʳ-* x z)) ⟩
   x * y - x * z ∎
 
--- X - (Y + Z) = (X - Y) - Z.
+-- Subtracting a sum is iterated subtraction.
 --
 -- 嵌套减法：减去和即反复减法。
 sub-+-assoc : ∀ X Y Z → X - (Y + Z) ≡ (X - Y) - Z
-sub-+-assoc X Y Z = let open ≡-Reasoning in begin
+sub-+-assoc X Y Z = begin
   X - (Y + Z)
   ≡⟨ cong (X +_) (neg-distrib-+ Y Z) ⟩
   X + (- Y + - Z)
@@ -302,20 +302,13 @@ sub-+-assoc X Y Z = let open ≡-Reasoning in begin
 --
 -- 四项归组
 
--- (x₁ + y₁) + (x₂ + y₂) = (x₁ + x₂) + (y₁ + y₂).
---
--- 将两对按首项与次项重新归组。
-pairs2 : ∀ x₁ x₂ y₁ y₂ →
-         (x₁ + y₁) + (x₂ + y₂) ≡ (x₁ + x₂) + (y₁ + y₂)
-pairs2 x₁ x₂ y₁ y₂ = +interchange x₁ y₁ x₂ y₂
-
 -- Interleave-regroup two groups of four terms.
 --
 -- 两组四项交错归组。
 pairs4 : ∀ x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ →
          (((x₁ + y₁) + (x₂ + y₂)) + ((x₃ + y₃) + (x₄ + y₄)))
          ≡ ((((x₁ + x₂) + x₃) + x₄) + (((y₁ + y₂) + y₃) + y₄))
-pairs4 x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ = let open ≡-Reasoning in begin
+pairs4 x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ = begin
     (((x₁ + y₁) + (x₂ + y₂)) + ((x₃ + y₃) + (x₄ + y₄)))
   ≡⟨ cong₂ _+_ (+interchange x₁ y₁ x₂ y₂)
                (+interchange x₃ y₃ x₄ y₄) ⟩
@@ -330,7 +323,7 @@ pairs4 x₁ x₂ x₃ x₄ y₁ y₂ y₃ y₄ = let open ≡-Reasoning in begin
 --
 -- 前两个加项旋到末尾。
 rot4 : ∀ X Y U V → ((X + Y) + U) + V ≡ ((U + V) + X) + Y
-rot4 X Y U V = let open ≡-Reasoning in begin
+rot4 X Y U V = begin
   ((X + Y) + U) + V
   ≡⟨ +-assoc (X + Y) U V ⟩
   (X + Y) + (U + V)
@@ -343,7 +336,7 @@ rot4 X Y U V = let open ≡-Reasoning in begin
 --
 -- 四个加项整体反转。
 rev4 : ∀ X Y U V → ((X + Y) + U) + V ≡ ((V + U) + Y) + X
-rev4 X Y U V = let open ≡-Reasoning in begin
+rev4 X Y U V = begin
   ((X + Y) + U) + V
   ≡⟨ +-assoc (X + Y) U V ⟩
   (X + Y) + (U + V)
@@ -354,12 +347,12 @@ rev4 X Y U V = let open ≡-Reasoning in begin
   ≡⟨ sym (+-assoc (V + U) Y X) ⟩
   ((V + U) + Y) + X ∎
 
--- -(((a + b) + -c) + -d) = ((-a + -b) + c) + d.
+-- Negating a signed four-term sum flips all signs.
 --
 -- 对带符号的四项和整体取负会将所有符号翻转。
 neg4 : ∀ a b c d →
        - (((a + b) + - c) + - d) ≡ ((- a + - b) + c) + d
-neg4 a b c d = let open ≡-Reasoning in begin
+neg4 a b c d = begin
     - (((a + b) + - c) + - d)
   ≡⟨ neg-distrib-+ ((a + b) + - c) (- d) ⟩
     - ((a + b) + - c) + - (- d)
@@ -367,7 +360,7 @@ neg4 a b c d = let open ≡-Reasoning in begin
     ((- a + - b) + c) + d ∎
   where
   inner : ∀ a b c → - ((a + b) + - c) ≡ (- a + - b) + c
-  inner a b c = let open ≡-Reasoning in begin
+  inner a b c = begin
     - ((a + b) + - c)
     ≡⟨ neg-distrib-+ (a + b) (- c) ⟩
     - (a + b) + - (- c)
@@ -378,9 +371,9 @@ neg4 a b c d = let open ≡-Reasoning in begin
 
 -- Negate the expansion of a two-term signed sum.
 --
--- 折叠两项带符号和的展开取负。
+-- 对两项带符号和的展开取负。
 foldNeg : ∀ x y → - (x + - y) ≡ - x + y
-foldNeg x y = let open ≡-Reasoning in begin
+foldNeg x y = begin
   - (x + - y)
   ≡⟨ neg-distrib-+ x (- y) ⟩
   - x + - (- y)
@@ -392,11 +385,11 @@ foldNeg x y = let open ≡-Reasoning in begin
 --
 -- 数乘重排
 
--- s*(r*x) = r*(s*x).
+-- Scalar factors can be reordered.
 --
 -- 数乘因子之间可交换顺序。
 swap-scalar : ∀ {r} s x → (s * (r * x)) ≡ r * (s * x)
-swap-scalar {r} s x = let open ≡-Reasoning in begin
+swap-scalar {r} s x = begin
   s * (r * x)
   ≡⟨ sym (*-assoc s r x) ⟩
   (s * r) * x
@@ -405,46 +398,28 @@ swap-scalar {r} s x = let open ≡-Reasoning in begin
   ≡⟨ *-assoc r s x ⟩
   r * (s * x) ∎
 
--- (r*x)*z = r*(x*z).
---
--- 将数乘因子右结合进乘积。
-front : ∀ {r} z x → (r * x) * z ≡ r * (x * z)
-front {r} z x = *-assoc r x z
-
--- (s*(r*x))*z = r*((s*x)*z).
+-- Exchange the outer and inner scalar factors inside a product.
 --
 -- 在乘积内交换外层与内层数乘因子。
 frontS : ∀ {r} s z x → (s * (r * x)) * z ≡ r * ((s * x) * z)
-frontS {r} s z x = let open ≡-Reasoning in begin
+frontS {r} s z x = begin
   (s * (r * x)) * z
   ≡⟨ cong (λ t → t * z) (swap-scalar {r} s x) ⟩
   (r * (s * x)) * z
   ≡⟨ *-assoc r (s * x) z ⟩
   r * ((s * x) * z) ∎
 
--- -(r*x) = r*(-x).
---
--- 取负与数乘可交换。
-front-neg : ∀ {r} x → - (r * x) ≡ r * (- x)
-front-neg {r} x = neg-distribʳ-* r x
-
--- -((s*(r*x))*z) = r*(-((s*x)*z)).
+-- Negation through a product of two scalar factors and an extra factor.
 --
 -- 通过两个数乘因子与一个因子的乘积进行取负。
 front-negS : ∀ {r} s z x →
              - ((s * (r * x)) * z) ≡ r * (- ((s * x) * z))
-front-negS {r} s z x = let open ≡-Reasoning in begin
+front-negS {r} s z x = begin
   - ((s * (r * x)) * z)
   ≡⟨ cong -_ (frontS {r} s z x) ⟩
   - (r * ((s * x) * z))
-  ≡⟨ front-neg {r} ((s * x) * z) ⟩
+  ≡⟨ neg-distribʳ-* r ((s * x) * z) ⟩
   r * (- ((s * x) * z)) ∎
-
--- Factor r out of two signed summands.
---
--- 从两个带符号加项中提出 r。
-factor2 : ∀ {r} x y → r * x + r * (- y) ≡ r * (x + - y)
-factor2 {r} x y = sym (*-distribˡ-+ r x (- y))
 
 -- Factor r out of a four-term signed sum.
 --
@@ -452,7 +427,7 @@ factor2 {r} x y = sym (*-distribˡ-+ r x (- y))
 factor4 : ∀ {r} x y z w →
           (((r * x + r * y) + r * (- z)) + r * (- w))
           ≡ r * (((x + y) + - z) + - w)
-factor4 {r} x y z w = let open ≡-Reasoning in begin
+factor4 {r} x y z w = begin
     (((r * x + r * y) + r * (- z)) + r * (- w))
   ≡⟨ cong (λ t → (t + r * (- z)) + r * (- w))
           (sym (*-distribˡ-+ r x y)) ⟩
@@ -468,11 +443,11 @@ factor4 {r} x y z w = let open ≡-Reasoning in begin
 --
 -- 单位/零规范化
 
--- 1*k - 0*k = k.
+-- Multiplying by one and subtracting zero leaves the value unchanged.
 --
 -- 乘以一减去乘以零仍为原值。
 norm1 : ∀ k → 1ℚ * k + - (0ℚ * k) ≡ k
-norm1 k = let open ≡-Reasoning in begin
+norm1 k = begin
   1ℚ * k + - (0ℚ * k)
   ≡⟨ cong (λ x → 1ℚ * k + - x) (*-zeroˡ k) ⟩
   1ℚ * k + - 0ℚ
@@ -481,11 +456,11 @@ norm1 k = let open ≡-Reasoning in begin
   ≡⟨ +-identityʳ k ⟩
   k ∎
 
--- 0 + (0 + (0 + k)) = k.
+-- Three layers of zero leave the value unchanged.
 --
 -- 三层零相加仍为原值。
 norm-tail : ∀ k → 0ℚ + (0ℚ + (0ℚ + k)) ≡ k
-norm-tail k = let open ≡-Reasoning in begin
+norm-tail k = begin
   0ℚ + (0ℚ + (0ℚ + k))
   ≡⟨ +-identityˡ (0ℚ + (0ℚ + k)) ⟩
   0ℚ + (0ℚ + k)

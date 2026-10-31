@@ -19,7 +19,7 @@ open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; ≤-<-trans; <-≤-trans; <-trans; <⇒≤; +-mono-≤
   ; +-monoʳ-<; +-comm; +-assoc; *-assoc; *-identityʳ; *-distribˡ-+; +-identityˡ
   ; +-identityʳ; pos⇒nonNeg; *-monoˡ-<-pos; neg-distrib-+; *-monoʳ-≤-nonNeg
-  ; *-monoˡ-≤-nonNeg; +-monoˡ-≤; +-monoʳ-≤)
+  ; *-monoˡ-≤-nonNeg; +-monoˡ-≤; +-monoʳ-≤; ≮⇒≥)
   renaming (+-inverseʳ to +-invʳ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
@@ -32,7 +32,7 @@ open import Real.Interval.OrderLaws using (width-below-strict)
 open import Real.Interval.Node using (u-dyadic; l-dyadic)
 open import Real.Interval.Kit using (0<half; 0≤half; half+half≡1)
 open import Real.Interval.Order renaming (<-trans to <-transR)
-open import Real.Interval.Rational using (pos-diff; ¬<⇒≥)
+open import Real.Interval.Rational using (pos-diff)
 open import Real.Interval.OrderComplete.Base using
   (_≤ℝ_; a+d≡b; x<x+; emb<; δ-dec; Subset; Upper; Occupied; Located; Bracket
   ; mkB; quarter; 0<quarter; qq≡h; 3/4; cube≤half; hp; hp-step)
@@ -383,7 +383,7 @@ module _ {P : Subset} where
       uu   = u u₀ 0
 
       not-u0<x0 = isUpper x₀ px₀
-      lx≤uu     = ¬<⇒≥ (λ uu<lx → not-u0<x0 (0 , uu<lx))
+      lx≤uu     = ≮⇒≥ (λ uu<lx → not-u0<x0 (0 , uu<lx))
 
       a = lx - 1ℚ
       b = uu + 1ℚ
@@ -431,7 +431,7 @@ module _ {P : Subset} where
           lxn = l x n
 
           ¬uun<lxn = λ uun<lxn → isUpper x px (n , uun<lxn)
-          lxn≤uun  = ¬<⇒≥ ¬uun<lxn
+          lxn≤uun  = ≮⇒≥ ¬uun<lxn
           uun≤uu   = u-mono u₀ {0} {n} z≤n
 
           ux≡ = sym (a+d≡b lxn (u x n))

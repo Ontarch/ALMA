@@ -32,11 +32,11 @@ open import Relation.Binary.PropositionalEquality using
 open ≡-Reasoning
 
 open import Base.RationalRing using (neg-involutive)
-open import Real using (embed; ε; half; embed-suc-pos)
+open import Real using (embed; ε; half; embed-suc-pos; embed-mono-<)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using
   (node; l; u; centre; width; width-n; width-1step; centre-l; centre-u; u-mono
-  ; l-mono; recipPow2; bound-w; n<2^n; embed-mono-<; 0<width)
+  ; l-mono; recipPow2; bound-w; n<2^n; 0<width)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.Kit using

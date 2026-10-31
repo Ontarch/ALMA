@@ -20,7 +20,8 @@ open ≤-Reasoning
 open import Relation.Binary.PropositionalEquality using (_≡_; cong; sym)
 open import Relation.Binary.Structures using (IsEquivalence)
 
-open import Real using (ε; 0<ε; ε-half; telescope)
+open import Base.RationalRing using (telescope)
+open import Real using (ε; 0<ε; ε-half)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (centre)
 open import Real.Interval.Rational using (negsub)

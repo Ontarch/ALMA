@@ -31,7 +31,7 @@ open import Relation.Binary.PropositionalEquality using
 open ≡-Reasoning
 
 open import Real using
-  (CauchySeq; ε; half; embed; embed-suc-pos; reciprocal-cong; 0<embed; 1/embed; embed-+-hom)
+  (CauchySeq; ε; half; embed; embed-suc-pos; reciprocal-cong; 0<embed; embed-+-hom)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (centre)
 open import Real.Interval.Kit using (strict-recip; tri-diff)
@@ -502,9 +502,9 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
             strict-recip (x * y) (embed (4 *ℕ suc j))
                          (positive⁻¹ (x * y) {{pos-xy}}) x*y<4sj
           e1≡ : ε (suc (suc k)) ≡ inv-y
-          e1≡ = sym (1/embed (suc (suc k)))
+          e1≡ = refl
           ek≡ : ε (suc k) ≡ inv-x
-          ek≡ = sym (1/embed (suc k))
+          ek≡ = refl
           s1 : inv-y + crossB < inv-y + t
           s1 = +-mono-≤-< ≤-refl seg2<t
           sum< : ε (suc (suc k)) + crossB < inv-x

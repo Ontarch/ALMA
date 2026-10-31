@@ -12,20 +12,21 @@ open import Data.Nat using (ℕ) renaming (_*_ to _ℕ*_)
 import Data.Nat.Properties as ℕP
 open import Data.Product using (_,_; Σ; _×_)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; ∣_∣; nonNegative)
+  (ℚ; 0ℚ; 1ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _≤_; ∣_∣; nonNegative)
 open import Data.Rational.Base using (_÷_) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (+-identityˡ; +-identityʳ; +-inverseʳ; +-comm; *-identityˡ; *-identityʳ
   ; *-assoc; *-comm; *-distribʳ-+; *-distribˡ-+; neg-distribˡ-*; neg-distribʳ-*
   ; ≤-refl; <⇒≤; +-mono-≤; neg-antimono-≤; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg
-  ; ∣p+q∣≤∣p∣+∣q∣; ∣p∣≡p∨∣p∣≡-p; ∣p*q∣≡∣p∣*∣q∣; 0≤p⇒∣p∣≡p)
+  ; ∣p+q∣≤∣p∣+∣q∣; ∣p∣≡p∨∣p∣≡-p; ∣p*q∣≡∣p∣*∣q∣; 0≤p⇒∣p∣≡p
+  ; ⊓-sel; ⊔-sel)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; trans; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (neg-involutive)
-open import Real using (embed; half; 2ℚ; telescope)
+open import Base.RationalRing using (neg-involutive; telescope)
+open import Real using (embed; half; 2ℚ)
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using
   (_*ℝ_; 0≤diff; cancelʳ; sub-mono)
@@ -34,7 +35,7 @@ open import Real.Interval.Bounded using (bounded)
 open import Real.IntervalEquiv using
   (node; centre; width; centre-l; centre-u; recipPow2)
 open import Real.Interval.Rational using
-  (min; max; max-eq; min-eq; sub-add; negsub)
+  (sub-add; negsub)
 open import Real.Interval.Kit using
   (*-mono-≤-nonNeg; add-self; 2ℚ*half≡1; 0≤half; half≤1; 0≤recipPow2)
 open import Real.Interval.Node using
@@ -228,47 +229,47 @@ module CentreCore (x y : RealI) (n : ℕ) where
     (D + E) * (half * half)
     ∎
 
-  hi4-fromL : max (max P1 P2) (max P3 P4) ≡ max P1 P2 →
-              max P1 P2 ≡ P1 ⊎ max P1 P2 ≡ P2 →
+  hi4-fromL : (P1 ⊔ P2) ⊔ (P3 ⊔ P4) ≡ (P1 ⊔ P2) →
+              (P1 ⊔ P2) ≡ P1 ⊎ (P1 ⊔ P2) ≡ P2 →
               hi4 ≡ P1 ⊎ hi4 ≡ P2 ⊎ hi4 ≡ P3 ⊎ hi4 ≡ P4
   hi4-fromL e (inj₁ e2) = inj₁ (trans e e2)
   hi4-fromL e (inj₂ e2) = inj₂ (inj₁ (trans e e2))
 
-  hi4-fromR : max (max P1 P2) (max P3 P4) ≡ max P3 P4 →
-              max P3 P4 ≡ P3 ⊎ max P3 P4 ≡ P4 →
+  hi4-fromR : (P1 ⊔ P2) ⊔ (P3 ⊔ P4) ≡ (P3 ⊔ P4) →
+              (P3 ⊔ P4) ≡ P3 ⊎ (P3 ⊔ P4) ≡ P4 →
               hi4 ≡ P1 ⊎ hi4 ≡ P2 ⊎ hi4 ≡ P3 ⊎ hi4 ≡ P4
   hi4-fromR e (inj₁ e2) = inj₂ (inj₂ (inj₁ (trans e e2)))
   hi4-fromR e (inj₂ e2) = inj₂ (inj₂ (inj₂ (trans e e2)))
 
-  hi4-combine : (max (max P1 P2) (max P3 P4) ≡ max P1 P2)
-              ⊎ (max (max P1 P2) (max P3 P4) ≡ max P3 P4) →
+  hi4-combine : ((P1 ⊔ P2) ⊔ (P3 ⊔ P4) ≡ (P1 ⊔ P2))
+              ⊎ ((P1 ⊔ P2) ⊔ (P3 ⊔ P4) ≡ (P3 ⊔ P4)) →
                 hi4 ≡ P1 ⊎ hi4 ≡ P2 ⊎ hi4 ≡ P3 ⊎ hi4 ≡ P4
-  hi4-combine (inj₁ e) = hi4-fromL e (max-eq P1 P2)
-  hi4-combine (inj₂ e) = hi4-fromR e (max-eq P3 P4)
+  hi4-combine (inj₁ e) = hi4-fromL e (⊔-sel P1 P2)
+  hi4-combine (inj₂ e) = hi4-fromR e (⊔-sel P3 P4)
 
   hi4-cases : hi4 ≡ P1 ⊎ hi4 ≡ P2 ⊎ hi4 ≡ P3 ⊎ hi4 ≡ P4
-  hi4-cases = hi4-combine (max-eq (max P1 P2) (max P3 P4))
+  hi4-cases = hi4-combine (⊔-sel (P1 ⊔ P2) (P3 ⊔ P4))
 
-  lo4-fromL : min (min P1 P2) (min P3 P4) ≡ min P1 P2 →
-              min P1 P2 ≡ P1 ⊎ min P1 P2 ≡ P2 →
+  lo4-fromL : (P1 ⊓ P2) ⊓ (P3 ⊓ P4) ≡ (P1 ⊓ P2) →
+              (P1 ⊓ P2) ≡ P1 ⊎ (P1 ⊓ P2) ≡ P2 →
               lo4 ≡ P1 ⊎ lo4 ≡ P2 ⊎ lo4 ≡ P3 ⊎ lo4 ≡ P4
   lo4-fromL e (inj₁ e2) = inj₁ (trans e e2)
   lo4-fromL e (inj₂ e2) = inj₂ (inj₁ (trans e e2))
 
-  lo4-fromR : min (min P1 P2) (min P3 P4) ≡ min P3 P4 →
-              min P3 P4 ≡ P3 ⊎ min P3 P4 ≡ P4 →
+  lo4-fromR : (P1 ⊓ P2) ⊓ (P3 ⊓ P4) ≡ (P3 ⊓ P4) →
+              (P3 ⊓ P4) ≡ P3 ⊎ (P3 ⊓ P4) ≡ P4 →
               lo4 ≡ P1 ⊎ lo4 ≡ P2 ⊎ lo4 ≡ P3 ⊎ lo4 ≡ P4
   lo4-fromR e (inj₁ e2) = inj₂ (inj₂ (inj₁ (trans e e2)))
   lo4-fromR e (inj₂ e2) = inj₂ (inj₂ (inj₂ (trans e e2)))
 
-  lo4-combine : (min (min P1 P2) (min P3 P4) ≡ min P1 P2)
-              ⊎ (min (min P1 P2) (min P3 P4) ≡ min P3 P4) →
+  lo4-combine : ((P1 ⊓ P2) ⊓ (P3 ⊓ P4) ≡ (P1 ⊓ P2))
+              ⊎ ((P1 ⊓ P2) ⊓ (P3 ⊓ P4) ≡ (P3 ⊓ P4)) →
                 lo4 ≡ P1 ⊎ lo4 ≡ P2 ⊎ lo4 ≡ P3 ⊎ lo4 ≡ P4
-  lo4-combine (inj₁ e) = lo4-fromL e (min-eq P1 P2)
-  lo4-combine (inj₂ e) = lo4-fromR e (min-eq P3 P4)
+  lo4-combine (inj₁ e) = lo4-fromL e (⊓-sel P1 P2)
+  lo4-combine (inj₂ e) = lo4-fromR e (⊓-sel P3 P4)
 
   lo4-cases : lo4 ≡ P1 ⊎ lo4 ≡ P2 ⊎ lo4 ≡ P3 ⊎ lo4 ≡ P4
-  lo4-cases = lo4-combine (min-eq (min P1 P2) (min P3 P4))
+  lo4-cases = lo4-combine (⊓-sel (P1 ⊓ P2) (P3 ⊓ P4))
 
   c4-c3≡ : P4 - P3 ≡ ux * (uy - ly)
   c4-c3≡ = begin
