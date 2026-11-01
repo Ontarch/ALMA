@@ -11,7 +11,7 @@ module Real where
 open import Agda.Primitive using (lzero)
 open import Data.Empty using (⊥-elim)
 open import Data.Integer.Base using (+_; +<+; +≤+) renaming (_*_ to _ℤ*_; _+_ to _ℤ+_)
-open import Data.Integer.Properties using (+◃n≡+n)
+open import Data.Integer.Properties using (pos-+; pos-*)
   renaming (*-identityʳ to ℤ*-identityʳ; ≤-<-trans to ℤ≤-<-trans
   ; ≤-trans to ℤ≤-trans; <-≤-trans to ℤ<-≤-trans; ≤-reflexive to ℤ≤-reflexive)
 open import Data.Nat using (ℕ; zero; _≥_; _⊔_; suc; s≤s; z≤n)
@@ -30,7 +30,7 @@ open import Data.Rational.Properties using
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Structures using (IsEquivalence)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; trans; subst; sym; module ≡-Reasoning)
+  (_≡_; refl; cong; cong₂; subst; sym; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Base.RationalRing using (telescope)
@@ -88,12 +88,18 @@ instance
 --
 -- 分子层面的加倍算术。
 num-2 : ∀ n → (+ 2) ℤ* (+ n) ≡ + (2 ℕ* n)
-num-2 n = +◃n≡+n (2 ℕ* n)
+num-2 n = sym (pos-* 2 n)
 
 2*embed : ∀ n → 2ℚ * embed n ≡ embed (2 ℕ* n)
-2*embed n =
-  trans (/-cong (num-2 n) refl)
-        (normalize-coprime (coprime-sym (1-coprimeTo (2 ℕ* n))))
+2*embed n = begin
+  2ℚ * embed n
+    ≡⟨⟩
+  (+ 2 ℤ* + n) / 1
+    ≡⟨ /-cong (num-2 n) refl ⟩
+  (+ (2 ℕ* n)) / 1
+    ≡⟨ normalize-coprime (coprime-sym (1-coprimeTo (2 ℕ* n))) ⟩
+  embed (2 ℕ* n)
+  ∎
 
 -- The denominator at the half index is twice the denominator at the
 -- current index.
@@ -108,7 +114,7 @@ den-2 k = sym (*-suc 2 k)
 -- 二分之一及其非零实例
 
 embed2-nonZero : NonZero (embed 2)
-embed2-nonZero = pos⇒nonZero (embed 2) {{embed-suc-pos {1}}}
+embed2-nonZero = embed-suc-nonZero {1}
 
 half : ℚ
 half = 1/_ (embed 2) {{embed2-nonZero}}
@@ -173,8 +179,8 @@ _≈_ x y = ∀ k → Σ ℕ (λ N → ∀ n → n ≥ N → _s≈_ (f x n) (f y
 ------------------------------------------------------------------------
 -- Halving lemma
 --
--- Two approximations at half precision add to the full precision.
--- Pure field algebra over ℚ.
+-- Two copies of the half-denominator reciprocal add to the
+-- full-denominator reciprocal. Pure field algebra over ℚ.
 --
 -- 折半引理
 --
@@ -236,7 +242,7 @@ halve m =
 -- 倒数保持命题相等。
 reciprocal-cong : ∀ a b → .{{na : NonZero a}} → .{{nb : NonZero b}} →
                   a ≡ b → 1/_ a ≡ 1/_ b
-reciprocal-cong a .a {{na}} {{na₁}} refl = refl
+reciprocal-cong a .a refl = refl
 
 ------------------------------------------------------------------------
 -- ε halving
@@ -294,9 +300,7 @@ reciprocal-cong a .a {{na}} {{na₁}} refl = refl
       eq = +-inverseʳ (f x n)
       d1 : (f x n + (- f x n)) < ε k
       d1 = ≤-<-trans (≤-reflexive eq) (0<ε k)
-      d2 : (f x n + (- f x n)) < ε k
-      d2 = d1
-  in (d1 , d2)
+  in (d1 , d1)
 
 ------------------------------------------------------------------------
 -- Symmetry
@@ -399,19 +403,22 @@ const q = record
 --
 -- embed 的算术同态
 
+-- Numerator addition: the sum of two positive numerators corresponds
+-- to the natural-number sum.
+--
+-- 分子加法：分子层面的加法同态。
 num-add : ∀ m n → (+ m ℤ* + 1 ℤ+ + n ℤ* + 1) ≡ + (m +ℕ n)
 num-add m n = begin
   (+ m ℤ* + 1 ℤ+ + n ℤ* + 1)
-    ≡⟨ cong (λ z → z ℤ+ (+ n ℤ* + 1))
-             (ℤ*-identityʳ (+ m)) ⟩
-  (+ m ℤ+ + n ℤ* + 1)
-    ≡⟨ cong (λ z → (+ m) ℤ+ z)
-             (ℤ*-identityʳ (+ n)) ⟩
+    ≡⟨ cong₂ _ℤ+_ (ℤ*-identityʳ (+ m)) (ℤ*-identityʳ (+ n)) ⟩
   (+ m ℤ+ + n)
-    ≡⟨⟩
+    ≡⟨ pos-+ m n ⟩
   + (m +ℕ n)
   ∎
 
+-- The embedding preserves addition.
+--
+-- 嵌入保持加法。
 embed-+-hom : ∀ m n → embed (m +ℕ n) ≡ embed m + embed n
 embed-+-hom m n = begin
   embed (m +ℕ n)
@@ -423,16 +430,16 @@ embed-+-hom m n = begin
   embed m + embed n
   ∎
 
-num-mul : ∀ m n → (+ m ℤ* + n) ≡ + (m ℕ* n)
-num-mul m n = +◃n≡+n (m ℕ* n)
-
+-- The embedding preserves multiplication.
+--
+-- 嵌入保持乘法。
 embed-*-hom : ∀ m n → embed (m ℕ* n) ≡ embed m * embed n
 embed-*-hom m n = begin
   embed (m ℕ* n)
     ≡⟨ sym (normalize-coprime (coprime-sym (1-coprimeTo (m ℕ* n)))) ⟩
-  (+ (m ℕ* n) / 1)
-    ≡⟨ sym (/-cong (num-mul m n) refl) ⟩
-  ((+ m ℤ* + n) / (1 ℕ* 1))
+  (+ (m ℕ* n)) / 1
+    ≡⟨ cong (λ x → x / 1) (pos-* m n) ⟩
+  (+ m ℤ* + n) / 1
     ≡⟨⟩
   embed m * embed n
   ∎
@@ -452,10 +459,16 @@ embed-* m n = sym (embed-*-hom m n)
 0≤embed zero    = ≤-refl
 0≤embed (suc n) = <⇒≤ (0<embed n)
 
+-- A natural number whose embedding is positive is at least one.
+--
+-- 嵌入为正的自然数至少为 1。
 embed-pos→≥1 : ∀ m → 0ℚ < embed m → m ≥ 1
 embed-pos→≥1 zero    pr = ⊥-elim (<-irrefl refl pr)
 embed-pos→≥1 (suc m) _  = s≤s z≤n
 
+-- Monotonicity of the embedding for strict and non-strict order.
+--
+-- 嵌入对严格序与非严格序单调。
 embed-mono-< : ∀ {m n} → m <ℕ n → embed m < embed n
 embed-mono-< {m} {n} h =
   *<* (ℤ<-≤-trans

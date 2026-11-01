@@ -40,7 +40,7 @@ open import Relation.Binary.PropositionalEquality using
   (trans; sym; cong; cong₂; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (neg-neg-mul; sq+; sq-; sq-comm; cross-eq)
+open import Base.RationalRing using (neg-neg-mul; sq+; sq-; swap-mid; cross-eq)
 
 ------------------------------------------------------------------------
 -- Gaussian rationals in rectangular form
@@ -209,10 +209,10 @@ norm²-mul (a , b) (c , d) = begin
                      (sym (+-assoc (ad * ad) (bc * bc) (Q + Q)))
 
   U-eq : U ≡ a²c² + b²d²
-  U-eq = cong₂ _+_ (sq-comm a c) (sq-comm b d)
+  U-eq = cong₂ _+_ (swap-mid a c a c) (swap-mid b d b d)
 
   V-eq : V ≡ a²d² + b²c²
-  V-eq = cong₂ _+_ (sq-comm a d) (sq-comm b c)
+  V-eq = cong₂ _+_ (swap-mid a d a d) (swap-mid b c b c)
 
   expand : (a * a + b * b) * (c * c + d * d)
          ≡ (a²c² + a²d²) + (b²c² + b²d²)

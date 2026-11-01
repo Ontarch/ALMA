@@ -9,44 +9,33 @@
 module Real.Interval where
 
 open import Data.Nat using (ℕ; suc; _^_)
-open import Data.Nat.Coprimality using (1-coprimeTo)
-  renaming (sym to coprime-sym)
+open import Data.Nat.Coprimality using (1-coprimeTo) renaming (sym to coprime-sym)
 open import Data.Nat.Properties using (m^n≢0)
 open import Data.Product using (_,_; _×_)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _<_; _≤_; _+_; _*_; Positive; NonZero)
-open import Data.Rational.Base using (_÷_; _-_) renaming (-_ to neg)
+open import Data.Rational.Base using (_÷_; _-_; 1/_) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (mkℚ+-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; ≤-reflexive; ≤-refl
-  ; ≤-trans; <⇒≤; <-trans; +-mono-≤; +-mono-<-≤; +-identityʳ
-  ; +-identityˡ; +-inverseʳ; +-assoc; +-comm; neg-distrib-+; *-inverseʳ
-  ; *-assoc; *-comm; *-distribʳ-+; *-identityˡ; neg-antimono-≤)
+  ; ≤-trans; <⇒≤; <-trans; +-mono-≤; +-mono-<-≤; +-identityʳ; +-identityˡ
+  ; +-inverseʳ; +-assoc; +-comm; neg-distrib-+; *-inverseʳ; *-assoc; *-comm
+  ; *-distribʳ-+; *-identityˡ; neg-antimono-≤)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; cong; cong₂; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Base.RationalRing using (neg-involutive)
-open import Real using (embed; 2ℚ; 2*embed; halve; reciprocal-cong; 2ℚ≡1+1)
+open import Real using
+  (embed; 2ℚ; 2*embed; embed2-nonZero; half; halve; reciprocal-cong; 2ℚ≡1+1)
 
 ------------------------------------------------------------------------
--- The standard coinductive real: a nested chain of rational intervals
---
--- Each node carries the current interval (l, u) with l < u and a chosen
--- subinterval (the next node) whose length is at most half. The real is
--- the intersection over the nested chain.
--- This corrects the point-centre neighbourhood tree (Neighborhood.agda):
--- a real chooses nested intervals (deterministic corecursive step),
--- whereas the E-M tree with caller-supplied branches cannot be totalised
--- along a single fast path. The nesting is carried data, not a branch.
+-- The standard coinductive real as a nested chain of rational intervals
 --
 -- 标准余归纳实数：有理区间的嵌套链
---
--- 每个节点携带当前区间 (l, u)，l < u，并选择一个长度至多减半的子区间
--- （下一节点）。实数即嵌套链的交集。
--- 这修正了点中心邻域树（Neighborhood.agda）：实数选择嵌套区间
--- （确定性余归纳步骤），而调用者携带分支的 E-M 树无法沿单条快速路径
--- 良定义。嵌套是携带数据，不是分支。
 
+-- The embedding of a positive power of two is positive.
+--
+-- 二的正幂的嵌入为正。
 pos-pow : ∀ k → Positive (embed (2 ^ suc k))
 pos-pow k =
   mkℚ+-pos (2 ^ suc k) 1
@@ -58,18 +47,25 @@ pos-pow k =
 -- 可求和的二进容差。
 δ : ℕ → ℚ
 δ k =
-  Data.Rational.Base.1/_ (embed (2 ^ suc k))
+  1/_ (embed (2 ^ suc k))
     {{pos⇒nonZero (embed (2 ^ suc k)) {{pos-pow k}}}}
 
+-- The dyadic tolerance is positive.
+--
+-- 二进容差为正。
 δ-pos : ∀ k → 0ℚ < δ k
 δ-pos k =
   positive⁻¹ (δ k)
     {{1/pos⇒pos (embed (2 ^ suc k)) {{pos-pow k}}}}
 
--- Coinductive nested-interval real.
---
--- 余归纳嵌套区间实数。
 mutual
+  -- A real: an interval (l, u) with l < u, a chosen subinterval next,
+  -- and the nesting conditions. Unlike the E-M tree in Neighborhood.agda,
+  -- the subinterval is carried data, chosen deterministically.
+  --
+  -- 实数：区间 (l, u)，l < u，一个选定的子区间 next，以及嵌套条件。
+  -- 与 Neighborhood.agda 的 E-M 树不同，子区间是携带数据，以确定性
+  -- 方式选定。
   record RealI : Set where
     coinductive
     field
@@ -79,6 +75,9 @@ mutual
       next : RealI
       nest : Nest l u next
 
+  -- Nesting conditions between consecutive levels.
+  --
+  -- 相邻层之间的嵌套条件。
   Nest : (l u : ℚ) (next : RealI) → Set
   Nest l u next =
     l ≤ RealI.l next ×
@@ -97,8 +96,8 @@ mutual
       n2m = subst NonZero (sym e)
               (pos⇒nonZero (embed (2 ^ suc (suc k))) {{pos-pow (suc k)}})
       nd = pos⇒nonZero (embed (2 ^ suc (suc k))) {{pos-pow (suc k)}}
-      t = Data.Rational.Base.1/_ (2ℚ * m) {{n2m}}
-      one/m = Data.Rational.Base.1/_ m {{nm}}
+      t = 1/_ (2ℚ * m) {{n2m}}
+      one/m = 1/_ m {{nm}}
       t≡δ : t ≡ δ (suc k)
       t≡δ = reciprocal-cong (2ℚ * m) (embed (2 ^ suc (suc k)))
               {{n2m}} {{nd}} e
@@ -188,9 +187,6 @@ double-half x = begin
   x
   ∎
   where
-  n2 = pos⇒nonZero (embed 2) {{pos-pow 0}}
-  half = Data.Rational.Base.1/_ (embed 2) {{n2}}
-
   2x : embed 2 * x ≡ x + x
   2x = begin
     embed 2 * x
@@ -203,7 +199,7 @@ double-half x = begin
     ∎
 
   inv : embed 2 * half ≡ 1ℚ
-  inv = *-inverseʳ (embed 2) {{n2}}
+  inv = *-inverseʳ (embed 2) {{embed2-nonZero}}
 
   main : (embed 2 * x) * half ≡ x
   main = begin

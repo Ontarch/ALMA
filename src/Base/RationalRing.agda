@@ -8,13 +8,17 @@
 
 module Base.RationalRing where
 
+open import Algebra.Properties.Group using (⁻¹-involutive)
+open import Algebra.Properties.CommutativeMonoid using (medial)
+open import Algebra.Properties.Ring using ([-x][-y]≈xy; [y-z]x≈yx-zx; x[y-z]≈xy-xz)
 open import Data.Rational using (0ℚ; 1ℚ; _+_; _*_; _-_; -_; _<_; _≤_)
 open import Data.Rational.Properties using
   (+-assoc; +-comm; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-comm
-  ; *-identityˡ; *-zeroˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+
-  ; neg-distribˡ-*; neg-distribʳ-*; <⇒≤; positive⁻¹)
+  ; *-identityˡ; *-zeroˡ; *-distribˡ-+; *-distribʳ-+; neg-distrib-+; positive⁻¹
+  ; neg-distribʳ-*; <⇒≤; +-0-group; +-*-ring; +-0-commutativeMonoid
+  ; *-1-commutativeMonoid)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+  (_≡_; refl; sym; cong; cong₂; module ≡-Reasoning)
 open ≡-Reasoning
 
 ------------------------------------------------------------------------
@@ -35,67 +39,44 @@ open ≡-Reasoning
 0≤1 = <⇒≤ 0<1
 
 ------------------------------------------------------------------------
+-- Medial laws, from the commutative-monoid structure on ℚ
+--
+-- medial 律，来自 ℚ 的交换幺半群结构
+
+-- Medial law for `+`.
+--
+-- 加法的 medial 律。
++interchange : ∀ a b c d → (a + b) + (c + d) ≡ (a + c) + (b + d)
++interchange = medial +-0-commutativeMonoid
+
+-- Medial law for `*`.
+--
+-- 乘法的 medial 律。
+swap-mid : ∀ a b c d → (a * b) * (c * d) ≡ (a * c) * (b * d)
+swap-mid = medial *-1-commutativeMonoid
+
+------------------------------------------------------------------------
 -- Negation
 --
 -- 取负
 
--- Double negation is the identity.
+-- Double negation is the identity, inherited from the additive group
+-- structure on ℚ.
 --
--- 双重取负为恒等。
+-- 双重取负为恒等，继承自 ℚ 的加法群结构。
 neg-involutive : ∀ x → - (- x) ≡ x
-neg-involutive x = begin
-  - (- x)
-  ≡⟨ sym (+-identityʳ (- (- x))) ⟩
-  - (- x) + 0ℚ
-  ≡⟨ cong (- (- x) +_) (sym (+-inverseˡ x)) ⟩
-  - (- x) + (- x + x)
-  ≡⟨ sym (+-assoc (- (- x)) (- x) x) ⟩
-  (- (- x) + - x) + x
-  ≡⟨ cong (_+ x) (+-inverseˡ (- x)) ⟩
-  0ℚ + x
-  ≡⟨ +-identityˡ x ⟩
-  x ∎
+neg-involutive = ⁻¹-involutive +-0-group
 
 -- The product of two negations is the original product.
 --
 -- 两个取负相乘得到原乘积。
 neg-neg-mul : ∀ x y → (- x) * (- y) ≡ x * y
-neg-neg-mul x y = begin
-  (- x) * (- y)
-  ≡⟨ sym (neg-distribˡ-* x (- y)) ⟩
-  - (x * (- y))
-  ≡⟨ cong -_ (sym (neg-distribʳ-* x y)) ⟩
-  - (- (x * y))
-  ≡⟨ neg-involutive (x * y) ⟩
-  x * y ∎
-
--- Negation does not change the square.
---
--- 取负不改变平方。
-neg-neg-square : ∀ x → (- x) * (- x) ≡ x * x
-neg-neg-square x = neg-neg-mul x x
+neg-neg-mul = [-x][-y]≈xy +-*-ring
 
 ------------------------------------------------------------------------
 -- Additive rearrangement
 --
 -- 加法重排
-
--- Swapping the inner two summands leaves a four-term sum unchanged.
---
--- 交换内层两个加项后四项和不变。
-+interchange : ∀ a b c d → (a + b) + (c + d) ≡ (a + c) + (b + d)
-+interchange a b c d = begin
-  (a + b) + (c + d)
-  ≡⟨ +-assoc a b (c + d) ⟩
-  a + (b + (c + d))
-  ≡⟨ cong (a +_) (sym (+-assoc b c d)) ⟩
-  a + ((b + c) + d)
-  ≡⟨ cong (a +_) (cong (_+ d) (+-comm b c)) ⟩
-  a + ((c + b) + d)
-  ≡⟨ cong (a +_) (+-assoc c b d) ⟩
-  a + (c + (b + d))
-  ≡⟨ sym (+-assoc a c (b + d)) ⟩
-  (a + c) + (b + d) ∎
 
 -- Reassociate a left-leaning four-term sum into right-nested form.
 --
@@ -172,79 +153,23 @@ sq- x y = begin
   ≡⟨ sq+ x (- y) ⟩
   x * x + ((- y) * (- y) + (x * (- y) + x * (- y)))
   ≡⟨ cong (x * x +_)
-          (cong₂ _+_ (neg-neg-square y)
-                     (cong₂ _+_ (sym (neg-distribʳ-* x y))
-                                (sym (neg-distribʳ-* x y)))) ⟩
+          (cong₂ (λ u v → u + (v + v))
+                (neg-neg-mul y y)
+                (sym (neg-distribʳ-* x y))) ⟩
   x * x + (y * y + (- (x * y) + - (x * y))) ∎
-
--- The square of a product is the product of the squares.
---
--- 乘积的平方等于平方的乘积。
-sq-comm : ∀ x y → (x * y) * (x * y) ≡ (x * x) * (y * y)
-sq-comm x y = begin
-  (x * y) * (x * y)
-  ≡⟨ *-assoc x y (x * y) ⟩
-  x * (y * (x * y))
-  ≡⟨ cong (x *_) (sym (*-assoc y x y)) ⟩
-  x * ((y * x) * y)
-  ≡⟨ cong (λ z → x * (z * y)) (*-comm y x) ⟩
-  x * ((x * y) * y)
-  ≡⟨ cong (x *_) (*-assoc x y y) ⟩
-  x * (x * (y * y))
-  ≡⟨ sym (*-assoc x x (y * y)) ⟩
-  (x * x) * (y * y) ∎
 
 -- By rearranging the four factors, the two cross products are equal.
 --
 -- 通过重排四个因子，两个交叉乘积相等。
 cross-eq : ∀ a b c d → (a * c) * (b * d) ≡ (a * d) * (b * c)
-cross-eq a b c d = trans canon₁ (sym canon₂)
-  where
-  canon₁ : (a * c) * (b * d) ≡ (a * b) * (c * d)
-  canon₁ = begin
-    (a * c) * (b * d)
-    ≡⟨ *-assoc a c (b * d) ⟩
-    a * (c * (b * d))
-    ≡⟨ cong (a *_) (sym (*-assoc c b d)) ⟩
-    a * ((c * b) * d)
-    ≡⟨ cong (λ z → a * (z * d)) (*-comm c b) ⟩
-    a * ((b * c) * d)
-    ≡⟨ cong (a *_) (*-assoc b c d) ⟩
-    a * (b * (c * d))
-    ≡⟨ sym (*-assoc a b (c * d)) ⟩
-    (a * b) * (c * d) ∎
-  canon₂ : (a * d) * (b * c) ≡ (a * b) * (c * d)
-  canon₂ = begin
-    (a * d) * (b * c)
-    ≡⟨ *-assoc a d (b * c) ⟩
-    a * (d * (b * c))
-    ≡⟨ cong (a *_) (sym (*-assoc d b c)) ⟩
-    a * ((d * b) * c)
-    ≡⟨ cong (λ z → a * (z * c)) (*-comm d b) ⟩
-    a * ((b * d) * c)
-    ≡⟨ cong (a *_) (*-assoc b d c) ⟩
-    a * (b * (d * c))
-    ≡⟨ cong (λ z → a * (b * z)) (*-comm d c) ⟩
-    a * (b * (c * d))
-    ≡⟨ sym (*-assoc a b (c * d)) ⟩
-    (a * b) * (c * d) ∎
-
--- Mixed product law used by Rotation / Gaussian.
---
--- 供 Rotation / Gaussian 使用的混合积律。
-swap-mid : ∀ x y z w → (x * y) * (z * w) ≡ (x * z) * (y * w)
-swap-mid x y z w = begin
-  (x * y) * (z * w)
-  ≡⟨ *-assoc x y (z * w) ⟩
-  x * (y * (z * w))
-  ≡⟨ cong (x *_) (sym (*-assoc y z w)) ⟩
-  x * ((y * z) * w)
-  ≡⟨ cong (x *_) (cong (_* w) (*-comm y z)) ⟩
-  x * ((z * y) * w)
-  ≡⟨ cong (x *_) (*-assoc z y w) ⟩
-  x * (z * (y * w))
-  ≡⟨ sym (*-assoc x z (y * w)) ⟩
-  (x * z) * (y * w) ∎
+cross-eq a b c d = begin
+  (a * c) * (b * d)
+    ≡⟨ swap-mid a c b d ⟩
+  (a * b) * (c * d)
+    ≡⟨ cong ((a * b) *_) (*-comm c d) ⟩
+  (a * b) * (d * c)
+    ≡⟨ sym (swap-mid a d b c) ⟩
+  (a * d) * (b * c) ∎
 
 -- Swap the last two factors of a left-associated triple product.
 --
@@ -268,23 +193,13 @@ flip3 s x y = begin
 --
 -- 右乘减法的分配。
 *ʳ-sub : ∀ x y z → (x - y) * z ≡ x * z - y * z
-*ʳ-sub x y z = begin
-  (x - y) * z
-  ≡⟨ *-distribʳ-+ z x (- y) ⟩
-  x * z + (- y) * z
-  ≡⟨ cong (x * z +_) (sym (neg-distribˡ-* y z)) ⟩
-  x * z - y * z ∎
+*ʳ-sub x y z = [y-z]x≈yx-zx +-*-ring z x y
 
 -- Left distributivity of multiplication over subtraction.
 --
 -- 左乘减法的分配。
 *ˡ-sub : ∀ x y z → x * (y - z) ≡ x * y - x * z
-*ˡ-sub x y z = begin
-  x * (y - z)
-  ≡⟨ *-distribˡ-+ x y (- z) ⟩
-  x * y + x * (- z)
-  ≡⟨ cong (x * y +_) (sym (neg-distribʳ-* x z)) ⟩
-  x * y - x * z ∎
+*ˡ-sub = x[y-z]≈xy-xz +-*-ring
 
 -- Subtracting a sum is iterated subtraction.
 --
@@ -411,7 +326,7 @@ frontS {r} s z x = begin
 
 -- Negation through a product of two scalar factors and an extra factor.
 --
--- 通过两个数乘因子与一个因子的乘积进行取负。
+-- 对由两个数乘因子与一个额外因子构成的乘积取负。
 front-negS : ∀ {r} s z x →
              - ((s * (r * x)) * z) ≡ r * (- ((s * x) * z))
 front-negS {r} s z x = begin
@@ -445,7 +360,7 @@ factor4 {r} x y z w = begin
 
 -- Multiplying by one and subtracting zero leaves the value unchanged.
 --
--- 乘以一减去乘以零仍为原值。
+-- 乘以一后减去零乘积仍为原值。
 norm1 : ∀ k → 1ℚ * k + - (0ℚ * k) ≡ k
 norm1 k = begin
   1ℚ * k + - (0ℚ * k)

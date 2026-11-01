@@ -32,7 +32,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; cong₂; module ≡-Reasoning)
 
 open import Physics.Quantum.Gaussian using (ℂ; _*ᶜ_; norm²; norm²-mul; Unit)
-open import Base.RationalRing using (neg-neg-square)
+open import Base.RationalRing using (neg-neg-mul)
 
 ------------------------------------------------------------------------
 -- Rational squares are nonnegative
@@ -53,7 +53,7 @@ private
   abs²≡² (mkℚ +0       _ _) = refl
   abs²≡² x@(mkℚ -[1+ _ ] _ _) = let open ≡-Reasoning in begin
     ∣ x ∣ * ∣ x ∣
-    ≡⟨ neg-neg-square x ⟩
+    ≡⟨ neg-neg-mul x x ⟩
     x * x ∎
 
   -- Every rational square is nonnegative, via |x| ≥ 0.
