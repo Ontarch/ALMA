@@ -11,24 +11,24 @@ module Real.Interval.Rational where
 open import Data.Empty using (⊥-elim)
 open import Data.Integer using (+_; +<+) renaming (_*_ to _*ℤ_; _<_ to _<ℤ_)
 import Data.Integer.Properties as ℤP
-open import Data.Nat using
-  (ℕ; zero; suc; z≤n; s≤s; _^_; _∸_) renaming (_+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<ℕ_)
+open import Data.Nat using (ℕ; zero; suc; z≤n; s≤s; _^_; _∸_)
+  renaming (_+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<ℕ_)
 import Data.Nat.Properties as ℕP
-open import Data.Rational using
-  (ℚ; 0ℚ; _⊓_; _⊔_; _+_; _-_; _<_; _≤_; ∣_∣; fromℚᵘ; toℚᵘ)
-  renaming (-_ to neg)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _<_
+  ; _≤_; 1/_; ∣_∣; fromℚᵘ; toℚᵘ; NonZero) renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-comm; +-inverseʳ; neg-distrib-+; +-mono-<-≤; ≤-refl; <⇒≤; <-cmp; ≤-trans
-  ; ≤-antisym; neg-antimono-≤; 0≤∣p∣; ∣-p∣≡∣p∣; ∣p∣≡p∨∣p∣≡-p
+  (+-comm; +-inverseʳ; neg-distrib-+; +-mono-<-≤; ≤-refl; *-assoc; *-identityˡ
+  ; *-comm; <⇒≤; <-cmp; ≤-trans; *-inverseʳ; *-identityʳ; ≤-antisym
+  ; neg-antimono-≤; 0≤∣p∣; ∣-p∣≡∣p∣; *-inverseˡ; ∣p∣≡p∨∣p∣≡-p
   ; 0≤p⇒∣p∣≡p; toℚᵘ-cancel-<; toℚᵘ-fromℚᵘ; p⊓q≤p; p⊓q≤q; p≤p⊔q; p≤q⊔p
   ; p≤q⇒p⊓q≡p; p≥q⇒p⊓q≡q; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p; ⊓-glb; ⊔-lub; ⊓-sel; ⊔-sel)
-open import Data.Rational.Unnormalised.Base
-  using (ℚᵘ; mkℚᵘ; _≃_; *≡*; *<*) renaming (_<_ to _<ᵘ_)
+open import Data.Rational.Unnormalised.Base using
+  (ℚᵘ; mkℚᵘ; _≃_; *≡*; *<*) renaming (_<_ to _<ᵘ_)
 open import Data.Rational.Unnormalised.Properties using (<-respˡ-≃; <-respʳ-≃)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Function.Base using (case_of_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; subst; subst₂; module ≡-Reasoning)
+  (_≡_; refl; cong; cong₂; sym; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
@@ -218,14 +218,7 @@ mag-≤ {l} {u} {x} l≤x x≤u =
 ------------------------------------------------------------------------
 -- Fraction comparison with a general denominator
 --
--- If N * (k+1) < (suc d) * 2^t then N / (suc d * 2^t) < 1/(k+1).
--- This generalises fracL-strict from IntervalEquiv, which is the
--- special case d = 0.
---
 -- 一般分母的分数比较
---
--- 若整数交叉相乘条件成立，则上述分数不等式成立。它推广了
--- IntervalEquiv 的 fracL-strict，后者是 d = 0 的特例。
 
 0<2^t : (t : ℕ) → 0 <ℕ 2 ^ t
 0<2^t zero    = s≤s z≤n
@@ -313,6 +306,51 @@ comb-strict N d k t h =
                      (toℚᵘ (fromℚᵘ (rawR k)))
          p2 = <-respʳ-≃ (flip-≃ eqR) p1
      in p2)
+
+------------------------------------------------------------------------
+-- Reciprocal of a product
+--
+-- 乘积的倒数
+
+-- The reciprocal of a product is the product of the reciprocals.
+--
+-- 乘积的倒数等于两因子倒数之积。
+recip-*-hom : (a b : ℚ) ⦃ na : NonZero a ⦄ ⦃ nb : NonZero b ⦄
+  ⦃ nab : NonZero (a * b) ⦄ →
+  (1/_) (a * b) ≡ (1/_) a * (1/_) b
+recip-*-hom a b ⦃ na ⦄ ⦃ nb ⦄ ⦃ nab ⦄ =
+  let ia = (1/_) a
+      ib = (1/_) b
+      x = ia * ib
+      p : x * (a * b) ≡ 1ℚ
+      p =
+        begin (ia * ib) * (a * b)
+          ≡⟨ *-assoc ia ib (a * b) ⟩
+        ia * (ib * (a * b))
+          ≡⟨ cong (ia *_) (sym (*-assoc ib a b)) ⟩
+        ia * ((ib * a) * b)
+          ≡⟨ cong (ia *_) (cong (λ z → z * b) (*-comm ib a)) ⟩
+        ia * ((a * ib) * b)
+          ≡⟨ cong (ia *_) (*-assoc a ib b) ⟩
+        ia * (a * (ib * b))
+          ≡⟨ sym (*-assoc ia a (ib * b)) ⟩
+        (ia * a) * (ib * b)
+          ≡⟨ cong₂ (λ u v → u * v) (*-inverseˡ a) (*-inverseˡ b) ⟩
+        1ℚ ∎
+      q : x ≡ (1/_) (a * b)
+      q =
+        begin x
+          ≡⟨ sym (*-identityʳ x) ⟩
+        x * 1ℚ
+          ≡⟨ cong (x *_) (sym (*-inverseʳ (a * b) ⦃ nab ⦄)) ⟩
+        x * ((a * b) * (1/_) (a * b))
+          ≡⟨ sym (*-assoc x (a * b) ((1/_) (a * b))) ⟩
+        (x * (a * b)) * (1/_) (a * b)
+          ≡⟨ cong (λ z → z * (1/_) (a * b)) p ⟩
+        1ℚ * (1/_) (a * b)
+          ≡⟨ *-identityˡ ((1/_) (a * b)) ⟩
+        (1/_) (a * b) ∎
+  in sym q
 
 ------------------------------------------------------------------------
 -- Negation of min/max

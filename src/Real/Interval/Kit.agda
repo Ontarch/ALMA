@@ -8,7 +8,7 @@
 
 module Real.Interval.Kit where
 
-open import Data.Nat using (ℕ; zero; suc; _^_; _∸_; s≤s; z≤n)
+open import Data.Nat using (ℕ; suc; _^_; _∸_; s≤s; z≤n)
   renaming (_*_ to _ℕ*_; _≤_ to _≤ℕ_; _+_ to _+ℕ_)
 open import Data.Nat.Properties using (*-suc; m≤m+n; ^-monoʳ-≤)
   renaming (≤-trans to ≤-transℕ; ≤-reflexive to ≤-reflexiveℕ
@@ -26,10 +26,8 @@ open import Data.Rational.Properties using
   ; ≤-trans; 0≤p⇒∣p∣≡p; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; pos*pos⇒pos
   ; pos⇒nonNeg; <-≤-trans; ≤-<-trans; <⇒≤; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg
   ; *-cancelˡ-≤-pos; *-cancelˡ-<-nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣
-  ; <-trans; +-assoc; +-comm; +-inverseˡ; +-identityʳ; *-zeroˡ; *-zeroʳ
-  ; *-monoʳ-<-pos; 0≤∣p∣; <-cmp; neg-distribˡ-*; <-asym; <-irrefl)
-open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
-open import Relation.Nullary.Negation using (contradiction)
+  ; <-trans; +-assoc; +-comm; +-inverseˡ; +-identityʳ; *-zeroˡ; *-monoʳ-<-pos
+  ; neg-distribˡ-*)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -41,14 +39,14 @@ open import Real using
 open import Real.Interval using (RealI)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using
-  (centre; recipPow2; bound-w; frac-strict; B<2^sucB; n<2^n; 1≤2^n)
-open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub)
+  (centre; recipPow2; bound-w; pos-2^t; frac-strict; B<2^sucB; n<2^n; 1≤2^n)
+open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub; recip-*-hom)
 
 ------------------------------------------------------------------------
 -- Convergence engines
 --
--- ≈ℝ-of-eq   pointwise centre equality ⟹ _≈ℝ_
--- ≈ℝ-of-rec  |centre difference| ≤ C · recipPow2 n ⟹ _≈ℝ_
+-- ≈ℝ-of-eq   pointwise centre equality -> _≈ℝ_
+-- ≈ℝ-of-rec  |centre difference| ≤ C · recipPow2 n -> _≈ℝ_
 --
 -- 收敛引擎
 --
@@ -83,6 +81,9 @@ open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub)
 --
 -- recipPow2 基础
 
+-- The successor-adjusted denominator equals the dyadic denominator.
+--
+-- 后继调整后的分母等于二进分母。
 embed-suc∸1 : ∀ k → embed (suc (2 ^ k ∸ 1)) ≡ embed (2 ^ k)
 embed-suc∸1 k = begin
   embed (suc (2 ^ k ∸ 1))
@@ -146,6 +147,9 @@ recip-antitone {a} {b} 0<a a≤b =
         b
       ∎
 
+-- The reciprocal of the dyadic scale is antitone in the index.
+--
+-- 二进刻度的倒数对索引单调不增。
 recipPow2-mono : ∀ {n m : ℕ} → n ≤ℕ m → recipPow2 m ≤ recipPow2 n
 recipPow2-mono {n} {m} n≤m =
   recip-antitone {a = embed (suc (2 ^ n ∸ 1))} {b = embed (suc (2 ^ m ∸ 1))}
@@ -206,7 +210,8 @@ n≤4n n = ≤-transℕ (n≤2n n) (2n≤4n n)
 ------------------------------------------------------------------------
 -- Archimedean tail
 --
--- C · recipPow2 n eventually < ε k.
+-- The decaying geometric term eventually falls below the given
+-- precision.
 --
 -- 阿基米德收尾
 --
@@ -341,47 +346,20 @@ B+1-pos B 0≤B = positive (<-≤-trans 0<1 1≤B+1)
 --
 -- 倒数分配
 
+-- The reciprocal of a product of positives is the product of the
+-- reciprocals; specialized from `recip-*-hom` by supplying the
+-- `Positive` instances.
+--
+-- 两个正数乘积的倒数等于倒数之积；由 `recip-*-hom` 特化得到，
+-- 通过提供 `Positive` 实例完成。
 inv-distrib : (p q : ℚ) → .{{pp : Positive p}} → .{{qq : Positive q}} →
   1/_ (p * q) {{pos⇒nonZero (p * q) {{pos*pos⇒pos p {{pp}} q {{qq}}}}}} ≡
   (1/_ p {{pos⇒nonZero p {{pp}}}}) * (1/_ q {{pos⇒nonZero q {{qq}}}})
-inv-distrib p q {{pp}} {{qq}} = begin
-  invpq
-    ≡⟨ sym (*-identityʳ invpq) ⟩
-  invpq * 1ℚ
-    ≡⟨ cong (invpq *_) (sym prod-inv) ⟩
-  invpq * ((p * q) * (invp * invq))
-    ≡⟨ sym (*-assoc invpq (p * q) _) ⟩
-  (invpq * (p * q)) * (invp * invq)
-    ≡⟨ cong (_* (invp * invq)) (*-inverseˡ (p * q) {{pq-nz}}) ⟩
-  1ℚ * (invp * invq)
-    ≡⟨ *-identityˡ (invp * invq) ⟩
-  invp * invq
-  ∎
-  where
-  p-nz = pos⇒nonZero p {{pp}}
-  q-nz = pos⇒nonZero q {{qq}}
-  pq-nz = pos⇒nonZero (p * q) {{pos*pos⇒pos p {{pp}} q {{qq}}}}
-  invp = 1/_ p {{p-nz}}
-  invq = 1/_ q {{q-nz}}
-  invpq = 1/_ (p * q) {{pq-nz}}
-  prod-inv : (p * q) * (invp * invq) ≡ 1ℚ
-  prod-inv = begin
-    (p * q) * (invp * invq)
-      ≡⟨ *-assoc p q _ ⟩
-    p * (q * (invp * invq))
-      ≡⟨ cong (p *_) (sym (*-assoc q invp invq)) ⟩
-    p * ((q * invp) * invq)
-      ≡⟨ cong (p *_) (cong (_* invq) (*-comm q invp)) ⟩
-    p * ((invp * q) * invq)
-      ≡⟨ cong (p *_) (*-assoc invp q invq) ⟩
-    p * (invp * (q * invq))
-      ≡⟨ sym (*-assoc p invp (q * invq)) ⟩
-    (p * invp) * (q * invq)
-      ≡⟨ cong₂ _*_ (*-inverseʳ p {{p-nz}}) (*-inverseʳ q {{q-nz}}) ⟩
-    1ℚ * 1ℚ
-      ≡⟨ *-identityˡ 1ℚ ⟩
-    1ℚ
-    ∎
+inv-distrib p q {{pp}} {{qq}} =
+  recip-*-hom p q
+    ⦃ pos⇒nonZero p {{pp}} ⦄
+    ⦃ pos⇒nonZero q {{qq}} ⦄
+    ⦃ pos⇒nonZero (p * q) {{pos*pos⇒pos p {{pp}} q {{qq}}}} ⦄
 
 ------------------------------------------------------------------------
 -- Reciprocal strictly antitone
@@ -533,9 +511,6 @@ pick B 0≤B k = m , bound
 --
 -- 范数开发所用的有理数/自然数工具
 
-0<1Q : 0ℚ < 1ℚ
-0<1Q = positive⁻¹ 1ℚ
-
 -- embed 2 and embed 3 are positive.
 --
 -- embed 2 与 embed 3 为正。
@@ -544,18 +519,6 @@ pick B 0≤B k = m , bound
 
 0<embed3 : 0ℚ < embed 3
 0<embed3 = <-trans 0<embed2 (embed-mono-< (s≤s (s≤s (s≤s z≤n))))
-
--- Double negation.
---
--- 双重取负。
-neg-neg : (x : ℚ) → neg (neg x) ≡ x
-neg-neg x =
-  begin neg (neg x)
-    ≡⟨ sym (+-identityʳ (neg (neg x))) ⟩ neg (neg x) + 0ℚ
-    ≡⟨ cong (neg (neg x) +_) (sym (+-inverseˡ x)) ⟩ neg (neg x) + (neg x + x)
-    ≡⟨ sym (+-assoc (neg (neg x)) (neg x) x) ⟩ (neg (neg x) + neg x) + x
-    ≡⟨ cong (_+ x) (+-inverseˡ (neg x)) ⟩ 0ℚ + x
-    ≡⟨ +-identityˡ x ⟩ x ∎
 
 -- Nonpositive inputs have nonnegative negation.
 --
@@ -586,40 +549,14 @@ npos⇒∣p∣≡neg {x} x≤0 =
 --
 -- 倒数工具
 
-inv-pos : (e : ℚ) → {{e-pos : Positive e}} →
-  Positive ((1/_) e {{pos⇒nonZero e {{e-pos}}}})
-inv-pos e {{e-pos}} with <-cmp 0ℚ ((1/_) e {{pos⇒nonZero e {{e-pos}}}})
-... | tri< 0<ie _ _ = positive 0<ie
-... | tri≈ _ 0≡ie _ =
-  let ie = (1/_) e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie≡1 : e * ie ≡ 1ℚ
-      e·ie≡1 = *-inverseʳ e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie≡0 : e * ie ≡ 0ℚ
-      e·ie≡0 =
-        begin e * ie ≡⟨ cong (e *_) (sym 0≡ie) ⟩ e * 0ℚ ≡⟨ *-zeroʳ e ⟩ 0ℚ ∎
-      1≡0 : 1ℚ ≡ 0ℚ
-      1≡0 = trans (sym e·ie≡1) e·ie≡0
-      0<0 : 0ℚ < 0ℚ
-      0<0 = subst (λ z → 0ℚ < z) 1≡0 0<1Q
-  in contradiction 0<0 (<-irrefl refl)
-... | tri> _ _ ie<0 =
-  let ie = (1/_) e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie≡1 : e * ie ≡ 1ℚ
-      e·ie≡1 = *-inverseʳ e {{pos⇒nonZero e {{e-pos}}}}
-      e·ie<0 : e * ie < 0ℚ
-      e·ie<0 =
-        let step : e * ie < e * 0ℚ
-            step = *-monoʳ-<-pos e {{e-pos}} ie<0
-        in subst (λ z → e * ie < z) (*-zeroʳ e) step
-      1<0 : 1ℚ < 0ℚ
-      1<0 = subst (λ z → z < 0ℚ) e·ie≡1 e·ie<0
-  in contradiction 1<0 (<-asym 0<1Q)
-
+-- The reciprocal of a positive rational at least 1 is at most 1.
+--
+-- 不小于 1 的正有理数，其倒数不大于 1。
 1≤⇒inv≤1 : {e : ℚ} ⦃ _ : NonZero e ⦄ → 0ℚ < e → 1ℚ ≤ e → (1/_) e ≤ 1ℚ
 1≤⇒inv≤1 {e} 0e p =
   let inv = (1/_) e {{pos⇒nonZero e {{positive 0e}}}}
       pinv : Positive inv
-      pinv = inv-pos e {{positive 0e}}
+      pinv = 1/pos⇒pos e {{positive 0e}}
       q : inv * 1ℚ ≤ inv * e
       q = *-monoˡ-≤-nonNeg inv {{pos⇒nonNeg inv {{pinv}}}} p
       e1 : inv * e ≡ 1ℚ
@@ -627,42 +564,6 @@ inv-pos e {{e-pos}} with <-cmp 0ℚ ((1/_) e {{pos⇒nonZero e {{e-pos}}}})
   in subst (λ z → z ≤ 1ℚ) (*-identityʳ inv)
        (subst (λ z → inv * 1ℚ ≤ z) e1 q)
 
-recip-*-hom : (a b : ℚ) ⦃ na : NonZero a ⦄ ⦃ nb : NonZero b ⦄
-  ⦃ nab : NonZero (a * b) ⦄ →
-  (1/_) (a * b) ≡ (1/_) a * (1/_) b
-recip-*-hom a b ⦃ na ⦄ ⦃ nb ⦄ ⦃ nab ⦄ =
-  let ia = (1/_) a
-      ib = (1/_) b
-      x = ia * ib
-      p : x * (a * b) ≡ 1ℚ
-      p =
-        begin (ia * ib) * (a * b)
-          ≡⟨ *-assoc ia ib (a * b) ⟩
-        ia * (ib * (a * b))
-          ≡⟨ cong (ia *_) (sym (*-assoc ib a b)) ⟩
-        ia * ((ib * a) * b)
-          ≡⟨ cong (ia *_) (cong (λ z → z * b) (*-comm ib a)) ⟩
-        ia * ((a * ib) * b)
-          ≡⟨ cong (ia *_) (*-assoc a ib b) ⟩
-        ia * (a * (ib * b))
-          ≡⟨ sym (*-assoc ia a (ib * b)) ⟩
-        (ia * a) * (ib * b)
-          ≡⟨ cong₂ (λ u v → u * v) (*-inverseˡ a) (*-inverseˡ b) ⟩
-        1ℚ ∎
-      q : x ≡ (1/_) (a * b)
-      q =
-        begin x
-          ≡⟨ sym (*-identityʳ x) ⟩
-        x * 1ℚ
-          ≡⟨ cong (x *_) (sym (*-inverseʳ (a * b) ⦃ nab ⦄)) ⟩
-        x * ((a * b) * (1/_) (a * b))
-          ≡⟨ sym (*-assoc x (a * b) ((1/_) (a * b))) ⟩
-        (x * (a * b)) * (1/_) (a * b)
-          ≡⟨ cong (λ z → z * (1/_) (a * b)) p ⟩
-        1ℚ * (1/_) (a * b)
-          ≡⟨ *-identityˡ ((1/_) (a * b)) ⟩
-        (1/_) (a * b) ∎
-  in sym q
 
 ------------------------------------------------------------------------
 -- halveQ algebra
@@ -676,7 +577,7 @@ half≥0' : 0ℚ ≤ half
 half≥0' =
   let embed2-pos = positive (embed-mono-< (s≤s z≤n))
       half-pos : Positive half
-      half-pos = inv-pos (embed 2) {{embed2-pos}}
+      half-pos = 1/pos⇒pos (embed 2) {{embed2-pos}}
   in <⇒≤ (positive⁻¹ half {{half-pos}})
 
 halveQ-mono : {a b : ℚ} → a ≤ b → halveQ a ≤ halveQ b
@@ -687,7 +588,7 @@ halveQ-mono {a} {b} p =
       half≡ = refl
       half-pos : Positive half
       half-pos = subst Positive (sym half≡)
-                   (inv-pos (embed 2) {{embed2-pos}})
+                   (1/pos⇒pos (embed 2) {{embed2-pos}})
       half≥0 : NonNegative half
       half≥0 = pos⇒nonNeg half {{half-pos}}
   in *-monoʳ-≤-nonNeg half {{half≥0}} p
@@ -708,20 +609,12 @@ halveQ-double x =
     ≡⟨ *-identityʳ x ⟩ x ∎
 
 halveQ-neg : (a : ℚ) → halveQ (neg a) ≡ neg (halveQ a)
-halveQ-neg a =
-  begin (neg a) * half
-    ≡⟨ sym (neg-distribˡ-* a half) ⟩ neg (a * half) ∎
+halveQ-neg a = sym (neg-distribˡ-* a half)
 
 ------------------------------------------------------------------------
 -- Order and difference utilities on ℚ
 --
 -- ℚ 上的序与差工具
-
-x≤∣x∣ : (x : ℚ) → x ≤ ∣ x ∣
-x≤∣x∣ x with <-cmp x 0ℚ
-... | tri< x<0 _ _ = ≤-trans (<⇒≤ x<0) (0≤∣p∣ x)
-... | tri≈ _ x=0 _ = subst (λ z → z ≤ ∣ z ∣) (sym x=0) (0≤∣p∣ 0ℚ)
-... | tri> _ _ x>0 = ≤-reflexive (sym (0≤p⇒∣p∣≡p (<⇒≤ x>0)))
 
 same⇒diff0 : {a b : ℚ} → a ≡ b → ∣ a - b ∣ ≡ 0ℚ
 same⇒diff0 {a} {b} eq =
@@ -750,17 +643,13 @@ move-≤-back {a} {b} {w} h =
                    (trans (cong (_+ w) (+-inverseˡ b)) (+-identityˡ w)))
   in subst (λ z → a + neg b ≤ z) e (+-mono-≤ h ≤-refl)
 
-+-monoʳ-≤ : (c : ℚ) → {a b : ℚ} → a ≤ b → c + a ≤ c + b
-+-monoʳ-≤ c {a} {b} h = +-mono-≤ (≤-refl {c}) h
-
 ------------------------------------------------------------------------
 -- recipPow2 utilities
 --
 -- recipPow2 工具
 
 nz2n : (n : ℕ) → NonZero (embed (2 ^ n))
-nz2n n = pos⇒nonZero (embed (2 ^ n))
-  {{positive (embed-mono-< (ℕP.≤-<-trans z≤n (n<2^n n)))}}
+nz2n n = pos⇒nonZero (embed (2 ^ n)) {{pos-2^t n}}
 
 nzSuc : (n : ℕ) → NonZero (embed (suc (2 ^ n ∸ 1)))
 nzSuc n = pos⇒nonZero (embed (suc (2 ^ n ∸ 1)))
@@ -778,7 +667,7 @@ recipPow2-pos n =
   let e-pos : Positive (embed (2 ^ n))
       e-pos = positive (embed-mono-< (ℕP.≤-<-trans z≤n (n<2^n n)))
   in subst Positive (sym (recipPow2≡ n))
-       (inv-pos (embed (2 ^ n)) {{e-pos}})
+       (1/pos⇒pos (embed (2 ^ n)) {{e-pos}})
 
 recipPow2-mul : (a b : ℕ) →
   recipPow2 (a +ℕ b) ≡ recipPow2 a * recipPow2 b
@@ -815,10 +704,6 @@ recipPow2-mul a b =
        ≡⟨ cong₂ (λ p q → p * q) (sym (recipPow2≡ a)) (sym (recipPow2≡ b)) ⟩
      recipPow2 a * recipPow2 b ∎
 
-n≤suc : (n : ℕ) → n ≤ℕ suc n
-n≤suc zero = z≤n
-n≤suc (suc n) = s≤s (n≤suc n)
-
 recipPow2-n≤1 : (n : ℕ) → recipPow2 n ≤ 1ℚ
 recipPow2-n≤1 n =
   let e = embed (2 ^ n)
@@ -830,6 +715,9 @@ recipPow2-n≤1 n =
       q = 1≤⇒inv≤1 {{nz2n n}} 0e 1≤e
   in subst (λ z → z ≤ 1ℚ) (sym (recipPow2≡ n)) q
 
+-- Doubling the index gives a smaller reciprocal.
+--
+-- 索引加倍得到更小的倒数。
 recipPow2-≤ : (n : ℕ) → recipPow2 (n +ℕ n) ≤ recipPow2 n
 recipPow2-≤ n =
   let r = recipPow2 n
@@ -852,7 +740,7 @@ frac-< : (d e : ℚ) (0<d : 0ℚ < d) {e-pos : Positive e} (C : ℚ)
 frac-< d e 0<d {e-pos} C h =
   let ie = (1/_) e {{pos⇒nonZero e {{e-pos}}}}
       ie-pos : Positive ie
-      ie-pos = inv-pos e {{e-pos}}
+      ie-pos = 1/pos⇒pos e {{e-pos}}
       ie·de≡d : ie * (d * e) ≡ d
       ie·de≡d =
         begin ie * (d * e)
@@ -872,7 +760,7 @@ tail-bound C 0≤C d 0<d =
   let d-nz = pos⇒nonZero d {{positive 0<d}}
       id = (1/_) d ⦃ d-nz ⦄
       id-pos : Positive id
-      id-pos = inv-pos d {{positive 0<d}}
+      id-pos = 1/pos⇒pos d {{positive 0<d}}
       q = C * id
       0≤q : 0ℚ ≤ q
       0≤q = subst (λ z → z ≤ q) (*-zeroˡ id)

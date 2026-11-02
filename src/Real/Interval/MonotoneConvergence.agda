@@ -11,9 +11,9 @@ module Real.Interval.MonotoneConvergence where
 open import Data.Nat using (ℕ; zero; suc; _⊔_; _^_; _∸_; z≤n; s≤s)
   renaming (_+_ to _+ℕ_; _*_ to _*ℕ_; _≤_ to _≤N_; _≥_ to _≥N_; _<_ to _<N_)
 open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; m≤m+n; n≤1+n; ^-monoʳ-≤; m+[n∸m]≡n)
+  (m≤m⊔n; m≤n⊔m; m≤m+n; n≤1+n; ^-monoʳ-≤; m+[n∸m]≡n; +-monoʳ-≤; *-monoʳ-≤)
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
-  ; +-identityʳ to +ℕ-identityʳ; +-suc to +ℕ-suc)
+  ; +-identityʳ to +ℕ-identityʳ; +-suc to +ℕ-suc; +-comm to +ℕ-comm)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Base.RationalRing using (neg-involutive)
@@ -360,9 +360,9 @@ module _ {f : ℕ → RealI}
         step2 : suc (2 ^ t) ≤N 2 ^ t +ℕ 2 ^ t
         step2 =
           let e1 : suc (2 ^ t) ≡ 2 ^ t +ℕ 1
-              e1 = Data.Nat.Properties.+-comm 1 (2 ^ t)
+              e1 = +ℕ-comm 1 (2 ^ t)
               e2 : 2 ^ t +ℕ 1 ≤N 2 ^ t +ℕ 2 ^ t
-              e2 = Data.Nat.Properties.+-monoʳ-≤ (2 ^ t) 1≤2^t
+              e2 = +-monoʳ-≤ (2 ^ t) 1≤2^t
           in ≤N-trans (≤N-reflexive e1) e2
         exp : 2 ^ suc t ≡ 2 ^ t +ℕ 2 ^ t
         exp =
@@ -373,7 +373,7 @@ module _ {f : ℕ → RealI}
             2 *ℕ n
               ≡⟨ refl ⟩
             n +ℕ (n +ℕ 0)
-              ≡⟨ cong (n +ℕ_) (Data.Nat.Properties.+-identityʳ n) ⟩
+              ≡⟨ cong (n +ℕ_) (+ℕ-identityʳ n) ⟩
             n +ℕ n
             ∎
     in subst (λ n → suc (suc t) ≤N n) (sym exp)
@@ -409,7 +409,7 @@ module _ {f : ℕ → RealI}
         a≤b =
           let t+1≤2^t : suc t ≤N 2 ^ t
               t+1≤2^t = 2^t≥t+1 t
-          in Data.Nat.Properties.*-monoʳ-≤ 2 t+1≤2^t
+          in *-monoʳ-≤ 2 t+1≤2^t
         ap = t +ℕ suc t
         a≡ : a ≡ suc ap
         a≡ =
@@ -419,7 +419,7 @@ module _ {f : ℕ → RealI}
             2 *ℕ suc t
               ≡⟨ refl ⟩
             suc t +ℕ (suc t +ℕ 0)
-              ≡⟨ cong (suc t +ℕ_) (Data.Nat.Properties.+-identityʳ (suc t)) ⟩
+              ≡⟨ cong (suc t +ℕ_) (+ℕ-identityʳ (suc t)) ⟩
             suc t +ℕ suc t
               ≡⟨ refl ⟩
             suc (t +ℕ suc t)

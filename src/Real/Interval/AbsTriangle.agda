@@ -28,7 +28,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (+interchange)
+open import Base.RationalRing using (+interchange; neg-involutive)
 open import Real using (embed; half; 2ℚ≡1+1)
 open import Real.Interval using (RealI; δ; δ-pos; dyadic)
 open import Real.Interval.Arith using (0ℝ; _+ℝ_; negℝ)
@@ -43,8 +43,9 @@ open import Real.Interval.Abs using
 open import Real.Interval.Kit using
   (≈ℝ-of-rec; half+half≡1; 0≤recipPow2; recipPow2-mul; recipPow2-n≤1
   ; recipPow2-≤; halveQ; half≥0'; halveQ-mono; 0≤halveQ; halveQ-distrib
-  ; halveQ-neg; x≤∣x∣; same⇒diff0; 0≤diff; move-≤; move-≤-back; neg-of-nonpos
-  ; npos⇒∣p∣≡neg; tail-bound; neg-neg; 0<embed2)
+  ; halveQ-neg; same⇒diff0; 0≤diff; move-≤; move-≤-back; neg-of-nonpos
+  ; npos⇒∣p∣≡neg; tail-bound; 0<embed2)
+open import Real.Interval.Rational using (r≤|r|)
 open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
 open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
 
@@ -129,7 +130,7 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
           s≡ : l + u ≡ p - q
           s≡ = begin l + u
             ≡⟨ +-comm l u ⟩ u + l
-            ≡⟨ cong (u +_) (sym (neg-neg l)) ⟩ u + neg (neg l)
+            ≡⟨ cong (u +_) (sym (neg-involutive l)) ⟩ u + neg (neg l)
             ≡⟨ refl ⟩ p - q ∎
           B≡ : ∣ halveQ (l + u) ∣ ≡ halveQ ∣ p - q ∣
           B≡ = begin
@@ -266,12 +267,12 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
       abs-neg : {X w : ℚ} → ∣ X ∣ ≤ w → neg X ≤ w
       abs-neg {X} {w} h =
         let k : neg X ≤ ∣ neg X ∣
-            k = x≤∣x∣ (neg X)
+            k = r≤|r| (neg X)
             e : ∣ neg X ∣ ≡ ∣ X ∣
             e = ∣-p∣≡∣p∣ X
         in ≤-trans k (≤-trans (≤-reflexive e) h)
       s1 : A - ∣ p + q ∣ ≤ w1 + w2
-      s1 = ≤-trans (x≤∣x∣ (A - ∣ p + q ∣)) h1'
+      s1 = ≤-trans (r≤|r| (A - ∣ p + q ∣)) h1'
       s2 : ∣ p + q ∣ ≤ ∣ p ∣ + ∣ q ∣
       s2 = ∣p+q∣≤∣p∣+∣q∣ p q
       s3 : ∣ p ∣ - B ≤ w1
@@ -281,7 +282,7 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
               begin neg (B - ∣ p ∣)
                 ≡⟨ neg-distrib-+ B (neg ∣ p ∣) ⟩
               neg B + neg (neg ∣ p ∣)
-                ≡⟨ cong (neg B +_) (neg-neg ∣ p ∣) ⟩
+                ≡⟨ cong (neg B +_) (neg-involutive ∣ p ∣) ⟩
               neg B + ∣ p ∣
                 ≡⟨ +-comm (neg B) ∣ p ∣ ⟩
               ∣ p ∣ + neg B
@@ -295,7 +296,7 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
               begin neg (C - ∣ q ∣)
                 ≡⟨ neg-distrib-+ C (neg ∣ q ∣) ⟩
               neg C + neg (neg ∣ q ∣)
-                ≡⟨ cong (neg C +_) (neg-neg ∣ q ∣) ⟩
+                ≡⟨ cong (neg C +_) (neg-involutive ∣ q ∣) ⟩
               neg C + ∣ q ∣
                 ≡⟨ +-comm (neg C) ∣ q ∣ ⟩
               ∣ q ∣ + neg C
@@ -789,7 +790,7 @@ abs-centre-even l u l≤u =
       neg-eq : (neg l) - (neg u) ≡ w
       neg-eq =
         begin (neg l) - (neg u)
-          ≡⟨ cong (neg l +_) (neg-neg u) ⟩
+          ≡⟨ cong (neg l +_) (neg-involutive u) ⟩
         neg l + u
           ≡⟨ +-comm (neg l) u ⟩
         u + neg l
@@ -814,7 +815,7 @@ abs-centre-even l u l≤u =
         let e1 : ∣ A - ∣ c ∣ ∣ ≤ w
             e1 = subst (λ z → ∣ A - z ∣ ≤ w) abs≡ h1'
             t1 : A - ∣ c ∣ ≤ w
-            t1 = ≤-trans (x≤∣x∣ (A - ∣ c ∣)) e1
+            t1 = ≤-trans (r≤|r| (A - ∣ c ∣)) e1
             a-aux : ∣ c ∣ - B ≡ neg (B - ∣ c ∣)
             a-aux = begin
               ∣ c ∣ - B
@@ -822,7 +823,7 @@ abs-centre-even l u l≤u =
               ∣ c ∣ + neg B
                 ≡⟨ +-comm ∣ c ∣ (neg B) ⟩
               neg B + ∣ c ∣
-                ≡⟨ cong (neg B +_) (sym (neg-neg ∣ c ∣)) ⟩
+                ≡⟨ cong (neg B +_) (sym (neg-involutive ∣ c ∣)) ⟩
               neg B + neg (neg ∣ c ∣)
                 ≡⟨ sym (neg-distrib-+ B (neg ∣ c ∣)) ⟩
               neg (B + neg ∣ c ∣)
@@ -831,7 +832,7 @@ abs-centre-even l u l≤u =
 
             t2 : ∣ c ∣ - B ≤ w
             t2 = subst (λ z → z ≤ w) (sym a-aux)
-                   (≤-trans (x≤∣x∣ (neg (B - ∣ c ∣)))
+                   (≤-trans (r≤|r| (neg (B - ∣ c ∣)))
                             (≤-trans (≤-reflexive (∣-p∣≡∣p∣ (B - ∣ c ∣))) h2'))
             s : A - B ≤ w + w
             s =
@@ -841,7 +842,7 @@ abs-centre-even l u l≤u =
                   d = +-mono-≤ t1 t2
               in ≤-trans k d
             t1' : B - ∣ c ∣ ≤ w
-            t1' = ≤-trans (x≤∣x∣ (B - ∣ c ∣)) h2'
+            t1' = ≤-trans (r≤|r| (B - ∣ c ∣)) h2'
 
             a-aux' : ∣ c ∣ - A ≡ neg (A - ∣ c ∣)
             a-aux' = begin
@@ -850,7 +851,7 @@ abs-centre-even l u l≤u =
               ∣ c ∣ + neg A
                 ≡⟨ +-comm ∣ c ∣ (neg A) ⟩
               neg A + ∣ c ∣
-                ≡⟨ cong (neg A +_) (sym (neg-neg ∣ c ∣)) ⟩
+                ≡⟨ cong (neg A +_) (sym (neg-involutive ∣ c ∣)) ⟩
               neg A + neg (neg ∣ c ∣)
                 ≡⟨ sym (neg-distrib-+ A (neg ∣ c ∣)) ⟩
               neg (A + neg ∣ c ∣)
@@ -859,7 +860,7 @@ abs-centre-even l u l≤u =
 
             t2' : ∣ c ∣ - A ≤ w
             t2' = subst (λ z → z ≤ w) (sym a-aux')
-                    (≤-trans (x≤∣x∣ (neg (A - ∣ c ∣)))
+                    (≤-trans (r≤|r| (neg (A - ∣ c ∣)))
                              (≤-trans (≤-reflexive (∣-p∣≡∣p∣ (A - ∣ c ∣))) e1))
 
             s' : B - A ≤ w + w
@@ -876,7 +877,7 @@ abs-centre-even l u l≤u =
                 neg (a - b)
                   ≡⟨ neg-distrib-+ a (neg b) ⟩
                 neg a + neg (neg b)
-                  ≡⟨ cong (neg a +_) (neg-neg b) ⟩
+                  ≡⟨ cong (neg a +_) (neg-involutive b) ⟩
                 neg a + b
                   ≡⟨ +-comm (neg a) b ⟩
                 b + neg a

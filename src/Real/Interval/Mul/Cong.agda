@@ -8,23 +8,22 @@
 
 module Real.Interval.Mul.Cong where
 
-open import Data.Nat hiding (NonZero; _+_) renaming (_<_ to _<ℕ_; _≤_ to _≤ℕ_
-  ; _*_ to _ℕ*_; _≥_ to _≥ℕ_)
+open import Data.Integer using (+_; +<+)
+open import Data.Nat using (ℕ; suc; _⊔_; _∸_; s≤s; z≤n)
+  renaming (_<_ to _<ℕ_; _≤_ to _≤ℕ_; _*_ to _ℕ*_; _≥_ to _≥ℕ_)
 import Data.Nat.Properties as ℕP
+open import Data.Nat.Coprimality using (1-coprimeTo)
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; NonZero; Positive)
 open import Data.Rational.Base using
   (1/_; _÷_; mkℚ; positive; nonNegative; *<*) renaming (-_ to neg)
-open import Data.Integer using (+_; +<+)
-open import Data.Nat.Coprimality using (1-coprimeTo)
-open import Data.Nat using (s≤s; z≤n)
 open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-trans; +-mono-≤; +-mono-<
-  ; +-mono-≤-<; +-identityʳ; +-assoc; *-assoc; *-comm; *-identityˡ; *-identityʳ
-  ; *-inverseʳ; *-inverseˡ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; *-zeroˡ
-  ; pos⇒nonNeg; pos⇒nonZero; pos*pos⇒pos; positive⁻¹; 1/pos⇒pos; *-distribˡ-+
-  ; neg-distribˡ-*; 0≤∣p∣; ∣p*q∣≡∣p∣*∣q∣; ∣p+q∣≤∣p∣+∣q∣)
+  ; +-monoʳ-≤; +-mono-≤-<; +-identityʳ; +-assoc; *-assoc; *-comm; *-identityˡ
+  ; *-identityʳ; *-inverseʳ; *-inverseˡ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg
+  ; *-zeroˡ; pos⇒nonNeg; pos⇒nonZero; pos*pos⇒pos; positive⁻¹; 1/pos⇒pos
+  ; *-distribˡ-+; neg-distribˡ-*; 0≤∣p∣; ∣p*q∣≡∣p∣*∣q∣; ∣p+q∣≤∣p∣+∣q∣)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -35,8 +34,7 @@ open import Real using
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Bounded using (bounded)
-open import Real.IntervalEquiv using
-  (centre; width; centre-l; centre-u; recipPow2)
+open import Real.IntervalEquiv using (centre; width; centre-l; centre-u; recipPow2)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Kit using
   (0≤half; two-half; n+n≡2n; recipPow2-bound; *-mono-≤-nonNeg; tri-diff; abs-swap
@@ -353,7 +351,7 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
   h2 = a * half
   e6≤h2 : e6 ≤ h2
   e6≤h2 = ≤-trans (≤-reflexive e6≡)
-    (Data.Rational.Properties.*-monoˡ-≤-nonNeg a
+    (*-monoˡ-≤-nonNeg a
       {{pos⇒nonNeg a {{positive 0<a}}}} inv6≤half)
 
 -- Adding one preserves the order.
@@ -361,7 +359,7 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
 -- 加一保持序关系。
 ≤+1 : (x : ℚ) → x ≤ x + 1ℚ
 ≤+1 x = ≤-trans (≤-reflexive (sym (+-identityʳ x)))
-                 (Data.Rational.Properties.+-monoʳ-≤ x 0≤1)
+                 (+-monoʳ-≤ x 0≤1)
 
 ------------------------------------------------------------------------
 -- Multiplication is compatible with interval equality

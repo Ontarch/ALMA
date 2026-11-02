@@ -24,21 +24,21 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (telescope)
+open import Base.RationalRing using (telescope; neg-involutive)
 open import Real using (half)
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using
-  (l; u; centre; width; width-n; node; recipPow2; negneg)
+  (l; u; centre; width; width-n; node; recipPow2)
 open import Real.Interval.Node using (0≤width-n)
 open import Real.Interval.Abs using (∣_∣ℝ; absLo; absHi)
 open import Real.Interval.Mul.Core using (term1; centre-mag)
 open import Real.Interval.Kit using
-  (≈ℝ-of-rec; 0<half; halveQ; recipPow2-n≤1; recipPow2-mul; 0≤recipPow2; *-mono-≤-nonNeg)
+  (≈ℝ-of-rec; 0<half; halveQ; add-right; recipPow2-n≤1; recipPow2-mul
+  ; 0≤recipPow2; *-mono-≤-nonNeg)
 open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
-open import Real.Interval.AbsTriangle using
-  (abs-centre-≤; centre-abs-node)
+open import Real.Interval.AbsTriangle using (abs-centre-≤; centre-abs-node)
 
 ------------------------------------------------------------------------
 -- Nonnegativity of the assembled constant
@@ -106,13 +106,6 @@ expand-diff a0 a1 a2 a3 a4 a5 =
             (a2 - a3) + ((a3 - a4) + (a4 - a5)) ∎) ⟩
        (a1 - a2) + ((a2 - a3) + ((a3 - a4) + (a4 - a5))) ∎) ⟩
   (a0 - a1) + ((a1 - a2) + ((a2 - a3) + ((a3 - a4) + (a4 - a5)))) ∎
-
--- Combine two absolute-value error bounds.
---
--- 两项绝对值误差合并。
-add-right : {a b k l : ℚ} → ∣ a ∣ ≤ k → ∣ b ∣ ≤ l → ∣ a + b ∣ ≤ k + l
-add-right {a} {b} {k} {l} pa pb =
-  ≤-trans (∣p+q∣≤∣p∣+∣q∣ a b) (+-mono-≤ pa pb)
 
 -- Combine five right-nested absolute-value error bounds.
 --
@@ -608,7 +601,7 @@ abs-mul-h x y n =
                           begin p - bx
                             ≡⟨ +-comm p (neg bx) ⟩
                           neg bx + p
-                            ≡⟨ cong (neg bx +_) (sym (negneg p)) ⟩
+                            ≡⟨ cong (neg bx +_) (sym (neg-involutive p)) ⟩
                           neg bx + neg (neg p)
                             ≡⟨ sym (neg-distrib-+ bx (neg p)) ⟩
                           neg (bx - p) ∎
@@ -639,7 +632,7 @@ abs-mul-h x y n =
                           begin q - by
                             ≡⟨ +-comm q (neg by) ⟩
                           neg by + q
-                            ≡⟨ cong (neg by +_) (sym (negneg q)) ⟩
+                            ≡⟨ cong (neg by +_) (sym (neg-involutive q)) ⟩
                           neg by + neg (neg q)
                             ≡⟨ sym (neg-distrib-+ by (neg q)) ⟩
                           neg (by - q) ∎
@@ -734,7 +727,7 @@ abs-mul-h x y n =
               begin B + neg (bx * by)
                 ≡⟨ +-comm B (neg (bx * by)) ⟩
               neg (bx * by) + B
-                ≡⟨ cong (neg (bx * by) +_) (sym (negneg B)) ⟩
+                ≡⟨ cong (neg (bx * by) +_) (sym (neg-involutive B)) ⟩
               neg (bx * by) + neg (neg B)
                 ≡⟨ sym (neg-distrib-+ (bx * by) (neg B)) ⟩
               neg (bx * by + neg B) ∎
