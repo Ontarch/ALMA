@@ -8,10 +8,9 @@
 
 module Real.Interval.Inverse where
 
-open import Data.Nat using
-  (ℕ; _⊔_; _^_; _≥_) renaming (_≤_ to _≤ℕ_; _+_ to _+ℕ_; _*_ to _ℕ*_)
-open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; m≤m+n; m≤n+m)
+open import Data.Nat using (ℕ; _⊔_; _^_; _≥_)
+  renaming (_≤_ to _≤ℕ_; _+_ to _+ℕ_; _*_ to _ℕ*_)
+open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m≤m+n; m≤n+m)
   renaming (≤-trans to ≤ℕ-trans; ≤-refl to ≤ℕ-refl)
 import Data.Nat.Properties as ℕP
 open import Data.Product using (_,_; proj₁; proj₂)

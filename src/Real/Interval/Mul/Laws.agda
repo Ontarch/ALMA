@@ -494,9 +494,9 @@ distribʳ-rec3 x y z n =
       ≤∎)
 
 ------------------------------------------------------------------------
--- Associativity: private module with all helpers
+-- Associativity: module collecting all helper lemmas
 --
--- 结合律：收集全部辅助引理的私有模块
+-- 结合律：收集全部辅助引理的模块
 
 module AssocCore (x y z : RealI) where
   Mx My Mz : ℚ

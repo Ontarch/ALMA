@@ -23,7 +23,7 @@ open import Data.Rational.Properties using
   ; +-monoʳ-≤; +-mono-≤-<; +-identityʳ; +-assoc; *-assoc; *-comm; *-identityˡ
   ; *-identityʳ; *-inverseʳ; *-inverseˡ; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg
   ; *-zeroˡ; pos⇒nonNeg; pos⇒nonZero; pos*pos⇒pos; positive⁻¹; 1/pos⇒pos
-  ; *-distribˡ-+; neg-distribˡ-*; 0≤∣p∣; ∣p*q∣≡∣p∣*∣q∣; ∣p+q∣≤∣p∣+∣q∣)
+  ; *-distribˡ-+; 0≤∣p∣; ∣p*q∣≡∣p∣*∣q∣; ∣p+q∣≤∣p∣+∣q∣)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -40,29 +40,11 @@ open import Real.Interval.Kit using
   (0≤half; two-half; n+n≡2n; recipPow2-bound; *-mono-≤-nonNeg; tri-diff; abs-swap
   ; recip-antitone; strict-recip; pick)
 open import Real.Interval.Node using (0≤width-n)
-open import Real.Interval.Mul.Core using (term1)
+open import Real.Interval.Mul.Core using (term1; sub-distribˡ)
 
 private
   0<6 : 0ℚ < embed 6
   0<6 = 0<embed 5
-
-  -- Left distributivity of multiplication over subtraction.
-  --
-  -- 乘法对减法的左分配律。
-  *-distribˡ-_- : (x y z : ℚ) → x * (y - z) ≡ x * y - x * z
-  *-distribˡ-_- x y z = begin
-    x * (y + neg z)
-      ≡⟨ *-distribˡ-+ x y (neg z) ⟩
-    x * y + x * neg z
-      ≡⟨ cong (λ w → x * y + w) (begin
-        x * neg z        ≡⟨ *-comm x (neg z) ⟩
-        neg z * x        ≡⟨ sym (neg-distribˡ-* z x) ⟩
-        neg (z * x)      ≡⟨ cong neg (*-comm z x) ⟩
-        neg (x * z)      ∎) ⟩
-    x * y + neg (x * z)
-      ≡⟨⟩
-    x * y - x * z
-    ∎
 
   -- Right distributivity of multiplication over subtraction.
   --
@@ -72,17 +54,19 @@ private
     (x + neg z) * y
       ≡⟨ *-comm (x + neg z) y ⟩
     y * (x + neg z)
-      ≡⟨ *-distribˡ-_- y x z ⟩
+      ≡⟨ sub-distribˡ y x z ⟩
     y * x - y * z
       ≡⟨ cong₂ _-_ (*-comm y x) (*-comm y z) ⟩
     x * y - z * y
     ∎
 
--- Cross-product difference bound:
+-- Cross-product difference bound
+--
 -- |a*b - a'*b'| ≤ |a|*|b-b'| + |b'|*|a-a'|.
 --
--- 叉积差界：
--- |a*b - a'*b'| ≤ |a|*|b-b'| + |b'|*|a-a'|。
+-- 叉积差界
+--
+-- 两乘积之差的绝对值被两段交叉误差之和界住。
 cross-lemma : (a b a' b' : ℚ) →
   ∣ a * b + neg (a' * b') ∣ ≤
     ∣ a ∣ * ∣ b + neg b' ∣ + ∣ b' ∣ * ∣ a + neg a' ∣
@@ -102,7 +86,7 @@ cross-lemma a b a' b' = outer
   sum≡ = cong₂ _+_ abs1≡ abs2≡
   p = a * b ; q = a * b' ; r = a' * b'
   t1≡ : d1 ≡ p + neg q
-  t1≡ = *-distribˡ-_- a b b'
+  t1≡ = sub-distribˡ a b b'
   t2≡ : d2 ≡ q + neg r
   t2≡ = *-distribʳ-_- b' a a'
   idn : (a * b + neg (a' * b')) ≡ d1 + d2
@@ -227,11 +211,13 @@ mul-cong-final k p1 p2 Q Q' εL εL<4 bound-total =
   step2 : q + q + q < ε k
   step2 = subst (λ z → q + q + q < z) 4q≡ 3q<4q
 
--- The ε modulus shrinks by a factor of four:
+-- The ε modulus shrinks by a factor of four
+--
 -- ε (4 * (k+1)) < ε k / 4.
 --
--- ε 模数缩小为四分之一：
--- ε (4 * (k+1)) < ε k / 4。
+-- ε 模数缩小
+--
+-- 将索引放大到四倍后，ε 模数严格小于原来的四分之一。
 mul-cong-ε : (k : ℕ) → ε (4 ℕ* suc k) < (ε k) ÷ embed 4
 mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
   where
@@ -314,7 +300,7 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
 
 -- a / 6 ≤ a for positive a.
 --
--- 对正 a，有 a / 6 ≤ a。
+-- 对正 a，除以 6 不增大原值。
 ÷6≤ : (a : ℚ) → 0ℚ < a → a ÷ embed 6 ≤ a
 ÷6≤ a 0<a = ≤-trans (≤-reflexive (*-comm a inv6))
   (≤-trans (*-monoʳ-≤-nonNeg a {{pos⇒nonNeg a {{positive 0<a}}}} 1/6≤1)
@@ -325,12 +311,11 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
   inv6 : ℚ
   inv6 = 1/_ (embed 6) {{6-nz}}
   1/6≤1 : inv6 ≤ 1ℚ
-  1/6≤1 = ≤-trans (recip-antitone 0<1 (embed-mono-≤ (s≤s z≤n)))
-                  (≤-reflexive (sym (*-identityʳ 1ℚ)))
+  1/6≤1 = recip-antitone 0<1 (embed-mono-≤ (s≤s z≤n))
 
 -- a / 6 + a / 6 ≤ a for positive a.
 --
--- 对正 a，有 a / 6 + a / 6 ≤ a。
+-- 对正 a，两份六分之一相加仍不超过原值。
 ÷6+÷6≤ : (a : ℚ) → 0ℚ < a → a ÷ embed 6 + a ÷ embed 6 ≤ a
 ÷6+÷6≤ a 0<a =
   ≤-trans (+-mono-≤ e6≤h2 e6≤h2) (≤-reflexive (two-half a))
@@ -384,10 +369,9 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
   ∣cyp∣≤Myp : ∀ m → ∣ centre y' m ∣ ≤ Myp
   ∣cyp∣≤Myp m = proj₂ Myp-b m (centre y' m) (centre-l y' m) (centre-u y' m)
 
-  -- Geometric constants C1 = (w0x*w0y)*half,
-  -- C2 for the primed pair.
+  -- Geometric constants for the two product pairs.
   --
-  -- 几何常数 C1 = (w0x*w0y)*half，C2 对应带撇的一对。
+  -- 对应两对乘积的几何常数。
   C1 = (width x 0) * (width y 0) * half
   C2 = (width x' 0) * (width y' 0) * half
   0≤prod : ∀ {a b} → 0ℚ ≤ a → 0ℚ ≤ b → 0ℚ ≤ a * b
@@ -407,17 +391,15 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
   -- the former denominator is larger.
   -- den1 is written in suc form so 1/embed den1 reduces canonically.
   --
-  -- ε L = 1/(4k+5)，ε k / 4 = 1/(4k+4)；
-  -- 前者的分母更大。
+  -- 前者分母更大，故 ε L 严格小于 ε k 的四分之一。
   -- den1 写成 suc 形式，使 1/embed den1 按规范方式归约。
   L = 4 ℕ* suc k
   εL<εk/4 : ε L < (ε k) ÷ embed 4
   εL<εk/4 = mul-cong-ε k
 
-  -- Indices past which the two geometric errors are
-  -- < ε L < ε k / 4.
+  -- Indices past which the two geometric errors are below ε L.
   --
-  -- 两个几何误差小于 ε L < ε k / 4 的指标下界。
+  -- 两个几何误差低于 ε L 的指标下界。
   Ng1 = proj₁ (recipPow2-bound C1 0≤C1 L)
   g1< : ∀ n → Ng1 ≤ℕ n → C1 * recipPow2 n < ε L
   g1< = proj₂ (recipPow2-bound C1 0≤C1 L)
@@ -428,8 +410,7 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
   -- Cross terms: pick moduli at level L so each factor fits
   -- ε L / 6 < ε k / 4.
   --
-  -- 交叉项：在层 L 选取模数，使每个因子满足
-  -- ε L / 6 < ε k / 4。
+  -- 交叉项：在层 L 选取模数，使每个因子都落在 ε L 的六分之一以内。
   my = proj₁ (pick Mx Mx-nn L)
   my-bound : ε my * (Mx + 1ℚ) ≤ (ε L) ÷ embed 6
   my-bound = proj₂ (pick Mx Mx-nn L)
@@ -491,11 +472,9 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
   N≥Ng2 : N ≥ℕ Ng2
   N≥Ng2 = ℕP.≤-trans Ng2≤Ng Ng≤N
 
-  -- The cross-product inequality:
-  -- |cx*cy - cx'*cy'| ≤ |cx|*|cy-cy'| + |cy'|*|cx-cx'|.
+  -- The cross-product inequality.
   --
-  -- 叉积不等式：
-  -- |cx*cy - cx'*cy'| ≤ |cx|*|cy-cy'| + |cy'|*|cx-cx'|。
+  -- 叉积不等式：中心乘积之差由两段交叉误差之和界住。
   cross : ∀ n →
     ∣_∣ ((centre x n) * (centre y n) - (centre x' n) * (centre y' n))
       ≤ ∣_∣ (centre x n) * ∣_∣ ((centre y n) - (centre y' n))

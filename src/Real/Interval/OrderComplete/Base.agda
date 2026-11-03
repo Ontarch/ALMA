@@ -8,39 +8,38 @@
 
 module Real.Interval.OrderComplete.Base where
 
-open import Data.Nat using (ℕ; zero; suc; _∸_; _^_; s≤s; z≤n)
-  renaming (_≤_ to _≤N_; _*_ to _*N_)
+open import Data.Nat using (zero; suc; _∸_; _^_; s≤s; z≤n)
+  renaming (_≤_ to _≤N_; _+_ to _+ℕ_)
 open import Data.Nat.Properties using (m≤n+m; m+[n∸m]≡n)
-  renaming (≤-trans to ≤N-trans; *-comm to *-commN)
+  renaming (≤-trans to ≤N-trans)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 open import Data.Sum using (_⊎_)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; NonZero; NonNegative; positive)
-open import Data.Rational.Base using (1/_; -_)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; NonNegative; positive)
+open import Data.Rational.Base using (-_)
 open import Data.Rational.Properties using
   (≤-reflexive; ≤-trans; <-≤-trans; +-mono-≤; +-monoˡ-<; +-monoʳ-<; +-comm
-  ; +-assoc; *-comm; *-assoc; *-identityˡ; *-identityʳ; *-distribˡ-+; *-inverseˡ
-  ; +-identityˡ; +-identityʳ; pos⇒nonNeg; *-monoˡ-<-pos; *-monoʳ-<-pos; *-zeroˡ
+  ; +-assoc; *-assoc; *-identityˡ; *-identityʳ; *-distribˡ-+; +-identityˡ
+  ; +-identityʳ; pos⇒nonNeg; *-monoˡ-<-pos; *-monoʳ-<-pos; *-zeroˡ
   ; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; neg-antimono-≤; +-monoˡ-≤)
   renaming (+-inverseʳ to +-invʳ; +-inverseˡ to +-invˡ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
-open Data.Rational.Properties.≤-Reasoning
-  renaming (_∎ to _∎≤; begin_ to begin≤_) hiding (step-≡-⟩; step-≡-⟨; step-≡-∣)
+open Data.Rational.Properties.≤-Reasoning hiding (step-≡-⟩; step-≡-⟨; step-≡-∣)
+  renaming (_∎ to _∎≤; begin_ to begin≤_)
 
 open import Base.RationalRing using (neg-involutive)
-open import Real using
-  (embed; half; embed-suc-nonZero; embed-mono-≤; reciprocal-cong; 0<embed; embed-*-hom)
+open import Real using (embed; half; embed-mono-≤; 0<embed)
 open import Real.Interval using (RealI; embedℚ; δ; sub-cancel)
-open import Real.IntervalEquiv using (width; l; u)
+open import Real.IntervalEquiv using (width; l; u; recipPow2)
 open import Real.Interval.OrderLaws using (width-below)
 open import Real.Interval.Node using (u-dyadic; l-dyadic)
 open import Real.Interval.Kit using
-  (recip-antitone; 0<half; 0≤half; half+half≡1; n≤2n)
+  (recip-antitone; 0<half; 0≤half; half+half≡1; n≤2n; recipPow2-mul)
 open import Real.Interval.Order using (_<ℝ_)
-open import Real.Interval.Rational using (0<2^t; pos-diff)
+open import Real.Interval.Rational using (pos-diff)
 
 ------------------------------------------------------------------------
 -- Non-strict order
@@ -49,7 +48,7 @@ open import Real.Interval.Rational using (0<2^t; pos-diff)
 --
 -- 非严格序
 --
--- 当 y 不严格低于 x 时，x ≤ℝ y。
+-- 当 y 不严格低于 x 时，称 x 非严格小于 y。
 
 infix 4 _≤ℝ_
 
@@ -75,9 +74,13 @@ a+d≡b a b =
     b
       ∎
 
--- Gap lemma: a' ≤ a, b ≤ b' and δ < (b − a)/2 imply a' + δ < b'.
+-- Gap lemma
 --
--- 间隙引理：a' ≤ a、b ≤ b' 且 δ < (b−a)/2，则 a' + δ < b'。
+-- a' ≤ a, b ≤ b' and δ < (b − a)/2 imply a' + δ < b'.
+--
+-- 间隙引理
+--
+-- 在左界不下移、右界不上移的前提下，增量小于间隙一半时，加上增量仍小于右界。
 gapLemma : ∀ {a' b' a b : ℚ} (δ : ℚ) →
   0ℚ < b - a →
   a' ≤ a → b ≤ b' → δ < (b - a) * half → a' + δ < b'
@@ -102,6 +105,9 @@ gapLemma {a'} {b'} {a} {b} δ g>0 a'≤a b≤b' δ<halfG = final
   final = subst (λ z → a' + δ < z) (a+d≡b a' b')
             (+-monoʳ-< a' δ<diff)
 
+-- Adding a positive rational strictly increases the value.
+--
+-- 加上正有理数严格增大原值。
 x<x+ : (x : ℚ) {y : ℚ} → 0ℚ < y → x < x + y
 x<x+ x {y} 0<y =
   subst₂ _<_ (+-identityˡ x) (+-comm y x) (+-monoˡ-< x 0<y)
@@ -113,7 +119,7 @@ x<x+ x {y} 0<y =
 --
 -- 有理序反射到实数序
 --
--- p < q 蕴含 embedℚ p <ℝ embedℚ q。
+-- 有理数的严格序被嵌入保持。
 
 emb< : {p q : ℚ} → p < q → embedℚ p <ℝ embedℚ q
 emb< {p} {q} p<q =
@@ -180,7 +186,7 @@ emb< {p} {q} p<q =
 --
 -- 二进半径的递减
 --
--- δ 对 n 反单调：m ≤ n → δ n ≤ δ m。
+-- 二进半径对层级索引反单调不增。
 
 δ-dec : ∀ m n → m ≤N n → δ n ≤ δ m
 δ-dec m n p =
@@ -370,103 +376,28 @@ cube≤half =
   ∎≤
 
 ------------------------------------------------------------------------
--- Reciprocal of a product
---
--- 乘积的倒数
-
-recip-mul : (p q : ℚ) → .{{np : NonZero p}} → .{{nq : NonZero q}} →
-  .{{npq : NonZero (p * q)}} →
-  (1/ p) * (1/ q) ≡ 1/ (p * q)
-recip-mul p q {{_}} {{_}} {{npq}} = sym (
-  begin
-    rpq
-      ≡⟨ sym (*-identityʳ rpq) ⟩
-    rpq * 1ℚ
-      ≡⟨ cong (rpq *_) (sym prod≡1) ⟩
-    rpq * (rp * rq * (p * q))
-      ≡⟨ sym (*-assoc rpq (rp * rq) (p * q)) ⟩
-    (rpq * (rp * rq)) * (p * q)
-      ≡⟨ cong (λ z → z * (p * q)) (*-comm rpq (rp * rq)) ⟩
-    ((rp * rq) * rpq) * (p * q)
-      ≡⟨ *-assoc (rp * rq) rpq (p * q) ⟩
-    (rp * rq) * (rpq * (p * q))
-      ≡⟨ cong ((rp * rq) *_) (*-inverseˡ (p * q) {{npq}}) ⟩
-    (rp * rq) * 1ℚ
-      ≡⟨ *-identityʳ (rp * rq) ⟩
-    rp * rq
-      ∎)
-  where
-  rp  = 1/ p
-  rq  = 1/ q
-  rpq = 1/ (p * q)
-  prod≡1 : (rp * rq) * (p * q) ≡ 1ℚ
-  prod≡1 =
-    begin
-      (rp * rq) * (p * q)
-        ≡⟨ sym (*-assoc (rp * rq) p q) ⟩
-      ((rp * rq) * p) * q
-        ≡⟨ cong (λ z → z * q)
-               (begin
-                  (rp * rq) * p
-                    ≡⟨ *-assoc rp rq p ⟩
-                  rp * (rq * p)
-                    ≡⟨ cong (rp *_) (*-comm rq p) ⟩
-                  rp * (p * rq)
-                    ≡⟨ sym (*-assoc rp p rq) ⟩
-                  (rp * p) * rq
-                    ∎) ⟩
-      ((rp * p) * rq) * q
-        ≡⟨ *-assoc (rp * p) rq q ⟩
-      (rp * p) * (rq * q)
-        ≡⟨ cong₂ _*_ (*-inverseˡ p) (*-inverseˡ q) ⟩
-      1ℚ * 1ℚ
-        ≡⟨ *-identityˡ 1ℚ ⟩
-      1ℚ
-        ∎
-
-------------------------------------------------------------------------
 -- Dyadic half-powers
 --
+-- The dyadic scale satisfies recipPow2 (suc j) = recipPow2 j * half.
+--
 -- 二进半幂
-
-private
-  1≤2^j : ∀ j → 1 ≤N 2 ^ j
-  1≤2^j = 0<2^t
-
-  nz2^j : ∀ j → NonZero (embed (2 ^ j))
-  nz2^j j =
-    subst (λ n → NonZero (embed n)) (m+[n∸m]≡n (1≤2^j j))
-      (embed-suc-nonZero {2 ^ j ∸ 1})
-
-hp : ℕ → ℚ
-hp j = 1/ embed (2 ^ j)
-  where instance nz = nz2^j j
-
-private pow2-suc : ∀ j → (2 ^ j) *N 2 ≡ 2 ^ (suc j)
-pow2-suc j = *-commN (2 ^ j) 2
-
-hp-step : ∀ j → hp j * half ≡ hp (suc j)
-hp-step j =
+--
+-- 二进刻度在取后继时等价于乘以二分之一。
+recipPow2-step : ∀ j → recipPow2 j * half ≡ recipPow2 (suc j)
+recipPow2-step j =
   begin
-    hp j * half
-      ≡⟨ recip-mul (embed (2 ^ j)) (embed 2)
-           {{np = nz2^j j}}
-           {{nq = embed-suc-nonZero {1}}}
-           {{npq = subst NonZero (sym prod≡) (nz2^j (suc j))}} ⟩
-    1/_ (embed (2 ^ j) * embed 2) {{subst NonZero (sym prod≡) (nz2^j (suc j))}}
-      ≡⟨ reciprocal-cong (embed (2 ^ j) * embed 2) (embed (2 ^ (suc j)))
-           {{na = subst NonZero (sym prod≡) (nz2^j (suc j))}}
-           {{nb = nz2^j (suc j)}}
-           prod≡ ⟩
-    1/_ (embed (2 ^ (suc j))) {{nz2^j (suc j)}}
+    recipPow2 j * half
+      ≡⟨ cong (recipPow2 j *_) half≡recipPow2-1 ⟩
+    recipPow2 j * recipPow2 1
+      ≡⟨ sym (recipPow2-mul j 1) ⟩
+    recipPow2 (j +ℕ 1)
+      ≡⟨ cong recipPow2 (n+1≡suc j) ⟩
+    recipPow2 (suc j)
   ∎
   where
-  prod≡ : embed (2 ^ j) * embed 2 ≡ embed (2 ^ (suc j))
-  prod≡ =
-    begin
-      embed (2 ^ j) * embed 2
-        ≡⟨ sym (embed-*-hom (2 ^ j) 2) ⟩
-      embed ((2 ^ j) *N 2)
-        ≡⟨ cong embed (pow2-suc j) ⟩
-      embed (2 ^ (suc j))
-        ∎
+  half≡recipPow2-1 : half ≡ recipPow2 1
+  half≡recipPow2-1 = refl
+
+  n+1≡suc : ∀ n → n +ℕ 1 ≡ suc n
+  n+1≡suc zero    = refl
+  n+1≡suc (suc n) = cong suc (n+1≡suc n)

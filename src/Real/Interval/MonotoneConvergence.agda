@@ -15,7 +15,7 @@ open import Data.Nat.Properties using
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
   ; +-identityʳ to +ℕ-identityʳ; +-suc to +ℕ-suc; +-comm to +ℕ-comm)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Data.Sum.Base using (inj₁; inj₂)
+open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
 open import Base.RationalRing using (neg-involutive)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; NonZero; nonNegative; positive)
@@ -26,14 +26,15 @@ open import Data.Rational.Properties using
   ; +-identityˡ; +-identityʳ; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; *-assoc; ≮⇒≥
   ; *-identityʳ; *-identityˡ; *-inverseʳ; *-inverseˡ; *-distribʳ-+; *-distribˡ-+
   ; neg-distrib-+; neg-distribˡ-*; pos⇒nonNeg; pos⇒nonZero; *-monoˡ-<-pos
-  ; +-inverseʳ; +-inverseˡ; nonNegative⁻¹; neg-antimono-≤; module ≤-Reasoning)
+  ; +-inverseʳ; +-inverseˡ; nonNegative⁻¹; neg-antimono-≤; module ≤-Reasoning
+  ; <-≤-trans; +-mono-≤-<; +-mono-<-≤; ∣p∣≡p∨∣p∣≡-p)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; cong; cong₂; subst; trans; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Real using
-  (CauchySeq; ε; embed; 0<ε; embed-suc-pos; reciprocal-cong; half; 2ℚ; 2ℚ≡1+1
-  ; 2*embed; embed2-nonZero; 0<embed)
+  (CauchySeq; ε; embed; 0<ε; reciprocal-cong; half; 2ℚ; 2ℚ≡1+1; 2*embed
+  ; embed2-nonZero; 0<embed)
 open import Real.CauchyToInterval using
   (cauchy→realI; centre-cauchy→realI; M; K; ε-K<δ-suc)
 open import Real.Interval using (RealI; δ; δ-half; δs≤δ; embedℚ; sub-cancel)
@@ -45,7 +46,7 @@ open import Real.IntervalEquiv using
 open import Real.Interval.Kit using
   (tail-bound; ≈ℝ-of-rec; recipPow2-mono; two-half; half≤1)
 open import Real.Interval.OrderComplete.Base using
-  (Subset; Located; Bracket; _≤ℝ_; hp; δ-dec; a+d≡b)
+  (Subset; Located; Bracket; _≤ℝ_; δ-dec; a+d≡b)
 open import Real.Interval.OrderComplete.Bisect using
   (bw; bw-pos; bw-nn; initBracket; widenBracket; cbr-seq; cwb; step₃-a≤a
   ; step₃-b≤b; step₃-shrink)
@@ -53,7 +54,6 @@ open import Real.Interval.RegularRep using (reg; i; width-i; fold≥k+4)
 open import Real.Interval.OrderLe using
   (≤ℝ-refl; ≤ℝ-trans; ≤ℝ-resp-≈; <⇒≤ℝ; <-≤ℝ-trans)
 open import Real.Interval.Mul.Order using (≈-<-respʳ)
-open import Real.Interval.Rational using (suc∸1; 0<2^t)
 open import Real.Interval.WeakArith using (recip-antitone; recip-antitone-≤)
 open import Real.Interval.Node using (u-dyadic; l-dyadic)
 
@@ -126,7 +126,7 @@ module _ {f : ℕ → RealI}
   -- The bracket width shrinks geometrically.
   --
   -- 括号宽度几何收缩。
-  bw≤ : ∀ j → bw (br-seq j) ≤ bw br0 * hp j
+  bw≤ : ∀ j → bw (br-seq j) ≤ bw br0 * recipPow2 j
   bw≤ j = cwb loc br0 j
 
   -- Iterated lower-endpoint monotonicity.
@@ -184,36 +184,6 @@ module _ {f : ℕ → RealI}
 --
 -- 下端点构成有理柯西序列
 
-  -- The order-completeness halving factor equals the interval
-  -- geometric factor.
-  --
-  -- 序完备的折半因子等于区间的几何因子。
-  hp≡recip : ∀ n → hp n ≡ recipPow2 n
-  hp≡recip n =
-    let e : embed (2 ^ n) ≡ embed (suc (2 ^ n ∸ 1))
-        e = cong embed (sym (suc∸1 (0<2^t n)))
-        nzN : Data.Rational.NonZero (embed (2 ^ n))
-        nzN = subst (λ m → Data.Rational.NonZero (embed m))
-                    (suc∸1 (0<2^t n))
-                    (pos⇒nonZero (embed (suc (2 ^ n ∸ 1)))
-                       ⦃ embed-suc-pos ⦄)
-    in reciprocal-cong (embed (2 ^ n)) (embed (suc (2 ^ n ∸ 1)))
-                      ⦃ nzN ⦄
-                      ⦃ pos⇒nonZero (embed (suc (2 ^ n ∸ 1)))
-                          ⦃ embed-suc-pos ⦄ ⦄
-                      e
-
-  -- Monotonicity of the halving factor in the reverse direction:
-  -- larger index gives smaller value, transported from the geometric
-  -- factor via a single subst₂.
-  --
-  -- 折半因子的反向单调性：下标越大值越小，经一次 subst₂ 从几何因子转移。
-  hp-mono : ∀ m n → m ≥N n → hp m ≤ hp n
-  hp-mono m n ge =
-    Relation.Binary.PropositionalEquality.subst₂ (λ x y → x ≤ y)
-      (sym (hp≡recip m)) (sym (hp≡recip n))
-      (recipPow2-mono ge)
-
   -- Modulus: a level at which the bracket width is below the given
   -- precision. The extra maximum with k makes the modulus dominate
   -- its argument, so the sampling index is at least n.
@@ -223,7 +193,7 @@ module _ {f : ℕ → RealI}
   a-mod : ℕ → ℕ
   a-mod k = proj₁ (tail-bound (bw br0) (bw-nn br0) (ε k) (0<ε k)) ⊔ k
 
-  a-mod< : ∀ k → bw br0 * hp (a-mod k) < ε k
+  a-mod< : ∀ k → bw br0 * recipPow2 (a-mod k) < ε k
   a-mod< k =
     let N0 = proj₁ (tail-bound (bw br0) (bw-nn br0) (ε k) (0<ε k))
         h = proj₂ (tail-bound (bw br0) (bw-nn br0) (ε k) (0<ε k))
@@ -236,9 +206,7 @@ module _ {f : ℕ → RealI}
         mon = *-monoˡ-≤-nonNeg (bw br0)
                 {{pos⇒nonNeg (bw br0) {{positive (bw-pos br0)}}}}
                 (recipPow2-mono N0≤N)
-        mid : bw br0 * recipPow2 N < ε k
-        mid = ≤-<-trans mon raw
-    in subst (λ z → bw br0 * z < ε k) (sym (hp≡recip N)) mid
+    in ≤-<-trans mon raw
 
   a-seq : CauchySeq
   a-seq = record
@@ -576,11 +544,11 @@ module _ {f : ℕ → RealI}
           ∎
         q' : neg z ≤ d
         q' = subst (λ w → w ≤ d) (sym nid) q
-        cases : Data.Sum.Base._⊎_ (∣ z ∣ ≡ z) (∣ z ∣ ≡ neg z)
-        cases = Data.Rational.Properties.∣p∣≡p∨∣p∣≡-p z
+        cases : _⊎_ (∣ z ∣ ≡ z) (∣ z ∣ ≡ neg z)
+        cases = ∣p∣≡p∨∣p∣≡-p z
     in abs-case cases p q'
     where
-    abs-case : ∀ {z d} → Data.Sum.Base._⊎_ (∣ z ∣ ≡ z) (∣ z ∣ ≡ neg z)
+    abs-case : ∀ {z d} → _⊎_ (∣ z ∣ ≡ z) (∣ z ∣ ≡ neg z)
              → z ≤ d → neg z ≤ d → ∣ z ∣ ≤ d
     abs-case (inj₁ e) p _ = subst (λ w → w ≤ _) (sym e) p
     abs-case (inj₂ e) _ q = subst (λ w → w ≤ _) (sym e) q
@@ -628,19 +596,9 @@ module _ {f : ℕ → RealI}
     ∣ centre L n - centre s n ∣ ≤ b n - a n
   L-s-diff n = bounded-diff (cL-lo n) (cL-hi n) (cs-lo n) (cs-hi n)
 
-  bw≤n : ∀ n → b n - a n ≤ bw br0 * hp n
-  bw≤n n = bw≤ n
-
-  bw≤r : ∀ n → bw br0 * hp n ≤ bw br0 * recipPow2 n
-  bw≤r n =
-    let e : hp n ≡ recipPow2 n
-        e = hp≡recip n
-    in ≤-reflexive (cong (bw br0 *_) e)
-
   L-s-bound : ∀ n →
     ∣ centre L n - centre s n ∣ ≤ bw br0 * recipPow2 n
-  L-s-bound n =
-    ≤-trans (≤-trans (L-s-diff n) (bw≤n n)) (bw≤r n)
+  L-s-bound n = ≤-trans (L-s-diff n) (bw≤ n)
 
   L≈s : L ≈ℝ s
   L≈s = ≈ℝ-of-rec L s (bw br0) (bw-nn br0) L-s-bound
@@ -1432,7 +1390,7 @@ module _ {f : ℕ → RealI}
               cL : centre L t ≡ a M
               cL = cL≡ t
               -- bw (br-seq M) + δ m ≤ δ t
-              bwM : bw (br-seq M) ≤ bw br0 * hp M
+              bwM : bw (br-seq M) ≤ bw br0 * recipPow2 M
               bwM = bw≤ M
               m≥t+3 : m ≥N suc (suc (suc t))
               m≥t+3 = fold≥k+4 (f n) (t ∸ 1)
@@ -1449,19 +1407,17 @@ module _ {f : ℕ → RealI}
               bwδ≤δt =
                 let M≥mod : a-mod (K t) ≤N M
                     M≥mod = M≥a-mod-K t
-                    hpM≤ : hp M ≤ hp (a-mod (K t))
-                    hpM≤ = hp-mono M (a-mod (K t)) M≥mod
-                    bwM' : bw (br-seq M) ≤ bw br0 * hp M
-                    bwM' = bwM
-                    bwM'' : bw (br-seq M) ≤ bw br0 * hp (a-mod (K t))
-                    bwM'' =
-                      ≤-trans bwM'
+                    hpM≤ : recipPow2 M ≤ recipPow2 (a-mod (K t))
+                    hpM≤ = recipPow2-mono M≥mod
+                    bwM' : bw (br-seq M) ≤ bw br0 * recipPow2 (a-mod (K t))
+                    bwM' =
+                      ≤-trans bwM
                         (*-monoˡ-≤-nonNeg (bw br0)
                            {{pos⇒nonNeg (bw br0)
                               {{positive (bw-pos br0)}}}}
                            hpM≤)
                     bw<εK : bw (br-seq M) < ε (K t)
-                    bw<εK = ≤-<-trans bwM'' (a-mod< (K t))
+                    bw<εK = ≤-<-trans bwM' (a-mod< (K t))
                     bw<δ : bw (br-seq M) < δ (suc t)
                     bw<δ = ≤-<-trans (<⇒≤ bw<εK) (ε-K<δ-suc t)
                     sum : bw (br-seq M) + δ m
@@ -1482,7 +1438,7 @@ module _ {f : ℕ → RealI}
                       let a<b : a M < b M
                           a<b = Bracket.a<b (br-seq M)
                           e : a M + neg (a M) < b M + neg (a M)
-                          e = Data.Rational.Properties.+-mono-<-≤ a<b (≤-refl {neg (a M)})
+                          e = +-mono-<-≤ a<b (≤-refl {neg (a M)})
                           e0 : a M + neg (a M) ≡ 0ℚ
                           e0 = +-inverseʳ (a M)
                       in <⇒≤ (subst (λ z → z < b M + neg (a M)) e0 e)
@@ -1602,7 +1558,7 @@ module _ {f : ℕ → RealI}
                                       (≤-refl {x = w * half})
                           step2 : δ t + w * half
                                     < δ t + ε (suc t) * half
-                          step2 = Data.Rational.Properties.+-mono-≤-<
+                          step2 = +-mono-≤-<
                                      (≤-refl {x = δ t}) w/2<
                           step3 : δ t + ε (suc t) * half
                                     ≤ ε t * half + ε (suc t) * half
@@ -1628,12 +1584,12 @@ module _ {f : ℕ → RealI}
                                              (≤N-refl)
                                              {{nzp}} {{nzq}}
                                   in *-monoˡ-<-pos half e1
-                            in Data.Rational.Properties.+-mono-≤-<
+                            in +-mono-≤-<
                                  (≤-refl {x = ε t * half}) εsuc<
                           step5 : ε t * half + ε t * half ≡ ε t
                           step5 = two-half (ε t)
-                      in Data.Rational.Properties.<-≤-trans
-                           (≤-<-trans (<⇒≤ (Data.Rational.Properties.<-≤-trans
+                      in <-≤-trans
+                           (≤-<-trans (<⇒≤ (<-≤-trans
                              (≤-<-trans step1 step2) step3)) step4)
                              (≤-reflexive step5)
                 in ≤-<-trans abs≤ d<εt

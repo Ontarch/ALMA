@@ -50,7 +50,7 @@ half-pos = positive 0<half
 
 -- δ n < g/2 whenever δ n + δ n < g.
 --
--- 若 δ n + δ n < g，则 δ n < g/2。
+-- 若二进容差的两倍低于目标，则该容差低于目标的一半。
 δ-half< : ∀ (n : ℕ) (g : ℚ) → δ n + δ n < g → δ n < g * half
 δ-half< n g d<n =
   let e1 : half * (δ n + δ n) < half * g
@@ -119,9 +119,9 @@ module _ {P : Subset} (loc : Located P)
   u-sup n = cong RealI.u (node-sup n)
 
   ----------------------------------------------------------------------
-  -- width (embedℚ 0) n ≡ δ n + δ n  (top-level within the module)
+  -- width (embedℚ 0) n ≡ δ n + δ n
   --
-  -- embedℚ 0 在层级 n 的宽度（模块内顶层陈述）。
+  -- embedℚ 0 在层级 n 的宽度。
 
   w0-embed0 : ∀ n → width (embedℚ 0ℚ) n ≡ δ n + δ n
   w0-embed0 n =
@@ -138,7 +138,7 @@ module _ {P : Subset} (loc : Located P)
   ----------------------------------------------------------------------
   -- smallNode: a level where both width sup and δ are below g/2.
   --
-  -- smallNode：使上确界宽度与 δ 均低于 g/2 的层级。
+  -- smallNode：使上确界宽度与二进容差均低于目标一半的层级。
 
   smallNode : (k : ℕ) (g : ℚ) → 0ℚ < g →
     Σ ℕ λ n → n ≥N k × width sup n < g * half × δ n < g * half
@@ -164,11 +164,11 @@ module _ {P : Subset} (loc : Located P)
     in n , n≥k , w< , d<
 
   ----------------------------------------------------------------------
-  -- sup-upper-witness: a strict-order witness embedℚ (u sup n) <ℝ z
-  -- given u sup k < l z k.
+  -- sup-upper-witness: given a gap at level k, produce a strict-order
+  -- witness between the dyadic upper bound and the target.
   --
-  -- sup-upper-witness：由 u sup k < l z k 给出严格序见证
-  -- embedℚ (u sup n) <ℝ z。
+  -- sup-upper-witness：由第 k 层的间隙，构造上界嵌入与目标之间的
+  -- 严格序见证。
 
   sup-upper-witness : (z : RealI) (k : ℕ) (g : ℚ)
       → g ≡ l z k - u sup k
@@ -190,11 +190,12 @@ module _ {P : Subset} (loc : Located P)
     in n , n≥k , eb<z
 
   ----------------------------------------------------------------------
-  -- sup-least-witness: a strict-order witness y <ℝ embedℚ (l sup n)
-  -- given u y k < l sup k.
+  -- sup-least-witness: given a gap at level k, produce a strict-order
+  -- witness between the candidate lower bound and the dyadic lower
+  -- bound of sup.
   --
-  -- sup-least-witness：由 u y k < l sup k 给出严格序见证
-  -- y <ℝ embedℚ (l sup n)。
+  -- sup-least-witness：由第 k 层的间隙，构造候选下界与上确界下界
+  -- 嵌入之间的严格序见证。
 
   sup-least-witness : (y : RealI) (k : ℕ) (g : ℚ)
       → g ≡ l sup k - u y k
@@ -232,9 +233,9 @@ module _ {P : Subset} (loc : Located P)
     in n , n≥k , y<ea
 
   ----------------------------------------------------------------------
-  -- sup is an upper bound: every member z satisfies z ≤ℝ sup.
+  -- sup is an upper bound: every member stays below sup.
   --
-  -- sup 是上界：每个成员 z 满足 z ≤ℝ sup。
+  -- sup 是上界：每个成员都不超过它。
 
   sup-upper : ∀ z → P z → z ≤ℝ sup
   sup-upper z pz sup<z =
@@ -251,9 +252,9 @@ module _ {P : Subset} (loc : Located P)
     in <-irrefl (embedℚ (u sup n)) absurd
 
   ----------------------------------------------------------------------
-  -- sup is least: any upper bound y satisfies sup ≤ℝ y.
+  -- sup is least: any upper bound is at least sup.
   --
-  -- sup 是最小上界：任意上界 y 满足 sup ≤ℝ y。
+  -- sup 是最小上界：任意上界都不小于它。
 
   sup-least : ∀ y → ((z : RealI) → P z → z ≤ℝ y) → sup ≤ℝ y
   sup-least y bound y<sup =

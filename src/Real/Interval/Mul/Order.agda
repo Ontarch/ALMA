@@ -15,7 +15,8 @@ open import Data.Nat.Properties using
   renaming (≤-trans to ≤ℕ-trans; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Rational using
-  (ℚ; 0ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _<_; _≤_; ∣_∣; positive) renaming (-_ to neg)
+  (ℚ; 0ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _<_; _≤_; ∣_∣; nonNegative; positive)
+  renaming (-_ to neg)
 open import Data.Rational.Properties using
   (+-identityʳ; neg-distrib-+; neg-distribˡ-*; ≤-trans; <⇒≤; ≤-<-trans
   ; <-≤-trans; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; pos*pos⇒pos; positive⁻¹
@@ -31,7 +32,7 @@ open import Real using (embed; ε; half; embed-mono-≤; embed-suc-pos; ε-half)
 open import Real.Interval using (RealI; δ; δ-pos; pos-pow)
 open import Real.IntervalEquiv using (node; l; u; centre; l-mono)
 open import Real.Interval.Arith using (0ℝ; _+ℝ_; _-ℝ_; negℝ)
-open import Real.Interval.Mul using (_*ℝ_; nn)
+open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Node using
   (node-*ℝ; node-negℝ; centre-add; u-dyadic; centre-neg; l-neg; u-neg)
 open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-refl; ≈ℝ-sym; ≈ℝ-trans)
@@ -137,10 +138,10 @@ private
       c1 = La * Lb; c2 = La * Ub; c3 = Ua * Lb; c4 = Ua * Ub
       0≤La = <⇒≤ 0<la
       0≤Lb = <⇒≤ 0<lb
-      c1≤c2 = *-monoˡ-≤-nonNeg La {{nn 0≤La}} (<⇒≤ (RealI.lo b))
-      c1≤c3 = *-monoʳ-≤-nonNeg Lb {{nn 0≤Lb}} (<⇒≤ (RealI.lo a))
+      c1≤c2 = *-monoˡ-≤-nonNeg La {{nonNegative 0≤La}} (<⇒≤ (RealI.lo b))
+      c1≤c3 = *-monoʳ-≤-nonNeg Lb {{nonNegative 0≤Lb}} (<⇒≤ (RealI.lo a))
       c3≤c4 = *-monoˡ-≤-nonNeg Ua
-                {{nn (≤-trans 0≤La (<⇒≤ (RealI.lo a)))}}
+                {{nonNegative (≤-trans 0≤La (<⇒≤ (RealI.lo a)))}}
                 (<⇒≤ (RealI.lo b))
     in   begin
             (c1 ⊓ c2) ⊓ (c3 ⊓ c4)

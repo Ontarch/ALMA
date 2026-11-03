@@ -36,8 +36,7 @@ open import Real.Interval.Reasoning using
 --
 -- |x| 的两个端点
 --
--- 与定义中出现的表达式定义性相等：
---   absLo l u = (l ⊔ - u) ⊔ 0          absHi l u = u ⊔ - l
+-- 与定义中出现的表达式定义性相等。
 
 absLo : ℚ → ℚ → ℚ
 absLo l u = (l ⊔ neg u) ⊔ 0ℚ

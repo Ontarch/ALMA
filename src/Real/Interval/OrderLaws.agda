@@ -8,13 +8,11 @@
 
 module Real.Interval.OrderLaws where
 
-open import Data.Nat using
-  (ℕ; zero; suc; _≥_; _⊔_; _^_; _∸_; s≤s; z≤n)
+open import Data.Nat using (ℕ; zero; suc; _≥_; _⊔_; _^_; _∸_; s≤s; z≤n)
   renaming (_≤_ to _≤ℕ_; _+_ to _+ℕ_)
-open import Data.Nat.Properties using
-  (m≤m⊔n; m≤n⊔m; m∸n+n≡m)
+open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m∸n+n≡m)
   renaming (≤-trans to ≤ℕ-trans; +-suc to +-sucℕ
-          ; +-comm to +-commℕ; +-identityʳ to +-identityʳℕ)
+  ; +-comm to +-commℕ; +-identityʳ to +-identityʳℕ)
 open import Data.Product using (Σ; _,_; _×_; proj₁; proj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣; Positive; NonZero; positive)
@@ -58,8 +56,8 @@ open import Real.Interval.Rational using (r≤|r|)
 -- 基本序论事实
 --
 -- RealI 上 _<ℝ_ 与 _≈ℝ_ 的基本序论事实：任意正有理数下方有 ε 与
--- 宽度，宽度随深度递减，上界 u ≤ centre + width，序与近似相等的
--- 相容性，以及序在加法、取负与减法下的单调性。
+-- 宽度，宽度随深度递减，上界由中心与宽度控制，序与近似相等相容，
+-- 序在加法、取负与减法下单调。
 
 eps-below : (b : ℚ) → 0ℚ < b → Σ ℕ (λ k → ε k < b)
 eps-below b 0<b = M , goal

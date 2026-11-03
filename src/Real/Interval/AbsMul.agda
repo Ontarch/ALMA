@@ -13,11 +13,13 @@ open import Data.Nat using (ℕ; zero; suc) renaming (_*_ to _ℕ*_; _+_ to _+N_
 open import Data.Nat.Properties using (+-suc; *-suc)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; ∣_∣; nonNegative)
   renaming (-_ to neg)
-open import Data.Rational.Properties as QP using
+open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; +-mono-≤; +-comm; +-assoc; +-identityʳ
   ; +-identityˡ; +-inverseˡ; +-inverseʳ; *-assoc; *-comm; *-identityʳ; *-zeroˡ
   ; *-distribʳ-+; ∣p+q∣≤∣p∣+∣q∣; ∣p*q∣≡∣p∣*∣q∣; ∣p∣≡p∨∣p∣≡-p
-  ; neg-distrib-+; 0≤∣p∣; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg)
+  ; neg-distrib-+; 0≤∣p∣; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; +-monoˡ-≤
+  ; ∣-p∣≡∣p∣; 0≤p⇒∣p∣≡p; *-distribˡ-+; *-zeroʳ; neg-distribˡ-*
+  ; neg-distribʳ-*; ∣∣p∣∣≡∣p∣)
 open import Data.Sum using (inj₁; inj₂)
 open import Function.Base using (case_of_)
 open import Relation.Binary.PropositionalEquality using
@@ -130,7 +132,7 @@ chain5 a0 a1 a2 a3 a4 a5 k1 k2 k3 k4 k5 p1 p2 p3 p4 p5 =
     (add5 p1 p2 p3 p4 p5)
 
 ------------------------------------------------------------------------
--- Rational helper lemmas (ℚ)
+-- Rational helper lemmas
 --
 -- 有理数引理
 
@@ -145,7 +147,7 @@ rev-tri a b =
           a
             ≡⟨ sym (+-identityʳ a) ⟩
           a + 0ℚ
-            ≡⟨ cong (a +_) (sym (QP.+-inverseˡ b)) ⟩
+            ≡⟨ cong (a +_) (sym (+-inverseˡ b)) ⟩
           a + (neg b + b)
             ≡⟨ sym (+-assoc a (neg b) b) ⟩
           (a + neg b) + b
@@ -173,7 +175,7 @@ rev-tri a b =
         ∎
   in
   begin≤ (∣ a ∣ - ∣ b ∣)
-    ≤⟨ QP.+-monoˡ-≤ (neg ∣ b ∣) t ⟩
+    ≤⟨ +-monoˡ-≤ (neg ∣ b ∣) t ⟩
     (∣ a - b ∣ + ∣ b ∣) + neg ∣ b ∣
     ≤⟨ ≤-reflexive eq ⟩
     ∣ a - b ∣
@@ -184,21 +186,7 @@ rev-tri a b =
 -- 绝对值函数是 1-Lipschitz 的。
 abs-lip : (a b : ℚ) → ∣ ∣ a ∣ - ∣ b ∣ ∣ ≤ ∣ a - b ∣
 abs-lip a b =
-  let neg-neg : (c : ℚ) → neg (neg c) ≡ c
-      neg-neg c =
-        begin neg (neg c)
-          ≡⟨ sym (+-identityʳ (neg (neg c))) ⟩
-        neg (neg c) + 0ℚ
-          ≡⟨ cong (neg (neg c) +_) (sym (+-inverseˡ c)) ⟩
-        neg (neg c) + (neg c + c)
-          ≡⟨ sym (+-assoc (neg (neg c)) (neg c) c) ⟩
-        (neg (neg c) + neg c) + c
-          ≡⟨ cong (_+ c) (+-inverseˡ (neg c)) ⟩
-        0ℚ + c
-          ≡⟨ +-identityˡ c ⟩
-        c
-        ∎
-      X = ∣ a ∣ - ∣ b ∣
+  let X = ∣ a ∣ - ∣ b ∣
       w = ∣ a - b ∣
       d1 : X ≤ w
       d1 = rev-tri a b
@@ -209,13 +197,13 @@ abs-lip a b =
         b + neg a
           ≡⟨ +-comm b (neg a) ⟩
         neg a + b
-          ≡⟨ cong (neg a +_) (sym (neg-neg b)) ⟩
+          ≡⟨ cong (neg a +_) (sym (neg-involutive b)) ⟩
         neg a + neg (neg b)
           ≡⟨ sym (neg-distrib-+ a (neg b)) ⟩
         neg (a + neg b)
         ∎
       eq : ∣ b - a ∣ ≡ w
-      eq = trans (cong ∣_∣ e) (QP.∣-p∣≡∣p∣ (a - b))
+      eq = trans (cong ∣_∣ e) (∣-p∣≡∣p∣ (a - b))
       d2 : neg X ≤ w
       d2 =
         let k : ∣ b ∣ - ∣ a ∣ ≤ w
@@ -227,7 +215,7 @@ abs-lip a b =
               neg (∣ a ∣ + neg ∣ b ∣)
                 ≡⟨ neg-distrib-+ ∣ a ∣ (neg ∣ b ∣) ⟩
               neg ∣ a ∣ + neg (neg ∣ b ∣)
-                ≡⟨ cong (neg ∣ a ∣ +_) (neg-neg ∣ b ∣) ⟩
+                ≡⟨ cong (neg ∣ a ∣ +_) (neg-involutive ∣ b ∣) ⟩
               neg ∣ a ∣ + ∣ b ∣
                 ≡⟨ +-comm (neg ∣ a ∣) ∣ b ∣ ⟩
               ∣ b ∣ + neg ∣ a ∣
@@ -341,7 +329,7 @@ centre-abs-bound r n M M-bnd =
     M-nn' : ∣ ∣ centre r (n +N n) ∣ ∣ ≤ M
     M-nn' =
       subst (λ z → z ≤ M)
-        (sym (QP.0≤p⇒∣p∣≡p (QP.0≤∣p∣ (centre r (n +N n)))))
+        (sym (0≤p⇒∣p∣≡p (0≤∣p∣ (centre r (n +N n)))))
         M-nn
     split :
       centre ∣ r ∣ℝ n ≡
@@ -352,7 +340,7 @@ centre-abs-bound r n M M-bnd =
           ≡⟨ sym (+-identityʳ (centre ∣ r ∣ℝ n)) ⟩
         centre ∣ r ∣ℝ n + 0ℚ
           ≡⟨ cong (centre ∣ r ∣ℝ n +_)
-                  (sym (QP.+-inverseˡ ∣ centre r (n +N n) ∣)) ⟩
+                  (sym (+-inverseˡ ∣ centre r (n +N n) ∣)) ⟩
         centre ∣ r ∣ℝ n + (neg ∣ centre r (n +N n) ∣ + ∣ centre r (n +N n) ∣)
           ≡⟨ sym (+-assoc (centre ∣ r ∣ℝ n)
                           (neg ∣ centre r (n +N n) ∣) ∣ centre r (n +N n) ∣) ⟩
@@ -399,20 +387,20 @@ abs-mul-sumEq Wxy0 T1 Cross4 T1abs r =
     fact2 : r * (Wxy0 + (T1 + (0ℚ + (Cross4 + T1abs)))) ≡ term
     fact2 =
       begin r * (Wxy0 + (T1 + (0ℚ + (Cross4 + T1abs))))
-        ≡⟨ QP.*-distribˡ-+ r Wxy0 (T1 + (0ℚ + (Cross4 + T1abs))) ⟩
+        ≡⟨ *-distribˡ-+ r Wxy0 (T1 + (0ℚ + (Cross4 + T1abs))) ⟩
       r * Wxy0 + r * (T1 + (0ℚ + (Cross4 + T1abs)))
         ≡⟨ cong (r * Wxy0 +_)
-            (QP.*-distribˡ-+ r T1 (0ℚ + (Cross4 + T1abs))) ⟩
+            (*-distribˡ-+ r T1 (0ℚ + (Cross4 + T1abs))) ⟩
       r * Wxy0 + (r * T1 + r * (0ℚ + (Cross4 + T1abs)))
         ≡⟨ cong (λ z → r * Wxy0 + (r * T1 + z))
             (begin r * (0ℚ + (Cross4 + T1abs))
-              ≡⟨ QP.*-distribˡ-+ r 0ℚ (Cross4 + T1abs) ⟩
+              ≡⟨ *-distribˡ-+ r 0ℚ (Cross4 + T1abs) ⟩
             r * 0ℚ + r * (Cross4 + T1abs)
               ≡⟨ cong (λ z → z + r * (Cross4 + T1abs))
-                  (QP.*-zeroʳ r) ⟩
+                  (*-zeroʳ r) ⟩
             0ℚ + r * (Cross4 + T1abs)
               ≡⟨ cong (λ z → 0ℚ + z)
-                  (QP.*-distribˡ-+ r Cross4 T1abs) ⟩
+                  (*-distribˡ-+ r Cross4 T1abs) ⟩
             0ℚ + (r * Cross4 + r * T1abs) ∎) ⟩
       term ∎
   in
@@ -442,7 +430,6 @@ abs-mul-h x y n =
       T1abs = width ∣ x ∣ℝ 0 * width ∣ y ∣ℝ 0 * half
       Wxy0 = width (x *ℝ y) 0
       Cross4 = My * wx0 + Mx * wy0 + wx0 * wy0
-      K = Wxy0 + (T1 + (0ℚ + (Cross4 + T1abs)))
       nn = n +N n
       4n = nn +N nn
       r2 = recipPow2 nn
@@ -562,9 +549,9 @@ abs-mul-h x y n =
             inv0 : neg bx * q + bx * q ≡ 0ℚ
             inv0 =
               begin neg bx * q + bx * q
-                ≡⟨ cong (_+ bx * q) (sym (QP.neg-distribˡ-* bx q)) ⟩
+                ≡⟨ cong (_+ bx * q) (sym (neg-distribˡ-* bx q)) ⟩
               neg (bx * q) + bx * q
-                ≡⟨ QP.+-inverseˡ (bx * q) ⟩
+                ≡⟨ +-inverseˡ (bx * q) ⟩
               0ℚ ∎
             -- Identity: p*q - bx*by = (p-bx)*q + bx*(q-by).
             --
@@ -577,10 +564,10 @@ abs-mul-h x y n =
                 ≡⟨ refl ⟩
               (p + neg bx) * q + bx * (q + neg by)
                 ≡⟨ cong₂ _+_ (*-distribʳ-+ q p (neg bx))
-                            (QP.*-distribˡ-+ bx q (neg by)) ⟩
+                            (*-distribˡ-+ bx q (neg by)) ⟩
               (p * q + neg bx * q) + (bx * q + bx * neg by)
                 ≡⟨ cong (λ z → (p * q + neg bx * q) + (bx * q + z))
-                   (sym (QP.neg-distribʳ-* bx by)) ⟩
+                   (sym (neg-distribʳ-* bx by)) ⟩
               (p * q + neg bx * q) + (bx * q + neg (bx * by))
                 ≡⟨ sym (+-assoc (p * q + neg bx * q) (bx * q) (neg (bx * by))) ⟩
               ((p * q + neg bx * q) + bx * q) + neg (bx * by)
@@ -610,14 +597,14 @@ abs-mul-h x y n =
                           begin ∣ p - bx ∣
                             ≡⟨ cong ∣_∣ s ⟩
                           ∣ neg (bx - p) ∣
-                            ≡⟨ QP.∣-p∣≡∣p∣ (bx - p) ⟩
+                            ≡⟨ ∣-p∣≡∣p∣ (bx - p) ⟩
                           ∣ bx - p ∣ ∎
                     in subst (λ z → z ≤ wx0 * r) (sym e) e4
                   a2raw : q ≤ My
                   a2raw = My-bnd 4n
                   a2 : ∣ q ∣ ≤ My
                   a2 =
-                    subst (λ z → z ≤ My) (sym (QP.∣∣p∣∣≡∣p∣ cy4)) a2raw
+                    subst (λ z → z ≤ My) (sym (∣∣p∣∣≡∣p∣ cy4)) a2raw
                   eq : ∣ (p - bx) * q ∣ ≡ ∣ p - bx ∣ * ∣ q ∣
                   eq = ∣p*q∣≡∣p∣*∣q∣ (p - bx) q
               in subst (λ z → z ≤ (wx0 * r) * My) (sym eq)
@@ -641,7 +628,7 @@ abs-mul-h x y n =
                           begin ∣ q - by ∣
                             ≡⟨ cong ∣_∣ s ⟩
                           ∣ neg (by - q) ∣
-                            ≡⟨ QP.∣-p∣≡∣p∣ (by - q) ⟩
+                            ≡⟨ ∣-p∣≡∣p∣ (by - q) ⟩
                           ∣ by - q ∣ ∎
                     in subst (λ z → z ≤ wy0 * r) (sym e) e5
                   b2 : ∣ bx ∣ ≤ Mx + wx0
@@ -655,7 +642,7 @@ abs-mul-h x y n =
         let inner : My * wx0 + wy0 * (Mx + wx0) ≡ Cross4
             inner =
               begin My * wx0 + wy0 * (Mx + wx0)
-                ≡⟨ cong (My * wx0 +_) (QP.*-distribˡ-+ wy0 Mx wx0) ⟩
+                ≡⟨ cong (My * wx0 +_) (*-distribˡ-+ wy0 Mx wx0) ⟩
               My * wx0 + (wy0 * Mx + wy0 * wx0)
                 ≡⟨ cong (λ z → My * wx0 + z)
                     (cong₂ _+_ (*-comm wy0 Mx) (*-comm wy0 wx0)) ⟩
@@ -692,7 +679,7 @@ abs-mul-h x y n =
                       ≡⟨ *-assoc r wy0 (Mx + wx0) ⟩
                     r * (wy0 * (Mx + wx0)) ∎) ⟩
               r * (My * wx0) + r * (wy0 * (Mx + wx0))
-                ≡⟨ sym (QP.*-distribˡ-+ r (My * wx0)
+                ≡⟨ sym (*-distribˡ-+ r (My * wx0)
                         (wy0 * (Mx + wx0))) ⟩
               r * (My * wx0 + wy0 * (Mx + wx0))
                 ≡⟨ *-comm r (My * wx0 + wy0 * (Mx + wx0)) ⟩
@@ -715,7 +702,7 @@ abs-mul-h x y n =
         let e : ∣ cx4 * cy4 ∣ ≡ ∣ cx4 ∣ * ∣ cy4 ∣
             e = mulabs
             zz : ∣ (∣ cx4 ∣ * ∣ cy4 ∣) - (∣ cx4 ∣ * ∣ cy4 ∣) ∣ ≡ 0ℚ
-            zz = cong ∣_∣ (QP.+-inverseʳ (∣ cx4 ∣ * ∣ cy4 ∣))
+            zz = cong ∣_∣ (+-inverseʳ (∣ cx4 ∣ * ∣ cy4 ∣))
         in subst (λ z → ∣ z - (∣ cx4 ∣ * ∣ cy4 ∣) ∣ ≤ 0ℚ) (sym e)
              (≤-reflexive zz)
       d4 : ∣ (∣ cx4 ∣ * ∣ cy4 ∣) - bx * by ∣ ≤ Cross4 * r
@@ -736,7 +723,7 @@ abs-mul-h x y n =
               begin ∣ B - bx * by ∣
                 ≡⟨ cong ∣_∣ s ⟩
               ∣ neg (bx * by - B) ∣
-                ≡⟨ QP.∣-p∣≡∣p∣ (bx * by - B) ⟩
+                ≡⟨ ∣-p∣≡∣p∣ (bx * by - B) ⟩
               ∣ bx * by - B ∣ ∎
         in subst (λ z → z ≤ T1abs * r) e e3
       S = Wxy0 * r + (T1 * r + (0ℚ + (Cross4 * r + T1abs * r)))
@@ -745,46 +732,8 @@ abs-mul-h x y n =
               (∣ cx4 ∣ * ∣ cy4 ∣) (bx * by) B
               (Wxy0 * r) (T1 * r) 0ℚ (Cross4 * r) (T1abs * r)
               d1 d2 d3 d4 d5
-      sumEq : S ≡ K * r
-      sumEq =
-        let fact : (k : ℚ) → k * r ≡ r * k
-            fact k = *-comm k r
-            term : ℚ
-            term = r * Wxy0 + (r * T1 + (0ℚ + (r * Cross4 + r * T1abs)))
-            right : 0ℚ + (Cross4 * r + T1abs * r)
-                    ≡ 0ℚ + (r * Cross4 + r * T1abs)
-            right =
-              cong₂ _+_ (refl {x = 0ℚ})
-                (cong₂ _+_ (fact Cross4) (fact T1abs))
-            fact2 : r * K ≡ term
-            fact2 =
-              begin r * K
-                ≡⟨ QP.*-distribˡ-+ r Wxy0 (T1 + (0ℚ + (Cross4 + T1abs))) ⟩
-              r * Wxy0 + r * (T1 + (0ℚ + (Cross4 + T1abs)))
-                ≡⟨ cong (r * Wxy0 +_)
-                    (QP.*-distribˡ-+ r T1 (0ℚ + (Cross4 + T1abs))) ⟩
-              r * Wxy0 + (r * T1 + r * (0ℚ + (Cross4 + T1abs)))
-                ≡⟨ cong (λ z → r * Wxy0 + (r * T1 + z))
-                    (begin r * (0ℚ + (Cross4 + T1abs))
-                      ≡⟨ QP.*-distribˡ-+ r 0ℚ (Cross4 + T1abs) ⟩
-                    r * 0ℚ + r * (Cross4 + T1abs)
-                      ≡⟨ cong (λ z → z + r * (Cross4 + T1abs))
-                          (QP.*-zeroʳ r) ⟩
-                    0ℚ + r * (Cross4 + T1abs)
-                      ≡⟨ cong (λ z → 0ℚ + z)
-                          (QP.*-distribˡ-+ r Cross4 T1abs) ⟩
-                    0ℚ + (r * Cross4 + r * T1abs) ∎) ⟩
-              term ∎
-        in
-        begin S
-          ≡⟨ cong₂ _+_ (fact Wxy0)
-              (cong₂ _+_ (fact T1) right) ⟩
-        term
-          ≡⟨ sym fact2 ⟩
-        r * K
-          ≡⟨ *-comm r K ⟩
-        K * r ∎
-  in subst (λ z → ∣ A - B ∣ ≤ z) sumEq c5
+  in subst (λ z → ∣ A - B ∣ ≤ z)
+       (abs-mul-sumEq Wxy0 T1 Cross4 T1abs r) c5
 
 ------------------------------------------------------------------------
 -- Multiplicative law

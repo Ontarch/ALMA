@@ -11,11 +11,11 @@ module Real.Interval.OrderLe where
 open import Data.Empty using (⊥-elim)
 open import Data.Product using (_×_; _,_)
 open import Data.Sum using (inj₁; inj₂)
-open import Data.Rational using
-  (ℚ; 0ℚ; _+_; _-_; _*_; _≤_; ∣_∣) renaming (-_ to neg)
+open import Data.Rational using (ℚ; 0ℚ; _+_; _-_; _*_; _≤_; ∣_∣)
+  renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (≤-refl; ≤-reflexive; +-mono-≤; +-assoc; +-comm; +-identityˡ; ≮⇒≥
-  ; +-identityʳ; +-inverseˡ; +-inverseʳ; *-distribʳ-+; neg-antimono-≤; neg-distrib-+
+  (≤-refl; ≤-reflexive; +-mono-≤; +-assoc; +-comm; +-identityˡ; ≮⇒≥; +-identityʳ
+  ; +-inverseˡ; +-inverseʳ; *-distribʳ-+; neg-antimono-≤; neg-distrib-+
   ; ∣p∣≡p∨∣p∣≡-p)
 open import Relation.Nullary using (¬_)
 open import Relation.Binary.PropositionalEquality using
@@ -33,6 +33,7 @@ open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
 open import Real.Interval.Node using (0≤width-n; centre-add; centre-neg)
 open import Real.Interval.Kit using (≈ℝ-of-rec; ≈ℝ-of-eq)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-sub)
+open import Real.Interval.Mul using (sub-monoˡ)
 open import Real.Interval.Mul.Order using (≈-<-respʳ)
 open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
 
@@ -41,26 +42,16 @@ open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
 --
 -- 有理数算术辅助
 
--- Monotonicity of subtraction.
+-- Bilateral subtraction monotonicity.
 --
--- 减法的单调性。
+-- 双边减法单调性。
 sub-mono : {a a' b b' : ℚ} → a ≤ a' → b' ≤ b → a - b ≤ a' - b'
 sub-mono {a} {a'} {b} {b'} p q = begin≤
   a - b
-    ≤⟨ +-mono-≤ p (≤-refl {neg b}) ⟩
+    ≤⟨ sub-monoˡ p ⟩
   a' - b
     ≤⟨ +-mono-≤ (≤-refl {a'}) (neg-antimono-≤ q) ⟩
   a' - b'
-  ≤∎
-
--- Subtracting a fixed term.
---
--- 减去固定项。
-sub-fixed : {a b c : ℚ} → a ≤ b → a - c ≤ b - c
-sub-fixed {a} {b} {c} p = begin≤
-  a - c
-    ≤⟨ +-mono-≤ p (≤-refl {neg c}) ⟩
-  b - c
   ≤∎
 
 -- Reassociation of a two-step difference.
@@ -170,7 +161,7 @@ module AntisymAux (x y : RealI)
       (u x n - l x n) + (l x n - l y n)
         ≤⟨ +-mono-≤
               (≤-reflexive (refl {x = u x n - l x n}))
-              (sub-fixed {a = l x n} {b = u y n} {c = l y n} (gap1 n)) ⟩
+              (sub-monoˡ {a = l x n} {b = u y n} {c = l y n} (gap1 n)) ⟩
       (u x n - l x n) + (u y n - l y n)
         ≤⟨ ≤-reflexive (refl {x = (u x n - l x n) + (u y n - l y n)}) ⟩
       width x n + width y n
@@ -189,7 +180,7 @@ module AntisymAux (x y : RealI)
       (u y n - l y n) + (l y n - l x n)
         ≤⟨ +-mono-≤
               (≤-reflexive (refl {x = u y n - l y n}))
-              (sub-fixed {a = l y n} {b = u x n} {c = l x n} (gap2 n)) ⟩
+              (sub-monoˡ {a = l y n} {b = u x n} {c = l x n} (gap2 n)) ⟩
       (u y n - l y n) + (u x n - l x n)
         ≤⟨ ≤-reflexive (refl {x = (u y n - l y n) + (u x n - l x n)}) ⟩
       width y n + width x n

@@ -8,22 +8,23 @@
 
 module Real.Interval.Embed where
 
-open import Data.Nat using (ℕ; s≤s; z≤n) renaming (_*_ to _ℕ*_)
+open import Data.Nat using (ℕ) renaming (_*_ to _ℕ*_)
 open import Data.Product using (_,_)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (+-identityˡ; +-identityʳ; +-inverseˡ; +-comm; +-assoc; *-identityˡ
-  ; *-identityʳ; *-assoc; *-comm; *-distribʳ-+; +-monoˡ-<; *-monoˡ-<-pos)
+  ; *-identityʳ; *-assoc; *-comm; *-distribʳ-+; +-monoˡ-<)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; cong₂; sym; trans; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Real using (half; embed; embed-mono-<; 2ℚ; 2ℚ≡1+1)
+open import Real using (half; 2ℚ; 2ℚ≡1+1)
 open import Real.Interval using (dyadic; δ; δ-half)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Order using (_<ℝ_)
+open import Real.Interval.OrderLaws using (half<1)
 open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-refl)
 open import Real.IntervalEquiv using (l; u; centre; width; recipPow2)
 open import Real.Interval.Node using
@@ -41,23 +42,6 @@ open import Real.Interval.Mul.Core using (term1)
 -- endpoint of 1ℝ.
 --
 -- 在深度 1 处，0ℝ 的上端点严格低于 1ℝ 的下端点。
-half<1 : half < 1ℚ
-half<1 =
-  let
-    1<2 : 1ℚ < embed 2
-    1<2 = embed-mono-< {1} {2} (s≤s (s≤s z≤n))
-
-    raw : half * 1ℚ < half * embed 2
-    raw = *-monoˡ-<-pos half 1<2
-
-    lhs≡ : half * 1ℚ ≡ half
-    lhs≡ = *-identityʳ half
-
-    rhs≡ : half * embed 2 ≡ 1ℚ
-    rhs≡ = trans (*-comm half (embed 2)) 2ℚ*half≡1
-  in
-    subst (λ a → a < half * embed 2) lhs≡
-      (subst (λ b → half < b) rhs≡ raw)
 
 δ0≡half : δ 0 ≡ half
 δ0≡half = refl
@@ -88,8 +72,9 @@ half<1 =
     rhs≡ : 1ℚ + neg (δ 1) ≡ neg (δ 1) + 1ℚ
     rhs≡ = +-comm 1ℚ (neg (δ 1))
   in
-    subst (λ z → z < neg (δ 1) + 1ℚ) lhs≡
-      (subst (λ w → δ 1 < w) rhs≡ step)
+    subst₂ _<_
+      (sym lhs≡) rhs≡
+      step
 
 u0ℝ1≡δ1 : u 0ℝ 1 ≡ δ 1
 u0ℝ1≡δ1 = begin
@@ -219,16 +204,16 @@ embedℚ-neg q =
       centre (negℝ (dyadic q 0)) n
         ∎
 
--- embedℚ preserves multiplication. term1 bounds the centre error of
--- x *ℝ R by a geometric series. For x = embedℚ p and R = embedℚ q,
+-- embedℚ preserves multiplication. The product centre error is
+-- bounded by a geometric series: for x = embedℚ p and R = embedℚ q,
 -- the centres at depth 2n are exactly p and q, so the error of the
--- product centre versus p * q is bounded by C * recipPow2 n, where
---   C = width (embedℚ p) 0 * width (embedℚ q) 0 * half.
+-- product centre versus p * q is controlled by a constant multiple
+-- of recipPow2 n. The constant depends only on the initial widths of
+-- the two embedded intervals and half.
 --
--- embedℚ 保乘法。term1 以几何级数界住乘积的中心误差。两个嵌入区间
--- 在相应深度的中心恰为各自的有理代表，故乘积中心对两代表乘积的误差
--- 由某个常数乘以 recipPow2 n 控制；该常数由两个嵌入区间的初始宽度
--- 与本模块中的 half 相乘得到。
+-- embedℚ 保乘法。乘积中心误差由几何级数控制：两个嵌入区间在相应
+-- 深度的中心恰为各自的有理代表，故乘积中心对两代表乘积的误差由
+-- 某个只依赖两个嵌入区间初始宽度的常数乘以 recipPow2 n 控制。
 embedℚ-* : (p q : ℚ) →
   dyadic (p * q) 0 ≈ℝ dyadic p 0 *ℝ dyadic q 0
 embedℚ-* p q =

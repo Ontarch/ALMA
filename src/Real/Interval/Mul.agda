@@ -9,7 +9,7 @@
 module Real.Interval.Mul where
 
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _≤_; _<_; ∣_∣; NonNegative; positive
+  (ℚ; 0ℚ; 1ℚ; _⊓_; _⊔_; _+_; _-_; _*_; _≤_; _<_; ∣_∣; positive
   ; nonNegative; nonPositive)
 open import Data.Rational.Base using (_÷_; 1/_) renaming (-_ to neg)
 open import Data.Product using (_,_; proj₁; proj₂)
@@ -43,9 +43,6 @@ open import Real.Interval.Reasoning
 -- Basic lemmas
 --
 -- 基本引理
-
-nn : ∀ {p : ℚ} → 0ℚ ≤ p → NonNegative p
-nn = nonNegative
 
 0≤mag : ∀ a b → 0ℚ ≤ mag a b
 0≤mag a b = ≤-trans (0≤∣p∣ a) (p≤p⊔q ∣ a ∣ ∣ b ∣)
@@ -95,12 +92,12 @@ le-shift : ∀ {x y z : ℚ} → x - y ≤ z → x ≤ z + y
 le-shift {x} {y} {z} h =
   subst (λ w → w ≤ z + y) (cancelʳ x y) (+-mono-≤ h (≤-refl {y}))
 
-sub-mono : ∀ {a b c : ℚ} → a ≤ b → a - c ≤ b - c
-sub-mono {a} {b} {c} h = +-mono-≤ h (≤-refl {neg c})
+sub-monoˡ : ∀ {a b c : ℚ} → a ≤ b → a - c ≤ b - c
+sub-monoˡ {a} {b} {c} h = +-mono-≤ h (≤-refl {neg c})
 
 sub-swap : ∀ {x y z : ℚ} → x - y ≤ z → x - z ≤ y
 sub-swap {x} {y} {z} h =
-  ≤-trans (sub-mono {a = x} {b = z + y} {c = z} (le-shift h))
+  ≤-trans (sub-monoˡ {a = x} {b = z + y} {c = z} (le-shift h))
           (≤-reflexive (cancel-z z y))
 
 mag-le : ∀ {l u l' u' : ℚ} → l ≤ l' → l' ≤ u' → u' ≤ u → mag l' u' ≤ mag l u
@@ -200,10 +197,10 @@ prod-diff≤ {l} {u} {l'} {u'} {a} {a'} {b} {b'}
         ∣ a * (b - b') ∣
           ≈⟨ ∣p*q∣≡∣p∣*∣q∣ a (b - b') ⟩
         ∣ a ∣ * ∣ b - b' ∣
-          ≤⟨ *-monoʳ-≤-nonNeg ∣ b - b' ∣ {{nn (0≤∣p∣ (b - b'))}}
+          ≤⟨ *-monoʳ-≤-nonNeg ∣ b - b' ∣ {{nonNegative (0≤∣p∣ (b - b'))}}
                                   (mag-≤ l≤a a≤u) ⟩
         U * ∣ b - b' ∣
-          ≤⟨ *-monoˡ-≤-nonNeg U {{nn 0≤U}}
+          ≤⟨ *-monoˡ-≤-nonNeg U {{nonNegative 0≤U}}
                                   (bounded-diff l'≤b b≤u' l'≤b' b'≤u') ⟩
         U * W'
       ≤∎
@@ -216,10 +213,10 @@ prod-diff≤ {l} {u} {l'} {u'} {a} {a'} {b} {b'}
         ∣ (a - a') * b' ∣
           ≈⟨ ∣p*q∣≡∣p∣*∣q∣ (a - a') b' ⟩
         ∣ a - a' ∣ * ∣ b' ∣
-          ≤⟨ *-monoʳ-≤-nonNeg ∣ b' ∣ {{nn (0≤∣p∣ b')}}
+          ≤⟨ *-monoʳ-≤-nonNeg ∣ b' ∣ {{nonNegative (0≤∣p∣ b')}}
                                   (bounded-diff l≤a a≤u l≤a' a'≤u) ⟩
         W * ∣ b' ∣
-          ≤⟨ *-monoˡ-≤-nonNeg W {{nn 0≤W}} (mag-≤ l'≤b' b'≤u') ⟩
+          ≤⟨ *-monoˡ-≤-nonNeg W {{nonNegative 0≤W}} (mag-≤ l'≤b' b'≤u') ⟩
         W * U'
       ≤∎
 
@@ -313,9 +310,9 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
           lo4
             ≤⟨ lo4≤c1 ⟩
           c1
-            ≤⟨ *-monoˡ-≤-nonNeg lx {{nn 0≤lx}} l'≤b ⟩
+            ≤⟨ *-monoˡ-≤-nonNeg lx {{nonNegative 0≤lx}} l'≤b ⟩
           lx * b
-            ≤⟨ *-monoʳ-≤-nonNeg b {{nn 0≤b}} l≤a ⟩
+            ≤⟨ *-monoʳ-≤-nonNeg b {{nonNegative 0≤b}} l≤a ⟩
           a * b
         ≤∎)
       (λ lx≤0 →
@@ -325,7 +322,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
           c2
             ≤⟨ *-monoˡ-≤-nonPos lx {{nonPositive lx≤0}} b≤u' ⟩
           lx * b
-            ≤⟨ *-monoʳ-≤-nonNeg b {{nn 0≤b}} l≤a ⟩
+            ≤⟨ *-monoʳ-≤-nonNeg b {{nonNegative 0≤b}} l≤a ⟩
           a * b
         ≤∎)
 
@@ -338,7 +335,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
           lo4
             ≤⟨ lo4≤c3 ⟩
           c3
-            ≤⟨ *-monoˡ-≤-nonNeg ux {{nn 0≤ux}} l'≤b ⟩
+            ≤⟨ *-monoˡ-≤-nonNeg ux {{nonNegative 0≤ux}} l'≤b ⟩
           ux * b
             ≤⟨ *-monoʳ-≤-nonPos b {{nonPositive b≤0}} a≤u ⟩
           a * b
@@ -366,9 +363,9 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
       (λ 0≤ux →
         begin≤
           a * b
-            ≤⟨ *-monoʳ-≤-nonNeg b {{nn 0≤b}} a≤u ⟩
+            ≤⟨ *-monoʳ-≤-nonNeg b {{nonNegative 0≤b}} a≤u ⟩
           ux * b
-            ≤⟨ *-monoˡ-≤-nonNeg ux {{nn 0≤ux}} b≤u' ⟩
+            ≤⟨ *-monoˡ-≤-nonNeg ux {{nonNegative 0≤ux}} b≤u' ⟩
           c4
             ≤⟨ c4≤hi4 ⟩
           hi4
@@ -376,7 +373,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
       (λ ux≤0 →
         begin≤
           a * b
-            ≤⟨ *-monoʳ-≤-nonNeg b {{nn 0≤b}} a≤u ⟩
+            ≤⟨ *-monoʳ-≤-nonNeg b {{nonNegative 0≤b}} a≤u ⟩
           ux * b
             ≤⟨ *-monoˡ-≤-nonPos ux {{nonPositive ux≤0}} l'≤b ⟩
           c3
@@ -393,7 +390,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
           a * b
             ≤⟨ *-monoʳ-≤-nonPos b {{nonPositive b≤0}} l≤a ⟩
           lx * b
-            ≤⟨ *-monoˡ-≤-nonNeg lx {{nn 0≤lx}} b≤u' ⟩
+            ≤⟨ *-monoˡ-≤-nonNeg lx {{nonNegative 0≤lx}} b≤u' ⟩
           c2
             ≤⟨ c2≤hi4 ⟩
           hi4
@@ -426,8 +423,8 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
   --
   -- 宽度的界
   --
-  -- hi4 − lo4 ≤ B：任意两角之差不超过 B，故四角皆被 lo4 + B 盖住。
-  -- B ≤ 2 (hi4 − lo4)：取 |·| 最大的端点，与另一区间的两端作积。
+  -- 任意两角之差不超过 B，故四角皆被 lo4 + B 盖住；另一方面，取
+  -- |·| 最大的端点与另一区间的两端作积，可看出 B 不超过两倍的宽度差。
 
   B : ℚ
   B = mag lx ux * (uy - ly) + mag ly uy * (ux - lx)
@@ -478,7 +475,7 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
 
   spanB : hi4 - lo4 ≤ B
   spanB =
-    ≤-trans (sub-mono {a = hi4} {b = lo4 + B} {c = lo4}
+    ≤-trans (sub-monoˡ {a = hi4} {b = lo4 + B} {c = lo4}
               (⊔-lub (⊔-lub h1 h2) (⊔-lub h3 h4)))
             (≤-reflexive (cancel-z lo4 B))
     where
@@ -555,9 +552,9 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
     ux - lx
     ∎
 
-  -- Lower bound: U_X · w_Y ≤ hi4 − lo4.
+  -- Lower bound for the X-magnitude times the Y-width.
   --
-  -- 下界：U_X · w_Y ≤ hi4 − lo4。
+  -- X 量级乘以 Y 宽度的下界。
   mag-widthˡ : mag lx ux * (uy - ly) ≤ hi4 - lo4
   mag-widthˡ with ≤-total ∣ ux ∣ ∣ lx ∣
   ... | inj₁ |ux|≤|lx| =
@@ -587,9 +584,9 @@ module Corner (lx ux ly uy : ℚ) (lx≤ux : lx ≤ ux) (ly≤uy : ly ≤ uy) wh
           hi4 - lo4
         ≤∎
 
-  -- Lower bound: U_Y · w_X ≤ hi4 − lo4.
+  -- Lower bound for the Y-magnitude times the X-width.
   --
-  -- 下界：U_Y · w_X ≤ hi4 − lo4。
+  -- Y 量级乘以 X 宽度的下界。
   mag-widthʳ : mag ly uy * (ux - lx) ≤ hi4 - lo4
   mag-widthʳ with ≤-total ∣ uy ∣ ∣ ly ∣
   ... | inj₁ |uy|≤|ly| =
@@ -852,7 +849,7 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
 
     0≤hh : 0ℚ ≤ h * h
     0≤hh = subst (λ z → z ≤ h * h) (*-zeroʳ h)
-                 (*-monoˡ-≤-nonNeg h {{nn 0≤h}} 0≤h)
+                 (*-monoˡ-≤-nonNeg h {{nonNegative 0≤h}} 0≤h)
 
     wX wX' wY wY' U U' Uy Uy' : ℚ
     wX = ux - lx
@@ -916,13 +913,13 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
 
     step1 : U' * wY' ≤ U * (wY * (h * h))
     step1 =
-      ≤-trans (*-monoʳ-≤-nonNeg wY' {{nn 0≤wY'}} U'≤U)
-              (*-monoˡ-≤-nonNeg U {{nn 0≤U}} wY'≤)
+      ≤-trans (*-monoʳ-≤-nonNeg wY' {{nonNegative 0≤wY'}} U'≤U)
+              (*-monoˡ-≤-nonNeg U {{nonNegative 0≤U}} wY'≤)
 
     step2 : Uy' * wX' ≤ Uy * (wX * (h * h))
     step2 =
-      ≤-trans (*-monoʳ-≤-nonNeg wX' {{nn 0≤wX'}} Uy'≤Uy)
-              (*-monoˡ-≤-nonNeg Uy {{nn 0≤Uy}} wX'≤)
+      ≤-trans (*-monoʳ-≤-nonNeg wX' {{nonNegative 0≤wX'}} Uy'≤Uy)
+              (*-monoˡ-≤-nonNeg Uy {{nonNegative 0≤Uy}} wX'≤)
 
     g2 : B' ≤ U * (wY * (h * h)) + Uy * (wX * (h * h))
     g2 = +-mono-≤ step1 step2
@@ -939,7 +936,7 @@ RealI.nest (x *ℝ y) = nest1 , nest2 , nest3
 
     g4 : (U * wY + Uy * wX) * (h * h)
        ≤ ((S.hi4 - S.lo4) + (S.hi4 - S.lo4)) * (h * h)
-    g4 = *-monoʳ-≤-nonNeg (h * h) {{nn 0≤hh}}
+    g4 = *-monoʳ-≤-nonNeg (h * h) {{nonNegative 0≤hh}}
            (+-mono-≤ S.mag-widthˡ S.mag-widthʳ)
 
     nest3 : D.hi4 - D.lo4 ≤ (S.hi4 - S.lo4) ÷ embed 2

@@ -9,8 +9,7 @@
 module Real.Interval.DensityArch where
 
 open import Data.Nat using (ℕ; suc) renaming (_+_ to _+N_; _≤_ to _≤N_)
-open import Data.Nat.Properties using ()
-  renaming (+-comm to +-commℕ)
+open import Data.Nat.Properties using () renaming (+-comm to +-commℕ)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _>_; _≤_; _≥_; ∣_∣)
@@ -19,7 +18,8 @@ open import Data.Rational.Properties using
   (≤-trans; ≤-refl; ≤-reflexive; <-≤-trans; ≤-<-trans; +-mono-≤; +-monoˡ-<
   ; +-assoc; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-identityˡ
   ; *-identityʳ; *-comm; *-distribˡ-+; *-distribʳ-+; pos⇒nonNeg; 0≤∣p∣
-  ; neg-antimono-≤; neg-distrib-+; neg-distribˡ-*; +-comm)
+  ; neg-antimono-≤; neg-distrib-+; neg-distribˡ-*; +-comm; +-inverseʳ
+  ; *-monoˡ-<-pos; *-monoʳ-≤-nonNeg; +-monoʳ-<)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; trans; sym; cong; cong₂; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -29,7 +29,7 @@ open import Base.RationalRing using (neg-involutive)
 open import Real.Interval using (RealI; embedℚ; δ; sub-cancel)
 open import Real.IntervalEquiv using (l; u; width; bound-w; l-mono; u-mono)
 open import Real.Interval.Node using (l-dyadic; u-dyadic)
-open import Real.Interval.Kit using (0<half; half+half≡1; 2ℚ*half≡1)
+open import Real.Interval.Kit using (0<half; half+half≡1; add-self; 2ℚ*half≡1)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.OrderLaws using (width-below-strict)
 open import Real.Interval.Rational using (r≤|r|; pos-diff)
@@ -52,14 +52,14 @@ cancel-plus x y z = begin
   x + (y + ((- x) + (- z)))
     ≡⟨ cong (x +_)
             (trans (sym (+-assoc y (- x) (- z)))
-                   (cong (λ w → w + (- z)) (Data.Rational.Properties.+-comm y (- x)))) ⟩
+                   (cong (λ w → w + (- z)) (+-comm y (- x)))) ⟩
   x + (((- x) + y) + (- z))
     ≡⟨ cong (x +_) (+-assoc (- x) y (- z)) ⟩
   x + ((- x) + (y + (- z)))
     ≡⟨ sym (+-assoc x (- x) (y + (- z))) ⟩
   (x + (- x)) + (y + (- z))
     ≡⟨ cong (λ w → w + (y + (- z)))
-            (Data.Rational.Properties.+-inverseʳ x) ⟩
+            (+-inverseʳ x) ⟩
   0ℚ + (y + (- z))
     ≡⟨ +-identityˡ (y + (- z)) ⟩
   y + (- z)
@@ -79,7 +79,7 @@ embed1≡1 = refl
   (half + half) - (half + 0ℚ)
     ≡⟨ cancel-plus half half 0ℚ ⟩
   half - 0ℚ
-    ≡⟨ Data.Rational.Properties.+-identityʳ half ⟩
+    ≡⟨ +-identityʳ half ⟩
   half
   ∎
 
@@ -150,7 +150,7 @@ archimedean x = n , (0 , goal)
     l-target = l-dyadic (embed n) 0
 
     commute : (- δ 0) + embed n ≡ embed n - δ 0
-    commute = Data.Rational.Properties.+-comm (- δ 0) (embed n)
+    commute = +-comm (- δ 0) (embed n)
 
     δ0≡half : δ 0 ≡ half
     δ0≡half = refl
@@ -213,18 +213,6 @@ width-0ℝ m = begin
   δ m + δ m
   ∎
 
--- Two copies of a tolerance equal twice the tolerance.
---
--- 两份容差相加等于该容差的两倍。
-δ+δ≡2δ : ∀ δ → δ + δ ≡ embed 2 * δ
-δ+δ≡2δ δ = sym (begin
-  (1ℚ + 1ℚ) * δ
-    ≡⟨ *-distribʳ-+ δ 1ℚ 1ℚ ⟩
-  1ℚ * δ + 1ℚ * δ
-    ≡⟨ cong₂ _+_ (*-identityˡ δ) (*-identityˡ δ) ⟩
-  δ + δ
-  ∎)
-
 -- A tolerance whose double stays below a bound is itself below half
 -- of that bound.
 --
@@ -234,10 +222,10 @@ width-0ℝ m = begin
   subst (λ z → z < d * half) lhs≡ step
   where
   h2 : embed 2 * δ < d
-  h2 = subst (λ z → z < d) (δ+δ≡2δ δ) h
+  h2 = subst (λ z → z < d) (add-self δ) h
 
   step : (embed 2 * δ) * half < d * half
-  step = Data.Rational.Properties.*-monoˡ-<-pos half {{positive 0<half}} h2
+  step = *-monoˡ-<-pos half {{positive 0<half}} h2
 
   lhs≡ : ((embed 2) * δ) * half ≡ δ
   lhs≡ = begin
@@ -372,7 +360,7 @@ dense {x} {y} (k , uxk<lyk) = q , ((m , x<q) , (m , q<y))
   q-uxm≥half-d =
     begin≤
       d * half
-        ≤⟨ Data.Rational.Properties.*-monoʳ-≤-nonNeg half
+        ≤⟨ *-monoʳ-≤-nonNeg half
              {{pos⇒nonNeg half {{positive 0<half}}}} dm≥d ⟩
       (l y m - u x m) * half
         ≈⟨ sym q-uxm≡ ⟩
@@ -389,7 +377,7 @@ dense {x} {y} (k , uxk<lyk) = q , ((m , x<q) , (m , q<y))
   lym-q≥half-d =
     begin≤
       d * half
-        ≤⟨ Data.Rational.Properties.*-monoʳ-≤-nonNeg half
+        ≤⟨ *-monoʳ-≤-nonNeg half
              {{pos⇒nonNeg half {{positive 0<half}}}} dm≥d ⟩
       (l y m - u x m) * half
         ≈⟨ sym lym-q≡ ⟩
@@ -412,7 +400,7 @@ dense {x} {y} (k , uxk<lyk) = q , ((m , x<q) , (m , q<y))
     uxm + ((- uxm) + q)
       ≡⟨ sym (+-assoc uxm (- uxm) q) ⟩
     (uxm + (- uxm)) + q
-      ≡⟨ cong (λ z → z + q) (Data.Rational.Properties.+-inverseʳ uxm) ⟩
+      ≡⟨ cong (λ z → z + q) (+-inverseʳ uxm) ⟩
     0ℚ + q
       ≡⟨ +-identityˡ q ⟩
     q
@@ -446,7 +434,7 @@ dense {x} {y} (k , uxk<lyk) = q , ((m , x<q) , (m , q<y))
     q + ((- q) + lym)
       ≡⟨ sym (+-assoc q (- q) lym) ⟩
     (q + (- q)) + lym
-      ≡⟨ cong (λ z → z + lym) (Data.Rational.Properties.+-inverseʳ q) ⟩
+      ≡⟨ cong (λ z → z + lym) (+-inverseʳ q) ⟩
     0ℚ + lym
       ≡⟨ +-identityˡ lym ⟩
     lym
@@ -455,13 +443,13 @@ dense {x} {y} (k , uxk<lyk) = q , ((m , x<q) , (m , q<y))
   inner : uxm + δ m < q
   inner =
     uxm + δ m
-      <⟨ Data.Rational.Properties.+-monoʳ-< uxm q-uxm>δm ⟩≤[
+      <⟨ +-monoʳ-< uxm q-uxm>δm ⟩≤[
       ≤-reflexive cancel-a ]
 
   raw1 : uxm < q - δ m
   raw1 =
     ≤-<-trans (≤-reflexive (sym cancel-l))
-      (<-≤-trans (Data.Rational.Properties.+-monoʳ-< (- δ m) inner)
+      (<-≤-trans (+-monoʳ-< (- δ m) inner)
                  (≤-reflexive (+-comm (- δ m) q)))
 
   x<q : u x m < l (embedℚ q) m
@@ -472,7 +460,7 @@ dense {x} {y} (k , uxk<lyk) = q , ((m , x<q) , (m , q<y))
   raw2 : q + δ m < lym
   raw2 =
     q + δ m
-      <⟨ Data.Rational.Properties.+-monoʳ-< q lym-q>δm ⟩≤[
+      <⟨ +-monoʳ-< q lym-q>δm ⟩≤[
       ≤-reflexive cancel-b ]
 
   q<y : u (embedℚ q) m < l y m

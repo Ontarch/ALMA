@@ -12,17 +12,20 @@ open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Sum.Base using (inj₁; inj₂)
 open import Data.Nat using (ℕ; suc)
   renaming (_⊔_ to _⊔N_; _+_ to _+N_; _≤_ to _≤N_)
-open import Data.Nat.Properties using (m≤n⊔m; m≤m⊔n; +-suc; +-identityʳ)
+open import Data.Nat.Properties using (m≤n⊔m; m≤m⊔n; +-suc)
+  renaming (+-identityʳ to +-identityʳℕ)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _⊔_; _+_; _-_; _*_; _≤_; _<_; _≥_; ∣_∣; positive)
   renaming (-_ to neg)
 open import Data.Rational.Base using (nonNegative)
-open import Data.Rational.Properties as QP using
+open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; +-mono-≤; +-mono-<-≤; +-comm; +-assoc
-  ; +-identityˡ; +-inverseʳ; +-inverseˡ; *-assoc; *-identityˡ; *-identityʳ
-  ; *-distribʳ-+; *-distribˡ-+; pos⇒nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣p-q∣≤∣p∣+∣q∣
-  ; 0≤∣p∣; 0≤p⇒∣p∣≡p; ∣-p∣≡∣p∣; *-monoˡ-≤-nonNeg; ≤-total; neg-distrib-+
-  ; neg-antimono-≤; neg-antimono-<; ∣p*q∣≡∣p∣*∣q∣; p≤q⊔p; ⊔-lub)
+  ; +-identityˡ; +-identityʳ; +-inverseʳ; +-inverseˡ; *-assoc; *-identityˡ
+  ; *-identityʳ; *-distribʳ-+; *-distribˡ-+; pos⇒nonNeg; ∣p+q∣≤∣p∣+∣q∣
+  ; ∣p-q∣≤∣p∣+∣q∣; 0≤∣p∣; 0≤p⇒∣p∣≡p; ∣-p∣≡∣p∣; *-monoˡ-≤-nonNeg
+  ; ≤-total; neg-distrib-+; neg-antimono-≤; neg-antimono-<; ∣p*q∣≡∣p∣*∣q∣
+  ; p≤q⊔p; ⊔-lub; *-zeroˡ; <-trans; ≤-<-trans; <-irrefl; *-zeroʳ
+  ; ∣p∣≡p∨∣p∣≡-p)
 open import Function.Base using (case_of_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
@@ -70,7 +73,7 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
                 h : halveQ 0ℚ ≤ halveQ (l + u)
                 h = halveQ-mono 0≤sum
                 h0 : halveQ 0ℚ ≡ 0ℚ
-                h0 = QP.*-zeroˡ half
+                h0 = *-zeroˡ half
             in subst (λ z → z ≤ halveQ (l + u)) (sym h0) h
           B≡ : ∣ halveQ (l + u) ∣ ≡ halveQ (l + u)
           B≡ = 0≤p⇒∣p∣≡p 0≤c
@@ -91,7 +94,7 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
             halveQ (neg u) + halveQ (neg l)
               ≡⟨ cong₂ _+_ (halveQ-neg u) (halveQ-neg l) ⟩
             neg (halveQ u) + neg (halveQ l)
-              ≡⟨ QP.+-comm (neg (halveQ u)) (neg (halveQ l)) ⟩
+              ≡⟨ +-comm (neg (halveQ u)) (neg (halveQ l)) ⟩
             neg (halveQ l) + neg (halveQ u)
               ≡⟨ sym (neg-distrib-+ (halveQ l) (halveQ u)) ⟩
             neg (halveQ l + halveQ u)
@@ -106,7 +109,7 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
             let h : halveQ (l + u) ≤ halveQ 0ℚ
                 h = halveQ-mono su≤0
                 h0 : halveQ 0ℚ ≡ 0ℚ
-                h0 = QP.*-zeroˡ half
+                h0 = *-zeroˡ half
             in subst (λ z → halveQ (l + u) ≤ z) h0 h
           B≡ : ∣ halveQ (l + u) ∣ ≡ neg (halveQ (l + u))
           B≡ = npos⇒∣p∣≡neg c≤0
@@ -145,10 +148,10 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
             halveQ ∣ p - q ∣ ∎
           max≤pq : p ⊔ q ≤ p + q
           max≤pq = ⊔-lub (begin≤ p
-                          ≤⟨ ≤-reflexive (sym (QP.+-identityʳ p)) ⟩ p + 0ℚ
+                          ≤⟨ ≤-reflexive (sym (+-identityʳ p)) ⟩ p + 0ℚ
                           ≤⟨ +-mono-≤ (≤-refl {p}) q≥0 ⟩ p + q ≤∎)
                         (begin≤ q
-                          ≤⟨ ≤-reflexive (sym (QP.+-identityʳ q)) ⟩ q + 0ℚ
+                          ≤⟨ ≤-reflexive (sym (+-identityʳ q)) ⟩ q + 0ℚ
                           ≤⟨ +-mono-≤ (≤-refl {q}) p≥0 ⟩ q + p
                           ≤⟨ ≤-reflexive (+-comm q p) ⟩ p + q ≤∎)
           diff≤pq : ∣ p - q ∣ ≤ p + q
@@ -420,10 +423,10 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
       diff≥d : centre A m - centre B m ≥ d
       diff≥d = +-mono-≤ cA≥l0 (neg-antimono-≤ cB≤u0)
       upper : centre A m - centre B m < d
-      upper = QP.≤-<-trans (h m) (h2 m m0≤m)
+      upper = ≤-<-trans (h m) (h2 m m0≤m)
   in let dd : d < d
-         dd = QP.≤-<-trans diff≥d upper
-     in QP.<-irrefl refl dd
+         dd = ≤-<-trans diff≥d upper
+     in <-irrefl refl dd
 
 -- Nesting a dyadic interval n times yields the dyadic at depth k + n.
 --
@@ -433,7 +436,7 @@ node-dyadic q k 0 =
   begin node (dyadic q k) 0
     ≡⟨ refl ⟩
   dyadic q k
-    ≡⟨ cong (dyadic q) (sym (+-identityʳ k)) ⟩
+    ≡⟨ cong (dyadic q) (sym (+-identityʳℕ k)) ⟩
   dyadic q (k +N 0) ∎
 node-dyadic q k (suc n) =
   begin node (dyadic q k) (suc n)
@@ -459,7 +462,7 @@ l0ℝ n =
               begin RealI.l (dyadic 0ℚ n)
                 ≡⟨ refl ⟩
               neg (δ n) + 0ℚ
-                ≡⟨ QP.+-identityʳ (neg (δ n)) ⟩
+                ≡⟨ +-identityʳ (neg (δ n)) ⟩
               neg (δ n) ∎
         in e)
 
@@ -493,24 +496,23 @@ labs-nonneg x (suc n) =
 
 abs-nonneg : (x : RealI) → 0ℝ ≤ℝ ∣ x ∣ℝ
 abs-nonneg x (n , h) =
-  let l0≤0 : 0ℚ ≤ l ∣ x ∣ℝ n
-      l0≤0 = labs-nonneg x n
+  let 0≤labs : 0ℚ ≤ l ∣ x ∣ℝ n
+      0≤labs = labs-nonneg x n
       u≥l : l ∣ x ∣ℝ n ≤ u ∣ x ∣ℝ n
       u≥l = <⇒≤ (RealI.lo (node ∣ x ∣ℝ n))
       u≥0 : u ∣ x ∣ℝ n ≥ 0ℚ
-      u≥0 = ≤-trans l0≤0 u≥l
+      u≥0 = ≤-trans 0≤labs u≥l
       l0ℝ≡ : l 0ℝ n ≡ neg (δ n)
       l0ℝ≡ = l0ℝ n
       negδ<0 : neg (δ n) < 0ℚ
-      negδ<0 = subst (λ z → neg (δ n) < z) (sym (QP.+-identityʳ 0ℚ))
-                 (neg-antimono-< (δ-pos n))
+      negδ<0 = neg-antimono-< (δ-pos n)
       h' : u ∣ x ∣ℝ n < neg (δ n)
       h' = subst (λ z → u ∣ x ∣ℝ n < z) l0ℝ≡ h
       u<0 : u ∣ x ∣ℝ n < 0ℚ
-      u<0 = QP.<-trans h' negδ<0
+      u<0 = <-trans h' negδ<0
   in let dd : 0ℚ < 0ℚ
-         dd = QP.≤-<-trans u≥0 u<0
-     in QP.<-irrefl refl dd
+         dd = ≤-<-trans u≥0 u<0
+     in <-irrefl refl dd
 
 ------------------------------------------------------------------------
 -- Toolkit lemmas for the norm development
@@ -527,7 +529,7 @@ node-abs x 0 =
   ∣ x ∣ℝ
     ≡⟨ refl ⟩
   ∣ node x 0 ∣ℝ
-    ≡⟨ cong ∣_∣ℝ (cong (node x) (sym (+-identityʳ 0))) ⟩
+    ≡⟨ cong ∣_∣ℝ (cong (node x) (sym (+-identityʳℕ 0))) ⟩
   ∣ node x (0 +N 0) ∣ℝ ∎
 node-abs x (suc n) =
   begin node ∣ x ∣ℝ (suc n)
@@ -603,7 +605,7 @@ abs-triangle x y =
             p = *-monoˡ-≤-nonNeg (embed 2)
                   {{pos⇒nonNeg (embed 2) {{positive 0<embed2}}}} s0≥0
             z : embed 2 * 0ℚ ≡ 0ℚ
-            z = QP.*-zeroʳ (embed 2)
+            z = *-zeroʳ (embed 2)
         in subst (λ z → z ≤ C) z p
       h : ∀ n →
         centre ∣ x +ℝ y ∣ℝ n - centre (∣ x ∣ℝ +ℝ ∣ y ∣ℝ) n
@@ -670,7 +672,7 @@ abs-triangle x y =
                           subst (λ z → r * r ≤ z) (*-identityʳ r)
                             (*-monoˡ-≤-nonNeg r {{nonNegative 0≤r}}
                               (recipPow2-n≤1 n))
-                    in QP.≤-trans (≤-reflexive e) s
+                    in ≤-trans (≤-reflexive e) s
                 in ≤-trans p (*-monoˡ-≤-nonNeg (width x 0)
                                 {{nonNegative (0≤width-n x 0)}} q)
             w2d≤ : width y nn ≤ width y 0 * recipPow2 n
@@ -689,7 +691,7 @@ abs-triangle x y =
                           subst (λ z → r * r ≤ z) (*-identityʳ r)
                             (*-monoˡ-≤-nonNeg r {{nonNegative 0≤r}}
                               (recipPow2-n≤1 n))
-                    in QP.≤-trans (≤-reflexive e) s
+                    in ≤-trans (≤-reflexive e) s
               in ≤-trans p (*-monoˡ-≤-nonNeg (width y 0)
                               {{nonNegative (0≤width-n y 0)}} q)
             wsum≤ : (u1d - l1d) + (u2d - l2d) ≤ s0 * recipPow2 n
@@ -741,7 +743,7 @@ abs-centre-even-helper A B C =
                   A + (neg C + C)
                     ≡⟨ cong (A +_) (+-inverseˡ C) ⟩
                   A + 0ℚ
-                    ≡⟨ QP.+-identityʳ A ⟩ A ∎) ⟩
+                    ≡⟨ +-identityʳ A ⟩ A ∎) ⟩
         A + neg B ∎
   in ≤-reflexive (sym e)
 
@@ -885,7 +887,7 @@ abs-centre-even l u l≤u =
 
             sAbs : ∣ A - B ∣ ≤ w + w
             sAbs = case_of_ {B = ∣ A - B ∣ ≤ w + w}
-                     (QP.∣p∣≡p∨∣p∣≡-p (A - B))
+                     (∣p∣≡p∨∣p∣≡-p (A - B))
                      λ { (inj₁ abs≡') →
                            subst (λ z → z ≤ w + w) (sym abs≡') s
                        ; (inj₂ abs≡') →
@@ -920,7 +922,7 @@ abs-even x =
             p = *-monoˡ-≤-nonNeg (embed 2)
                   {{pos⇒nonNeg (embed 2) {{positive 0<embed2}}}} w≥0
             z : embed 2 * 0ℚ ≡ 0ℚ
-            z = QP.*-zeroʳ (embed 2)
+            z = *-zeroʳ (embed 2)
         in subst (λ z → z ≤ C) z p
       h : ∀ n →
         ∣ centre ∣ negℝ x ∣ℝ n - centre ∣ x ∣ℝ n ∣ ≤ C * recipPow2 n

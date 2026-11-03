@@ -29,7 +29,7 @@ open import Base.RationalRing using (neg-involutive; telescope)
 open import Real using (embed; half; 2ℚ)
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using
-  (_*ℝ_; 0≤diff; cancelʳ; sub-mono)
+  (_*ℝ_; 0≤diff; cancelʳ; sub-monoˡ)
 import Real.Interval.Mul as MUL
 open import Real.Interval.Bounded using (bounded)
 open import Real.IntervalEquiv using
@@ -50,7 +50,7 @@ open import Real.Interval.Reasoning
 --
 -- 绝对值界
 --
--- 若 −C ≤ t ≤ C 则 |t| ≤ C。
+-- 当 t 被上下对称地界住时，其绝对值也被同一个界界住。
 
 abs-≤ : ∀ {t C : ℚ} → neg C ≤ t → t ≤ C → ∣ t ∣ ≤ C
 abs-≤ {t} {C} h1 h2 with ∣p∣≡p∨∣p∣≡-p t
@@ -415,7 +415,7 @@ module CentreCore (x y : RealI) (n : ℕ) where
   abs-key-upper : (S + S) - (D + E) ≤ w * w'
   abs-key-upper = begin≤
         (S + S) - (D + E)
-          ≤⟨ sub-mono {a = S + S} {b = D + D} {c = D + E}
+          ≤⟨ sub-monoˡ {a = S + S} {b = D + D} {c = D + E}
                       (+-mono-≤ S≤D S≤D) ⟩
         (D + D) - (D + E)
           ≈⟨ double-sub D E ⟩
@@ -433,7 +433,7 @@ module CentreCore (x y : RealI) (n : ℕ) where
         E - D
           ≈⟨ sym (abs-key-double-sub-comm E D) ⟩
         (E + E) - (D + E)
-          ≤⟨ sub-mono {a = E + E} {b = S + S} {c = D + E}
+          ≤⟨ sub-monoˡ {a = E + E} {b = S + S} {c = D + E}
                       (+-mono-≤ E≤S E≤S) ⟩
         (S + S) - (D + E)
         ≤∎

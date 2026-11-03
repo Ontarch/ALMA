@@ -27,7 +27,7 @@ open ≡-Reasoning
 
 open import Real using (embed; half; 0<embed)
 open import Real.Interval using (RealI; δ; δ-half; δ-pos; sub-cancel)
-open import Real.IntervalEquiv using (l; u; u-mono; width)
+open import Real.IntervalEquiv using (l; u; u-mono; width; recipPow2)
 open import Real.Interval.OrderLaws using (width-below-strict)
 open import Real.Interval.Node using (u-dyadic; l-dyadic)
 open import Real.Interval.Kit using (0<half; 0≤half; half+half≡1)
@@ -35,7 +35,7 @@ open import Real.Interval.Order renaming (<-trans to <-transR)
 open import Real.Interval.Rational using (pos-diff)
 open import Real.Interval.OrderComplete.Base using
   (_≤ℝ_; a+d≡b; x<x+; emb<; δ-dec; Subset; Upper; Occupied; Located; Bracket
-  ; mkB; quarter; 0<quarter; qq≡h; 3/4; cube≤half; hp; hp-step)
+  ; mkB; quarter; 0<quarter; qq≡h; 3/4; cube≤half; recipPow2-step)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 
 ------------------------------------------------------------------------
@@ -336,7 +336,7 @@ module _ {P : Subset} (loc : Located P) where
   record CStep (br0 : Bracket P) (j : ℕ) : Set where
     field
       cbr : Bracket P
-      cw≤ : bw cbr ≤ bw br0 * hp j
+      cw≤ : bw cbr ≤ bw br0 * recipPow2 j
 
   cstep : ∀ {br0 j} (s : CStep br0 j) → CStep br0 (suc j)
   cstep {br0} {j} (record { cbr = br ; cw≤ = w≤ }) =
@@ -347,11 +347,11 @@ module _ {P : Subset} (loc : Located P) where
             ≤⟨ step₃-shrink br ⟩
           bw br * half
             ≤⟨ *-monoʳ-≤-nonNeg half w≤ ⟩
-          (bw br0 * hp j) * half
-            ≈⟨ *-assoc (bw br0) (hp j) half ⟩
-          bw br0 * (hp j * half)
-            ≈⟨ cong ((bw br0) *_) (hp-step j) ⟩
-          bw br0 * hp (suc j)
+          (bw br0 * recipPow2 j) * half
+            ≈⟨ *-assoc (bw br0) (recipPow2 j) half ⟩
+          bw br0 * (recipPow2 j * half)
+            ≈⟨ cong ((bw br0) *_) (recipPow2-step j) ⟩
+          bw br0 * recipPow2 (suc j)
         ≤∎
       }
 
@@ -363,7 +363,7 @@ module _ {P : Subset} (loc : Located P) where
   cbr-seq : (br0 : Bracket P) (j : ℕ) → Bracket P
   cbr-seq br0 j = CStep.cbr (csteps br0 j)
 
-  cwb : ∀ br0 j → bw (cbr-seq br0 j) ≤ bw br0 * hp j
+  cwb : ∀ br0 j → bw (cbr-seq br0 j) ≤ bw br0 * recipPow2 j
   cwb br0 j = CStep.cw≤ (csteps br0 j)
 
 ------------------------------------------------------------------------

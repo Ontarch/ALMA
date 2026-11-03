@@ -9,8 +9,7 @@
 module Real.Interval.Recip where
 
 open import Data.Empty using (⊥)
-open import Data.Nat using
-  (ℕ; suc; z≤n; _∸_; _^_; _≥_; s≤s)
+open import Data.Nat using (ℕ; suc; z≤n; _∸_; _^_; _≥_; s≤s)
   renaming (_≤_ to _≤ℕ_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<ℕ_)
 open import Data.Nat.Properties using
   (m≤m+n; m≤n+m; +-suc; *-mono-≤; *-suc; ^-distribʳ-*; ^-distribˡ-+-*)

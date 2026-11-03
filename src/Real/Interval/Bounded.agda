@@ -45,7 +45,7 @@ m≤m+nℚ m n 0≤n = begin
 --
 -- 一致界
 --
--- M = |l x| + |u x| + 1，对 n 一致。
+-- 对层级 n 一致的上界。
 
 bound : (x : RealI) → ℚ
 bound x = ∣ RealI.l x ∣ + ∣ RealI.u x ∣ + 1ℚ
