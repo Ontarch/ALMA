@@ -1,0 +1,305 @@
+------------------------------------------------------------------------
+-- Bundles for interval reals
+--
+-- 区间实数的打包结构
+------------------------------------------------------------------------
+
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
+
+module Real.Interval.Bundles where
+
+open import Algebra.Structures using
+  (IsMagma; IsSemigroup; IsMonoid; IsCommutativeMonoid; IsGroup; IsAbelianGroup
+  ; IsRing; IsCommutativeRing)
+open import Data.Nat using (ℕ)
+open import Data.Product using (Σ; _×_; _,_)
+open import Data.Rational using (ℚ; _+_; _*_; _<_; -_)
+open import Data.Sum using (inj₁; inj₂)
+open import Relation.Nullary using (¬_)
+open import Relation.Binary.Structures using
+  (IsStrictPartialOrder; IsApartnessRelation)
+open import Relation.Binary.Definitions using (_Respects₂_)
+
+open import Real using (embed)
+open import Real.Interval using (RealI; embedℚ)
+open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-isEquivalence; ≈ℝ-trans)
+open import Real.Interval.Apartness using (_#ℝ_; #ℝ-isApartnessRelation)
+open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; _-ℝ_)
+open import Real.Interval.ArithLaws using
+  (+ℝ-assoc; +ℝ-comm; +ℝ-identityˡ; +ℝ-identityʳ; +ℝ-inverseˡ; +ℝ-inverseʳ)
+open import Real.Interval.Mul using (_*ℝ_)
+open import Real.Interval.Mul.Laws using
+  (*ℝ-assoc; *ℝ-comm; *ℝ-identityˡ; *ℝ-identityʳ; *ℝ-distribˡ-+; *ℝ-distribʳ-+)
+open import Real.Interval.Mul.Cong using (*ℝ-cong)
+open import Real.Interval.Mul.Order using (+ℝ-cong; ≈-neg; ≈-<-respʳ; <-*mono)
+open import Real.Interval.Order using (_<ℝ_; <-irrefl; <-trans)
+open import Real.Interval.OrderLaws using (≈-<-resp; <-+mono)
+open import Real.Interval.OrderLe using (≤ℝ-antisym)
+open import Real.Interval.OrderComplete.Base using (Subset; Located; emb<; _≤ℝ_)
+open import Real.Interval.OrderComplete using (order-complete)
+open import Real.Interval.Infimum using (LocatedBelow)
+open import Real.Interval.Inverse using (*ℝ-inverse)
+open import Real.Interval.Recip using (recipℝ')
+open import Real.Interval.Embed using (0ℝ<ℝ1ℝ; embedℚ-+; embedℚ-*; embedℚ-neg)
+open import Real.Interval.DensityArch
+  renaming (dense to dense-proof; archimedean to archimedean-proof)
+
+------------------------------------------------------------------------
+-- Additive group
+--
+-- 加法群
+
++ℝ-isMagma : IsMagma _≈ℝ_ _+ℝ_
++ℝ-isMagma = record
+  { isEquivalence = ≈ℝ-isEquivalence
+  ; ∙-cong        = +ℝ-cong
+  }
+
++ℝ-isSemigroup : IsSemigroup _≈ℝ_ _+ℝ_
++ℝ-isSemigroup = record
+  { isMagma = +ℝ-isMagma
+  ; assoc   = +ℝ-assoc
+  }
+
++ℝ-isMonoid : IsMonoid _≈ℝ_ _+ℝ_ 0ℝ
++ℝ-isMonoid = record
+  { isSemigroup = +ℝ-isSemigroup
+  ; identity    = +ℝ-identityˡ , +ℝ-identityʳ
+  }
+
++ℝ-isGroup : IsGroup _≈ℝ_ _+ℝ_ 0ℝ negℝ
++ℝ-isGroup = record
+  { isMonoid = +ℝ-isMonoid
+  ; inverse  = +ℝ-inverseʳ , +ℝ-inverseˡ
+  ; ⁻¹-cong  = ≈-neg
+  }
+
++ℝ-isAbelianGroup : IsAbelianGroup _≈ℝ_ _+ℝ_ 0ℝ negℝ
++ℝ-isAbelianGroup = record
+  { isGroup = +ℝ-isGroup
+  ; comm    = +ℝ-comm
+  }
+
+------------------------------------------------------------------------
+-- Multiplicative monoid
+--
+-- 乘法幺半群
+
+*ℝ-isMagma : IsMagma _≈ℝ_ _*ℝ_
+*ℝ-isMagma = record
+  { isEquivalence = ≈ℝ-isEquivalence
+  ; ∙-cong        = *ℝ-cong
+  }
+
+*ℝ-isSemigroup : IsSemigroup _≈ℝ_ _*ℝ_
+*ℝ-isSemigroup = record
+  { isMagma = *ℝ-isMagma
+  ; assoc   = *ℝ-assoc
+  }
+
+*ℝ-isMonoid : IsMonoid _≈ℝ_ _*ℝ_ 1ℝ
+*ℝ-isMonoid = record
+  { isSemigroup = *ℝ-isSemigroup
+  ; identity    = *ℝ-identityˡ , *ℝ-identityʳ
+  }
+
+*ℝ-isCommutativeMonoid : IsCommutativeMonoid _≈ℝ_ _*ℝ_ 1ℝ
+*ℝ-isCommutativeMonoid = record
+  { isMonoid = *ℝ-isMonoid
+  ; comm     = *ℝ-comm
+  }
+
+------------------------------------------------------------------------
+-- Ring and commutative ring
+--
+-- 环与交换环
+
++ℝ*ℝ-isRing : IsRing _≈ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
++ℝ*ℝ-isRing = record
+  { +-isAbelianGroup = +ℝ-isAbelianGroup
+  ; *-cong           = *ℝ-cong
+  ; *-assoc          = *ℝ-assoc
+  ; *-identity       = *ℝ-identityˡ , *ℝ-identityʳ
+  ; distrib          = *ℝ-distribˡ-+ , *ℝ-distribʳ-+
+  }
+
++ℝ*ℝ-isCommutativeRing :
+  IsCommutativeRing _≈ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
++ℝ*ℝ-isCommutativeRing = record
+  { isRing = +ℝ*ℝ-isRing
+  ; *-comm = *ℝ-comm
+  }
+
+------------------------------------------------------------------------
+-- Constructive apartness ring: inverse only for apart elements
+--
+-- 构造性分离环：逆元只对分离元素保证
+
+record IsIntervalApartnessRing : Set₁ where
+  field
+    isCommutativeRing   :
+      IsCommutativeRing _≈ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
+    isApartnessRelation : IsApartnessRelation _≈ℝ_ _#ℝ_
+    #⇒invertible :
+      ∀ {x y : RealI} → x #ℝ y →
+      Σ RealI λ z → (z *ℝ (x -ℝ y) ≈ℝ 1ℝ)
+                    × ((x -ℝ y) *ℝ z ≈ℝ 1ℝ)
+
+private
+  #⇒invertible-proof :
+    ∀ {x y : RealI} → x #ℝ y →
+    Σ RealI λ z → (z *ℝ (x -ℝ y) ≈ℝ 1ℝ)
+                  × ((x -ℝ y) *ℝ z ≈ℝ 1ℝ)
+  #⇒invertible-proof {x} {y} (inj₁ x<y) =
+    let
+      d = x -ℝ y
+      d<0 : d <ℝ 0ℝ
+      d<0 = ≈-<-respʳ (+ℝ-inverseˡ y)
+              (<-+mono x y (negℝ y) x<y)
+      inv = recipℝ' d (inj₂ d<0)
+      d*inv : d *ℝ inv ≈ℝ 1ℝ
+      d*inv = *ℝ-inverse d (inj₂ d<0)
+      inv*d : inv *ℝ d ≈ℝ 1ℝ
+      inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
+    in inv , inv*d , d*inv
+  #⇒invertible-proof {x} {y} (inj₂ y<x) =
+    let
+      d = x -ℝ y
+      0<d : 0ℝ <ℝ d
+      0<d = ≈-<-resp (+ℝ-inverseˡ y)
+              (<-+mono y x (negℝ y) y<x)
+      inv = recipℝ' d (inj₁ 0<d)
+      d*inv : d *ℝ inv ≈ℝ 1ℝ
+      d*inv = *ℝ-inverse d (inj₁ 0<d)
+      inv*d : inv *ℝ d ≈ℝ 1ℝ
+      inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
+    in inv , inv*d , d*inv
+
+intervalApartnessRing : IsIntervalApartnessRing
+intervalApartnessRing = record
+  { isCommutativeRing   = +ℝ*ℝ-isCommutativeRing
+  ; isApartnessRelation = #ℝ-isApartnessRelation
+  ; #⇒invertible        = #⇒invertible-proof
+  }
+
+------------------------------------------------------------------------
+-- Constructive Heyting field: tightness
+--
+-- 构造性海廷域：紧密性
+
+record IsIntervalHeytingField : Set₁ where
+  field
+    isIntervalApartnessRing : IsIntervalApartnessRing
+    tight : ∀ {x y : RealI} → ¬ (x #ℝ y) → x ≈ℝ y
+
+private
+  tight-proof : ∀ {x y : RealI} → ¬ (x #ℝ y) → x ≈ℝ y
+  tight-proof {x} {y} ¬x#y = ≤ℝ-antisym {x} {y} ¬y<x ¬x<y
+    where
+      ¬y<x : ¬ (y <ℝ x)
+      ¬y<x y<x = ¬x#y (inj₂ y<x)
+      ¬x<y : ¬ (x <ℝ y)
+      ¬x<y x<y = ¬x#y (inj₁ x<y)
+
+intervalHeytingField : IsIntervalHeytingField
+intervalHeytingField = record
+  { isIntervalApartnessRing = intervalApartnessRing
+  ; tight = tight-proof
+  }
+
+------------------------------------------------------------------------
+-- Ordered field
+--
+-- 有序域
+
+record IsIntervalOrderedField : Set₁ where
+  field
+    isIntervalHeytingField : IsIntervalHeytingField
+    <-isStrictPartialOrder : IsStrictPartialOrder _≈ℝ_ _<ℝ_
+    +-mono-<     : ∀ x y z → x <ℝ y → (x +ℝ z) <ℝ (y +ℝ z)
+    *-mono-<-pos : ∀ x y z → x <ℝ y → 0ℝ <ℝ z →
+                   (x *ℝ z) <ℝ (y *ℝ z)
+    0<1          : 0ℝ <ℝ 1ℝ
+
+private
+  <-resp-≈-structure : _<ℝ_ Respects₂ _≈ℝ_
+  <-resp-≈-structure = ≈-<-respʳ , ≈-<-resp
+
+  <-isStrictPartialOrder : IsStrictPartialOrder _≈ℝ_ _<ℝ_
+  <-isStrictPartialOrder = record
+    { isEquivalence = ≈ℝ-isEquivalence
+    ; irrefl        = λ {x} {y} x≈y x<y → <-irrefl y (≈-<-resp x≈y x<y)
+    ; trans         = <-trans
+    ; <-resp-≈      = <-resp-≈-structure
+    }
+
+intervalOrderedField : IsIntervalOrderedField
+intervalOrderedField = record
+  { isIntervalHeytingField   = intervalHeytingField
+  ; <-isStrictPartialOrder   = <-isStrictPartialOrder
+  ; +-mono-<                 = <-+mono
+  ; *-mono-<-pos             = <-*mono
+  ; 0<1                      = 0ℝ<ℝ1ℝ
+  }
+
+------------------------------------------------------------------------
+-- Complete ordered field
+--
+-- 完备有序域
+
+record IsIntervalCompleteOrderedField : Set₁ where
+  field
+    isIntervalOrderedField : IsIntervalOrderedField
+    sup-complete :
+      (P : Subset) (loc : Located P)
+      (x₀ : RealI) (px₀ : P x₀)
+      (u₀ : RealI) (isUpper : (x : RealI) → P x → x ≤ℝ u₀) →
+      Σ RealI λ s →
+        (∀ x → P x → x ≤ℝ s)
+        × (∀ u → ((x : RealI) → P x → x ≤ℝ u) → s ≤ℝ u)
+    inf-complete :
+      (P : Subset) (locb : LocatedBelow P)
+      (x₀ : RealI) (px₀ : P x₀)
+      (l₀ : RealI) (isLower : (x : RealI) → P x → l₀ ≤ℝ x) →
+      Σ RealI λ i →
+        (∀ x → P x → i ≤ℝ x)
+        × (∀ l → ((x : RealI) → P x → l ≤ℝ x) → l ≤ℝ i)
+
+intervalCompleteOrderedField : IsIntervalCompleteOrderedField
+intervalCompleteOrderedField = record
+  { isIntervalOrderedField = intervalOrderedField
+  ; sup-complete = λ P loc x₀ px₀ u₀ isUpper →
+      order-complete {P = P} loc {x₀} px₀ {u₀} isUpper
+  ; inf-complete = λ P locb x₀ px₀ l₀ isLower →
+      Real.Interval.Infimum.inf-complete
+        {P = P} locb {x₀} px₀ {l₀} isLower
+  }
+
+------------------------------------------------------------------------
+-- Archimedean field with ℚ embedding
+--
+-- 带 ℚ 嵌入的阿基米德域
+
+record IsIntervalArchimedeanField : Set₁ where
+  field
+    isIntervalCompleteOrderedField : IsIntervalCompleteOrderedField
+    embed-+     : ∀ (p q : ℚ) →
+                  embedℚ (p + q) ≈ℝ (embedℚ p +ℝ embedℚ q)
+    embed-*     : ∀ (p q : ℚ) →
+                  embedℚ (p * q) ≈ℝ (embedℚ p *ℝ embedℚ q)
+    embed-neg   : ∀ (p : ℚ) → embedℚ (- p) ≈ℝ negℝ (embedℚ p)
+    embed-<     : ∀ {p q : ℚ} → p < q → embedℚ p <ℝ embedℚ q
+    dense       : ∀ (x y : RealI) → x <ℝ y →
+                  Σ ℚ (λ q → (x <ℝ embedℚ q) × (embedℚ q <ℝ y))
+    archimedean : ∀ x → Σ ℕ (λ n → x <ℝ embedℚ (embed n))
+
+intervalArchimedeanField : IsIntervalArchimedeanField
+intervalArchimedeanField = record
+  { isIntervalCompleteOrderedField = intervalCompleteOrderedField
+  ; embed-+     = embedℚ-+
+  ; embed-*     = embedℚ-*
+  ; embed-neg   = embedℚ-neg
+  ; embed-<     = emb<
+  ; dense       = λ x y p → dense-proof {x} {y} p
+  ; archimedean = archimedean-proof
+  }

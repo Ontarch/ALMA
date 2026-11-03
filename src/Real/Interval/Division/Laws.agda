@@ -214,7 +214,7 @@ open import Real.Interval.Reasoning.Equiv
                        t1 t2 ⟩
         _/ℝ_ x y nz_y *ℝ (y *ℝ w) +ℝ _/ℝ_ z w nz_w *ℝ (y *ℝ w)
           ≈ℝ⟨ ≈ℝ-sym (*ℝ-distribʳ-+
-                (_/ℝ_ x y nz_y) (_/ℝ_ z w nz_w) (y *ℝ w)) ⟩
+                (y *ℝ w) (_/ℝ_ x y nz_y) (_/ℝ_ z w nz_w)) ⟩
         (_/ℝ_ x y nz_y +ℝ _/ℝ_ z w nz_w) *ℝ (y *ℝ w)
       ∎ℝ
 

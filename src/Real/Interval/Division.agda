@@ -381,7 +381,7 @@ negℝ-/ℝ x y nz =
   ≈ℝ-sym
     (beginℝ
       (x +ℝ y) *ℝ recipℝ' z nz
-        ≈ℝ⟨ *ℝ-distribʳ-+ x y (recipℝ' z nz) ⟩
+        ≈ℝ⟨ *ℝ-distribʳ-+ (recipℝ' z nz) x y ⟩
       x *ℝ recipℝ' z nz +ℝ y *ℝ recipℝ' z nz
     ∎ℝ)
 

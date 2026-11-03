@@ -450,47 +450,47 @@ distribʳ-rec3 x y z n =
 -- 右分配律
 
 *ℝ-distribʳ-+ : (x y z : RealI) →
-  (x +ℝ y) *ℝ z ≈ℝ (x *ℝ z) +ℝ (y *ℝ z)
+  (y +ℝ z) *ℝ x ≈ℝ (y *ℝ x) +ℝ (z *ℝ x)
 *ℝ-distribʳ-+ x y z =
-  ≈ℝ-of-rec ((x +ℝ y) *ℝ z) ((x *ℝ z) +ℝ (y *ℝ z))
-    (width z 0 * (width x 0 + width y 0)
-      + (width z 0 * width x 0 + width z 0 * width y 0))
-    (le-addˡ {x = 0ℚ} {y = width z 0 * (width x 0 + width y 0)}
-             {z = width z 0 * width x 0 + width z 0 * width y 0}
-             (add2-nonNeg (mul-nonNeg (0≤width-n z 0) (0≤width-n x 0))
-                          (mul-nonNeg (0≤width-n z 0) (0≤width-n y 0)))
-             (mul-nonNeg (0≤width-n z 0)
-                         (add2-nonNeg (0≤width-n x 0) (0≤width-n y 0))))
+  ≈ℝ-of-rec ((y +ℝ z) *ℝ x) ((y *ℝ x) +ℝ (z *ℝ x))
+    (width x 0 * (width y 0 + width z 0)
+      + (width x 0 * width y 0 + width x 0 * width z 0))
+    (le-addˡ {x = 0ℚ} {y = width x 0 * (width y 0 + width z 0)}
+             {z = width x 0 * width y 0 + width x 0 * width z 0}
+             (add2-nonNeg (mul-nonNeg (0≤width-n x 0) (0≤width-n y 0))
+                          (mul-nonNeg (0≤width-n x 0) (0≤width-n z 0)))
+             (mul-nonNeg (0≤width-n x 0)
+                         (add2-nonNeg (0≤width-n y 0) (0≤width-n z 0))))
     (λ n →
       begin≤
-        ∣ centre ((x +ℝ y) *ℝ z) n
-            - centre ((x *ℝ z) +ℝ (y *ℝ z)) n ∣
-          ≤⟨ tri-diff (centre ((x +ℝ y) *ℝ z) n)
-                      (centre (x +ℝ y) (2 ℕ* n) * centre z (2 ℕ* n))
-                      (centre ((x *ℝ z) +ℝ (y *ℝ z)) n) ⟩
-        ∣ centre ((x +ℝ y) *ℝ z) n
-            - centre (x +ℝ y) (2 ℕ* n) * centre z (2 ℕ* n) ∣
-          + ∣ centre (x +ℝ y) (2 ℕ* n) * centre z (2 ℕ* n)
-              - centre ((x *ℝ z) +ℝ (y *ℝ z)) n ∣
-          ≤⟨ +-mono-≤ (≤-trans (centre-*ℝ≤ (x +ℝ y) z n)
-                              (distribʳ-rec1 x y z n))
-                      (≤-trans (≤-reflexive (distribʳ-mid-rewrite x y z n))
-                               (distribʳ-mid-split x y z n)) ⟩
-        (width z 0 * (width x 0 + width y 0)) * recipPow2 n
-          + ((width x (2 ℕ* n) * width z (2 ℕ* n)) * half
-             + (width y (2 ℕ* n) * width z (2 ℕ* n)) * half)
-          ≤⟨ +-mono-≤ (≤-refl {(width z 0 * (width x 0 + width y 0)) * recipPow2 n})
-                      (+-mono-≤ (distribʳ-rec2 x y z n)
-                                (distribʳ-rec3 x y z n)) ⟩
-        (width z 0 * (width x 0 + width y 0)) * recipPow2 n
-          + ((width z 0 * width x 0) * recipPow2 n
-             + (width z 0 * width y 0) * recipPow2 n)
-          ≤⟨ ≤-reflexive (add3-eq (width z 0 * (width x 0 + width y 0))
-                                  (width z 0 * width x 0)
-                                  (width z 0 * width y 0)
+        ∣ centre ((y +ℝ z) *ℝ x) n
+            - centre ((y *ℝ x) +ℝ (z *ℝ x)) n ∣
+          ≤⟨ tri-diff (centre ((y +ℝ z) *ℝ x) n)
+                      (centre (y +ℝ z) (2 ℕ* n) * centre x (2 ℕ* n))
+                      (centre ((y *ℝ x) +ℝ (z *ℝ x)) n) ⟩
+        ∣ centre ((y +ℝ z) *ℝ x) n
+            - centre (y +ℝ z) (2 ℕ* n) * centre x (2 ℕ* n) ∣
+          + ∣ centre (y +ℝ z) (2 ℕ* n) * centre x (2 ℕ* n)
+              - centre ((y *ℝ x) +ℝ (z *ℝ x)) n ∣
+          ≤⟨ +-mono-≤ (≤-trans (centre-*ℝ≤ (y +ℝ z) x n)
+                              (distribʳ-rec1 y z x n))
+                      (≤-trans (≤-reflexive (distribʳ-mid-rewrite y z x n))
+                               (distribʳ-mid-split y z x n)) ⟩
+        (width x 0 * (width y 0 + width z 0)) * recipPow2 n
+          + ((width y (2 ℕ* n) * width x (2 ℕ* n)) * half
+             + (width z (2 ℕ* n) * width x (2 ℕ* n)) * half)
+          ≤⟨ +-mono-≤ (≤-refl {(width x 0 * (width y 0 + width z 0)) * recipPow2 n})
+                      (+-mono-≤ (distribʳ-rec2 y z x n)
+                                (distribʳ-rec3 y z x n)) ⟩
+        (width x 0 * (width y 0 + width z 0)) * recipPow2 n
+          + ((width x 0 * width y 0) * recipPow2 n
+             + (width x 0 * width z 0) * recipPow2 n)
+          ≤⟨ ≤-reflexive (add3-eq (width x 0 * (width y 0 + width z 0))
+                                  (width x 0 * width y 0)
+                                  (width x 0 * width z 0)
                                   (recipPow2 n)) ⟩
-        (width z 0 * (width x 0 + width y 0)
-         + (width z 0 * width x 0 + width z 0 * width y 0)) * recipPow2 n
+        (width x 0 * (width y 0 + width z 0)
+         + (width x 0 * width y 0 + width x 0 * width z 0)) * recipPow2 n
       ≤∎)
 
 ------------------------------------------------------------------------

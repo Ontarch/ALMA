@@ -498,7 +498,7 @@ pos*pos a b (n , δn<lan) (m , δm<lbm) = K , goal
 
     distrib : (y -ℝ x) *ℝ z ≈ℝ y *ℝ z -ℝ x *ℝ z
     distrib =
-      ≈ℝ-trans (*ℝ-distribʳ-+ y (negℝ x) z)
+      ≈ℝ-trans (*ℝ-distribʳ-+ z y (negℝ x))
       (≈ℝ-trans
         (+ℝ-cong (≈ℝ-refl {y *ℝ z}) (≈ℝ-sym (negℝ-*ℝ x z)))
         (≈ℝ-sym (≈ℝ-refl {y *ℝ z -ℝ x *ℝ z})))
