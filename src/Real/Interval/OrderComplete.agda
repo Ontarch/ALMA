@@ -127,7 +127,7 @@ module _ {P : Subset} (loc : Located P)
   w0-embed0 n =
     begin
       width (embedℚ 0ℚ) n
-        ≡⟨ cong (λ r → RealI.u r - RealI.l r) (node-dyadic 0ℚ n) ⟩
+        ≡⟨ cong (λ r → RealI.u r - RealI.l r) (node-dyadic 0ℚ 0 n) ⟩
       RealI.u (dyadic 0ℚ n) - RealI.l (dyadic 0ℚ n)
         ≡⟨ sub-cancel (δ n) (- δ n) 0ℚ ⟩
       δ n + (- (- δ n))

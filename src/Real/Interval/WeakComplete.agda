@@ -39,7 +39,7 @@ open import Real.CauchyToInterval using (cauchy→realI; centre-cauchy→realI; 
 open import Real.Interval.WeakArith using
   (h; h-mono; h≡suc2c; h≥2k; h+1; h+1≡suc; h+1≥2*suc; 2ss; 2ss-nonZero
   ; εs-half; 2ss2a≡4a; recip-antitone-≤; base-bound; prod≤2^
-  ; embed-prod<; cancel-*; doubleN; diff-neg)
+  ; embed-prod<; *-1/-cancel; doubleN; diff-neg)
 open import Real.Interval.RegularRep using (reg; reg-reg)
 
 ------------------------------------------------------------------------
@@ -440,7 +440,7 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
           inv-y = 1/_ y {{nz-y}}
 
           h1 : x * t ≡ inv-y
-          h1 = cancel-* x y {{nz-x}} {{nz-y}} {{nz-xy}}
+          h1 = *-1/-cancel x y {{nz-x}} {{nz-y}} {{nz-xy}}
 
           inv-yx : 1/_ (y * x) {{nz-yx}} ≡ t
           inv-yx = reciprocal-cong (y * x) (x * y)
@@ -448,7 +448,7 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
 
           h2 : y * t ≡ inv-x
           h2 = trans (cong (y *_) (sym inv-yx))
-                     (cancel-* y x {{nz-y}} {{nz-x}} {{nz-yx}})
+                     (*-1/-cancel y x {{nz-y}} {{nz-x}} {{nz-yx}})
 
           x+1≡y : x + 1ℚ ≡ y
           x+1≡y =

@@ -13,7 +13,6 @@ open import Algebra.Apartness using
 open import Algebra.Bundles using
   (CommutativeMonoid; AbelianGroup; Ring; CommutativeRing)
 open import Algebra.Bundles.Raw using (RawSemiring; RawRing)
-open import Algebra.Definitions using (Invertible)
 open import Algebra.Structures using
   (IsMagma; IsSemigroup; IsMonoid; IsCommutativeMonoid; IsGroup; IsAbelianGroup
   ; IsRing; IsCommutativeRing)
@@ -23,13 +22,12 @@ open import Data.Product using (Σ; _×_; _,_)
 open import Data.Rational using (ℚ; _+_; _*_; _<_; -_)
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Nullary using (¬_)
-open import Relation.Binary.Structures using
-  (IsStrictPartialOrder; IsApartnessRelation)
+open import Relation.Binary.Structures using (IsStrictPartialOrder)
 open import Relation.Binary.Definitions using (_Respects₂_)
 
 open import Real using (embed)
 open import Real.Interval using (RealI; embedℚ)
-open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-isEquivalence; ≈ℝ-trans; ≈ℝ-sym)
+open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-isEquivalence; ≈ℝ-trans)
 open import Real.Interval.Apartness using (_#ℝ_; #ℝ-isApartnessRelation; #ℝ-irrefl)
 open import Real.Interval.ApartnessInvertible using (invertible⇒#)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; _-ℝ_)
@@ -37,8 +35,7 @@ open import Real.Interval.ArithLaws using
   (+ℝ-assoc; +ℝ-comm; +ℝ-identityˡ; +ℝ-identityʳ; +ℝ-inverseˡ; +ℝ-inverseʳ)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Mul.Laws using
-  (*ℝ-assoc; *ℝ-comm; *ℝ-identityˡ; *ℝ-identityʳ; *ℝ-distribˡ-+; *ℝ-distribʳ-+
-  ; *ℝ-zeroˡ; *ℝ-zeroʳ)
+  (*ℝ-assoc; *ℝ-comm; *ℝ-identityˡ; *ℝ-identityʳ; *ℝ-distribˡ-+; *ℝ-distribʳ-+)
 open import Real.Interval.Mul.Cong using (*ℝ-cong)
 open import Real.Interval.Mul.Order using (+ℝ-cong; ≈-neg; ≈-<-respʳ; <-*mono)
 open import Real.Interval.Order using (_<ℝ_; <-irrefl; <-trans)
@@ -47,7 +44,7 @@ open import Real.Interval.OrderLe using (≤ℝ-antisym)
 open import Real.Interval.OrderComplete.Base using (Subset; Located; emb<; _≤ℝ_)
 open import Real.Interval.OrderComplete using (order-complete)
 open import Real.Interval.Infimum using (LocatedBelow)
-open import Real.Interval.Infimum renaming (inf-complete to infimum-complete)
+  renaming (inf-complete to infimum-complete)
 open import Real.Interval.Inverse using (*ℝ-inverse)
 open import Real.Interval.Recip using (recipℝ')
 open import Real.Interval.Embed using (0ℝ<ℝ1ℝ; embedℚ-+; embedℚ-*; embedℚ-neg)

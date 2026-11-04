@@ -32,7 +32,7 @@ open import Relation.Binary.Definitions using (Tri; tri<; tri≈; tri>)
 open import Real using (embed; reciprocal-cong; embed-suc-pos; embed-mono-<)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using
-  (l; u; node; width; width-n; recipPow2; bound-w; n<2^n; pos-2^t)
+  (l; u; node; width; width-n; recipPow2; bound-w; l-nest; u-nest; n<2^n; pos-2^t)
 open import Real.Interval.Rational using (suc∸1; 0<2^t; pos-diff)
 open import Real.Interval.Reasoning
 
@@ -64,10 +64,10 @@ x <ℝ y = Σ ℕ (λ n → u x n < l y n)
 -- 把两个见证移到同一层级。
 
 l-step : (r : RealI) (n : ℕ) → l r n ≤ l r (suc n)
-l-step r n = proj₁ (RealI.nest (node r n))
+l-step r n = l-nest (node r n)
 
 u-step : (r : RealI) (n : ℕ) → u r (suc n) ≤ u r n
-u-step r n = proj₁ (proj₂ (RealI.nest (node r n)))
+u-step r n = u-nest (node r n)
 
 l-up : (r : RealI) (n d : ℕ) → l r n ≤ l r (n +ℕ d)
 l-up r n zero    = ≤-reflexive (cong (l r) (sym (+-identityʳℕ n)))

@@ -36,7 +36,7 @@ open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (bounded-diff; mono-half)
 open import Real.Interval.Rational using
   (pos-diff; sub-add; negsub; mag; mag-≤; r≤|r|)
-open import Real.Interval.Kit using (add-self)
+open import Real.Interval.Kit using (add-self; 0≤diff)
 open import Real.Interval.Reasoning
 
 ------------------------------------------------------------------------
@@ -46,11 +46,6 @@ open import Real.Interval.Reasoning
 
 0≤mag : ∀ a b → 0ℚ ≤ mag a b
 0≤mag a b = ≤-trans (0≤∣p∣ a) (p≤p⊔q ∣ a ∣ ∣ b ∣)
-
-0≤diff : ∀ {a b : ℚ} → a ≤ b → 0ℚ ≤ b - a
-0≤diff {a} {b} a≤b =
-  subst (λ z → z ≤ b + neg a) (+-inverseʳ a)
-        (+-mono-≤ a≤b (≤-refl {neg a}))
 
 le-addˡ : ∀ {x y z : ℚ} → x ≤ z → 0ℚ ≤ y → x ≤ y + z
 le-addˡ {x} {y} {z} x≤z 0≤y =

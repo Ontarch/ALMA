@@ -14,8 +14,8 @@ open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Sum using (inj₁; inj₂)
 open import Data.Rational.Properties using
   (neg-antimono-≤; neg-antimono-<; ≤-refl; ≤-trans; <⇒≤; ≤-total; <-cmp
-  ; +-mono-≤; +-comm; +-identityʳ; +-inverseʳ; ≤-antisym; ≮⇒≥; p≤p⊔q; p≤q⊔p
-  ; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p; ⊔-lub; ⊔-mono-≤)
+  ; +-mono-≤; +-comm; +-identityʳ; ≤-antisym; ≮⇒≥; p≤p⊔q; p≤q⊔p; p≤q⇒p⊔q≡q
+  ; p≥q⇒p⊔q≡p; ⊔-lub; ⊔-mono-≤)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; cong; cong₂; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -25,6 +25,7 @@ open import Real using (embed)
 open import Real.Interval using (RealI; double-half)
 open import Real.IntervalEquiv using (mono-half)
 open import Real.Interval.Rational using (neg-sub)
+open import Real.Interval.Kit using (0≤diff)
 open import Real.Interval.Reasoning using
   (begin≤_; begin<_; _≤∎; _≈⟨_⟩_; _≤⟨_⟩_; _<⟨_⟩≤[_])
 
@@ -168,16 +169,6 @@ abs-width≤-mid-h2 {l} {u} 0≤u =
 --
 -- abs-width≥ 的辅助引理
 
-abs-width≥-0≤diff : ∀ {a b : ℚ} → a ≤ b → 0ℚ ≤ b - a
-abs-width≥-0≤diff {a} {b} a≤b =
-  begin≤
-    0ℚ
-      ≈⟨ sym (+-inverseʳ a) ⟩
-    a + neg a
-      ≤⟨ +-mono-≤ a≤b (≤-refl {neg a}) ⟩
-    b + neg a
-  ≤∎
-
 double-≤ : ∀ {x : ℚ} → 0ℚ ≤ x → x ≤ x + x
 double-≤ {x} 0≤x =
   begin≤
@@ -193,7 +184,7 @@ abs-width≥-pos : ∀ {l u : ℚ} → 0ℚ ≤ l → l ≤ u →
 abs-width≥-pos {l} {u} 0≤l l≤u =
   begin≤
     0ℚ
-      ≤⟨ abs-width≥-0≤diff l≤u ⟩
+      ≤⟨ 0≤diff l≤u ⟩
     u - l
       ≈⟨ sym (abs-width-pos 0≤l (≤-trans 0≤l l≤u)) ⟩
     absHi l u - absLo l u
@@ -204,7 +195,7 @@ abs-width≥-neg : ∀ {l u : ℚ} → l ≤ u → u ≤ 0ℚ →
 abs-width≥-neg {l} {u} l≤u u≤0 =
   begin≤
     0ℚ
-      ≤⟨ abs-width≥-0≤diff l≤u ⟩
+      ≤⟨ 0≤diff l≤u ⟩
     u - l
       ≈⟨ sym (abs-width-neg l≤u u≤0) ⟩
     absHi l u - absLo l u

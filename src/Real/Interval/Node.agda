@@ -8,8 +8,9 @@
 
 module Real.Interval.Node where
 
-open import Data.Nat using (ℕ; zero; suc) renaming (_*_ to _ℕ*_)
-open import Data.Nat.Properties using (*-suc)
+open import Data.Nat using (ℕ; zero; suc) renaming (_*_ to _ℕ*_; _+_ to _+ℕ_)
+open import Data.Nat.Properties using (*-suc; +-suc)
+  renaming (+-identityʳ to +-identityʳℕ)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; nonNegative) renaming (-_ to neg)
 open import Data.Rational.Properties using
@@ -37,15 +38,30 @@ open import Real.Interval.Reasoning
 --
 -- node 与 dyadic 交换
 
-node-dyadic : (q : ℚ) (n : ℕ) → node (dyadic q 0) n ≡ dyadic q n
-node-dyadic q zero    = refl
-node-dyadic q (suc n) = cong RealI.next (node-dyadic q n)
+-- node of a dyadic interval, at general depth.
+--
+-- dyadic 区间的一般深度节点。
+node-dyadic : (q : ℚ) (k n : ℕ) →
+  node (dyadic q k) n ≡ dyadic q (k +ℕ n)
+node-dyadic q k zero    = cong (dyadic q) (sym (+-identityʳℕ k))
+node-dyadic q k (suc n) =
+  begin
+    node (dyadic q k) (suc n)
+  ≡⟨ refl ⟩
+    RealI.next (node (dyadic q k) n)
+  ≡⟨ cong RealI.next (node-dyadic q k n) ⟩
+    RealI.next (dyadic q (k +ℕ n))
+  ≡⟨ refl ⟩
+    dyadic q (suc (k +ℕ n))
+  ≡⟨ cong (dyadic q) (sym (+-suc k n)) ⟩
+    dyadic q (k +ℕ suc n)
+  ∎
 
 l-dyadic : (q : ℚ) (n : ℕ) → l (dyadic q 0) n ≡ neg (δ n) + q
-l-dyadic q n = cong RealI.l (node-dyadic q n)
+l-dyadic q n = cong RealI.l (node-dyadic q 0 n)
 
 u-dyadic : (q : ℚ) (n : ℕ) → u (dyadic q 0) n ≡ δ n + q
-u-dyadic q n = cong RealI.u (node-dyadic q n)
+u-dyadic q n = cong RealI.u (node-dyadic q 0 n)
 
 ------------------------------------------------------------------------
 -- node commutes with +ℝ

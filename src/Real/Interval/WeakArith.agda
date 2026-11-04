@@ -111,10 +111,10 @@ cancel-*-rearrange x y =
     ((x * y) * (1/(x * y))) * (1/ y)
       ∎
 
-cancel-* : ∀ x y .{{_ : NonZero x}} .{{_ : NonZero y}}
+*-1/-cancel : ∀ x y .{{_ : NonZero x}} .{{_ : NonZero y}}
             .{{_ : NonZero (x * y)}} →
   x * (1/(x * y)) ≡ 1/ y
-cancel-* x y =
+*-1/-cancel x y =
   begin
     x * (1/(x * y))
       ≡⟨ sym (*-identityʳ (x * (1/(x * y)))) ⟩
@@ -223,12 +223,6 @@ s2nat k c le =
 --
 -- 自然数嵌入的倒数反单调
 
-recip-antitone : ∀ a b → (0ℚ < embed a) → a <N b →
-  .{{_ : NonZero (embed a)}} .{{_ : NonZero (embed b)}} →
-  1/ embed b < 1/ embed a
-recip-antitone a b 0<a a<b =
-  strict-recip (embed a) (embed b) 0<a (embed-mono-< a<b)
-
 pos-+ : ∀ d a → 0ℚ < embed a → 0ℚ < embed (d +ℕ a)
 pos-+ d a 0<a =
   <-≤-trans 0<a (embed-mono-≤ (m≤n+m a d))
@@ -244,10 +238,8 @@ recip-step (suc d) a 0<a {{nz-a}} {{nz-da}} =
     pi = pos-+ d a 0<a
     nz-i : NonZero (embed i)
     nz-i = pos⇒nonZero (embed i) {{positive pi}}
-    nz-si : NonZero (embed (suc i))
-    nz-si = pos⇒nonZero (embed (suc i)) {{positive (0<embed i)}}
-    strict = recip-antitone i (suc i) pi (s≤s ≤N-refl)
-               {{nz-i}} {{nz-si}}
+    strict = strict-recip (embed i) (embed (suc i)) pi
+               (embed-mono-< (s≤s ≤N-refl))
     ih = recip-step d a 0<a {{nz-a}} {{nz-i}}
   in ≤-trans (<⇒≤ strict) ih
 

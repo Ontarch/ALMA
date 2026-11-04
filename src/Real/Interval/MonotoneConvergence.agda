@@ -34,7 +34,7 @@ open ≡-Reasoning
 
 open import Real using
   (CauchySeq; ε; embed; 0<ε; reciprocal-cong; half; 2ℚ; 2ℚ≡1+1; 2*embed
-  ; embed2-nonZero; 0<embed)
+  ; embed2-nonZero; 0<embed; embed-mono-<)
 open import Real.CauchyToInterval using
   (cauchy→realI; centre-cauchy→realI; M; K; ε-K<δ-suc)
 open import Real.Interval using (RealI; δ; δ-half; δs≤δ; embedℚ; sub-cancel)
@@ -44,7 +44,7 @@ open import Real.IntervalEquiv using
   (centre; width; l; u; node; recipPow2; bounded-diff; n<2^n; centre-in-l
   ; centre-in-u; pos-2^t)
 open import Real.Interval.Kit using
-  (tail-bound; ≈ℝ-of-rec; recipPow2-mono; two-half; half≤1)
+  (tail-bound; ≈ℝ-of-rec; strict-recip; recipPow2-mono; two-half; half≤1)
 open import Real.Interval.OrderComplete.Base using
   (Subset; Located; Bracket; _≤ℝ_; δ-dec; a+d≡b)
 open import Real.Interval.OrderComplete.Bisect using
@@ -54,7 +54,7 @@ open import Real.Interval.RegularRep using (reg; i; width-i; fold≥k+4)
 open import Real.Interval.OrderLe using
   (≤ℝ-refl; ≤ℝ-trans; ≤ℝ-resp-≈; <⇒≤ℝ; <-≤ℝ-trans)
 open import Real.Interval.Mul.Order using (≈-<-respʳ)
-open import Real.Interval.WeakArith using (recip-antitone; recip-antitone-≤)
+open import Real.Interval.WeakArith using (recip-antitone-≤)
 open import Real.Interval.Node using (u-dyadic; l-dyadic)
 
 ------------------------------------------------------------------------
@@ -1570,19 +1570,9 @@ module _ {f : ℕ → RealI}
                             let εsuc< : ε (suc t) * half < ε t * half
                                 εsuc< =
                                   let e1 : ε (suc t) < ε t
-                                      e1 =
-                                        let p = embed (suc t)
-                                            q = embed (suc (suc t))
-                                            nzp : NonZero p
-                                            nzp = pos⇒nonZero p
-                                                    {{positive (0<embed t)}}
-                                            nzq : NonZero q
-                                            nzq = pos⇒nonZero q
-                                                    {{positive (0<embed (suc t))}}
-                                        in recip-antitone (suc t) (suc (suc t))
-                                             (0<embed t)
-                                             (≤N-refl)
-                                             {{nzp}} {{nzq}}
+                                      e1 = strict-recip (embed (suc t)) (embed (suc (suc t)))
+                                            (0<embed t)
+                                            (embed-mono-< {suc t} {suc (suc t)} (≤N-refl {suc (suc t)}))
                                   in *-monoˡ-<-pos half e1
                             in +-mono-≤-<
                                  (≤-refl {x = ε t * half}) εsuc<

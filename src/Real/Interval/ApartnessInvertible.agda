@@ -44,6 +44,7 @@ open import Real.IntervalEquiv using
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; _-ℝ_)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Order using (_<ℝ_; l-mono'; u-mono')
+open import Real.Interval.AbsTriangle using (l0ℝ)
 open import Real.Interval.Apartness using (_#ℝ_)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Node using
@@ -614,16 +615,13 @@ l-sub x y n =
 u-0 : (n : ℕ) → u 0ℝ n ≡ δ n
 u-0 n = trans (u-dyadic 0ℚ n) (+-identityʳ (δ n))
 
-l-0 : (n : ℕ) → l 0ℝ n ≡ neg (δ n)
-l-0 n = trans (l-dyadic 0ℚ n) (+-identityʳ (neg (δ n)))
-
 -- (x -ℝ y) <ℝ 0ℝ implies x <ℝ y.
 --
 -- 差严格小于零蕴含前者严格小于后者。
 d<0⇒x<y : (x y : RealI) → (x -ℝ y) <ℝ 0ℝ → x <ℝ y
 d<0⇒x<y x y (n , wn) =
   let w2 : u x n - l y n < neg (δ n)
-      w2 = subst₂ _<_ (u-sub x y n) (l-0 n) wn
+      w2 = subst₂ _<_ (u-sub x y n) (l0ℝ n) wn
       w3 : (u x n - l y n) + (l y n + δ n) < neg (δ n) + (l y n + δ n)
       w3 = +-monoˡ-< (l y n + δ n) w2
       lhs≡ : (u x n - l y n) + (l y n + δ n) ≡ u x n + δ n
@@ -890,7 +888,7 @@ inv⇒d#0 d (z , dz≈1) =
               (+-monoˡ-< (u d (2 ℕ* n₀) + neg (δ n)) δn<nd)
             udn<-δn : u d n < neg (δ n)
             udn<-δn = ≤-<-trans udn≤ u2n<-δn
-        in inj₁ (n , subst₂ _<_ refl (sym (l-0 n)) udn<-δn)
+        in inj₁ (n , subst₂ _<_ refl (sym (l0ℝ n)) udn<-δn)
   in [ pos-case , neg-case ]′ signs
 
 -- Invertibility entails apartness.

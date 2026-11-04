@@ -40,7 +40,7 @@ open import Real.IntervalEquiv using
   (l; u; centre; width; width-n; centre-l; centre-u; l-mono; u-mono; node
   ; recipPow2; node-suc)
 open import Real.Interval.Node using
-  (centre-add; 0≤width-n; l-hom; u-hom; l-neg; u-neg)
+  (centre-add; 0≤width-n; l-hom; u-hom; l-neg; u-neg; node-dyadic)
 open import Real.Interval.Abs using
   (∣_∣ℝ; absLo; absHi; lo-pos; hi-pos; lo-neg; hi-neg; lo-mid)
 open import Real.Interval.Kit using
@@ -427,27 +427,6 @@ abs-centre-triangle l1 u1 l2 u2 l1≤u1 l2≤u2 =
   in let dd : d < d
          dd = ≤-<-trans diff≥d upper
      in <-irrefl refl dd
-
--- Nesting a dyadic interval n times yields the dyadic at depth k + n.
---
--- 嵌套 dyadic n 次后得到深度为 k + n 的 dyadic。
-node-dyadic : (q : ℚ) (k n : ℕ) → node (dyadic q k) n ≡ dyadic q (k +N n)
-node-dyadic q k 0 =
-  begin node (dyadic q k) 0
-    ≡⟨ refl ⟩
-  dyadic q k
-    ≡⟨ cong (dyadic q) (sym (+-identityʳℕ k)) ⟩
-  dyadic q (k +N 0) ∎
-node-dyadic q k (suc n) =
-  begin node (dyadic q k) (suc n)
-    ≡⟨ node-suc (dyadic q k) n ⟩
-  node (RealI.next (dyadic q k)) n
-    ≡⟨ cong (λ z → node z n) refl ⟩
-  node (dyadic q (suc k)) n
-    ≡⟨ node-dyadic q (suc k) n ⟩
-  dyadic q (suc k +N n)
-    ≡⟨ cong (dyadic q) (sym (+-suc k n)) ⟩
-  dyadic q (k +N suc n) ∎
 
 -- The lower endpoint of 0ℝ at level n is the negated dyadic tolerance.
 --

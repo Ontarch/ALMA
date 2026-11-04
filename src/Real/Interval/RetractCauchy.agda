@@ -11,17 +11,15 @@ module Real.Interval.RetractCauchy where
 open import Data.Nat using (ℕ; suc; _⊔_; _^_; s≤s)
   renaming (_≤_ to _≤N_; _≥_ to _≥N_; _*_ to _*ℕ_; _<_ to _<N_)
 open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m≤m+n; m≤n+m; n<1+n; ^-monoʳ-≤)
-  renaming (≤-trans to ≤N-trans
-           ; ≤-<-trans to ≤N-<-trans; <-≤-trans to <N-≤-trans)
+  renaming (≤-trans to ≤N-trans; ≤-<-trans to ≤N-<-trans; <-≤-trans to <N-≤-trans)
 open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _<_; _≤_; ∣_∣; 1/_; positive; Positive; NonZero; NonNegative; nonNegative)
+  (ℚ; 0ℚ; 1ℚ; _+_; _-_; -_; _*_; _<_; _≤_; ∣_∣; 1/_; positive; Positive
+  ; NonZero; NonNegative; nonNegative)
 open import Data.Rational.Properties using
-  (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; <-trans
-  ; +-mono-<; +-monoʳ-<; +-mono-≤; +-inverseʳ; +-identityˡ; ∣p+q∣≤∣p∣+∣q∣
-  ; ∣-p∣≡∣p∣; positive⁻¹; *-inverseʳ; *-inverseˡ
-  ; *-identityʳ; *-assoc; *-comm; *-monoˡ-≤-nonNeg
-  ; *-monoʳ-<-pos
-  ; +-assoc; +-comm)
+  (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; <-trans; +-mono-<
+  ; +-monoʳ-<; +-mono-≤; +-inverseʳ; +-identityˡ; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣
+  ; positive⁻¹; *-inverseʳ; *-inverseˡ; 0≤p⇒∣p∣≡p; *-identityʳ; *-assoc
+  ; *-comm; *-monoˡ-≤-nonNeg; *-monoʳ-<-pos; +-assoc; +-comm)
   renaming (1/pos⇒pos to pos-recip)
 open import Data.Product using (_,_)
 open import Data.Sum using (inj₁; inj₂)
@@ -252,16 +250,6 @@ private
   recip-antitone-strict (embed (suc b)) (embed (suc a))
     (positive⁻¹ (embed (suc b)))
     (embed-mono-< (s≤s b<a))
-
--- Absolute value of a non-negative rational is itself.
---
--- 非负有理数的绝对值是其自身。
---
--- Direct alias of the stdlib lemma.
---
--- 直接复用标准库引理。
-0≤p⇒∣p∣≡p : ∀ {p} → 0ℚ ≤ p → ∣ p ∣ ≡ p
-0≤p⇒∣p∣≡p = Data.Rational.Properties.0≤p⇒∣p∣≡p
 
 -- Absolute value of a non-positive rational is its negation, via
 -- ∣-p∣ ≡ ∣p∣ and the non-negative lemma applied to -p.

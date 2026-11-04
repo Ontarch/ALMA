@@ -302,21 +302,21 @@ centre-u r n =
       final = ≤-trans mono (≤-reflexive chain)
   in final
 
--- One-step monotonicity of the lower and upper endpoints.
+-- Nesting conditions on the endpoints
 --
--- 下端点与上端点的单步单调性。
-l-step : (r : RealI) → RealI.l r ≤ RealI.l (RealI.next r)
-l-step r = proj₁ (RealI.nest r)
+-- 端点的嵌套条件
+l-nest : (r : RealI) → l r 0 ≤ l (RealI.next r) 0
+l-nest r = proj₁ (RealI.nest r)
 
-u-step : (r : RealI) → RealI.u (RealI.next r) ≤ RealI.u r
-u-step r = proj₁ (proj₂ (RealI.nest r))
+u-nest : (r : RealI) → u (RealI.next r) 0 ≤ u r 0
+u-nest r = proj₁ (proj₂ (RealI.nest r))
 
 -- Iterated monotonicity of the lower endpoint.
 --
 -- 下端点的迭代单调性。
 l-mono0 : (r : RealI) (m : ℕ) → RealI.l r ≤ RealI.l (node r m)
 l-mono0 r zero    = ≤-refl
-l-mono0 r (suc m) = ≤-trans (l-mono0 r m) (l-step (node r m))
+l-mono0 r (suc m) = ≤-trans (l-mono0 r m) (l-nest (node r m))
 
 l-mono : (r : RealI) → {n m : ℕ} → n ≤N m →
   RealI.l (node r n) ≤ RealI.l (node r m)
@@ -328,7 +328,7 @@ l-mono r {suc n} {suc m} (s≤s p) =
 
 u-mono0 : (r : RealI) (m : ℕ) → RealI.u (node r m) ≤ RealI.u r
 u-mono0 r zero    = ≤-refl
-u-mono0 r (suc m) = ≤-trans (u-step (node r m)) (u-mono0 r m)
+u-mono0 r (suc m) = ≤-trans (u-nest (node r m)) (u-mono0 r m)
 
 u-mono : (r : RealI) → {n m : ℕ} → n ≤N m →
   RealI.u (node r m) ≤ RealI.u (node r n)

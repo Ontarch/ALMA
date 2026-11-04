@@ -29,7 +29,7 @@ open import Base.RationalRing using (neg-involutive; telescope)
 open import Real using (embed; half; 2ℚ)
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using
-  (_*ℝ_; 0≤diff; cancelʳ; sub-monoˡ)
+  (_*ℝ_; cancelʳ; sub-monoˡ)
 import Real.Interval.Mul as MUL
 open import Real.Interval.Bounded using (bounded)
 open import Real.IntervalEquiv using
@@ -37,7 +37,7 @@ open import Real.IntervalEquiv using
 open import Real.Interval.Rational using
   (sub-add; negsub)
 open import Real.Interval.Kit using
-  (*-mono-≤-nonNeg; add-self; 2ℚ*half≡1; 0≤half; half≤1; 0≤recipPow2)
+  (*-mono-≤-nonNeg; add-self; 2ℚ*half≡1; 0≤half; half≤1; 0≤diff; 0≤recipPow2)
 open import Real.Interval.Node using
   (node-*ℝ; width-rec; mul-pair; mul-nonNeg; 0≤width-n; recipPow2≤1; rr≤r)
 open import Base.RationalRing using (*ʳ-sub; +interchange)
