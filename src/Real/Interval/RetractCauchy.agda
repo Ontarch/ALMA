@@ -17,14 +17,14 @@ open import Data.Rational using
   ; NonZero; NonNegative; nonNegative)
 open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; <-trans; +-mono-<
-  ; +-monoʳ-<; +-mono-≤; +-inverseʳ; +-identityˡ; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣
+  ; +-monoʳ-<; +-mono-≤; +-inverseʳ; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣
   ; positive⁻¹; *-inverseʳ; *-inverseˡ; 0≤p⇒∣p∣≡p; *-identityʳ; *-assoc
   ; *-comm; *-monoˡ-≤-nonNeg; *-monoʳ-<-pos; +-assoc; +-comm)
   renaming (1/pos⇒pos to pos-recip)
 open import Data.Product using (_,_)
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; sym; trans; subst; module ≡-Reasoning)
+  (_≡_; refl; cong; sym; trans; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Base.RationalRing using (telescope)
@@ -35,6 +35,7 @@ open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using (realI→cauchy; centre; n<2^n)
 open import Real.CauchyToInterval using
   (cauchy→realI; M; K; centre-cauchy→realI; μ≤M; K≥k)
+open import Real.Interval.Kit using (npos⇒∣p∣≡neg)
 open import Real.Regular using (regularize; μr; μr≥k; μr-mono≤)
 open import Real.Interval.Rational using (r≤|r|; negsub)
 
@@ -251,34 +252,13 @@ private
     (positive⁻¹ (embed (suc b)))
     (embed-mono-< (s≤s b<a))
 
--- Absolute value of a non-positive rational is its negation, via
--- ∣-p∣ ≡ ∣p∣ and the non-negative lemma applied to -p.
---
--- 非正有理数的绝对值是其相反数
---
--- 经绝对值对取负不变，对相反数应用非负引理。
-p≤0⇒∣p∣≡-p : ∀ {p} → p ≤ 0ℚ → ∣ p ∣ ≡ - p
-p≤0⇒∣p∣≡-p {p} p≤0 = begin
-  ∣ p ∣     ≡⟨ sym (∣-p∣≡∣p∣ p) ⟩
-  ∣ - p ∣   ≡⟨ 0≤p⇒∣p∣≡p (neg-nonNeg p≤0) ⟩
-  - p ∎
-  where
-  -- p ≤ 0 implies 0 ≤ -p, by adding -p on the right.
-  --
-  -- p ≤ 0 蕴含 0 ≤ -p，在右侧加 -p。
-  neg-nonNeg : p ≤ 0ℚ → 0ℚ ≤ - p
-  neg-nonNeg p≤0 =
-    subst (λ q → q ≤ - p) (+-inverseʳ p)
-      (subst (λ q → p + - p ≤ q) (+-identityˡ (- p))
-        (+-mono-≤ p≤0 (≤-refl {x = - p})))
-
 -- Both directed bounds imply the absolute bound.
 --
 -- 两个方向的界蕴含绝对界。
 both<⇒abs< : ∀ q e → q < e → - q < e → ∣ q ∣ < e
 both<⇒abs< q e fwd bwd with Data.Rational.Properties.≤-total q 0ℚ
 ... | inj₁ q≤0 =
-  ≤-<-trans (≤-reflexive (p≤0⇒∣p∣≡-p q≤0)) bwd
+  ≤-<-trans (≤-reflexive (npos⇒∣p∣≡neg q≤0)) bwd
 ... | inj₂ 0≤q =
   ≤-<-trans (≤-reflexive (0≤p⇒∣p∣≡p 0≤q)) fwd
 

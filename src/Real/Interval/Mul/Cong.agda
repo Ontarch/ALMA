@@ -34,10 +34,11 @@ open import Real using
 open import Real.Interval using (RealI)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Bounded using (bounded)
-open import Real.IntervalEquiv using (centre; width; centre-l; centre-u; recipPow2)
+open import Real.IntervalEquiv using
+  (2m; centre; width; centre-l; centre-u; recipPow2)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Kit using
-  (0≤half; two-half; n+n≡2n; recipPow2-bound; *-mono-≤-nonNeg; tri-diff; abs-swap
+  (0≤half; two-half; recipPow2-bound; *-mono-≤-nonNeg; tri-diff; abs-swap
   ; recip-antitone; strict-recip; pick)
 open import Real.Interval.Node using (0≤width-n)
 open import Real.Interval.Mul.Core using (term1; sub-distribˡ)
@@ -487,7 +488,7 @@ mul-cong-ε k = subst (λ z → ε (4 ℕ* suc k) < z) (sym εk4≡) raw
     where
     nn = 2 ℕ* n
     n≤nn : n ≤ℕ nn
-    n≤nn = subst (λ z → n ≤ℕ z) (n+n≡2n n) (ℕP.m≤m+n n n)
+    n≤nn = subst (λ z → n ≤ℕ z) (sym (2m n)) (ℕP.m≤m+n n n)
     cx = centre x nn ; cy = centre y nn
     cx' = centre x' nn ; cy' = centre y' nn
     p1 = centre (x *ℝ y) n

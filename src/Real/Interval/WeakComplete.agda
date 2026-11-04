@@ -33,13 +33,13 @@ open ≡-Reasoning
 open import Real using
   (CauchySeq; ε; half; embed; embed-suc-pos; reciprocal-cong; 0<embed; embed-+-hom)
 open import Real.Interval using (RealI)
-open import Real.IntervalEquiv using (centre)
+open import Real.IntervalEquiv using (2m; centre)
 open import Real.Interval.Kit using (strict-recip; tri-diff)
 open import Real.CauchyToInterval using (cauchy→realI; centre-cauchy→realI; M; K; K≥k)
 open import Real.Interval.WeakArith using
   (h; h-mono; h≡suc2c; h≥2k; h+1; h+1≡suc; h+1≥2*suc; 2ss; 2ss-nonZero
-  ; εs-half; 2ss2a≡4a; recip-antitone-≤; base-bound; prod≤2^
-  ; embed-prod<; *-1/-cancel; doubleN; diff-neg)
+  ; εs-half; 2ss2a≡4a; recip-antitone-≤; base-bound; prod≤2^; embed-prod<
+  ; *-1/-cancel; diff-neg)
 open import Real.Interval.RegularRep using (reg; reg-reg)
 
 ------------------------------------------------------------------------
@@ -295,7 +295,7 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
     K-inc : ∀ n → K n ≤N K (suc n)
     K-inc n =
       ≤N-trans (m≤m+n (K n) (K n))
-               (≤N-reflexive (sym (doubleN (K n))))
+               (≤N-reflexive (sym (2m (K n))))
 
     -- M b-seq n ≡ K n: the modulus is the identity and K is increasing.
     --
@@ -324,7 +324,7 @@ module _ {f : ℕ → RealI} (w : WeakCauchy f) where
           ∎
 
     j≤2j : j ≤N 2 *ℕ j
-    j≤2j = ≤N-trans (m≤m+n j j) (≤N-reflexive (sym (doubleN j)))
+    j≤2j = ≤N-trans (m≤m+n j j) (≤N-reflexive (sym (2m j)))
     hj≥sk : h j ≥N suc k
     hj≥sk =
       ≤N-trans (K≥k (suc k))

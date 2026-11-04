@@ -14,15 +14,14 @@ open import Data.Nat.Properties using
   (m≤m+n; m≤n+m; m+[n∸m]≡n; n≤1+n; +-suc; *-suc; *-monoʳ-≤; *-distribˡ-+)
   renaming (≤-trans to ≤N-trans; ≤-refl to ≤N-refl; ≤-reflexive to ≤N-reflexive
   ; +-comm to +-commℕ; +-assoc to +-assocℕ; *-assoc to *-assocℕ; *-comm to *-commℕ
-  ; +-identityʳ to +-identityʳℕ; *-identityʳ to *-identityʳℕ; *-identityˡ to *-identityˡℕ
-  ; +-mono-< to +-mono-<N; ≤-<-trans to ≤N-<-trans)
+  ; *-identityˡ to *-identityˡℕ; +-mono-< to +-mono-<N; ≤-<-trans to ≤N-<-trans)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; positive; Positive; NonZero)
 open import Data.Rational.Base using (1/_; -_)
 open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; ≤-<-trans; <-≤-trans; +-mono-<; +-mono-≤-<
   ; +-identityʳ; neg-distrib-+; pos⇒nonZero; pos*pos⇒pos; *-inverseʳ; +-comm
-  ; *-inverseˡ; *-assoc; *-comm; *-identityˡ; *-identityʳ; <⇒≤; *-distribʳ-+)
+  ; *-inverseˡ; *-assoc; *-comm; *-identityˡ; *-identityʳ; <⇒≤)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -31,8 +30,8 @@ open import Base.RationalRing using (0<1; neg-involutive)
 open import Real using
   (ε; embed; half; embed-suc-nonZero; 2ℚ; 2*embed; halve; embed-*; 0<embed
   ; reciprocal-cong; embed-mono-<; embed-mono-≤; embed-+-hom)
-open import Real.IntervalEquiv using (recipPow2; n<2^n; 1≤2^n)
-open import Real.Interval.Kit using (strict-recip)
+open import Real.IntervalEquiv using (2m; recipPow2; n<2^n; 1≤2^n)
+open import Real.Interval.Kit using (add-self; strict-recip)
 
 ------------------------------------------------------------------------
 -- Product of reciprocals and cancellation
@@ -502,16 +501,6 @@ half*recipPow2 n =
 --
 -- 四倍嵌入
 
-4*embed-2*2n≡4n : ∀ n → 2 *ℕ (2 *ℕ n) ≡ 4 *ℕ n
-4*embed-2*2n≡4n n =
-  begin
-    2 *ℕ (2 *ℕ n)
-      ≡⟨ sym (*-assocℕ 2 2 n) ⟩
-    (2 *ℕ 2) *ℕ n
-      ≡⟨⟩
-    4 *ℕ n
-      ∎
-
 4*embed : ∀ n → 2ℚ * (2ℚ * embed n) ≡ embed (4 *ℕ n)
 4*embed n =
   begin
@@ -520,7 +509,7 @@ half*recipPow2 n =
     2ℚ * embed (2 *ℕ n)
       ≡⟨ 2*embed (2 *ℕ n) ⟩
     embed (2 *ℕ (2 *ℕ n))
-      ≡⟨ cong embed (4*embed-2*2n≡4n n) ⟩
+      ≡⟨ cong embed (2*2a≡4a n) ⟩
     embed (4 *ℕ n)
       ∎
 
@@ -546,19 +535,9 @@ diff-neg x y =
 --
 -- 基本有理数不等式
 
-double : ∀ u → 2ℚ * u ≡ u + u
-double u =
-  begin
-    2ℚ * u
-      ≡⟨ *-distribʳ-+ u 1ℚ 1ℚ ⟩
-    1ℚ * u + 1ℚ * u
-      ≡⟨ cong₂ _+_ (*-identityˡ u) (*-identityˡ u) ⟩
-    u + u
-      ∎
-
 x<2x : ∀ x → 0ℚ < x → x < 2ℚ * x
 x<2x x 0<x =
-  subst (λ y → x < y) (sym (double x))
+  subst (λ y → x < y) (add-self x)
     (subst (λ z → z < x + x) (+-identityʳ x)
       (+-mono-≤-< (≤-refl {x = x}) 0<x))
 
@@ -584,7 +563,7 @@ u-bound u 0<u {{nz-u}} {{nz-2u}} {{nz-4u}} {{nz-nx}} =
     four-u = 2ℚ * two-u
     next = two-u + 1ℚ
     0<two-u : 0ℚ < two-u
-    0<two-u = subst (λ x → 0ℚ < x) (sym (double u))
+    0<two-u = subst (λ x → 0ℚ < x) (add-self u)
                     (+-mono-< 0<u 0<u)
     two-u<next : two-u < next
     two-u<next = x<x+1 two-u
@@ -684,18 +663,6 @@ base-bound k =
 --
 -- 自然数加倍与界
 
-doubleN : ∀ x → 2 *ℕ x ≡ x +ℕ x
-doubleN x =
-  begin
-    2 *ℕ x
-      ≡⟨ *-commℕ 2 x ⟩
-    x *ℕ 2
-      ≡⟨ *-suc x 1 ⟩
-    x +ℕ x *ℕ 1
-      ≡⟨ cong (x +ℕ_) (*-identityʳℕ x) ⟩
-    x +ℕ x
-      ∎
-
 k+4≤2k+4 : ∀ k →
   suc (suc (suc (suc k))) ≤N 2 *ℕ suc (suc k)
 k+4≤2k+4 k =
@@ -709,7 +676,7 @@ k+4≤2k+4 k =
     a≡ =
       begin
         2 *ℕ suc (suc k)
-          ≡⟨ doubleN (suc (suc k)) ⟩
+          ≡⟨ 2m (suc (suc k)) ⟩
         suc (suc k) +ℕ suc (suc k)
           ≡⟨ refl ⟩
         suc (suc (k +ℕ suc (suc k)))
@@ -737,7 +704,7 @@ prod≤2^ (suc k) =
     step1 =
       begin
         b *ℕ (2 *ℕ a)
-          ≡⟨ cong (b *ℕ_) (doubleN a) ⟩
+          ≡⟨ cong (b *ℕ_) (2m a) ⟩
         b *ℕ (a +ℕ a)
           ≡⟨ *-distribˡ-+ b a a ⟩
         b *ℕ a +ℕ b *ℕ a
@@ -745,7 +712,7 @@ prod≤2^ (suc k) =
         a *ℕ b +ℕ b *ℕ a
           ≡⟨ cong (a *ℕ b +ℕ_) (*-commℕ b a) ⟩
         a *ℕ b +ℕ a *ℕ b
-          ≡⟨ sym (doubleN (a *ℕ b)) ⟩
+          ≡⟨ sym (2m (a *ℕ b)) ⟩
         2 *ℕ (a *ℕ b)
           ∎
   in ≤N-trans (≤N-trans p1 (≤N-reflexive step1)) p3
@@ -777,14 +744,7 @@ four-a a =
       ∎
 
 sk≡k+1 : ∀ k → suc k ≡ k +ℕ 1
-sk≡k+1 k =
-  begin
-    suc k
-      ≡⟨ cong suc (sym (+-identityʳℕ k)) ⟩
-    suc (k +ℕ 0)
-      ≡⟨ sym (+-suc k 0) ⟩
-    k +ℕ 1
-      ∎
+sk≡k+1 k = trans (sym (1+n≡ k)) (+-commℕ 1 k)
 
 ssk≡k+2 : ∀ k → suc (suc k) ≡ k +ℕ 2
 ssk≡k+2 k =

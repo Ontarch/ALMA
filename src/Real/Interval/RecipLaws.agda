@@ -9,7 +9,7 @@
 module Real.Interval.RecipLaws where
 
 open import Data.Nat using (ℕ; suc; _^_; _≥_; z≤n)
-  renaming (_+_ to _+N_; _*_ to _*N_; _<_ to _<N_)
+  renaming (_+_ to _+N_; _<_ to _<N_)
 open import Data.Nat.Properties using (m≤m+n; n<1+n)
   renaming (<-trans to <N-trans; ≤-<-trans to ≤N-<-trans)
 open import Data.Product using (_,_; proj₁; proj₂)
@@ -19,23 +19,24 @@ open import Data.Rational using
 open import Data.Rational.Base using (1/_) renaming (-_ to neg)
 open import Data.Rational.Properties using
   (≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; +-monoˡ-<; +-assoc; +-identityʳ
-  ; +-inverseʳ; *-comm; *-assoc; *-identityˡ; *-identityʳ; *-inverseˡ; *-inverseʳ
-  ; *-distribʳ-+; pos⇒nonZero; pos*pos⇒pos; positive⁻¹)
+  ; +-inverseʳ; *-assoc; *-identityˡ; *-inverseʳ; pos⇒nonZero; pos*pos⇒pos
+  ; ≤-reflexive)
   renaming (<-trans to <-transQ)
 open import Relation.Nullary using (¬_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; cong₂; subst; module ≡-Reasoning)
+  (_≡_; refl; sym; trans; cong; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
 open import Real using
   (CauchySeq; embed; embed-*-hom; embed-mono-<; embed-suc-pos; reciprocal-cong)
 open CauchySeq renaming (f to seq-f)
 open import Real.Interval using (RealI; δ; δ-pos)
+open import Real.Interval.Rational using (recip-*-hom)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; negℝ)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-refl; ≈ℝ-sym; ≈ℝ-trans)
 open import Real.IntervalEquiv using
-  (l; u; centre; centre-u; u-mono; bound-w; n<2^n; realI→cauchy; node)
+  (l; u; pp; centre; centre-u; u-mono; bound-w; n<2^n; realI→cauchy; node)
 open import Real.Interval.Order using (_<ℝ_; <-irrefl)
 open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
 open import Real.Interval.Mul.Laws using
@@ -49,7 +50,7 @@ open import Real.Interval.Recip using
   (recipℝ; recipℝ'; recipCauchy; realI→posCauchy; PosCauchy; u-0ℝ)
 open import Real.CauchyToInterval using
   (cauchy→realI; M; node-go)
-open import Real.Interval.Kit using (recip-antitone; strict-recip)
+open import Real.Interval.Kit using (add-self; recip-antitone; strict-recip)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.Reasoning.Equiv
 
@@ -57,21 +58,6 @@ open import Real.Interval.Reasoning.Equiv
 -- Rational arithmetic helpers
 --
 -- 有理数算术辅助
-
--- Doubling as a sum.
---
--- 二倍写法。
-2q≡q+q : (q : ℚ) → embed 2 * q ≡ q + q
-2q≡q+q q =
-  begin
-    embed 2 * q
-      ≡⟨⟩
-    (1ℚ + 1ℚ) * q
-      ≡⟨ *-distribʳ-+ q 1ℚ 1ℚ ⟩
-    1ℚ * q + 1ℚ * q
-      ≡⟨ cong₂ _+_ (*-identityˡ q) (*-identityˡ q) ⟩
-    q + q
-  ∎
 
 -- Move an additive term to the other side of a strict inequality.
 --
@@ -91,91 +77,6 @@ add-cancel-< {a} {b} {c} s =
         ≡⟨ sym (+-assoc a b (neg b)) ⟩
       (a + b) + neg b
     ∎
-
--- Left cancellation of a positive factor.
---
--- 正因子的左消去。
-cancel-* : {c x y : ℚ} → (nz : NonZero c) → 0ℚ < c → c * x ≡ c * y → x ≡ y
-cancel-* {c} {x} {y} nz 0<c eq =
-  let ic : ℚ
-      ic = (1/_) c {{nz}}
-  in
-  begin
-    x
-      ≡⟨ sym (*-identityˡ x) ⟩
-    1ℚ * x
-      ≡⟨ sym (cong (_* x) (*-inverseˡ c {{nz}})) ⟩
-    ic * c * x
-      ≡⟨ *-assoc ic c x ⟩
-    ic * (c * x)
-      ≡⟨ cong (ic *_) eq ⟩
-    ic * (c * y)
-      ≡⟨ sym (*-assoc ic c y) ⟩
-    (ic * c) * y
-      ≡⟨ cong (_* y) (*-inverseˡ c {{nz}}) ⟩
-    1ℚ * y
-      ≡⟨ *-identityˡ y ⟩
-    y
-  ∎
-
--- The doubling identity for powers of two.
---
--- 二的幂的倍增关系。
-2*2^n≡ : ∀ n → 2 *N 2 ^ n ≡ 2 ^ suc n
-2*2^n≡ n = refl
-
--- Reciprocal of a product splits into the product of reciprocals.
---
--- 乘积的倒数分配。
-recip-mul : (A B : ℚ) (pA : Positive A) (pB : Positive B)
-  (nzA : NonZero A) (nzB : NonZero B) (nzAB : NonZero (A * B))
-  → (1/_) (A * B) {{nzAB}} ≡ (1/_) A {{nzA}} * (1/_) B {{nzB}}
-recip-mul A B pA pB nzA nzB nzAB = cancel-* nzAB 0<AB eq
-  where
-
-  pAB : Positive (A * B)
-  pAB = pos*pos⇒pos A {{pA}} B {{pB}}
-
-  0<AB : 0ℚ < A * B
-  0<AB = positive⁻¹ (A * B) {{pAB}}
-
-  iA : ℚ
-  iA = (1/_) A {{nzA}}
-
-  iB : ℚ
-  iB = (1/_) B {{nzB}}
-
-  step : (A * B) * iA ≡ B
-  step =
-    begin
-      (A * B) * iA
-        ≡⟨ cong (_* iA) (*-comm A B) ⟩
-      (B * A) * iA
-        ≡⟨ *-assoc B A iA ⟩
-      B * (A * iA)
-        ≡⟨ cong (B *_) (*-inverseʳ A {{nzA}}) ⟩
-      B * 1ℚ
-        ≡⟨ *-identityʳ B ⟩
-      B
-    ∎
-
-  rhs : (A * B) * (iA * iB) ≡ 1ℚ
-  rhs =
-    begin
-      (A * B) * (iA * iB)
-        ≡⟨ sym (*-assoc (A * B) iA iB) ⟩
-      ((A * B) * iA) * iB
-        ≡⟨ cong (_* iB) step ⟩
-      B * iB
-        ≡⟨ *-inverseʳ B {{nzB}} ⟩
-      1ℚ
-    ∎
-
-  lhs : (A * B) * (1/_) (A * B) {{nzAB}} ≡ 1ℚ
-  lhs = *-inverseʳ (A * B) {{nzAB}}
-
-  eq : (A * B) * (1/_) (A * B) {{nzAB}} ≡ (A * B) * (iA * iB)
-  eq = trans lhs (sym rhs)
 
 ------------------------------------------------------------------------
 -- Sign preservation: 0 < recipℝ x
@@ -311,7 +212,7 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
   inv< = strict-recip U (embed (2 ^ n)) 0<U U<e2n
 
   den-eq : embed (2 ^ suc n) ≡ A * B
-  den-eq = trans (cong embed (sym (2*2^n≡ n))) (embed-*-hom 2 (2 ^ n))
+  den-eq = trans (cong embed (sym (pp n))) (embed-*-hom 2 (2 ^ n))
 
   rec-step : iE ≡ iAB
   rec-step = reciprocal-cong (embed (2 ^ suc n)) (A * B) {{nzE}} {{nzAB}} den-eq
@@ -324,7 +225,7 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
       A * iE
         ≡⟨ cong (A *_) rec-step ⟩
       A * iAB
-        ≡⟨ cong (A *_) (recip-mul A B A-pos B-pos nzA nzB nzAB) ⟩
+      ≡⟨ cong (A *_) (recip-*-hom A B {{nzA}} {{nzB}} {{nzAB}}) ⟩
       A * (iA * iB)
         ≡⟨ sym (*-assoc A iA iB) ⟩
       (A * iA) * iB
@@ -346,9 +247,8 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
   δn<lR : δ n < seq-f cs (M cs n) - δ n
   δn<lR =
     add-cancel-<
-      (subst (λ z → z < seq-f cs (M cs n))
-             (2q≡q+q (δ n))
-             (<-≤-trans 2δ< hn≥))
+      (≤-<-trans (≤-reflexive (add-self (δ n)))
+                (<-≤-trans 2δ< hn≥))
 
   goal : u 0ℝ n < l (cauchy→realI cs) n
   goal =

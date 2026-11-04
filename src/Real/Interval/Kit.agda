@@ -10,9 +10,8 @@ module Real.Interval.Kit where
 
 open import Data.Nat using (ℕ; suc; _^_; _∸_; s≤s; z≤n)
   renaming (_*_ to _ℕ*_; _≤_ to _≤ℕ_; _+_ to _+ℕ_)
-open import Data.Nat.Properties using (*-suc; m≤m+n; ^-monoʳ-≤)
-  renaming (≤-trans to ≤-transℕ; ≤-reflexive to ≤-reflexiveℕ
-  ; *-assoc to *-assocℕ; *-comm to *-commℕ; *-identityʳ to *-identityʳℕ)
+open import Data.Nat.Properties using (m≤m+n; ^-monoʳ-≤)
+  renaming (≤-trans to ≤-transℕ; ≤-reflexive to ≤-reflexiveℕ; *-assoc to *-assocℕ)
 import Data.Nat.Properties as ℕP
 import Data.Integer.Properties as ℤP
 open import Data.Product using (_,_; Σ; proj₁; proj₂)
@@ -39,7 +38,8 @@ open import Real using
 open import Real.Interval using (RealI)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using
-  (centre; recipPow2; bound-w; pos-2^t; frac-strict; B<2^sucB; n<2^n; 1≤2^n)
+  (centre; recipPow2; bound-w; pos-2^t; frac-strict; B<2^sucB; 2m; n<2^n; 1≤2^n
+  ; recip≤1)
 open import Real.Interval.Rational using (suc∸1; 0<2^t; negsub; recip-*-hom)
 
 ------------------------------------------------------------------------
@@ -165,20 +165,8 @@ recipPow2-mono {n} {m} n≤m =
 --
 -- 自然数不等式
 
-n+n≡2n : ∀ n → n +ℕ n ≡ 2 ℕ* n
-n+n≡2n n =
-  sym (begin
-    2 ℕ* n
-      ≡⟨ *-commℕ 2 n ⟩
-    n ℕ* 2
-      ≡⟨ *-suc n 1 ⟩
-    n +ℕ (n ℕ* 1)
-      ≡⟨ cong (n +ℕ_) (*-identityʳℕ n) ⟩
-    n +ℕ n
-  ∎)
-
 n≤2n : ∀ n → n ≤ℕ 2 ℕ* n
-n≤2n n = ≤-transℕ (m≤m+n n n) (≤-reflexiveℕ (n+n≡2n n))
+n≤2n n = ≤-transℕ (m≤m+n n n) (≤-reflexiveℕ (sym (2m n)))
 
 2*2n≡4n : ∀ n → 2 ℕ* (2 ℕ* n) ≡ 4 ℕ* n
 2*2n≡4n n =
@@ -545,27 +533,6 @@ npos⇒∣p∣≡neg {x} x≤0 =
        ≡⟨ 0≤p⇒∣p∣≡p (neg-of-nonpos x≤0) ⟩ neg x ∎
 
 ------------------------------------------------------------------------
--- Reciprocal utilities
---
--- 倒数工具
-
--- The reciprocal of a positive rational at least 1 is at most 1.
---
--- 不小于 1 的正有理数，其倒数不大于 1。
-1≤⇒inv≤1 : {e : ℚ} ⦃ _ : NonZero e ⦄ → 0ℚ < e → 1ℚ ≤ e → (1/_) e ≤ 1ℚ
-1≤⇒inv≤1 {e} 0e p =
-  let inv = (1/_) e {{pos⇒nonZero e {{positive 0e}}}}
-      pinv : Positive inv
-      pinv = 1/pos⇒pos e {{positive 0e}}
-      q : inv * 1ℚ ≤ inv * e
-      q = *-monoˡ-≤-nonNeg inv {{pos⇒nonNeg inv {{pinv}}}} p
-      e1 : inv * e ≡ 1ℚ
-      e1 = *-inverseˡ e {{pos⇒nonZero e {{positive 0e}}}}
-  in subst (λ z → z ≤ 1ℚ) (*-identityʳ inv)
-       (subst (λ z → inv * 1ℚ ≤ z) e1 q)
-
-
-------------------------------------------------------------------------
 -- halveQ algebra
 --
 -- halveQ 的代数
@@ -707,12 +674,10 @@ recipPow2-mul a b =
 recipPow2-n≤1 : (n : ℕ) → recipPow2 n ≤ 1ℚ
 recipPow2-n≤1 n =
   let e = embed (2 ^ n)
-      0e : 0ℚ < e
-      0e = embed-mono-< (ℕP.≤-<-trans z≤n (n<2^n n))
       1≤e : 1ℚ ≤ e
       1≤e = embed-mono-≤ (1≤2^n n)
       q : (1/_) e {{nz2n n}} ≤ 1ℚ
-      q = 1≤⇒inv≤1 {{nz2n n}} 0e 1≤e
+      q = recip≤1 e 1≤e (nz2n n)
   in subst (λ z → z ≤ 1ℚ) (sym (recipPow2≡ n)) q
 
 -- Doubling the index gives a smaller reciprocal.

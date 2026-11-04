@@ -29,7 +29,7 @@ open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; div-add)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Rational using (sub-add)
 open import Real.Interval.Kit using
-  (recipPow2-mono; n≤2n; n≤4n; *-mono-≤-nonNeg; 0≤recipPow2)
+  (recipPow2-mono; n≤2n; n≤4n; *-mono-≤-nonNeg; 0≤recipPow2; recipPow2-n≤1)
 open import Base.RationalRing using (+interchange)
 open import Real.Interval.Reasoning
 
@@ -253,16 +253,6 @@ add2-nonNeg {p} {q} 0≤p 0≤q =
 0≤width-n : (r : RealI) (n : ℕ) → 0ℚ ≤ width r n
 0≤width-n r n = <⇒≤ (0<width (node r n))
 
-recipPow2≤1 : ∀ n → recipPow2 n ≤ 1ℚ
-recipPow2≤1 n =
-  begin≤
-    recipPow2 n
-      ≤⟨ recipPow2-mono (Data.Nat.z≤n {n}) ⟩
-    recipPow2 0
-      ≈⟨ refl ⟩
-    1ℚ
-  ≤∎
-
 rr≤r : ∀ {r : ℚ} → 0ℚ ≤ r → r ≤ 1ℚ → r * r ≤ r
 rr≤r {r} 0≤r r≤1 =
   begin≤
@@ -346,7 +336,7 @@ width-prod : (x y : RealI) (n : ℕ) →
 width-prod x y n =
   begin≤
     width x (2 ℕ* n) * width y (2 ℕ* n)
-      ≤⟨ prod-rec (0≤recipPow2 n) (recipPow2≤1 n)
+      ≤⟨ prod-rec (0≤recipPow2 n) (recipPow2-n≤1 n)
                    (width-rec x n) (width-rec y n)
                    (0≤width-n x (2 ℕ* n)) (0≤width-n y (2 ℕ* n))
                    (0≤width-n x 0) (0≤width-n y 0) ⟩
@@ -359,7 +349,7 @@ width-x-sum : (x y z : RealI) (n : ℕ) →
 width-x-sum x y z n =
   begin≤
     width x (2 ℕ* n) * width (y +ℝ z) (2 ℕ* n)
-      ≤⟨ prod-rec (0≤recipPow2 n) (recipPow2≤1 n)
+      ≤⟨ prod-rec (0≤recipPow2 n) (recipPow2-n≤1 n)
                    (width-rec x n) (width-sum-rec y z n)
                    (0≤width-n x (2 ℕ* n)) (0≤width-n (y +ℝ z) (2 ℕ* n))
                    (0≤width-n x 0)

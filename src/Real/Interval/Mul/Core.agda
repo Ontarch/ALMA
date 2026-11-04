@@ -37,9 +37,9 @@ open import Real.IntervalEquiv using
 open import Real.Interval.Rational using
   (sub-add; negsub)
 open import Real.Interval.Kit using
-  (*-mono-≤-nonNeg; add-self; 2ℚ*half≡1; 0≤half; half≤1; 0≤diff; 0≤recipPow2)
+  (*-mono-≤-nonNeg; add-self; 2ℚ*half≡1; 0≤half; recipPow2-n≤1; half≤1; 0≤diff; 0≤recipPow2)
 open import Real.Interval.Node using
-  (node-*ℝ; width-rec; mul-pair; mul-nonNeg; 0≤width-n; recipPow2≤1; rr≤r)
+  (node-*ℝ; width-rec; mul-pair; mul-nonNeg; 0≤width-n; rr≤r)
 open import Base.RationalRing using (*ʳ-sub; +interchange)
 open import Real.Interval.Reasoning
 
@@ -580,7 +580,7 @@ term1-prod x R n = begin≤
         ≤⟨ *-monoˡ-≤-nonNeg (width x 0 * width R 0)
             {{nonNegative (mul-nonNeg (0≤width-n x 0)
                                       (0≤width-n R 0))}}
-            (rr≤r {r = recipPow2 n} (0≤recipPow2 n) (recipPow2≤1 n)) ⟩
+            (rr≤r {r = recipPow2 n} (0≤recipPow2 n) (recipPow2-n≤1 n)) ⟩
       width x 0 * width R 0 * recipPow2 n
       ≤∎
 

@@ -9,17 +9,16 @@
 module Real.Interval.AbsMul where
 
 open import Data.Product using (_,_; proj₁; proj₂)
-open import Data.Nat using (ℕ; zero; suc) renaming (_*_ to _ℕ*_; _+_ to _+N_)
-open import Data.Nat.Properties using (+-suc; *-suc)
+open import Data.Nat using (ℕ) renaming (_+_ to _+N_)
 open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; ∣_∣; nonNegative)
   renaming (-_ to neg)
 open import Data.Rational.Properties using
   (≤-refl; ≤-reflexive; ≤-trans; <⇒≤; +-mono-≤; +-comm; +-assoc; +-identityʳ
-  ; +-identityˡ; +-inverseˡ; +-inverseʳ; *-assoc; *-comm; *-identityʳ; *-zeroˡ
+  ; +-identityˡ; +-inverseˡ; +-inverseʳ; *-assoc; *-comm; *-identityʳ
   ; *-distribʳ-+; ∣p+q∣≤∣p∣+∣q∣; ∣p*q∣≡∣p∣*∣q∣; ∣p∣≡p∨∣p∣≡-p
-  ; neg-distrib-+; 0≤∣p∣; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg; +-monoˡ-≤
-  ; ∣-p∣≡∣p∣; 0≤p⇒∣p∣≡p; *-distribˡ-+; *-zeroʳ; neg-distribˡ-*
-  ; neg-distribʳ-*; ∣∣p∣∣≡∣p∣)
+  ; neg-distrib-+; 0≤∣p∣; *-monoˡ-≤-nonNeg; +-monoˡ-≤; ∣-p∣≡∣p∣
+  ; 0≤p⇒∣p∣≡p; *-distribˡ-+; *-zeroʳ; neg-distribˡ-*; neg-distribʳ-*
+  ; ∣∣p∣∣≡∣p∣)
 open import Data.Sum using (inj₁; inj₂)
 open import Function.Base using (case_of_)
 open import Relation.Binary.PropositionalEquality using
@@ -32,10 +31,11 @@ open import Real.Interval using (RealI)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.IntervalEquiv using
-  (l; u; centre; width; width-n; node; recipPow2)
+  (l; u; 2m; centre; width; width-n; node; recipPow2)
 open import Real.Interval.Node using (0≤width-n)
 open import Real.Interval.Abs using (∣_∣ℝ; absLo; absHi)
 open import Real.Interval.Mul.Core using (term1; centre-mag)
+open import Real.Interval.Node using (mul-nonNeg)
 open import Real.Interval.Kit using
   (≈ℝ-of-rec; 0<half; halveQ; add-right; recipPow2-n≤1; recipPow2-mul
   ; 0≤recipPow2; *-mono-≤-nonNeg)
@@ -46,43 +46,6 @@ open import Real.Interval.AbsTriangle using (abs-centre-≤; centre-abs-node)
 -- Nonnegativity of the assembled constant
 --
 -- 组装常数的非负性
-
--- Two nonnegative rationals have a nonnegative sum.
---
--- 两个非负有理数之和非负。
-sum-nn : (a b : ℚ) → 0ℚ ≤ a → 0ℚ ≤ b → 0ℚ ≤ a + b
-sum-nn a b = +-mono-≤
-
--- The product of two nonnegative rationals is nonnegative.
---
--- 两个非负有理数之积非负。
-mul-nn : (a b : ℚ) → 0ℚ ≤ a → 0ℚ ≤ b → 0ℚ ≤ a * b
-mul-nn a b p q =
-  let q1 : 0ℚ * b ≤ a * b
-      q1 = *-monoʳ-≤-nonNeg b {{nonNegative q}} p
-  in subst (λ z → z ≤ a * b) (*-zeroˡ b) q1
-
--- Rewrite the multiplication-based depth as twice the addition-based
--- depth.
---
--- 把基于乘法的深度改写为两倍加法深度。
-mul2eq : (k : ℕ) → 2 ℕ* k ≡ k +N k
-mul2eq zero = refl
-mul2eq (suc k) =
-  let ih = mul2eq k
-      step : 2 +N (2 ℕ* k) ≡ 2 +N (k +N k)
-      step = cong (2 +N_) ih
-      step2 : 2 +N (k +N k) ≡ suc k +N suc k
-      step2 =
-        begin 2 +N (k +N k)
-          ≡⟨ refl ⟩
-        suc (suc k +N k)
-          ≡⟨ sym (+-suc (suc k) k) ⟩
-        suc k +N suc k
-        ∎
-      main : 2 +N (2 ℕ* k) ≡ suc k +N suc k
-      main = trans step step2
-  in subst (λ t → t ≡ suc k +N suc k) (sym (*-suc 2 k)) main
 
 -- Expand-diff the outer difference into a right-nested sum of
 -- consecutive differences.
@@ -252,7 +215,7 @@ term1' x R n =
     (λ d → ∣ centre (x *ℝ R) n - d ∣
            ≤ (width x 0 * width R 0 * half) * recipPow2 n)
     (cong₂ (λ p q → centre x p * centre R q)
-       (mul2eq n) (mul2eq n))
+       (2m n) (2m n))
     (term1 x R n)
 
 -- The constant is nonnegative.
@@ -276,17 +239,18 @@ abs-mul-K≥0 x y =
       wynn = 0≤width-n y 0
       c4nn : 0ℚ ≤ Cross4
       c4nn =
-        +-mono-≤ (+-mono-≤ (mul-nn My wx0 My0≤ wxnn)
-                           (mul-nn Mx wy0 Mx0≤ wynn))
-                 (mul-nn wx0 wy0 wxnn wynn)
+        +-mono-≤ (+-mono-≤ (mul-nonNeg {My} {wx0} My0≤ wxnn)
+                           (mul-nonNeg {Mx} {wy0} Mx0≤ wynn))
+                 (mul-nonNeg {wx0} {wy0} wxnn wynn)
       t1nn : 0ℚ ≤ T1
-      t1nn = mul-nn (wx0 * wy0) half
-               (mul-nn wx0 wy0 wxnn wynn) (<⇒≤ 0<half)
+      t1nn = mul-nonNeg {wx0 * wy0} {half}
+              (mul-nonNeg {wx0} {wy0} wxnn wynn) (<⇒≤ 0<half)
+
       tann : 0ℚ ≤ T1abs
-      tann = mul-nn (width ∣ x ∣ℝ 0 * width ∣ y ∣ℝ 0) half
-               (mul-nn (width ∣ x ∣ℝ 0) (width ∣ y ∣ℝ 0)
+      tann = mul-nonNeg {width ∣ x ∣ℝ 0 * width ∣ y ∣ℝ 0} {half}
+              (mul-nonNeg {width ∣ x ∣ℝ 0} {width ∣ y ∣ℝ 0}
                   (0≤width-n ∣ x ∣ℝ 0) (0≤width-n ∣ y ∣ℝ 0))
-               (<⇒≤ 0<half)
+              (<⇒≤ 0<half)
       wnn : 0ℚ ≤ Wxy0
       wnn = 0≤width-n (x *ℝ y) 0
       inner : 0ℚ ≤ 0ℚ + (Cross4 + T1abs)
@@ -493,8 +457,9 @@ abs-mul-h x y n =
         ≤-trans (term1' x y nn)
           (*-monoˡ-≤-nonNeg T1
             {{nonNegative
-               (mul-nn (wx0 * wy0) half
-                  (mul-nn wx0 wy0 (0≤width-n x 0) (0≤width-n y 0))
+              (mul-nonNeg {wx0 * wy0} {half}
+                  (mul-nonNeg {wx0} {wy0}
+                    (0≤width-n x 0) (0≤width-n y 0))
                   (<⇒≤ 0<half))}} r2≤r)
 
       -- e3: B vs bx*by.
@@ -504,7 +469,7 @@ abs-mul-h x y n =
       e3 =
         subst (λ d → ∣ B - d ∣ ≤ T1abs * r)
           (cong₂ (λ a b → centre ∣ x ∣ℝ a * centre ∣ y ∣ℝ b)
-             (mul2eq n) (mul2eq n))
+             (2m n) (2m n))
           (term1 ∣ x ∣ℝ ∣ y ∣ℝ n)
 
       -- e4: bx vs |cx4|.

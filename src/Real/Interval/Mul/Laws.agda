@@ -33,9 +33,9 @@ open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-trans)
 open import Real.Interval.Node using
   (centre-add; centre-0ℝ; centre-1ℝ; width-rec; width-rec4; width-prod
   ; width-sum-rec; width-x-sum; prod-rec; mul-nonNeg; add2-nonNeg
-  ; 0≤width-n; recipPow2≤1)
+  ; 0≤width-n)
 open import Real.Interval.Kit using
-  (≈ℝ-of-rec; half-drop; tri-diff; abs-swap; 2*2n≡4n
+  (≈ℝ-of-rec; half-drop; tri-diff; abs-swap; 2*2n≡4n; recipPow2-n≤1
   ; n≤2n; 2n≤4n; 0≤recipPow2; two-half; *-mono-≤-nonNeg)
 open import Real.Interval.Reasoning using (begin≤_; _≤⟨_⟩_; _≤∎)
 
@@ -408,7 +408,7 @@ distribʳ-rec1-aux x y z n =
               {b = width z (2 ℕ* n)}
               {b' = width z 0}
               {r = recipPow2 n}
-              (0≤recipPow2 n) (recipPow2≤1 n)
+              (0≤recipPow2 n) (recipPow2-n≤1 n)
               (width-sum-rec x y n) (width-rec z n)
               (0≤width-n (x +ℝ y) (2 ℕ* n)) (0≤width-n z (2 ℕ* n))
               (add2-nonNeg (0≤width-n x 0) (0≤width-n y 0))
@@ -771,7 +771,7 @@ module AssocCore (x y z : RealI) where
                 {b = width z (2 ℕ* n)}
                 {b' = width z 0}
                 {r = recipPow2 n}
-                (0≤recipPow2 n) (recipPow2≤1 n)
+                (0≤recipPow2 n) (recipPow2-n≤1 n)
                 (w2 (x *ℝ y) n) (w2 z n)
                 (0≤width-n (x *ℝ y) (2 ℕ* n)) (0≤width-n z (2 ℕ* n))
                 (0≤width-n (x *ℝ y) 0) (0≤width-n z 0))
@@ -790,7 +790,7 @@ module AssocCore (x y z : RealI) where
                                 {b = width y (4 ℕ* n)}
                                 {b' = width y 0}
                                 {r = recipPow2 n}
-                                (0≤recipPow2 n) (recipPow2≤1 n)
+                                (0≤recipPow2 n) (recipPow2-n≤1 n)
                                 (w4 x n) (w4 y n)
                                 (0≤width-n x (4 ℕ* n))
                                 (0≤width-n y (4 ℕ* n))
@@ -844,7 +844,7 @@ module AssocCore (x y z : RealI) where
                                 {b = width z (4 ℕ* n)}
                                 {b' = width z 0}
                                 {r = recipPow2 n}
-                                (0≤recipPow2 n) (recipPow2≤1 n)
+                                (0≤recipPow2 n) (recipPow2-n≤1 n)
                                 (w4 y n) (w4 z n)
                                 (0≤width-n y (4 ℕ* n))
                                 (0≤width-n z (4 ℕ* n))
@@ -866,7 +866,7 @@ module AssocCore (x y z : RealI) where
                 {b = width (y *ℝ z) (2 ℕ* n)}
                 {b' = width (y *ℝ z) 0}
                 {r = recipPow2 n}
-                (0≤recipPow2 n) (recipPow2≤1 n)
+                (0≤recipPow2 n) (recipPow2-n≤1 n)
                 (w2 x n) (w2 (y *ℝ z) n)
                 (0≤width-n x (2 ℕ* n)) (0≤width-n (y *ℝ z) (2 ℕ* n))
                 (0≤width-n x 0) (0≤width-n (y *ℝ z) 0))
