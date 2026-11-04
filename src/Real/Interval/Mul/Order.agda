@@ -39,7 +39,7 @@ open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-refl; ≈ℝ-sym; ≈ℝ
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.OrderLaws using (eps-below; <-+mono; <-neg; <-sub; ≈-<-resp)
 open import Real.Interval.ArithLaws using
-  (x-ℝx; +ℝ-assoc; +ℝ-inverseʳ; +ℝ-identityˡ; +ℝ-identityʳ)
+  (x-ℝx; +ℝ-assoc; +ℝ-inverseˡ; +ℝ-identityˡ; +ℝ-identityʳ)
 open import Real.Interval.Mul.Laws using (*ℝ-distribʳ-+)
 open import Real.Interval.Kit using
   (n≤2n; *-mono-≤-nonNeg; recip-antitone; ≈ℝ-of-eq)
@@ -517,6 +517,6 @@ pos*pos a b (n , δn<lan) (m , δm<lbm) = K , goal
       ≈ℝ-trans
         (+ℝ-assoc (y *ℝ z) (negℝ (x *ℝ z)) (x *ℝ z))
         (≈ℝ-trans
-          (+ℝ-cong (≈ℝ-refl {y *ℝ z}) (+ℝ-inverseʳ (x *ℝ z)))
+          (+ℝ-cong (≈ℝ-refl {y *ℝ z}) (+ℝ-inverseˡ (x *ℝ z)))
           (+ℝ-identityʳ (y *ℝ z)))
   in ≈-<-trans-helper (≈ℝ-sym left-eq) added right-eq

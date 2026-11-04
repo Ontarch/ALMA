@@ -10,16 +10,16 @@ module Real.Interval.Embed where
 
 open import Data.Nat using (ℕ) renaming (_*_ to _ℕ*_)
 open import Data.Product using (_,_)
-open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣) renaming (-_ to neg)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣)
+  renaming (-_ to neg)
 open import Data.Rational.Properties using
-  (+-identityˡ; +-identityʳ; +-inverseˡ; +-comm; +-assoc; *-identityˡ
-  ; *-identityʳ; *-assoc; *-comm; *-distribʳ-+; +-monoˡ-<)
+  (+-identityˡ; +-identityʳ; +-inverseˡ; +-comm; +-assoc; *-identityʳ; *-assoc
+  ; *-comm; +-monoˡ-<)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Real using (half; 2ℚ; 2ℚ≡1+1)
+open import Real using (half; 2ℚ)
 open import Real.Interval using (dyadic; δ; δ-half)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ)
 open import Real.Interval.Mul using (_*ℝ_)
@@ -30,7 +30,7 @@ open import Real.IntervalEquiv using (l; u; centre; width; recipPow2)
 open import Real.Interval.Node using
   (l-dyadic; u-dyadic; centre-add; centre-neg; mul-nonNeg; 0≤width-n)
 open import Real.Interval.Kit using
-  (≈ℝ-of-eq; ≈ℝ-of-rec; 0≤half; 2ℚ*half≡1; abs-swap)
+  (≈ℝ-of-eq; ≈ℝ-of-rec; 0≤half; add-self; 2ℚ*half≡1; abs-swap)
 open import Real.Interval.Mul.Core using (term1)
 
 ------------------------------------------------------------------------
@@ -145,7 +145,7 @@ centre-embedℚ q n =
     ((neg dn + q) + (dn + q)) * half
       ≡⟨ cong (_* half) sum ⟩
     (q + q) * half
-      ≡⟨ cong (_* half) q+q≡2*q ⟩
+      ≡⟨ cong (_* half) (add-self q) ⟩
     2ℚ * q * half
       ≡⟨ cong (_* half) (*-comm 2ℚ q) ⟩
     (q * 2ℚ) * half
@@ -156,17 +156,6 @@ centre-embedℚ q n =
       ≡⟨ *-identityʳ q ⟩
     q
       ∎
-  where
-    q+q≡2*q : q + q ≡ 2ℚ * q
-    q+q≡2*q = sym (begin
-      2ℚ * q
-        ≡⟨ cong (_* q) (sym 2ℚ≡1+1) ⟩
-      (1ℚ + 1ℚ) * q
-        ≡⟨ *-distribʳ-+ q 1ℚ 1ℚ ⟩
-      1ℚ * q + 1ℚ * q
-        ≡⟨ cong₂ _+_ (*-identityˡ q) (*-identityˡ q) ⟩
-      q + q
-        ∎)
 
 -- embedℚ preserves addition: both sides agree in centre at every
 -- depth.

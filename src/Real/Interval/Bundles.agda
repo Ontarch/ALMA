@@ -8,9 +8,16 @@
 
 module Real.Interval.Bundles where
 
+open import Algebra.Apartness using
+  (IsHeytingCommutativeRing; IsHeytingField; HeytingCommutativeRing; HeytingField)
+open import Algebra.Bundles using
+  (CommutativeMonoid; AbelianGroup; Ring; CommutativeRing)
+open import Algebra.Bundles.Raw using (RawSemiring; RawRing)
+open import Algebra.Definitions using (Invertible)
 open import Algebra.Structures using
   (IsMagma; IsSemigroup; IsMonoid; IsCommutativeMonoid; IsGroup; IsAbelianGroup
   ; IsRing; IsCommutativeRing)
+open import Level using (0ℓ)
 open import Data.Nat using (ℕ)
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.Rational using (ℚ; _+_; _*_; _<_; -_)
@@ -22,14 +29,16 @@ open import Relation.Binary.Definitions using (_Respects₂_)
 
 open import Real using (embed)
 open import Real.Interval using (RealI; embedℚ)
-open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-isEquivalence; ≈ℝ-trans)
-open import Real.Interval.Apartness using (_#ℝ_; #ℝ-isApartnessRelation)
+open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-isEquivalence; ≈ℝ-trans; ≈ℝ-sym)
+open import Real.Interval.Apartness using (_#ℝ_; #ℝ-isApartnessRelation; #ℝ-irrefl)
+open import Real.Interval.ApartnessInvertible using (invertible⇒#)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; _-ℝ_)
 open import Real.Interval.ArithLaws using
   (+ℝ-assoc; +ℝ-comm; +ℝ-identityˡ; +ℝ-identityʳ; +ℝ-inverseˡ; +ℝ-inverseʳ)
 open import Real.Interval.Mul using (_*ℝ_)
 open import Real.Interval.Mul.Laws using
-  (*ℝ-assoc; *ℝ-comm; *ℝ-identityˡ; *ℝ-identityʳ; *ℝ-distribˡ-+; *ℝ-distribʳ-+)
+  (*ℝ-assoc; *ℝ-comm; *ℝ-identityˡ; *ℝ-identityʳ; *ℝ-distribˡ-+; *ℝ-distribʳ-+
+  ; *ℝ-zeroˡ; *ℝ-zeroʳ)
 open import Real.Interval.Mul.Cong using (*ℝ-cong)
 open import Real.Interval.Mul.Order using (+ℝ-cong; ≈-neg; ≈-<-respʳ; <-*mono)
 open import Real.Interval.Order using (_<ℝ_; <-irrefl; <-trans)
@@ -38,11 +47,12 @@ open import Real.Interval.OrderLe using (≤ℝ-antisym)
 open import Real.Interval.OrderComplete.Base using (Subset; Located; emb<; _≤ℝ_)
 open import Real.Interval.OrderComplete using (order-complete)
 open import Real.Interval.Infimum using (LocatedBelow)
+open import Real.Interval.Infimum renaming (inf-complete to infimum-complete)
 open import Real.Interval.Inverse using (*ℝ-inverse)
 open import Real.Interval.Recip using (recipℝ')
 open import Real.Interval.Embed using (0ℝ<ℝ1ℝ; embedℚ-+; embedℚ-*; embedℚ-neg)
-open import Real.Interval.DensityArch
-  renaming (dense to dense-proof; archimedean to archimedean-proof)
+open import Real.Interval.DensityArch renaming
+  (dense to dense-proof; archimedean to archimedean-proof)
 
 ------------------------------------------------------------------------
 -- Additive group
@@ -70,7 +80,7 @@ open import Real.Interval.DensityArch
 +ℝ-isGroup : IsGroup _≈ℝ_ _+ℝ_ 0ℝ negℝ
 +ℝ-isGroup = record
   { isMonoid = +ℝ-isMonoid
-  ; inverse  = +ℝ-inverseʳ , +ℝ-inverseˡ
+  ; inverse  = +ℝ-inverseˡ , +ℝ-inverseʳ
   ; ⁻¹-cong  = ≈-neg
   }
 
@@ -131,30 +141,26 @@ open import Real.Interval.DensityArch
   }
 
 ------------------------------------------------------------------------
--- Constructive apartness ring: inverse only for apart elements
+-- Invertibility and tightness
 --
--- 构造性分离环：逆元只对分离元素保证
-
-record IsIntervalApartnessRing : Set₁ where
-  field
-    isCommutativeRing   :
-      IsCommutativeRing _≈ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
-    isApartnessRelation : IsApartnessRelation _≈ℝ_ _#ℝ_
-    #⇒invertible :
-      ∀ {x y : RealI} → x #ℝ y →
-      Σ RealI λ z → (z *ℝ (x -ℝ y) ≈ℝ 1ℝ)
-                    × ((x -ℝ y) *ℝ z ≈ℝ 1ℝ)
+-- stdlib's `Invertible _≈_ 1# _*_ d` unfolds to a pair of mutual
+-- inverses, and `Tight _≈_ _#_` unfolds to the two implications
+-- relating non-apartness and equivalence.
+--
+-- 可逆性与紧密性
+--
+-- stdlib 的 `Invertible _≈_ 1# _*_ d` 展开为一对互逆元素，
+-- `Tight _≈_ _#_` 展开为联系非分离与等价的两个蕴含式。
 
 private
-  #⇒invertible-proof :
-    ∀ {x y : RealI} → x #ℝ y →
-    Σ RealI λ z → (z *ℝ (x -ℝ y) ≈ℝ 1ℝ)
-                  × ((x -ℝ y) *ℝ z ≈ℝ 1ℝ)
-  #⇒invertible-proof {x} {y} (inj₁ x<y) =
+  #⇒invertible-stdlib : ∀ {x y : RealI} → x #ℝ y →
+    Σ RealI λ z →
+      (z *ℝ (x -ℝ y)) ≈ℝ 1ℝ × ((x -ℝ y) *ℝ z) ≈ℝ 1ℝ
+  #⇒invertible-stdlib {x} {y} (inj₁ x<y) =
     let
       d = x -ℝ y
       d<0 : d <ℝ 0ℝ
-      d<0 = ≈-<-respʳ (+ℝ-inverseˡ y)
+      d<0 = ≈-<-respʳ (+ℝ-inverseʳ y)
               (<-+mono x y (negℝ y) x<y)
       inv = recipℝ' d (inj₂ d<0)
       d*inv : d *ℝ inv ≈ℝ 1ℝ
@@ -162,11 +168,11 @@ private
       inv*d : inv *ℝ d ≈ℝ 1ℝ
       inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
     in inv , inv*d , d*inv
-  #⇒invertible-proof {x} {y} (inj₂ y<x) =
+  #⇒invertible-stdlib {x} {y} (inj₂ y<x) =
     let
       d = x -ℝ y
       0<d : 0ℝ <ℝ d
-      0<d = ≈-<-resp (+ℝ-inverseˡ y)
+      0<d = ≈-<-resp (+ℝ-inverseʳ y)
               (<-+mono y x (negℝ y) y<x)
       inv = recipℝ' d (inj₁ 0<d)
       d*inv : d *ℝ inv ≈ℝ 1ℝ
@@ -175,36 +181,49 @@ private
       inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
     in inv , inv*d , d*inv
 
-intervalApartnessRing : IsIntervalApartnessRing
-intervalApartnessRing = record
-  { isCommutativeRing   = +ℝ*ℝ-isCommutativeRing
-  ; isApartnessRelation = #ℝ-isApartnessRelation
-  ; #⇒invertible        = #⇒invertible-proof
-  }
+  invertible⇒#-stdlib : ∀ {x y : RealI} →
+    Σ RealI (λ z →
+      (z *ℝ (x -ℝ y)) ≈ℝ 1ℝ × ((x -ℝ y) *ℝ z) ≈ℝ 1ℝ) →
+    x #ℝ y
+  invertible⇒#-stdlib {x} {y} (z , zd , dz) =
+    invertible⇒# x y (z , dz , zd)
 
-------------------------------------------------------------------------
--- Constructive Heyting field: tightness
---
--- 构造性海廷域：紧密性
-
-record IsIntervalHeytingField : Set₁ where
-  field
-    isIntervalApartnessRing : IsIntervalApartnessRing
-    tight : ∀ {x y : RealI} → ¬ (x #ℝ y) → x ≈ℝ y
-
-private
-  tight-proof : ∀ {x y : RealI} → ¬ (x #ℝ y) → x ≈ℝ y
-  tight-proof {x} {y} ¬x#y = ≤ℝ-antisym {x} {y} ¬y<x ¬x<y
+  tight-forward : ∀ {x y : RealI} → ¬ (x #ℝ y) → x ≈ℝ y
+  tight-forward {x} {y} ¬x#y = ≤ℝ-antisym ¬y<x ¬x<y
     where
       ¬y<x : ¬ (y <ℝ x)
       ¬y<x y<x = ¬x#y (inj₂ y<x)
+
       ¬x<y : ¬ (x <ℝ y)
       ¬x<y x<y = ¬x#y (inj₁ x<y)
 
-intervalHeytingField : IsIntervalHeytingField
+  tight-full : Relation.Binary.Definitions.Tight _≈ℝ_ _#ℝ_
+  tight-full x y = tight-forward {x} {y} , #ℝ-irrefl {x} {y}
+
+------------------------------------------------------------------------
+-- stdlib IsHeytingCommutativeRing
+--
+-- stdlib 的 IsHeytingCommutativeRing 实例
+
+intervalHeytingCommutativeRing :
+  IsHeytingCommutativeRing _≈ℝ_ _#ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
+intervalHeytingCommutativeRing = record
+  { isCommutativeRing   = +ℝ*ℝ-isCommutativeRing
+  ; isApartnessRelation = #ℝ-isApartnessRelation
+  ; #⇒invertible        = #⇒invertible-stdlib
+  ; invertible⇒#        = invertible⇒#-stdlib
+  }
+
+------------------------------------------------------------------------
+-- stdlib IsHeytingField
+--
+-- stdlib 的 IsHeytingField 实例
+
+intervalHeytingField :
+  IsHeytingField _≈ℝ_ _#ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
 intervalHeytingField = record
-  { isIntervalApartnessRing = intervalApartnessRing
-  ; tight = tight-proof
+  { isHeytingCommutativeRing = intervalHeytingCommutativeRing
+  ; tight = tight-full
   }
 
 ------------------------------------------------------------------------
@@ -214,7 +233,8 @@ intervalHeytingField = record
 
 record IsIntervalOrderedField : Set₁ where
   field
-    isIntervalHeytingField : IsIntervalHeytingField
+    isIntervalHeytingField :
+      IsHeytingField _≈ℝ_ _#ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
     <-isStrictPartialOrder : IsStrictPartialOrder _≈ℝ_ _<ℝ_
     +-mono-<     : ∀ x y z → x <ℝ y → (x +ℝ z) <ℝ (y +ℝ z)
     *-mono-<-pos : ∀ x y z → x <ℝ y → 0ℝ <ℝ z →
@@ -228,7 +248,8 @@ private
   <-isStrictPartialOrder : IsStrictPartialOrder _≈ℝ_ _<ℝ_
   <-isStrictPartialOrder = record
     { isEquivalence = ≈ℝ-isEquivalence
-    ; irrefl        = λ {x} {y} x≈y x<y → <-irrefl y (≈-<-resp x≈y x<y)
+    ; irrefl = λ {x} {y} x≈y x<y →
+       <-irrefl y (≈-<-resp x≈y x<y)
     ; trans         = <-trans
     ; <-resp-≈      = <-resp-≈-structure
     }
@@ -271,8 +292,7 @@ intervalCompleteOrderedField = record
   ; sup-complete = λ P loc x₀ px₀ u₀ isUpper →
       order-complete {P = P} loc {x₀} px₀ {u₀} isUpper
   ; inf-complete = λ P locb x₀ px₀ l₀ isLower →
-      Real.Interval.Infimum.inf-complete
-        {P = P} locb {x₀} px₀ {l₀} isLower
+      infimum-complete {P = P} locb {x₀} px₀ {l₀} isLower
   }
 
 ------------------------------------------------------------------------
@@ -302,4 +322,68 @@ intervalArchimedeanField = record
   ; embed-<     = emb<
   ; dense       = λ x y p → dense-proof {x} {y} p
   ; archimedean = archimedean-proof
+  }
+
+------------------------------------------------------------------------
+-- stdlib bundles
+--
+-- stdlib 打包结构
+
+intervalCommutativeRing : CommutativeRing 0ℓ 0ℓ
+intervalCommutativeRing = record
+  { Carrier           = RealI
+  ; _≈_               = _≈ℝ_
+  ; _+_               = _+ℝ_
+  ; _*_               = _*ℝ_
+  ; -_                = negℝ
+  ; 0#                = 0ℝ
+  ; 1#                = 1ℝ
+  ; isCommutativeRing = +ℝ*ℝ-isCommutativeRing
+  }
+
+intervalRing : Ring 0ℓ 0ℓ
+intervalRing = CommutativeRing.ring intervalCommutativeRing
+
+intervalAbelianGroup : AbelianGroup 0ℓ 0ℓ
+intervalAbelianGroup =
+  CommutativeRing.+-abelianGroup intervalCommutativeRing
+
+intervalCommutativeMonoid : CommutativeMonoid 0ℓ 0ℓ
+intervalCommutativeMonoid =
+  CommutativeRing.*-commutativeMonoid intervalCommutativeRing
+
+intervalRawRing : RawRing 0ℓ 0ℓ
+intervalRawRing = record
+  { Carrier = RealI
+  ; _≈_     = _≈ℝ_
+  ; _+_     = _+ℝ_
+  ; _*_     = _*ℝ_
+  ; -_      = negℝ
+  ; 0#      = 0ℝ
+  ; 1#      = 1ℝ
+  }
+
+intervalRawSemiring : RawSemiring 0ℓ 0ℓ
+intervalRawSemiring = record
+  { Carrier = RealI
+  ; _≈_     = _≈ℝ_
+  ; _+_     = _+ℝ_
+  ; _*_     = _*ℝ_
+  ; 0#      = 0ℝ
+  ; 1#      = 1ℝ
+  }
+
+------------------------------------------------------------------------
+-- stdlib Heyting field bundles
+--
+-- stdlib 的海廷域打包结构
+
+intervalHeytingCommutativeRingBundle : HeytingCommutativeRing 0ℓ 0ℓ 0ℓ
+intervalHeytingCommutativeRingBundle = record
+  { isHeytingCommutativeRing = intervalHeytingCommutativeRing
+  }
+
+intervalHeytingFieldBundle : HeytingField 0ℓ 0ℓ 0ℓ
+intervalHeytingFieldBundle = record
+  { isHeytingField = intervalHeytingField
   }

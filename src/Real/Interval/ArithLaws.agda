@@ -114,22 +114,8 @@ open import Real.Interval.Node using (centre-add; centre-neg; centre-0ℝ)
 -- Inverses
 --
 -- 逆元
-+ℝ-inverseˡ : (x : RealI) → x +ℝ negℝ x ≈ℝ 0ℝ
++ℝ-inverseˡ : (x : RealI) → negℝ x +ℝ x ≈ℝ 0ℝ
 +ℝ-inverseˡ x = ≈ℝ-of-eq _ _ λ n →
-  begin
-    centre (x +ℝ negℝ x) n
-  ≡⟨ centre-add x (negℝ x) n ⟩
-    centre x n + centre (negℝ x) n
-  ≡⟨ cong (λ w → centre x n + w) (centre-neg x n) ⟩
-    centre x n + neg (centre x n)
-  ≡⟨ +-inverseʳ (centre x n) ⟩
-    0ℚ
-  ≡⟨ sym (centre-0ℝ n) ⟩
-    centre 0ℝ n
-  ∎
-
-+ℝ-inverseʳ : (x : RealI) → negℝ x +ℝ x ≈ℝ 0ℝ
-+ℝ-inverseʳ x = ≈ℝ-of-eq _ _ λ n →
   begin
     centre (negℝ x +ℝ x) n
   ≡⟨ centre-add (negℝ x) x n ⟩
@@ -137,6 +123,20 @@ open import Real.Interval.Node using (centre-add; centre-neg; centre-0ℝ)
   ≡⟨ cong (λ w → w + centre x n) (centre-neg x n) ⟩
     neg (centre x n) + centre x n
   ≡⟨ +-inverseˡ (centre x n) ⟩
+    0ℚ
+  ≡⟨ sym (centre-0ℝ n) ⟩
+    centre 0ℝ n
+  ∎
+
++ℝ-inverseʳ : (x : RealI) → x +ℝ negℝ x ≈ℝ 0ℝ
++ℝ-inverseʳ x = ≈ℝ-of-eq _ _ λ n →
+  begin
+    centre (x +ℝ negℝ x) n
+  ≡⟨ centre-add x (negℝ x) n ⟩
+    centre x n + centre (negℝ x) n
+  ≡⟨ cong (λ w → centre x n + w) (centre-neg x n) ⟩
+    centre x n + neg (centre x n)
+  ≡⟨ +-inverseʳ (centre x n) ⟩
     0ℚ
   ≡⟨ sym (centre-0ℝ n) ⟩
     centre 0ℝ n
@@ -173,7 +173,7 @@ negℝ-0ℝ = ≈ℝ-of-eq _ _ λ n →
 --
 -- 导出律
 x-ℝx : (x : RealI) → x -ℝ x ≈ℝ 0ℝ
-x-ℝx x = +ℝ-inverseˡ x
+x-ℝx x = +ℝ-inverseʳ x
 
 -ℝ-add : (x y z : RealI) → (x -ℝ y) +ℝ z ≈ℝ (x +ℝ z) -ℝ y
 -ℝ-add x y z = ≈ℝ-of-eq _ _ λ n →
