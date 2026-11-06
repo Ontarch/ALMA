@@ -21,13 +21,13 @@ open import Data.Nat using (ℕ)
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.Rational using (ℚ; _+_; _*_; _<_; -_)
 open import Data.Sum using (inj₁; inj₂)
-open import Relation.Nullary using (¬_)
-open import Relation.Binary.Structures using (IsStrictPartialOrder)
-open import Relation.Binary.Definitions using (_Respects₂_)
+open import Relation.Binary.Bundles using (Poset; StrictPartialOrder)
+open import Relation.Binary.Structures using (IsPartialOrder; IsStrictPartialOrder)
+open import Relation.Binary.Definitions using (Tight)
 
 open import Real using (embed)
 open import Real.Interval using (RealI; embedℚ)
-open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-isEquivalence; ≈ℝ-trans)
+open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-isEquivalence; ≈ℝ-trans; ≈ℝ-sym)
 open import Real.Interval.Apartness using (_#ℝ_; #ℝ-isApartnessRelation; #ℝ-irrefl)
 open import Real.Interval.ApartnessInvertible using (invertible⇒#)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; _-ℝ_)
@@ -40,7 +40,7 @@ open import Real.Interval.Mul.Cong using (*ℝ-cong)
 open import Real.Interval.Mul.Order using (+ℝ-cong; ≈-neg; ≈-<-respʳ; <-*mono)
 open import Real.Interval.Order using (_<ℝ_; <-irrefl; <-trans)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-+mono)
-open import Real.Interval.OrderLe using (≤ℝ-antisym)
+open import Real.Interval.OrderLe using (≤ℝ-trans; ≤ℝ-antisym)
 open import Real.Interval.OrderComplete.Base using (Subset; Located; emb<; _≤ℝ_)
 open import Real.Interval.OrderComplete using (order-complete)
 open import Real.Interval.Infimum using (LocatedBelow)
@@ -50,6 +50,7 @@ open import Real.Interval.Recip using (recipℝ')
 open import Real.Interval.Embed using (0ℝ<ℝ1ℝ; embedℚ-+; embedℚ-*; embedℚ-neg)
 open import Real.Interval.DensityArch renaming
   (dense to dense-proof; archimedean to archimedean-proof)
+open import Real.Interval.LimitLaws using (tight)
 
 ------------------------------------------------------------------------
 -- Additive group
@@ -140,67 +141,57 @@ open import Real.Interval.DensityArch renaming
 ------------------------------------------------------------------------
 -- Invertibility and tightness
 --
--- stdlib's `Invertible _≈_ 1# _*_ d` unfolds to a pair of mutual
--- inverses, and `Tight _≈_ _#_` unfolds to the two implications
+-- The standard library's notion of invertibility unfolds to a pair of
+-- mutual inverses, and tightness unfolds to the two implications
 -- relating non-apartness and equivalence.
 --
 -- 可逆性与紧密性
 --
--- stdlib 的 `Invertible _≈_ 1# _*_ d` 展开为一对互逆元素，
--- `Tight _≈_ _#_` 展开为联系非分离与等价的两个蕴含式。
+-- 标准库的可逆性展开为一对互逆元素，紧密性展开为联系非分离与等价
+-- 的两个蕴含式。
 
-private
-  #⇒invertible-stdlib : ∀ {x y : RealI} → x #ℝ y →
-    Σ RealI λ z →
-      (z *ℝ (x -ℝ y)) ≈ℝ 1ℝ × ((x -ℝ y) *ℝ z) ≈ℝ 1ℝ
-  #⇒invertible-stdlib {x} {y} (inj₁ x<y) =
-    let
-      d = x -ℝ y
-      d<0 : d <ℝ 0ℝ
-      d<0 = ≈-<-respʳ (+ℝ-inverseʳ y)
-              (<-+mono x y (negℝ y) x<y)
-      inv = recipℝ' d (inj₂ d<0)
-      d*inv : d *ℝ inv ≈ℝ 1ℝ
-      d*inv = *ℝ-inverse d (inj₂ d<0)
-      inv*d : inv *ℝ d ≈ℝ 1ℝ
-      inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
-    in inv , inv*d , d*inv
-  #⇒invertible-stdlib {x} {y} (inj₂ y<x) =
-    let
-      d = x -ℝ y
-      0<d : 0ℝ <ℝ d
-      0<d = ≈-<-resp (+ℝ-inverseʳ y)
-              (<-+mono y x (negℝ y) y<x)
-      inv = recipℝ' d (inj₁ 0<d)
-      d*inv : d *ℝ inv ≈ℝ 1ℝ
-      d*inv = *ℝ-inverse d (inj₁ 0<d)
-      inv*d : inv *ℝ d ≈ℝ 1ℝ
-      inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
-    in inv , inv*d , d*inv
+#⇒invertible-stdlib : ∀ {x y : RealI} → x #ℝ y →
+  Σ RealI λ z →
+    (z *ℝ (x -ℝ y)) ≈ℝ 1ℝ × ((x -ℝ y) *ℝ z) ≈ℝ 1ℝ
+#⇒invertible-stdlib {x} {y} (inj₁ x<y) =
+  let
+    d = x -ℝ y
+    d<0 : d <ℝ 0ℝ
+    d<0 = ≈-<-respʳ (+ℝ-inverseʳ y)
+            (<-+mono x y (negℝ y) x<y)
+    inv = recipℝ' d (inj₂ d<0)
+    d*inv : d *ℝ inv ≈ℝ 1ℝ
+    d*inv = *ℝ-inverse d (inj₂ d<0)
+    inv*d : inv *ℝ d ≈ℝ 1ℝ
+    inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
+  in inv , inv*d , d*inv
+#⇒invertible-stdlib {x} {y} (inj₂ y<x) =
+  let
+    d = x -ℝ y
+    0<d : 0ℝ <ℝ d
+    0<d = ≈-<-resp (+ℝ-inverseʳ y)
+            (<-+mono y x (negℝ y) y<x)
+    inv = recipℝ' d (inj₁ 0<d)
+    d*inv : d *ℝ inv ≈ℝ 1ℝ
+    d*inv = *ℝ-inverse d (inj₁ 0<d)
+    inv*d : inv *ℝ d ≈ℝ 1ℝ
+    inv*d = ≈ℝ-trans (*ℝ-comm inv d) d*inv
+  in inv , inv*d , d*inv
 
-  invertible⇒#-stdlib : ∀ {x y : RealI} →
-    Σ RealI (λ z →
-      (z *ℝ (x -ℝ y)) ≈ℝ 1ℝ × ((x -ℝ y) *ℝ z) ≈ℝ 1ℝ) →
-    x #ℝ y
-  invertible⇒#-stdlib {x} {y} (z , zd , dz) =
-    invertible⇒# x y (z , dz , zd)
+invertible⇒#-stdlib : ∀ {x y : RealI} →
+  Σ RealI (λ z →
+    (z *ℝ (x -ℝ y)) ≈ℝ 1ℝ × ((x -ℝ y) *ℝ z) ≈ℝ 1ℝ) →
+  x #ℝ y
+invertible⇒#-stdlib {x} {y} (z , zd , dz) =
+  invertible⇒# x y (z , dz , zd)
 
-  tight-forward : ∀ {x y : RealI} → ¬ (x #ℝ y) → x ≈ℝ y
-  tight-forward {x} {y} ¬x#y = ≤ℝ-antisym ¬y<x ¬x<y
-    where
-      ¬y<x : ¬ (y <ℝ x)
-      ¬y<x y<x = ¬x#y (inj₂ y<x)
-
-      ¬x<y : ¬ (x <ℝ y)
-      ¬x<y x<y = ¬x#y (inj₁ x<y)
-
-  tight-full : Relation.Binary.Definitions.Tight _≈ℝ_ _#ℝ_
-  tight-full x y = tight-forward {x} {y} , #ℝ-irrefl {x} {y}
+tight-full : Tight _≈ℝ_ _#ℝ_
+tight-full x y = tight {x} {y} , #ℝ-irrefl {x} {y}
 
 ------------------------------------------------------------------------
--- stdlib IsHeytingCommutativeRing
+-- The standard library IsHeytingCommutativeRing instance
 --
--- stdlib 的 IsHeytingCommutativeRing 实例
+-- 标准库的海廷交换环实例
 
 intervalHeytingCommutativeRing :
   IsHeytingCommutativeRing _≈ℝ_ _#ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
@@ -212,15 +203,67 @@ intervalHeytingCommutativeRing = record
   }
 
 ------------------------------------------------------------------------
--- stdlib IsHeytingField
+-- The standard library IsHeytingField instance
 --
--- stdlib 的 IsHeytingField 实例
+-- 标准库的海廷域实例
 
 intervalHeytingField :
   IsHeytingField _≈ℝ_ _#ℝ_ _+ℝ_ _*ℝ_ negℝ 0ℝ 1ℝ
 intervalHeytingField = record
   { isHeytingCommutativeRing = intervalHeytingCommutativeRing
   ; tight = tight-full
+  }
+
+------------------------------------------------------------------------
+-- Order bundles
+--
+-- The strict order is packaged as a standard library strict partial
+-- order and the non-strict order as a poset. Constructively the reals
+-- cannot carry a total order: totality of the non-strict order would
+-- imply LLPO.
+--
+-- 序打包
+--
+-- 严格序打包为标准库的严格偏序，非严格序打包为偏序集。构造性实数
+-- 不能携带全序：非严格序的全序性将蕴含 LLPO。
+
+intervalStrictPartialOrder : StrictPartialOrder 0ℓ 0ℓ 0ℓ
+intervalStrictPartialOrder = record
+  { Carrier              = RealI
+  ; _≈_                  = _≈ℝ_
+  ; _<_                  = _<ℝ_
+  ; isStrictPartialOrder = record
+      { isEquivalence = ≈ℝ-isEquivalence
+      ; irrefl        = λ {x} {y} x≈y x<y →
+          <-irrefl y (≈-<-resp x≈y x<y)
+      ; trans         = <-trans
+      ; <-resp-≈      = ≈-<-respʳ , ≈-<-resp
+      }
+  }
+
+-- Equality reflects into the non-strict order.
+--
+-- 等价可转化为非严格序。
+≤ℝ-reflexive : ∀ {x y} → x ≈ℝ y → x ≤ℝ y
+≤ℝ-reflexive {x} {y} x≈y y<x =
+  <-irrefl x (≈-<-resp (≈ℝ-sym x≈y) y<x)
+
+≤ℝ-isPartialOrder : IsPartialOrder _≈ℝ_ _≤ℝ_
+≤ℝ-isPartialOrder = record
+  { isPreorder = record
+    { isEquivalence = ≈ℝ-isEquivalence
+    ; reflexive     = ≤ℝ-reflexive
+    ; trans         = ≤ℝ-trans
+    }
+  ; antisym = ≤ℝ-antisym
+  }
+
+intervalPoset : Poset 0ℓ 0ℓ 0ℓ
+intervalPoset = record
+  { Carrier        = RealI
+  ; _≈_            = _≈ℝ_
+  ; _≤_            = _≤ℝ_
+  ; isPartialOrder = ≤ℝ-isPartialOrder
   }
 
 ------------------------------------------------------------------------
@@ -238,26 +281,14 @@ record IsIntervalOrderedField : Set₁ where
                    (x *ℝ z) <ℝ (y *ℝ z)
     0<1          : 0ℝ <ℝ 1ℝ
 
-private
-  <-resp-≈-structure : _<ℝ_ Respects₂ _≈ℝ_
-  <-resp-≈-structure = ≈-<-respʳ , ≈-<-resp
-
-  <-isStrictPartialOrder : IsStrictPartialOrder _≈ℝ_ _<ℝ_
-  <-isStrictPartialOrder = record
-    { isEquivalence = ≈ℝ-isEquivalence
-    ; irrefl = λ {x} {y} x≈y x<y →
-       <-irrefl y (≈-<-resp x≈y x<y)
-    ; trans         = <-trans
-    ; <-resp-≈      = <-resp-≈-structure
-    }
-
 intervalOrderedField : IsIntervalOrderedField
 intervalOrderedField = record
-  { isIntervalHeytingField   = intervalHeytingField
-  ; <-isStrictPartialOrder   = <-isStrictPartialOrder
-  ; +-mono-<                 = <-+mono
-  ; *-mono-<-pos             = <-*mono
-  ; 0<1                      = 0ℝ<ℝ1ℝ
+  { isIntervalHeytingField = intervalHeytingField
+  ; <-isStrictPartialOrder =
+      StrictPartialOrder.isStrictPartialOrder intervalStrictPartialOrder
+  ; +-mono-<               = <-+mono
+  ; *-mono-<-pos           = <-*mono
+  ; 0<1                    = 0ℝ<ℝ1ℝ
   }
 
 ------------------------------------------------------------------------
@@ -322,9 +353,9 @@ intervalArchimedeanField = record
   }
 
 ------------------------------------------------------------------------
--- stdlib bundles
+-- Standard library bundles
 --
--- stdlib 打包结构
+-- 标准库打包结构
 
 intervalCommutativeRing : CommutativeRing 0ℓ 0ℓ
 intervalCommutativeRing = record
@@ -371,9 +402,9 @@ intervalRawSemiring = record
   }
 
 ------------------------------------------------------------------------
--- stdlib Heyting field bundles
+-- Standard library Heyting field bundles
 --
--- stdlib 的海廷域打包结构
+-- 标准库的海廷域打包结构
 
 intervalHeytingCommutativeRingBundle : HeytingCommutativeRing 0ℓ 0ℓ 0ℓ
 intervalHeytingCommutativeRingBundle = record

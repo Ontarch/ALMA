@@ -50,134 +50,133 @@ open import Real.Interval.Rational using (sub-add; max-neg; min-neg)
 --
 -- 辅助引理
 
-private
-  0<2^n-ℕ : ∀ n → 0 <ℕ 2 ^ n
-  0<2^n-ℕ zero    = s≤s z≤n
-  0<2^n-ℕ (suc n) = ≤ℕ-trans (s≤s z≤n) (*-monoʳ-≤ 2 (0<2^n-ℕ n))
+0<2^n-ℕ : ∀ n → 0 <ℕ 2 ^ n
+0<2^n-ℕ zero    = s≤s z≤n
+0<2^n-ℕ (suc n) = ≤ℕ-trans (s≤s z≤n) (*-monoʳ-≤ 2 (0<2^n-ℕ n))
 
-  2*2^n≡2^n+2^n : ∀ n → 2 ℕ* 2 ^ n ≡ 2 ^ n +ℕ 2 ^ n
-  2*2^n≡2^n+2^n n =
-    begin
-      2 ℕ* 2 ^ n
-    ≡⟨ *-commℕ 2 (2 ^ n) ⟩
-      2 ^ n ℕ* 2
-    ≡⟨ *-suc (2 ^ n) 1 ⟩
-      2 ^ n +ℕ (2 ^ n ℕ* 1)
-    ≡⟨ cong ((2 ^ n) +ℕ_) (*-identityʳℕ (2 ^ n)) ⟩
-      2 ^ n +ℕ 2 ^ n
-    ∎
+2*2^n≡2^n+2^n : ∀ n → 2 ℕ* 2 ^ n ≡ 2 ^ n +ℕ 2 ^ n
+2*2^n≡2^n+2^n n =
+  begin
+    2 ℕ* 2 ^ n
+  ≡⟨ *-commℕ 2 (2 ^ n) ⟩
+    2 ^ n ℕ* 2
+  ≡⟨ *-suc (2 ^ n) 1 ⟩
+    2 ^ n +ℕ (2 ^ n ℕ* 1)
+  ≡⟨ cong ((2 ^ n) +ℕ_) (*-identityʳℕ (2 ^ n)) ⟩
+    2 ^ n +ℕ 2 ^ n
+  ∎
 
-  sucn≤2^n : ∀ n → suc n ≤ℕ 2 ^ n
-  sucn≤2^n zero = s≤s z≤n
-  sucn≤2^n (suc n) =
-    let
-      ih : suc n ≤ℕ 2 ^ n
-      ih = sucn≤2^n n
-      step1 : suc (suc n) ≤ℕ suc (2 ^ n)
-      step1 = s≤s {m = suc n} {n = 2 ^ n} ih
-      step2 : suc (2 ^ n) ≤ℕ 2 ^ n +ℕ 2 ^ n
-      step2 = m<m+n (2 ^ n) {2 ^ n} (0<2^n-ℕ n)
-      step3 : suc (suc n) ≤ℕ 2 ^ n +ℕ 2 ^ n
-      step3 = ≤ℕ-trans step1 step2
-      step4 : 2 ^ n +ℕ 2 ^ n ≡ 2 ^ suc n
-      step4 = sym (2*2^n≡2^n+2^n n)
-    in subst (λ z → suc (suc n) ≤ℕ z) step4 step3
+sucn≤2^n : ∀ n → suc n ≤ℕ 2 ^ n
+sucn≤2^n zero = s≤s z≤n
+sucn≤2^n (suc n) =
+  let
+    ih : suc n ≤ℕ 2 ^ n
+    ih = sucn≤2^n n
+    step1 : suc (suc n) ≤ℕ suc (2 ^ n)
+    step1 = s≤s {m = suc n} {n = 2 ^ n} ih
+    step2 : suc (2 ^ n) ≤ℕ 2 ^ n +ℕ 2 ^ n
+    step2 = m<m+n (2 ^ n) {2 ^ n} (0<2^n-ℕ n)
+    step3 : suc (suc n) ≤ℕ 2 ^ n +ℕ 2 ^ n
+    step3 = ≤ℕ-trans step1 step2
+    step4 : 2 ^ n +ℕ 2 ^ n ≡ 2 ^ suc n
+    step4 = sym (2*2^n≡2^n+2^n n)
+  in subst (λ z → suc (suc n) ≤ℕ z) step4 step3
 
-  δ≤ε : ∀ j → δ j ≤ ε j
-  δ≤ε j =
-    recip-antitone
-      {a = embed (suc j)} {b = embed (2 ^ suc j)}
-      (positive⁻¹ (embed (suc j)) {{embed-suc-pos}})
-      (embed-mono-≤ suclemma)
-    where
-      suclemma : suc j ≤ℕ 2 ^ suc j
-      suclemma =
-        ≤ℕ-trans (sucn≤2^n j)
-                 (subst (λ z → 2 ^ j ≤ℕ z)
-                        (sym (2*2^n≡2^n+2^n j))
-                        (m≤m+n (2 ^ j) (2 ^ j)))
+δ≤ε : ∀ j → δ j ≤ ε j
+δ≤ε j =
+  recip-antitone
+    {a = embed (suc j)} {b = embed (2 ^ suc j)}
+    (positive⁻¹ (embed (suc j)) {{embed-suc-pos}})
+    (embed-mono-≤ suclemma)
+  where
+    suclemma : suc j ≤ℕ 2 ^ suc j
+    suclemma =
+      ≤ℕ-trans (sucn≤2^n j)
+                (subst (λ z → 2 ^ j ≤ℕ z)
+                      (sym (2*2^n≡2^n+2^n j))
+                      (m≤m+n (2 ^ j) (2 ^ j)))
 
-  δ-mono : ∀ {j K} → j ≤ℕ K → δ K ≤ δ j
-  δ-mono {j} {K} j≤K =
-    recip-antitone
-      {a = embed (2 ^ suc j)} {b = embed (2 ^ suc K)}
-      (positive⁻¹ (embed (2 ^ suc j)) {{pos-pow j}})
-      (embed-mono-≤ (^-monoʳ-≤ 2 (s≤s j≤K)))
+δ-mono : ∀ {j K} → j ≤ℕ K → δ K ≤ δ j
+δ-mono {j} {K} j≤K =
+  recip-antitone
+    {a = embed (2 ^ suc j)} {b = embed (2 ^ suc K)}
+    (positive⁻¹ (embed (2 ^ suc j)) {{pos-pow j}})
+    (embed-mono-≤ (^-monoʳ-≤ 2 (s≤s j≤K)))
 
-  neg-max4 : ∀ a b c d →
+neg-max4 : ∀ a b c d →
+  neg (((a ⊔ b) ⊔ (c ⊔ d)))
+  ≡ ((neg a ⊓ neg b) ⊓ (neg c ⊓ neg d))
+neg-max4 a b c d =
+  begin
     neg (((a ⊔ b) ⊔ (c ⊔ d)))
-    ≡ ((neg a ⊓ neg b) ⊓ (neg c ⊓ neg d))
-  neg-max4 a b c d =
-    begin
-      neg (((a ⊔ b) ⊔ (c ⊔ d)))
-    ≡⟨ sym (min-neg (a ⊔ b) (c ⊔ d)) ⟩
-      neg (a ⊔ b) ⊓ neg (c ⊔ d)
-    ≡⟨ sym (cong₂ _⊓_ (min-neg a b) (min-neg c d)) ⟩
-      (neg a ⊓ neg b) ⊓ (neg c ⊓ neg d)
-    ∎
+  ≡⟨ sym (min-neg (a ⊔ b) (c ⊔ d)) ⟩
+    neg (a ⊔ b) ⊓ neg (c ⊔ d)
+  ≡⟨ sym (cong₂ _⊓_ (min-neg a b) (min-neg c d)) ⟩
+    (neg a ⊓ neg b) ⊓ (neg c ⊓ neg d)
+  ∎
 
-  neg-min4 : ∀ a b c d →
+neg-min4 : ∀ a b c d →
+  neg (((a ⊓ b) ⊓ (c ⊓ d)))
+  ≡ ((neg a ⊔ neg b) ⊔ (neg c ⊔ neg d))
+neg-min4 a b c d =
+  begin
     neg (((a ⊓ b) ⊓ (c ⊓ d)))
-    ≡ ((neg a ⊔ neg b) ⊔ (neg c ⊔ neg d))
-  neg-min4 a b c d =
-    begin
-      neg (((a ⊓ b) ⊓ (c ⊓ d)))
-    ≡⟨ sym (max-neg (a ⊓ b) (c ⊓ d)) ⟩
-      neg (a ⊓ b) ⊔ neg (c ⊓ d)
-    ≡⟨ sym (cong₂ _⊔_ (max-neg a b) (max-neg c d)) ⟩
-      (neg a ⊔ neg b) ⊔ (neg c ⊔ neg d)
-    ∎
+  ≡⟨ sym (max-neg (a ⊓ b) (c ⊓ d)) ⟩
+    neg (a ⊓ b) ⊔ neg (c ⊓ d)
+  ≡⟨ sym (cong₂ _⊔_ (max-neg a b) (max-neg c d)) ⟩
+    (neg a ⊔ neg b) ⊔ (neg c ⊔ neg d)
+  ∎
 
-  l-prod-pos : (a b : RealI) →
-    0ℚ < RealI.l a → 0ℚ < RealI.l b →
-    RealI.l (a *ℝ b) ≡ RealI.l a * RealI.l b
-  l-prod-pos a b 0<la 0<lb =
-    let
-      La = RealI.l a; Ua = RealI.u a
-      Lb = RealI.l b; Ub = RealI.u b
-      c1 = La * Lb; c2 = La * Ub; c3 = Ua * Lb; c4 = Ua * Ub
-      0≤La = <⇒≤ 0<la
-      0≤Lb = <⇒≤ 0<lb
-      c1≤c2 = *-monoˡ-≤-nonNeg La {{nonNegative 0≤La}} (<⇒≤ (RealI.lo b))
-      c1≤c3 = *-monoʳ-≤-nonNeg Lb {{nonNegative 0≤Lb}} (<⇒≤ (RealI.lo a))
-      c3≤c4 = *-monoˡ-≤-nonNeg Ua
-                {{nonNegative (≤-trans 0≤La (<⇒≤ (RealI.lo a)))}}
-                (<⇒≤ (RealI.lo b))
-    in   begin
-            (c1 ⊓ c2) ⊓ (c3 ⊓ c4)
-          ≡⟨ cong (λ z → z ⊓ (c3 ⊓ c4)) (p≤q⇒p⊓q≡p c1≤c2) ⟩
-            c1 ⊓ (c3 ⊓ c4)
-          ≡⟨ cong (c1 ⊓_) (p≤q⇒p⊓q≡p c3≤c4) ⟩
-            c1 ⊓ c3
-          ≡⟨ p≤q⇒p⊓q≡p c1≤c3 ⟩
-            c1
-          ∎
+l-prod-pos : (a b : RealI) →
+  0ℚ < RealI.l a → 0ℚ < RealI.l b →
+  RealI.l (a *ℝ b) ≡ RealI.l a * RealI.l b
+l-prod-pos a b 0<la 0<lb =
+  let
+    La = RealI.l a; Ua = RealI.u a
+    Lb = RealI.l b; Ub = RealI.u b
+    c1 = La * Lb; c2 = La * Ub; c3 = Ua * Lb; c4 = Ua * Ub
+    0≤La = <⇒≤ 0<la
+    0≤Lb = <⇒≤ 0<lb
+    c1≤c2 = *-monoˡ-≤-nonNeg La {{nonNegative 0≤La}} (<⇒≤ (RealI.lo b))
+    c1≤c3 = *-monoʳ-≤-nonNeg Lb {{nonNegative 0≤Lb}} (<⇒≤ (RealI.lo a))
+    c3≤c4 = *-monoˡ-≤-nonNeg Ua
+              {{nonNegative (≤-trans 0≤La (<⇒≤ (RealI.lo a)))}}
+              (<⇒≤ (RealI.lo b))
+  in   begin
+          (c1 ⊓ c2) ⊓ (c3 ⊓ c4)
+        ≡⟨ cong (λ z → z ⊓ (c3 ⊓ c4)) (p≤q⇒p⊓q≡p c1≤c2) ⟩
+          c1 ⊓ (c3 ⊓ c4)
+        ≡⟨ cong (c1 ⊓_) (p≤q⇒p⊓q≡p c3≤c4) ⟩
+          c1 ⊓ c3
+        ≡⟨ p≤q⇒p⊓q≡p c1≤c3 ⟩
+          c1
+        ∎
 
-  u-dyadic-0 : (K : ℕ) → u 0ℝ K ≡ δ K
-  u-dyadic-0 K =
-    begin
-      u 0ℝ K
-    ≡⟨ u-dyadic 0ℚ K ⟩
-      δ K + 0ℚ
-    ≡⟨ +-identityʳ (δ K) ⟩
-      δ K
-    ∎
+u-dyadic-0 : (K : ℕ) → u 0ℝ K ≡ δ K
+u-dyadic-0 K =
+  begin
+    u 0ℝ K
+  ≡⟨ u-dyadic 0ℚ K ⟩
+    δ K + 0ℚ
+  ≡⟨ +-identityʳ (δ K) ⟩
+    δ K
+  ∎
 
-  abs-neg : ∀ {a b : ℚ} → ∣ neg a - neg b ∣ ≡ ∣ a - b ∣
-  abs-neg {a} {b} =
-    begin
-      ∣ neg a - neg b ∣
-    ≡⟨ cong ∣_∣ (sym (neg-distrib-+ a (neg b))) ⟩
-      ∣ neg (a + neg b) ∣
-    ≡⟨ ∣-p∣≡∣p∣ (a - b) ⟩
-      ∣ a - b ∣
-    ∎
+abs-neg : ∀ {a b : ℚ} → ∣ neg a - neg b ∣ ≡ ∣ a - b ∣
+abs-neg {a} {b} =
+  begin
+    ∣ neg a - neg b ∣
+  ≡⟨ cong ∣_∣ (sym (neg-distrib-+ a (neg b))) ⟩
+    ∣ neg (a + neg b) ∣
+  ≡⟨ ∣-p∣≡∣p∣ (a - b) ⟩
+    ∣ a - b ∣
+  ∎
 
-  neg-flip : ∀ {x y : ℚ} → neg x < neg y → y < x
-  neg-flip {x} {y} h =
-    subst₂ _<_
-      (neg-involutive y) (neg-involutive x)
-      (neg-antimono-< {neg x} {neg y} h)
+neg-flip : ∀ {x y : ℚ} → neg x < neg y → y < x
+neg-flip {x} {y} h =
+  subst₂ _<_
+    (neg-involutive y) (neg-involutive x)
+    (neg-antimono-< {neg x} {neg y} h)
 
 ------------------------------------------------------------------------
 -- Approximate equality and negation

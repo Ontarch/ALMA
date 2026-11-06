@@ -52,4 +52,5 @@ html: $(EVERYTHING) $(INDEX)
 
 clean:
 	find src -name '*.agdai' -delete
+	rm -rf _build
 	rm -f $(EVERYTHING) $(INDEX)
