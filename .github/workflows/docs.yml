@@ -100,12 +100,12 @@ jobs:
                   content = f.read()
 
               injected_html = """
-              <span style="display: inline-flex; align-items: center; gap: 12px; background-color: #f6f8fa; border-left: 4px solid #28a745; padding: 6px 14px; margin: 8px 0; border-radius: 4px; font-family: sans-serif; font-size: 13px; white-space: nowrap;">
+              <div style="margin-top: 12px; margin-bottom: 12px; font-family: sans-serif; font-size: 14px; white-space: nowrap;">
                   <strong style="color: #24292e;">📊 Interactive Graphs:</strong>
-                  <a href="deps-project.html" target="_blank" style="color: #0366d6; text-decoration: none; font-weight: 600;">Full Project (240 nodes)</a>
-                  <span style="color: #d1d5da;">|</span>
+                  <a href="deps-project.html" target="_blank" style="color: #0366d6; text-decoration: none; font-weight: 600; margin-left: 12px;">Full Project (240 nodes)</a>
+                  <span style="color: #d1d5da; margin: 0 8px;">|</span>
                   <a href="deps-real.html" target="_blank" style="color: #28a745; text-decoration: none; font-weight: 600;">Real Module (57 nodes)</a>
-              </span>
+              </div>
               """
 
               pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)'
