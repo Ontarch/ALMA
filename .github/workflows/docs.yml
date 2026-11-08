@@ -83,6 +83,43 @@ jobs:
       - name: Generate Agda HTML documentation
         run: make html
 
+      - name: Copy interactive HTML to docs
+        run: |
+          cp src/deps-project.html ./docs/ || true
+          cp src/deps-real.html ./docs/ || true
+
+      - name: Inject interactive graph link into index.html
+        run: |
+          python3 - << 'EOF'
+          import os
+
+          index_path = './docs/index.html'
+          if os.path.exists(index_path):
+              with open(index_path, 'r', encoding='utf-8') as f:
+                  content = f.read()
+
+              injected_html = """
+              <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px;">
+                  <strong style="margin-right: 15px; font-size: 16px;">📊 交互式架构图：</strong>
+                  <a href="deps-project.html" target="_blank" style="background-color: #007bff; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 10px;">全项目依赖图 (240 节点)</a>
+                  <a href="deps-real.html" target="_blank" style="background-color: #28a745; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold;">Real 模块依赖图 (57 节点)</a>
+              </div>
+              """
+
+              target = '<a href="Everything.html">Everything</a>'
+              if target in content:
+                  content = content.replace(target, target + injected_html)
+                  print("Successfully injected links after 'import Everything'.")
+              else:
+                  content = content.replace('</body>', injected_html + '</body>')
+                  print("Injected at the end of body.")
+
+              with open(index_path, 'w', encoding='utf-8') as f:
+                  f.write(content)
+          else:
+              print("Error: ./docs/index.html not found!")
+          EOF
+
       - name: Debug – list generated files
         run: |
           echo "=== docs/ tree (first 80) ==="
