@@ -83,10 +83,55 @@ jobs:
       - name: Generate Agda HTML documentation
         run: make html
 
+      - name: Auto-generate Dependency Graphs
+        run: |
+          agda --dependency-graph=src/deps.dot src/Everything.agda
+          
+          python3 - << 'EOF'
+          import re
+          import subprocess
+
+          def filter_and_generate(in_file, out_dot, prefixes, out_html):
+              nodes = {}
+              edges = []
+              node_re = re.compile(r'\s*(m\d+)\[label="([^"]+)"\];')
+              edge_re = re.compile(r'\s*(m\d+)\s*->\s*(m\d+);')
+              
+              with open(in_file) as f:
+                  for line in f:
+                      m = node_re.match(line)
+                      if m:
+                          nodes[m.group(1)] = m.group(2)
+                          continue
+                      m = edge_re.match(line)
+                      if m:
+                          edges.append((m.group(1), m.group(2)))
+                          
+              keep = {i for i, name in nodes.items() if any(name.startswith(p) for p in prefixes)}
+              kept_edges = [(a, b) for a, b in edges if a in keep and b in keep]
+              
+              with open(out_dot, 'w') as f:
+                  f.write('digraph dependencies {\n')
+                  for i, name in nodes.items():
+                      if i in keep:
+                          f.write(f'   {i}[label="{name}"];\n')
+                  for a, b in kept_edges:
+                      f.write(f'   {a} -> {b};\n')
+                  f.write('}\n')
+              
+              subprocess.run(['python3', 'src/dot_to_html.py', out_dot, out_html], check=True)
+
+          project_prefixes = ('Base.', 'Cosmos.', 'Equivalence.', 'Physics.', 'Real.', 'SecondPass.', 'SketchPass.', 'Wellspring.', 'Everything')
+          filter_and_generate('src/deps.dot', 'deps-project.dot', project_prefixes, 'deps-project.html')
+
+          real_prefixes = ('Real',)
+          filter_and_generate('src/deps.dot', 'deps-real.dot', real_prefixes, 'deps-real.html')
+          EOF
+
       - name: Copy interactive HTML to docs
         run: |
-          cp src/deps-project.html ./docs/ || true
-          cp src/deps-real.html ./docs/ || true
+          cp deps-project.html ./docs/ || true
+          cp deps-real.html ./docs/ || true
 
       - name: Inject interactive graph link into index.html
         run: |
@@ -96,30 +141,36 @@ jobs:
 
           index_path = './docs/index.html'
           if os.path.exists(index_path):
+              def get_node_count(filepath):
+                  try:
+                      with open(filepath, 'r', encoding='utf-8') as f:
+                          content = f.read()
+                          m = re.search(r'Nodes:\s*(\d+)', content)
+                          if m: return m.group(1)
+                  except:
+                      pass
+                  return "?"
+
+              proj_nodes = get_node_count('deps-project.html')
+              real_nodes = get_node_count('deps-real.html')
+
               with open(index_path, 'r', encoding='utf-8') as f:
                   content = f.read()
 
-              injected_html = """
-              <br><span style="font-family: sans-serif; font-size: 14px; white-space: nowrap; display: inline-block; padding: 4px 0;">
-                  Interactive Graphs:
-                  <a href="deps-project.html" target="_blank" style="color: #0366d6; text-decoration: none; font-weight: 600; margin-left: 8px;">Full Project (240 nodes)</a>
-                  <span style="color: #d1d5da; margin: 0 8px;">|</span>
-                  <a href="deps-real.html" target="_blank" style="color: #28a745; text-decoration: none; font-weight: 600;">Real Module (57 nodes)</a>
-              </span><br>
-              """
+              injected_html = f"<br><span style=\"font-family: sans-serif; font-size: 14px; white-space: nowrap;\">Interactive Graphs: <a href=\"deps-project.html\" target=\"_blank\" style=\"color: #0366d6; text-decoration: none; font-weight: 600; margin-left: 8px;\">Full Project ({proj_nodes} nodes)</a> <span style=\"color: #d1d5da; margin: 0 8px;\">|</span> <a href=\"deps-real.html\" target=\"_blank\" style=\"color: #28a745; text-decoration: none; font-weight: 600;\">Real Module ({real_nodes} nodes)</a></span><br>"
               
               pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)\s*'
               
               if re.search(pattern, content):
                   content = re.sub(pattern, r'\1' + injected_html, content, count=1)
-                  print("Successfully injected and cleaned trailing whitespace.")
               else:
                   target_text = 'import Everything'
                   if target_text in content:
                       content = content.replace(target_text, target_text + injected_html, 1)
-                      print("Injected after text 'import Everything'.")
                   else:
-                      print("Warning: Could not find insertion point.")
+                      target_all = '-- All modules'
+                      if target_all in content:
+                          content = content.replace(target_all, injected_html + target_all, 1)
                   
               with open(index_path, 'w', encoding='utf-8') as f:
                   f.write(content)
