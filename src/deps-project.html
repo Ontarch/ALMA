@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Agda Dependencies</title>
+<style>
+  body { margin:0; font-family:monospace; background:#f4f5f7; overflow:hidden; user-select:none; }
+  #search { position:absolute; top:15px; left:15px; z-index:100; padding:8px 12px; border:1px solid #ccc; border-radius:4px; width:300px; font-size:14px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  #viewport { position:absolute; top:0; left:0; transform-origin: 0 0; cursor:grab; }
+  #viewport:active { cursor:grabbing; }
+  
+  .node { position:absolute; padding:6px 10px; background:#fff; border:1.5px solid #6c757d; border-radius:16px; font-size:12px; cursor:pointer; transform:translate(-50%, -50%); white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: background 0.2s, border-color 0.2s, opacity 0.2s; z-index:2; }
+  .node:hover { border-color: #007bff; box-shadow: 0 4px 8px rgba(0,123,255,0.2); }
+  .node.highlight { background:#ffe066; border-color:#f59f00; font-weight:bold; z-index:10; box-shadow: 0 0 10px rgba(245,159,0,0.5); }
+  .node.faded { opacity: 0.1; }
+  
+  svg { position:absolute; top:0; left:0; pointer-events:none; z-index:1; }
+  path { stroke:#aeb5bc; stroke-width:1.5; transition: stroke 0.2s; }
+  path.highlight { stroke:#f59f00; stroke-width:2.5; }
+  
+  #info { position:absolute; bottom:15px; right:15px; background:#fff; padding:6px 10px; border-radius:4px; font-size:12px; border:1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 100; }
+</style>
+</head>
+<body>
+<input id="search" placeholder="Search module...">
+<div id="viewport">
+  <svg id="lines">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#aeb5bc" />
+      </marker>
+      <marker id="arrow-hl" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59f00" />
+      </marker>
+    </defs>
+  </svg>
+  <div id="nodes-container"></div>
+</div>
+<div id="info">Nodes: 240 | Edges: 389<br><small>点击节点高亮上下游 | 拖拽平移 | 滚轮缩放</small></div>
+
+<script>
+  const nodesData = [{"id": "m5", "label": "Cosmos.M.Object"}, {"id": "m6", "label": "Cosmos.Carried.SameIndexColimitS"}, {"id": "m10", "label": "Cosmos.Carried.ColimitPolarity"}, {"id": "m17", "label": "Real.Interval.MonotoneConvergence"}, {"id": "m18", "label": "Real.Interval"}, {"id": "m20", "label": "Physics.Spacetime.LorentzGroup"}, {"id": "m22", "label": "Physics.Spacetime.Clifford"}, {"id": "m24", "label": "Cosmos.M.SewingObstruction"}, {"id": "m29", "label": "Real.Interval.OrderComplete"}, {"id": "m30", "label": "Wellspring.Properties.Dynamics"}, {"id": "m31", "label": "Wellspring.Prelude"}, {"id": "m33", "label": "Cosmos.Carried.TrivProj"}, {"id": "m35", "label": "Cosmos.Carried.FinColimit"}, {"id": "m38", "label": "Real.Interval.Mul.Order"}, {"id": "m49", "label": "Equivalence.SubstTransport"}, {"id": "m50", "label": "Real.Pushback"}, {"id": "m53", "label": "SecondPass.FinCatInfinitySubCocone"}, {"id": "m54", "label": "Physics.Lattice"}, {"id": "m55", "label": "Physics.Quantum.Rotation"}, {"id": "m56", "label": "Cosmos.Carried.SameIndexCatS"}, {"id": "m59", "label": "SecondPass.FinCatInfinityMediateUniqueness"}, {"id": "m61", "label": "Cosmos.Carried.FinTower"}, {"id": "m62", "label": "Real.ToleranceBridge"}, {"id": "m63", "label": "SecondPass.Closure"}, {"id": "m66", "label": "SecondPass.FinCatNEmbeddingMismatch"}, {"id": "m70", "label": "SketchPass.Cosmos"}, {"id": "m71", "label": "Wellspring.Indestructibility"}, {"id": "m75", "label": "Wellspring.Properties.Cong"}, {"id": "m78", "label": "Cosmos.ContCategory"}, {"id": "m79", "label": "Cosmos.M.TowerSeparation"}, {"id": "m81", "label": "Wellspring.Properties.MorphLift"}, {"id": "m82", "label": "Physics.Newton.DegreeBoundary"}, {"id": "m84", "label": "Equivalence.LinearDynamics"}, {"id": "m87", "label": "Wellspring.Properties.Equiv"}, {"id": "m88", "label": "Real.Interval.Reasoning.Equiv"}, {"id": "m94", "label": "Cosmos.Carried.SeqColimitCat"}, {"id": "m95", "label": "Physics.Quantum.AmplitudeComp"}, {"id": "m102", "label": "Real.Archimedean"}, {"id": "m103", "label": "Cosmos.Carried.FinNatUIP"}, {"id": "m105", "label": "Cosmos.M.Terminal"}, {"id": "m106", "label": "Base.MCorr.TerminalSequence"}, {"id": "m109", "label": "SecondPass.FinCatInfinityProjection"}, {"id": "m110", "label": "SecondPass.FinCatNProjectiveObstruction"}, {"id": "m111", "label": "SecondPass.FinCatInfinityColimitUniversal"}, {"id": "m116", "label": "SketchPass.ContCategory"}, {"id": "m117", "label": "Wellspring.Properties.Transport"}, {"id": "m120", "label": "SecondPass.ShiftedTower"}, {"id": "m124", "label": "Base.MCorr.SetoidPushComp"}, {"id": "m126", "label": "Real.Interval.Retract"}, {"id": "m127", "label": "Equivalence.ScaleInvariant"}, {"id": "m131", "label": "Physics.Quantum.FiniteVec"}, {"id": "m132", "label": "Equivalence.Core"}, {"id": "m134", "label": "SecondPass.FinCatNDefaultUnif"}, {"id": "m136", "label": "Real.Interval.Node"}, {"id": "m142", "label": "Real.Interval.AbsTriangle"}, {"id": "m145", "label": "Cosmos.M.ContainerInstance"}, {"id": "m146", "label": "Real.Interval.Abs"}, {"id": "m152", "label": "Cosmos.M.Lambek"}, {"id": "m153", "label": "SecondPass.FinCatInfinityEndomorphismCandidates"}, {"id": "m155", "label": "Real.Interval.Recip"}, {"id": "m157", "label": "Wellspring.Beings"}, {"id": "m161", "label": "Real.Interval.OrderLaws"}, {"id": "m167", "label": "SecondPass.StrictLift"}, {"id": "m169", "label": "Physics.FourDAction"}, {"id": "m175", "label": "Wellspring.Properties.Composition"}, {"id": "m177", "label": "Real.Regular"}, {"id": "m182", "label": "Cosmos.M.PermutationNonCommutative"}, {"id": "m183", "label": "SketchPass.MorphismObject"}, {"id": "m185", "label": "Base.MCorr.WContainerInstance"}, {"id": "m189", "label": "SecondPass.ContCatEquivFunctor"}, {"id": "m193", "label": "Equivalence.DiscreteEq"}, {"id": "m194", "label": "Real.Interval.WeakCompleteFromCauchyI"}, {"id": "m196", "label": "Wellspring.Properties.Bisim"}, {"id": "m197", "label": "SecondPass.CumulativeHierarchyInner"}, {"id": "m199", "label": "Physics.Newton.QuadraticJacobi"}, {"id": "m208", "label": "SecondPass.MorphismObject"}, {"id": "m214", "label": "Real.Interval.Mul.Core"}, {"id": "m215", "label": "Real.Interval.Bounded"}, {"id": "m219", "label": "SecondPass.Cosmos"}, {"id": "m220", "label": "Wellspring.Universe"}, {"id": "m222", "label": "Real.Interval.NegLaws"}, {"id": "m224", "label": "Base.RationalRing"}, {"id": "m229", "label": "Real.CauchyConvergence"}, {"id": "m232", "label": "SecondPass.FinCatNSurjectivity"}, {"id": "m238", "label": "Real.Convergence"}, {"id": "m240", "label": "Real.IntervalEquiv"}, {"id": "m252", "label": "SecondPass.FinCatNInnerObstruction"}, {"id": "m253", "label": "SecondPass.FinCatNColimitWithDep"}, {"id": "m259", "label": "Equivalence.Lattice"}, {"id": "m261", "label": "SketchPass.ObjEquivCat"}, {"id": "m267", "label": "SecondPass.FinCatNInnerSewing"}, {"id": "m273", "label": "Cosmos.Carried.FinEmbed"}, {"id": "m274", "label": "SecondPass.StrictLiftShape"}, {"id": "m280", "label": "SecondPass.MorphismObject.MorphismObject"}, {"id": "m282", "label": "SecondPass.FinCatNColimit"}, {"id": "m285", "label": "Real.Interval.RetractCauchy"}, {"id": "m291", "label": "Cosmos.ContFunctor"}, {"id": "m295", "label": "Real.Interval.AbsMul"}, {"id": "m296", "label": "Base.MCorr.InitialAlgebra"}, {"id": "m297", "label": "Cosmos.M.GenCongruence"}, {"id": "m298", "label": "Base.MCorr.SetoidPush"}, {"id": "m302", "label": "Physics.Quantum.Gaussian"}, {"id": "m305", "label": "Wellspring.Properties.CongPos"}, {"id": "m307", "label": "SecondPass.DependentEmbedding"}, {"id": "m309", "label": "Cosmos.Carried.FinPushColimitCat"}, {"id": "m310", "label": "Base.IndexedMType"}, {"id": "m316", "label": "Cosmos.Carried.NontrivialPushTowerS"}, {"id": "m317", "label": "Real.Interval.RegularRep"}, {"id": "m319", "label": "Real.Interval.DensityArch"}, {"id": "m326", "label": "SecondPass.FinCatInfinityMediate"}, {"id": "m332", "label": "Real.Interval.Inverse"}, {"id": "m336", "label": "Equivalence.TopologicalEq"}, {"id": "m339", "label": "SketchPass.MorphismMorphism"}, {"id": "m342", "label": "Physics.Newton.QuadraticBilinear"}, {"id": "m344", "label": "Real.Interval.Apartness"}, {"id": "m345", "label": "Cosmos.M.ListCosmos"}, {"id": "m352", "label": "Real.Interval.RecipLaws"}, {"id": "m353", "label": "Cosmos.M.DetCongruence"}, {"id": "m355", "label": "SecondPass.MorphismObject.Covariant"}, {"id": "m362", "label": "Physics.CausalOrder"}, {"id": "m365", "label": "Equivalence.StrongEquiv"}, {"id": "m374", "label": "Base.MCorr.Setoid"}, {"id": "m375", "label": "SecondPass.ConditionalNontrivialLimit"}, {"id": "m378", "label": "SketchPass.ContCatEquiv"}, {"id": "m380", "label": "SecondPass.FinCatNOuterObstruction"}, {"id": "m381", "label": "Real.Interval.WeakArith"}, {"id": "m383", "label": "SecondPass.CumulativeHierarchyLimit"}, {"id": "m386", "label": "Equivalence.LayeredEqGenDepth"}, {"id": "m387", "label": "SecondPass.FinCatInfinityTowerCompat"}, {"id": "m390", "label": "SketchPass.ContCatEquivFunctor"}, {"id": "m397", "label": "Real.Interval.Rational"}, {"id": "m398", "label": "SecondPass.MorphismCorrespondence"}, {"id": "m399", "label": "Equivalence.QuantumLayer"}, {"id": "m400", "label": "Base.MCategory"}, {"id": "m401", "label": "Real.Interval.Kit"}, {"id": "m406", "label": "SecondPass.Unfolding"}, {"id": "m412", "label": "Base.RelEquipment"}, {"id": "m414", "label": "SecondPass.CumulativeHierarchy"}, {"id": "m415", "label": "Cosmos.Carried.FinProj"}, {"id": "m417", "label": "Real.Interval.Countermodel"}, {"id": "m419", "label": "SketchPass.ObjEquivFunctor"}, {"id": "m420", "label": "SecondPass.ContainerAutomorphism"}, {"id": "m421", "label": "Real.Interval.Division"}, {"id": "m422", "label": "SecondPass.CumulativeHierarchySewing"}, {"id": "m428", "label": "SecondPass.FinCatInfinity"}, {"id": "m429", "label": "Cosmos.M.ListSwap"}, {"id": "m430", "label": "SecondPass.FinCatNFunctorial"}, {"id": "m434", "label": "Physics.Newton.Quadratic"}, {"id": "m437", "label": "SecondPass.ListCosmos"}, {"id": "m438", "label": "Physics.Quantum.Measurement"}, {"id": "m441", "label": "SecondPass.FinCatInfinitySubstDstSelf"}, {"id": "m442", "label": "Base.MCorr.SetoidCoalg"}, {"id": "m447", "label": "SecondPass.FinCatNPermutedEmbedding"}, {"id": "m448", "label": "Real.Interval.ArithLaws"}, {"id": "m452", "label": "Physics.CausalSetOrder"}, {"id": "m453", "label": "SecondPass.FinCatNWitness"}, {"id": "m457", "label": "Real.Interval.Reasoning"}, {"id": "m458", "label": "Real.Interval.Division.Laws"}, {"id": "m462", "label": "SecondPass.CoalgCat"}, {"id": "m465", "label": "Cosmos.M.ListSwapDef"}, {"id": "m472", "label": "Real.Interval.Embed"}, {"id": "m475", "label": "SecondPass.FinCatInfinityColimit"}, {"id": "m479", "label": "Cosmos.Carried.Boundaries"}, {"id": "m481", "label": "SecondPass.Terminal"}, {"id": "m482", "label": "Wellspring.Cosmos"}, {"id": "m486", "label": "Cosmos.Carried.DetColimit"}, {"id": "m488", "label": "Cosmos.M.PermutedEmbedding"}, {"id": "m491", "label": "Physics.Newton.Poisson"}, {"id": "m498", "label": "SketchPass.ContCategoryLemmas"}, {"id": "m501", "label": "Real.Interval.Arith"}, {"id": "m502", "label": "Base.MCorr"}, {"id": "m506", "label": "Cosmos.M.NontrivialLimit"}, {"id": "m510", "label": "Real.Interval.Mul.Laws"}, {"id": "m513", "label": "SecondPass.ContCatEquivLemmas"}, {"id": "m514", "label": "Real.Interval.Bundles"}, {"id": "m516", "label": "Cosmos.Carried.LimitSystemS"}, {"id": "m517", "label": "SecondPass.FinCatInfinityProjectionUnfold"}, {"id": "m519", "label": "SecondPass.CumulativeHierarchyInstances"}, {"id": "m528", "label": "Cosmos.ContCatEquiv"}, {"id": "m531", "label": "SecondPass.LayerZeroMediator"}, {"id": "m534", "label": "Equivalence.Properties"}, {"id": "m535", "label": "Real.Interval.Equiv"}, {"id": "m538", "label": "Physics.Quantum.UnitaryInstrument"}, {"id": "m539", "label": "Cosmos.Carried.LimitSystem"}, {"id": "m543", "label": "SecondPass.FinCatNNonCommutative"}, {"id": "m544", "label": "Real.Neighborhood"}, {"id": "m545", "label": "Cosmos.Carried.ChainColimitPropS"}, {"id": "m546", "label": "Cosmos.Carried.SeqColimitS"}, {"id": "m547", "label": "Physics.EinsteinAction"}, {"id": "m549", "label": "Cosmos.ContCategoryLemmas"}, {"id": "m555", "label": "Physics.CausalSlice"}, {"id": "m556", "label": "Physics.CausalSet"}, {"id": "m558", "label": "Real.Interval.ApartnessInvertible"}, {"id": "m566", "label": "SecondPass.Instances"}, {"id": "m567", "label": "Cosmos.M.CosmosCategory"}, {"id": "m569", "label": "SketchPass.Unfolding"}, {"id": "m572", "label": "Everything"}, {"id": "m573", "label": "Real.Interval.Mul.Cong"}, {"id": "m574", "label": "Real.Interval.Infimum"}, {"id": "m588", "label": "Wellspring.Properties.CongHom"}, {"id": "m592", "label": "Base.MCorr.SetoidPushCat"}, {"id": "m593", "label": "SecondPass.MorphismMorphism"}, {"id": "m594", "label": "Wellspring.StandardModel"}, {"id": "m600", "label": "Physics.LatticeCoherence"}, {"id": "m601", "label": "Real.Interval.LimitLaws"}, {"id": "m603", "label": "SecondPass.FinCatNTowerLemmas"}, {"id": "m605", "label": "Real.Interval.OrderLe"}, {"id": "m606", "label": "Real.CauchyToInterval"}, {"id": "m607", "label": "Wellspring.Properties.CongPaths"}, {"id": "m609", "label": "Base.DetCat"}, {"id": "m612", "label": "Cosmos.M.CoalgCat"}, {"id": "m614", "label": "Real.Interval.OrderComplete.Base"}, {"id": "m619", "label": "Physics.CausalCurvature"}, {"id": "m620", "label": "SecondPass.CosmosCategory"}, {"id": "m624", "label": "Equivalence.ManifoldEq"}, {"id": "m629", "label": "Physics.Quantum.Stochastic"}, {"id": "m631", "label": "Base.MCorr.SetoidPushMap"}, {"id": "m633", "label": "Real.Interval.Complete"}, {"id": "m636", "label": "Physics.Newton.QuadraticSkew"}, {"id": "m638", "label": "Wellspring.Properties.SubstCore"}, {"id": "m640", "label": "Real.Sequence"}, {"id": "m645", "label": "Cosmos.Carried.FinPushColimitS"}, {"id": "m646", "label": "Equivalence.Map"}, {"id": "m654", "label": "Real.Interval.OrderComplete.Bisect"}, {"id": "m655", "label": "SecondPass.Lambek"}, {"id": "m657", "label": "Equivalence.GroupInvariant"}, {"id": "m661", "label": "Cosmos.Carried.NontrivialPullTowerS"}, {"id": "m665", "label": "Base.MCorr.SetoidCat"}, {"id": "m667", "label": "Base.SetoidColimit"}, {"id": "m668", "label": "Real.Interval.WeakComplete"}, {"id": "m670", "label": "Cosmos.Carried.FinPushMediateS"}, {"id": "m674", "label": "Cosmos.M.ContainerAutomorphism"}, {"id": "m676", "label": "SecondPass.FinCatInfinitySubstitution"}, {"id": "m681", "label": "Cosmos.M.MorphismCorrespondence"}, {"id": "m682", "label": "Cosmos.Carried.DetSys"}, {"id": "m685", "label": "Real.Interval.Order"}, {"id": "m691", "label": "Cosmos.Carried.SeqColimit"}, {"id": "m695", "label": "SketchPass.ContCatEquivLemmas"}, {"id": "m698", "label": "Real.Interval.Mul"}, {"id": "m702", "label": "Physics.Spacetime.LorentzForm"}];
+  const edgesData = [{"source": "m5", "target": "m442"}, {"source": "m5", "target": "m528"}, {"source": "m5", "target": "m549"}, {"source": "m6", "target": "m56"}, {"source": "m10", "target": "m665"}, {"source": "m17", "target": "m317"}, {"source": "m17", "target": "m381"}, {"source": "m17", "target": "m605"}, {"source": "m17", "target": "m606"}, {"source": "m17", "target": "m654"}, {"source": "m20", "target": "m702"}, {"source": "m24", "target": "m5"}, {"source": "m29", "target": "m654"}, {"source": "m30", "target": "m196"}, {"source": "m33", "target": "m682"}, {"source": "m35", "target": "m539"}, {"source": "m38", "target": "m161"}, {"source": "m38", "target": "m448"}, {"source": "m38", "target": "m510"}, {"source": "m49", "target": "m132"}, {"source": "m50", "target": "m238"}, {"source": "m50", "target": "m633"}, {"source": "m53", "target": "m517"}, {"source": "m54", "target": "m84"}, {"source": "m54", "target": "m193"}, {"source": "m54", "target": "m399"}, {"source": "m54", "target": "m438"}, {"source": "m54", "target": "m624"}, {"source": "m54", "target": "m629"}, {"source": "m55", "target": "m302"}, {"source": "m56", "target": "m665"}, {"source": "m59", "target": "m326"}, {"source": "m61", "target": "m35"}, {"source": "m62", "target": "m102"}, {"source": "m62", "target": "m229"}, {"source": "m62", "target": "m633"}, {"source": "m63", "target": "m655"}, {"source": "m66", "target": "m282"}, {"source": "m66", "target": "m307"}, {"source": "m70", "target": "m339"}, {"source": "m71", "target": "m30"}, {"source": "m75", "target": "m588"}, {"source": "m78", "target": "m49"}, {"source": "m79", "target": "m5"}, {"source": "m81", "target": "m75"}, {"source": "m84", "target": "m127"}, {"source": "m87", "target": "m117"}, {"source": "m88", "target": "m535"}, {"source": "m94", "target": "m546"}, {"source": "m95", "target": "m302"}, {"source": "m105", "target": "m5"}, {"source": "m106", "target": "m374"}, {"source": "m109", "target": "m428"}, {"source": "m109", "target": "m453"}, {"source": "m110", "target": "m453"}, {"source": "m111", "target": "m398"}, {"source": "m111", "target": "m475"}, {"source": "m117", "target": "m638"}, {"source": "m120", "target": "m475"}, {"source": "m124", "target": "m298"}, {"source": "m126", "target": "m136"}, {"source": "m126", "target": "m606"}, {"source": "m127", "target": "m132"}, {"source": "m131", "target": "m302"}, {"source": "m132", "target": "m310"}, {"source": "m134", "target": "m232"}, {"source": "m136", "target": "m501"}, {"source": "m136", "target": "m698"}, {"source": "m142", "target": "m146"}, {"source": "m142", "target": "m614"}, {"source": "m145", "target": "m5"}, {"source": "m145", "target": "m665"}, {"source": "m146", "target": "m401"}, {"source": "m152", "target": "m5"}, {"source": "m153", "target": "m111"}, {"source": "m155", "target": "m161"}, {"source": "m155", "target": "m448"}, {"source": "m155", "target": "m606"}, {"source": "m157", "target": "m71"}, {"source": "m161", "target": "m136"}, {"source": "m161", "target": "m685"}, {"source": "m167", "target": "m414"}, {"source": "m169", "target": "m556"}, {"source": "m175", "target": "m87"}, {"source": "m182", "target": "m674"}, {"source": "m183", "target": "m390"}, {"source": "m183", "target": "m569"}, {"source": "m185", "target": "m296"}, {"source": "m189", "target": "m528"}, {"source": "m189", "target": "m549"}, {"source": "m194", "target": "m633"}, {"source": "m194", "target": "m668"}, {"source": "m196", "target": "m81"}, {"source": "m197", "target": "m414"}, {"source": "m199", "target": "m434"}, {"source": "m208", "target": "m189"}, {"source": "m208", "target": "m406"}, {"source": "m214", "target": "m136"}, {"source": "m214", "target": "m215"}, {"source": "m215", "target": "m685"}, {"source": "m219", "target": "m593"}, {"source": "m220", "target": "m157"}, {"source": "m222", "target": "m136"}, {"source": "m229", "target": "m238"}, {"source": "m232", "target": "m253"}, {"source": "m238", "target": "m698"}, {"source": "m240", "target": "m18"}, {"source": "m240", "target": "m397"}, {"source": "m252", "target": "m110"}, {"source": "m252", "target": "m267"}, {"source": "m252", "target": "m430"}, {"source": "m253", "target": "m282"}, {"source": "m253", "target": "m307"}, {"source": "m259", "target": "m127"}, {"source": "m259", "target": "m193"}, {"source": "m267", "target": "m167"}, {"source": "m273", "target": "m539"}, {"source": "m274", "target": "m167"}, {"source": "m280", "target": "m189"}, {"source": "m280", "target": "m406"}, {"source": "m282", "target": "m375"}, {"source": "m282", "target": "m603"}, {"source": "m285", "target": "m177"}, {"source": "m285", "target": "m606"}, {"source": "m291", "target": "m78"}, {"source": "m295", "target": "m142"}, {"source": "m295", "target": "m214"}, {"source": "m296", "target": "m374"}, {"source": "m297", "target": "m5"}, {"source": "m297", "target": "m665"}, {"source": "m298", "target": "m374"}, {"source": "m302", "target": "m224"}, {"source": "m305", "target": "m607"}, {"source": "m307", "target": "m167"}, {"source": "m309", "target": "m516"}, {"source": "m309", "target": "m609"}, {"source": "m316", "target": "m10"}, {"source": "m316", "target": "m56"}, {"source": "m316", "target": "m94"}, {"source": "m316", "target": "m516"}, {"source": "m317", "target": "m401"}, {"source": "m319", "target": "m161"}, {"source": "m326", "target": "m53"}, {"source": "m332", "target": "m38"}, {"source": "m332", "target": "m88"}, {"source": "m332", "target": "m155"}, {"source": "m332", "target": "m573"}, {"source": "m336", "target": "m193"}, {"source": "m339", "target": "m695"}, {"source": "m342", "target": "m434"}, {"source": "m344", "target": "m161"}, {"source": "m345", "target": "m353"}, {"source": "m352", "target": "m332"}, {"source": "m352", "target": "m472"}, {"source": "m352", "target": "m614"}, {"source": "m353", "target": "m5"}, {"source": "m353", "target": "m665"}, {"source": "m355", "target": "m189"}, {"source": "m355", "target": "m406"}, {"source": "m362", "target": "m296"}, {"source": "m374", "target": "m502"}, {"source": "m375", "target": "m453"}, {"source": "m378", "target": "m116"}, {"source": "m378", "target": "m261"}, {"source": "m380", "target": "m110"}, {"source": "m380", "target": "m430"}, {"source": "m381", "target": "m401"}, {"source": "m383", "target": "m167"}, {"source": "m383", "target": "m462"}, {"source": "m386", "target": "m132"}, {"source": "m387", "target": "m109"}, {"source": "m387", "target": "m273"}, {"source": "m390", "target": "m378"}, {"source": "m390", "target": "m419"}, {"source": "m397", "target": "m224"}, {"source": "m397", "target": "m457"}, {"source": "m398", "target": "m462"}, {"source": "m400", "target": "m310"}, {"source": "m401", "target": "m535"}, {"source": "m406", "target": "m528"}, {"source": "m406", "target": "m549"}, {"source": "m414", "target": "m655"}, {"source": "m415", "target": "m33"}, {"source": "m415", "target": "m103"}, {"source": "m417", "target": "m136"}, {"source": "m417", "target": "m633"}, {"source": "m419", "target": "m261"}, {"source": "m420", "target": "m620"}, {"source": "m421", "target": "m352"}, {"source": "m422", "target": "m383"}, {"source": "m422", "target": "m519"}, {"source": "m428", "target": "m35"}, {"source": "m428", "target": "m383"}, {"source": "m429", "target": "m297"}, {"source": "m430", "target": "m134"}, {"source": "m434", "target": "m224"}, {"source": "m437", "target": "m398"}, {"source": "m438", "target": "m131"}, {"source": "m438", "target": "m374"}, {"source": "m441", "target": "m676"}, {"source": "m442", "target": "m374"}, {"source": "m447", "target": "m134"}, {"source": "m448", "target": "m136"}, {"source": "m452", "target": "m362"}, {"source": "m452", "target": "m556"}, {"source": "m453", "target": "m383"}, {"source": "m458", "target": "m421"}, {"source": "m462", "target": "m481"}, {"source": "m465", "target": "m297"}, {"source": "m472", "target": "m161"}, {"source": "m472", "target": "m214"}, {"source": "m475", "target": "m387"}, {"source": "m479", "target": "m539"}, {"source": "m481", "target": "m219"}, {"source": "m482", "target": "m31"}, {"source": "m486", "target": "m539"}, {"source": "m488", "target": "m5"}, {"source": "m491", "target": "m224"}, {"source": "m498", "target": "m116"}, {"source": "m501", "target": "m18"}, {"source": "m501", "target": "m397"}, {"source": "m506", "target": "m79"}, {"source": "m506", "target": "m105"}, {"source": "m510", "target": "m214"}, {"source": "m513", "target": "m208"}, {"source": "m514", "target": "m332"}, {"source": "m514", "target": "m558"}, {"source": "m514", "target": "m574"}, {"source": "m514", "target": "m601"}, {"source": "m516", "target": "m298"}, {"source": "m516", "target": "m415"}, {"source": "m517", "target": "m676"}, {"source": "m519", "target": "m167"}, {"source": "m528", "target": "m291"}, {"source": "m531", "target": "m603"}, {"source": "m534", "target": "m132"}, {"source": "m535", "target": "m240"}, {"source": "m538", "target": "m95"}, {"source": "m538", "target": "m438"}, {"source": "m539", "target": "m415"}, {"source": "m539", "target": "m691"}, {"source": "m543", "target": "m447"}, {"source": "m544", "target": "m18"}, {"source": "m544", "target": "m502"}, {"source": "m545", "target": "m56"}, {"source": "m545", "target": "m94"}, {"source": "m546", "target": "m665"}, {"source": "m547", "target": "m619"}, {"source": "m549", "target": "m78"}, {"source": "m555", "target": "m362"}, {"source": "m558", "target": "m142"}, {"source": "m558", "target": "m319"}, {"source": "m558", "target": "m344"}, {"source": "m558", "target": "m472"}, {"source": "m566", "target": "m111"}, {"source": "m566", "target": "m620"}, {"source": "m567", "target": "m5"}, {"source": "m567", "target": "m665"}, {"source": "m569", "target": "m378"}, {"source": "m569", "target": "m498"}, {"source": "m572", "target": "m6"}, {"source": "m572", "target": "m17"}, {"source": "m572", "target": "m20"}, {"source": "m572", "target": "m22"}, {"source": "m572", "target": "m24"}, {"source": "m572", "target": "m50"}, {"source": "m572", "target": "m54"}, {"source": "m572", "target": "m55"}, {"source": "m572", "target": "m59"}, {"source": "m572", "target": "m61"}, {"source": "m572", "target": "m62"}, {"source": "m572", "target": "m63"}, {"source": "m572", "target": "m66"}, {"source": "m572", "target": "m70"}, {"source": "m572", "target": "m82"}, {"source": "m572", "target": "m106"}, {"source": "m572", "target": "m120"}, {"source": "m572", "target": "m126"}, {"source": "m572", "target": "m145"}, {"source": "m572", "target": "m152"}, {"source": "m572", "target": "m153"}, {"source": "m572", "target": "m169"}, {"source": "m572", "target": "m182"}, {"source": "m572", "target": "m185"}, {"source": "m572", "target": "m194"}, {"source": "m572", "target": "m197"}, {"source": "m572", "target": "m199"}, {"source": "m572", "target": "m222"}, {"source": "m572", "target": "m252"}, {"source": "m572", "target": "m274"}, {"source": "m572", "target": "m280"}, {"source": "m572", "target": "m285"}, {"source": "m572", "target": "m295"}, {"source": "m572", "target": "m309"}, {"source": "m572", "target": "m316"}, {"source": "m572", "target": "m345"}, {"source": "m572", "target": "m355"}, {"source": "m572", "target": "m380"}, {"source": "m572", "target": "m400"}, {"source": "m572", "target": "m412"}, {"source": "m572", "target": "m417"}, {"source": "m572", "target": "m420"}, {"source": "m572", "target": "m422"}, {"source": "m572", "target": "m437"}, {"source": "m572", "target": "m441"}, {"source": "m572", "target": "m452"}, {"source": "m572", "target": "m458"}, {"source": "m572", "target": "m465"}, {"source": "m572", "target": "m479"}, {"source": "m572", "target": "m486"}, {"source": "m572", "target": "m488"}, {"source": "m572", "target": "m491"}, {"source": "m572", "target": "m506"}, {"source": "m572", "target": "m513"}, {"source": "m572", "target": "m514"}, {"source": "m572", "target": "m531"}, {"source": "m572", "target": "m538"}, {"source": "m572", "target": "m543"}, {"source": "m572", "target": "m544"}, {"source": "m572", "target": "m545"}, {"source": "m572", "target": "m547"}, {"source": "m572", "target": "m555"}, {"source": "m572", "target": "m566"}, {"source": "m572", "target": "m567"}, {"source": "m572", "target": "m592"}, {"source": "m572", "target": "m594"}, {"source": "m572", "target": "m600"}, {"source": "m572", "target": "m612"}, {"source": "m572", "target": "m636"}, {"source": "m572", "target": "m640"}, {"source": "m572", "target": "m645"}, {"source": "m572", "target": "m661"}, {"source": "m572", "target": "m667"}, {"source": "m572", "target": "m670"}, {"source": "m572", "target": "m681"}, {"source": "m573", "target": "m214"}, {"source": "m574", "target": "m29"}, {"source": "m574", "target": "m472"}, {"source": "m574", "target": "m605"}, {"source": "m588", "target": "m305"}, {"source": "m592", "target": "m124"}, {"source": "m592", "target": "m631"}, {"source": "m592", "target": "m665"}, {"source": "m593", "target": "m208"}, {"source": "m594", "target": "m220"}, {"source": "m600", "target": "m132"}, {"source": "m600", "target": "m193"}, {"source": "m600", "target": "m399"}, {"source": "m601", "target": "m344"}, {"source": "m601", "target": "m605"}, {"source": "m601", "target": "m633"}, {"source": "m603", "target": "m453"}, {"source": "m605", "target": "m38"}, {"source": "m605", "target": "m614"}, {"source": "m606", "target": "m698"}, {"source": "m607", "target": "m175"}, {"source": "m612", "target": "m105"}, {"source": "m614", "target": "m161"}, {"source": "m619", "target": "m556"}, {"source": "m620", "target": "m219"}, {"source": "m624", "target": "m534"}, {"source": "m629", "target": "m131"}, {"source": "m631", "target": "m298"}, {"source": "m633", "target": "m606"}, {"source": "m636", "target": "m342"}, {"source": "m638", "target": "m482"}, {"source": "m640", "target": "m502"}, {"source": "m645", "target": "m124"}, {"source": "m645", "target": "m516"}, {"source": "m645", "target": "m631"}, {"source": "m646", "target": "m132"}, {"source": "m654", "target": "m614"}, {"source": "m655", "target": "m481"}, {"source": "m657", "target": "m127"}, {"source": "m661", "target": "m56"}, {"source": "m661", "target": "m94"}, {"source": "m665", "target": "m374"}, {"source": "m668", "target": "m317"}, {"source": "m668", "target": "m381"}, {"source": "m668", "target": "m606"}, {"source": "m670", "target": "m516"}, {"source": "m674", "target": "m374"}, {"source": "m676", "target": "m111"}, {"source": "m681", "target": "m429"}, {"source": "m682", "target": "m502"}, {"source": "m685", "target": "m240"}, {"source": "m691", "target": "m502"}, {"source": "m695", "target": "m183"}, {"source": "m698", "target": "m401"}];
+
+  const viewport = document.getElementById('viewport');
+  const container = document.getElementById('nodes-container');
+  const svg = document.getElementById('lines');
+  const nodeElements = {};
+  const nodeDims = {};
+
+  // 1. 初始化节点
+  nodesData.forEach((n) => {
+    const div = document.createElement('div');
+    div.className = 'node';
+    div.id = 'node-' + n.id;
+    div.textContent = n.label;
+    container.appendChild(div);
+    nodeElements[n.id] = div;
+  });
+
+  nodesData.forEach((n, i) => {
+    const rect = nodeElements[n.id].getBoundingClientRect();
+    nodeDims[n.id] = { w: rect.width, h: rect.height };
+    n.x = (Math.random() - 0.5) * 2000;
+    n.y = (Math.random() - 0.5) * 2000;
+    n.vx = 0; n.vy = 0;
+  });
+
+  // 2. 物理引擎
+  const MAX_COORD = 5000;
+  for (let iter = 0; iter < 300; iter++) {
+    for (let i = 0; i < nodesData.length; i++) {
+      for (let j = i + 1; j < nodesData.length; j++) {
+        const n1 = nodesData[i], n2 = nodesData[j];
+        let dx = n2.x - n1.x;
+        let dy = n2.y - n1.y;
+        let distSq = dx*dx + dy*dy;
+        if (distSq === 0) distSq = 0.1;
+        let dist = Math.sqrt(distSq);
+        
+        if (dist < 1000) {
+          let force = 30000 / distSq; 
+          let fx = (dx / dist) * force;
+          let fy = (dy / dist) * force;
+          n1.vx -= fx; n1.vy -= fy;
+          n2.vx += fx; n2.vy += fy;
+        }
+      }
+    }
+
+    edgesData.forEach(e => {
+      const n1 = nodesData.find(n => n.id === e.source);
+      const n2 = nodesData.find(n => n.id === e.target);
+      let dx = n2.x - n1.x;
+      let dy = n2.y - n1.y;
+      let dist = Math.sqrt(dx*dx + dy*dy) || 0.1;
+      
+      let targetDist = 300; 
+      let force = (dist - targetDist) * 0.03;
+      
+      let fx = (dx / dist) * force;
+      let fy = (dy / dist) * force;
+      
+      n1.vx += fx; n1.vy += fy;
+      n2.vx -= fx; n2.vy -= fy;
+    });
+
+    nodesData.forEach(n => {
+      n.vx -= n.x * 0.01;
+      n.vy -= n.y * 0.01;
+      n.vx *= 0.8; n.vy *= 0.8;
+      
+      n.vx = Math.max(-20, Math.min(20, n.vx));
+      n.vy = Math.max(-20, Math.min(20, n.vy));
+      
+      n.x += n.vx; n.y += n.vy;
+      
+      if (n.x > MAX_COORD) n.x = MAX_COORD;
+      if (n.x < -MAX_COORD) n.x = -MAX_COORD;
+      if (n.y > MAX_COORD) n.y = MAX_COORD;
+      if (n.y < -MAX_COORD) n.y = -MAX_COORD;
+    });
+  }
+
+  // 3. 坐标平移与边界计算
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  nodesData.forEach(n => {
+    minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+    maxX = Math.max(maxX, n.x); maxY = Math.max(maxY, n.y);
+  });
+
+  const padding = 500;
+  const offsetX = -minX + padding;
+  const offsetY = -minY + padding;
+  const totalWidth = maxX - minX + padding * 2;
+  const totalHeight = maxY - minY + padding * 2;
+
+  viewport.style.width = totalWidth + 'px';
+  viewport.style.height = totalHeight + 'px';
+  svg.setAttribute('width', totalWidth);
+  svg.setAttribute('height', totalHeight);
+
+  nodesData.forEach(n => {
+    n.x += offsetX; n.y += offsetY;
+    nodeElements[n.id].style.left = n.x + 'px';
+    nodeElements[n.id].style.top = n.y + 'px';
+  });
+
+  // 4. 绘制曲线连线
+  edgesData.forEach(e => {
+    const n1 = nodesData.find(n => n.id === e.source);
+    const n2 = nodesData.find(n => n.id === e.target);
+    const d1 = nodeDims[e.source];
+    const d2 = nodeDims[e.target];
+    
+    const angle = Math.atan2(n2.y - n1.y, n2.x - n1.x);
+    const r1x = (d1.w / 2) + 2; const r1y = (d1.h / 2) + 2;
+    const r2x = (d2.w / 2) + 8; const r2y = (d2.h / 2) + 8;
+
+    const x1 = n1.x + Math.cos(angle) * r1x;
+    const y1 = n1.y + Math.sin(angle) * r1y;
+    const x2 = n2.x - Math.cos(angle) * r2x;
+    const y2 = n2.y - Math.sin(angle) * r2y;
+
+    const cx = (x1 + x2) / 2 - (y2 - y1) / 8;
+    const cy = (y1 + y2) / 2 + (x2 - x1) / 8;
+    const d = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('marker-end', 'url(#arrow)');
+    path.id = `path-${e.source}-${e.target}`;
+    svg.appendChild(path);
+  });
+
+  // 5. 视图初始化与缩放核心逻辑 (修复了偏移问题)
+  let scale = Math.min(window.innerWidth / totalWidth, window.innerHeight / totalHeight) * 0.9;
+  scale = Math.min(Math.max(scale, 0.05), 1.0);
+  
+  // 让图的中心对齐到屏幕中心
+  let translateX = (window.innerWidth - totalWidth * scale) / 2;
+  let translateY = (window.innerHeight - totalHeight * scale) / 2;
+
+  const updateTransform = () => {
+    viewport.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  };
+  updateTransform();
+
+  let isDragging = false;
+  let startX, startY;
+
+  document.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.node') || e.target.id === 'search') return;
+    isDragging = true;
+    startX = e.clientX - translateX;
+    startY = e.clientY - translateY;
+    clearHighlight();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    translateX = e.clientX - startX;
+    translateY = e.clientY - startY;
+    updateTransform();
+  });
+
+  document.addEventListener('mouseup', () => isDragging = false);
+
+  // 修复缩放中心点定位的数学公式
+  document.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) return;
+    e.preventDefault();
+    
+    const oldScale = scale;
+    const zoomSensitivity = 0.001;
+    scale -= e.deltaY * zoomSensitivity;
+    scale = Math.min(Math.max(0.02, scale), 3); // 限制范围
+    
+    // 鼠标当前位置的屏幕坐标
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    
+    // 核心公式：确保鼠标指向的视口位置在缩放前后不变
+    translateX = mouseX - (mouseX - translateX) * (scale / oldScale);
+    translateY = mouseY - (mouseY - translateY) * (scale / oldScale);
+    
+    updateTransform();
+  }, { passive: false });
+
+  // 6. 高亮交互
+  function clearHighlight() {
+    document.querySelectorAll('.node').forEach(el => el.className = 'node');
+    document.querySelectorAll('path').forEach(el => {
+      el.style.display = 'block';
+      el.classList.remove('highlight');
+      el.setAttribute('marker-end', 'url(#arrow)');
+    });
+  }
+
+  let selectedNodeId = null;
+
+  function highlightNode(nodeId) {
+    if (selectedNodeId === nodeId) {
+      selectedNodeId = null;
+      clearHighlight();
+      return;
+    }
+    selectedNodeId = nodeId;
+    clearHighlight();
+
+    const neighbors = new Set();
+    neighbors.add(nodeId);
+    edgesData.forEach(e => {
+      if (e.source === nodeId) neighbors.add(e.target);
+      if (e.target === nodeId) neighbors.add(e.source);
+    });
+
+    nodesData.forEach(n => {
+      if (neighbors.has(n.id)) nodeElements[n.id].classList.add('highlight');
+      else nodeElements[n.id].classList.add('faded');
+    });
+
+    edgesData.forEach(e => {
+      const path = document.getElementById(`path-${e.source}-${e.target}`);
+      if (e.source === nodeId || e.target === nodeId) {
+        path.classList.add('highlight');
+        path.setAttribute('marker-end', 'url(#arrow-hl)');
+      } else {
+        path.style.display = 'none';
+      }
+    });
+  }
+
+  nodesData.forEach(n => {
+    nodeElements[n.id].addEventListener('click', (e) => {
+      e.stopPropagation();
+      highlightNode(n.id);
+    });
+  });
+
+  // 7. 搜索
+  document.getElementById('search').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    if (!q) {
+      clearHighlight();
+      return;
+    }
+    
+    const matched = new Set();
+    nodesData.forEach(n => {
+      if (n.label.toLowerCase().includes(q)) matched.add(n.id);
+    });
+
+    clearHighlight();
+
+    nodesData.forEach(n => {
+      if (matched.has(n.id)) nodeElements[n.id].classList.add('highlight');
+      else nodeElements[n.id].classList.add('faded');
+    });
+
+    edgesData.forEach(e => {
+      const path = document.getElementById(`path-${e.source}-${e.target}`);
+      if (matched.has(e.source) && matched.has(e.target)) {
+        path.classList.add('highlight');
+        path.setAttribute('marker-end', 'url(#arrow-hl)');
+      } else {
+        path.style.display = 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>
