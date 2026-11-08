@@ -100,19 +100,19 @@ jobs:
                   content = f.read()
 
               injected_html = """
-              <div style="margin-top: 12px; margin-bottom: 12px; font-family: sans-serif; font-size: 14px; white-space: nowrap;">
-                  <strong style="color: #24292e;">📊 Interactive Graphs:</strong>
-                  <a href="deps-project.html" target="_blank" style="color: #0366d6; text-decoration: none; font-weight: 600; margin-left: 12px;">Full Project (240 nodes)</a>
+              <br><span style="font-family: sans-serif; font-size: 14px; white-space: nowrap; display: inline-block; padding: 4px 0;">
+                  Interactive Graphs:
+                  <a href="deps-project.html" target="_blank" style="color: #0366d6; text-decoration: none; font-weight: 600; margin-left: 8px;">Full Project (240 nodes)</a>
                   <span style="color: #d1d5da; margin: 0 8px;">|</span>
                   <a href="deps-real.html" target="_blank" style="color: #28a745; text-decoration: none; font-weight: 600;">Real Module (57 nodes)</a>
-              </div>
+              </span><br>
               """
-
-              pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)'
+              
+              pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)\s*'
               
               if re.search(pattern, content):
                   content = re.sub(pattern, r'\1' + injected_html, content, count=1)
-                  print("Successfully injected links precisely after 'import Everything'.")
+                  print("Successfully injected and cleaned trailing whitespace.")
               else:
                   target_text = 'import Everything'
                   if target_text in content:
