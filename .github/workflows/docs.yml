@@ -92,6 +92,7 @@ jobs:
         run: |
           python3 - << 'EOF'
           import os
+          import re
 
           index_path = './docs/index.html'
           if os.path.exists(index_path):
@@ -99,21 +100,31 @@ jobs:
                   content = f.read()
 
               injected_html = """
-              <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px;">
-                  <strong style="margin-right: 15px; font-size: 16px;">📊 交互式架构图：</strong>
-                  <a href="deps-project.html" target="_blank" style="background-color: #007bff; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 10px;">全项目依赖图 (240 节点)</a>
-                  <a href="deps-real.html" target="_blank" style="background-color: #28a745; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold;">Real 模块依赖图 (57 节点)</a>
+              <div style="margin: 10px 0; padding: 8px 12px; background: #f4f8fb; border-left: 3px solid #007bff; font-size: 0.9em; font-family: sans-serif;">
+                  <strong>📊 Interactive Architecture Graphs:</strong>
+                  <a href="deps-project.html" target="_blank" style="color: #0056b3; text-decoration: underline; margin-right: 15px;">Full Project Graph (240 nodes)</a>
+                  <a href="deps-real.html" target="_blank" style="color: #28a745; text-decoration: underline;">Real Module Graph (57 nodes)</a>
               </div>
               """
 
-              target = '<a href="Everything.html">Everything</a>'
-              if target in content:
-                  content = content.replace(target, target + injected_html)
-                  print("Successfully injected links after 'import Everything'.")
+              pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)'
+              
+              if re.search(pattern, content):
+                  content = re.sub(pattern, r'\1' + injected_html, content, count=1)
+                  print("Successfully injected links precisely after 'import Everything'.")
               else:
-                  content = content.replace('</body>', injected_html + '</body>')
-                  print("Injected at the end of body.")
-
+                  target_text = 'import Everything'
+                  if target_text in content:
+                      content = content.replace(target_text, target_text + injected_html, 1)
+                      print("Injected after text 'import Everything'.")
+                  else:
+                      target_all = '-- All modules'
+                      if target_all in content:
+                          content = content.replace(target_all, injected_html + target_all, 1)
+                          print("Injected before '-- All modules'.")
+                      else:
+                          print("Warning: Could not find insertion point.")
+                  
               with open(index_path, 'w', encoding='utf-8') as f:
                   f.write(content)
           else:
