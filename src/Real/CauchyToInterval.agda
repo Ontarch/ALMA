@@ -25,7 +25,7 @@ open import Relation.Binary.PropositionalEquality using
 open ≡-Reasoning
 
 open import Base.RationalRing using (neg-involutive; +interchange; telescope)
-open import Real using (CauchySeq; ε; embed; embed-mono-<)
+open import Real using (CauchySeq; ε; const; embed; embed-mono-<)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
 open import Real.Interval using
   (RealI; δ; δ-half; negδ<δ; pos-pow; double-half)
@@ -335,3 +335,25 @@ centre-cauchy→realI x n = begin
 -- 采样下标支配恒等。
 K≥k : (k : ℕ) → K k ≥ k
 K≥k k = ≤N-trans (ℕP.<⇒≤ (n<2^n k)) (^-monoʳ-≤ 2 (m≤n+m k 2))
+
+------------------------------------------------------------------------
+-- The rational point as a nested-interval real
+--
+-- 有理常数的点
+
+-- The rational r embedded as a nested-interval real. The constant
+-- Cauchy sequence is mapped through the existing construction, so no
+-- nesting proof is duplicated.
+--
+-- 将有理数 r 嵌入为嵌套区间实数。常柯西序列经既有构造映射，无需
+-- 重复任何嵌套证明。
+point : ℚ → RealI
+point r = cauchy→realI (const r)
+
+-- Every centre of the embedded real is exactly r.
+--
+-- 嵌入实数的每一层中心都恰为 r。
+centre-point : ∀ r k → centre (point r) k ≡ r
+centre-point r k =
+  let eq = centre-cauchy→realI (const r) k
+  in eq

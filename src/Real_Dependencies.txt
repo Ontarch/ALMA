@@ -1,0 +1,338 @@
+------------------------------------------------------------------------
+Real 模块架构与依赖关系 (纯文本版)
+------------------------------------------------------------------------
+
+说明：
+以“功能分类”为骨架，标注模块在依赖图中的上游（依赖了谁）和下游（被谁使用）。
+符号说明：
+  [依赖]   -> 该模块 import 了右侧模块
+  [被依赖] <- 右侧模块 import 了该模块
+
+------------------------------------------------------------------------
+1. 顶层与基础架构
+
+这一层是整个库的基石，定义了最基本的数据类型、等价关系和收敛概念。
+
+- Real
+  [说明]     构造性柯西实数的最底层定义。
+  [依赖]     无（基础模块）。
+  [被依赖]   Real.Interval, Real.Archimedean, Real.Regular, Real.Neighborhood 等。
+
+- Real.Archimedean
+  [说明]     有理容差的阿基米德精度选择。
+  [依赖]     Real。
+  [被依赖]   Real.ToleranceBridge（见第 7 类）。
+
+- Real.Interval
+  [说明]     余归纳实数作为嵌套区间链的核心定义。
+  [依赖]     Real。
+  [被依赖]   Real.Sequence, Real.IntervalEquiv, Real.CauchyToInterval 等。
+
+- Real.IntervalEquiv
+  [说明]     从嵌套区间实数到柯西序列的表示等价。
+  [依赖]     Real.Interval, Real.Interval.Rational。
+  [被依赖]   Real.Interval.Equiv, Real.Interval.Reasoning.Equiv, Real.Interval.RegularRep 等。
+
+- Real.CauchyToInterval
+  [说明]     反向等价，柯西序列 -> 嵌套区间实数。
+  [依赖]     Real.Interval, Real.Interval.Node。
+  [被依赖]   Real.CauchyConvergence, Real.Interval.Complete, Real.Interval.Retract 等。
+
+- Real.Convergence
+  [说明]     有理序列的任意容差收敛。
+  [依赖]     Real.Interval.Kit。
+  [被依赖]   Real.CauchyConvergence。
+
+- Real.CauchyConvergence
+  [说明]     CauchySeq 层的算术与收敛。
+  [依赖]     Real.Convergence, Real.Interval.Complete。
+  [被依赖]   Real.Pushback, Real.ToleranceBridge。
+
+
+------------------------------------------------------------------------
+2. 核心区间定义与数据结构
+
+定义了 RealI 的内部结构、算术和等价性。
+
+- Real.Interval.Rational
+  [依赖]     无。
+  [被依赖]   Real.Interval.Arith, Real.IntervalEquiv, Real.Interval.Reasoning, Real.Interval.Mul, Real.Interval.Abs。
+
+- Real.Interval.Arith
+  [说明]     有理区间上的算术。
+  [依赖]     Real.Interval.Rational。
+  [被依赖]   Real.Interval.Equiv, Real.Interval.Node, Real.Interval.ArithLaws, Real.Interval.NegLaws, Real.Interval.Kit。
+
+- Real.Interval.Equiv
+  [说明]     实数区间等价。
+  [依赖]     Real.Interval.Arith, Real.IntervalEquiv。
+  [被依赖]   Real.Interval.Abs。
+
+- Real.Interval.Node
+  [说明]     RealI 的节点层结构引理。
+  [依赖]     Real.Interval.Arith, Real.Interval.Order（见第 4 类）。
+  [被依赖]   Real.CauchyToInterval, Real.Interval.Mul, Real.Interval.ArithLaws, Real.Interval.OrderLaws, Real.Interval.Abs 等。
+
+- Real.Interval.Bounded
+  [说明]     有理区间的有界性。
+  [依赖]     Real.Interval.Order（见第 4 类）。
+  [被依赖]   Real.Interval.Mul.Core。
+
+
+------------------------------------------------------------------------
+3. 基础工具与推理
+
+开发中常用的工具箱和推理链语法。
+
+- Real.Interval.Reasoning
+  [说明]     有理数不等式的推理组合子。
+  [依赖]     Real.Interval.Rational。
+  [被依赖]   Real.Interval.Kit, Real.Interval.Mul.Core。
+
+- Real.Interval.Reasoning.Equiv
+  [说明]     区间相等的推理组合子。
+  [依赖]     Real.IntervalEquiv。
+  [被依赖]   较少直接依赖，多用于证明中。
+
+- Real.Interval.Kit
+  [说明]     有理代数与收敛引擎。
+  [依赖]     Real.Interval.Arith, Real.Interval.Reasoning。
+  [被依赖]   Real.Interval.Order, Real.Convergence, Real.Interval.WeakArith, Real.Interval.RegularRep。
+
+- Real.Regular
+  [说明]     模数正规化。
+  [依赖]     Real。
+  [被依赖]   Real.Interval.RetractCauchy, Real.Interval.WeakComplete。
+
+
+------------------------------------------------------------------------
+4. 序关系与代数定律
+
+RealI 上的序、加法群、取负、绝对值与嵌入。
+
+- Real.Interval.Order
+  [说明]     实数区间上的序。
+  [依赖]     Real.Interval.Kit。
+  [被依赖]   Real.Interval.Node, Real.Interval.Bounded, Real.Interval.OrderLaws, Real.Interval.OrderLe, Real.Interval.Apartness。
+
+- Real.Interval.ArithLaws
+  [说明]     RealI 的加法群律。
+  [依赖]     Real.Interval.Arith, Real.Interval.Node。
+  [被依赖]   Real.Interval.Recip。
+
+- Real.Interval.NegLaws
+  [说明]     加法取负的剩余代数定律。
+  [依赖]     Real.Interval.Arith。
+
+- Real.Interval.OrderLaws
+  [说明]     区间序律（严格序与非严格序的交互）。
+  [依赖]     Real.Interval.Order, Real.Interval.Node。
+  [被依赖]   Real.Interval.MonotoneConvergence。
+
+- Real.Interval.OrderLe
+  [说明]     非严格序 _≤ℝ_ 的定律。
+  [依赖]     Real.Interval.Order, Real.Interval.Node。
+  [被依赖]   Real.Interval.DensityArch, Real.Interval.MonotoneConvergence。
+
+- Real.Interval.Abs
+  [说明]     有理区间上的绝对值。
+  [依赖]     Real.Interval.Equiv, Real.Interval.Rational。
+  [被依赖]   Real.Interval.AbsTriangle, Real.Interval.AbsMul, Real.Interval.Mul.Laws, Real.Interval.Mul.Order, Real.Interval.Embed, Real.Interval.Apartness。
+
+- Real.Interval.AbsTriangle
+  [依赖]     Real.Interval.Abs。
+  [被依赖]   Real.Interval.AbsMul。
+
+- Real.Interval.AbsMul
+  [说明]     绝对值的乘性定律。
+  [依赖]     Real.Interval.AbsTriangle, Real.Interval.Mul（见第 5 类）。
+
+- Real.Interval.Embed
+  [说明]     域公理：非平凡性与 Q 嵌入。
+  [依赖]     Real.Interval.Node, Real.Interval.Abs。
+  [被依赖]   Real.Interval.RecipLaws, Real.Interval.ApartnessInvertible, Real.Interval.Bundles。
+
+
+------------------------------------------------------------------------
+5. 乘法及其高级性质
+
+逐层递进的乘法定义与证明。
+
+- Real.Interval.Mul
+  [说明]     区间乘法。
+  [依赖]     Real.Interval.Node, Real.Interval.Rational。
+  [被依赖]   Real.Interval.AbsMul, Real.Interval.Mul.Core, Real.Interval.Mul.Laws, Real.Interval.Mul.Cong, Real.Interval.Mul.Order, Real.CauchyToInterval。
+
+- Real.Interval.Mul.Core
+  [说明]     RealI 乘法律的核心引理。
+  [依赖]     Real.Interval.Mul, Real.Interval.Reasoning, Real.Interval.Bounded。
+  [被依赖]   Real.Interval.Mul.Laws, Real.Interval.Mul.Cong。
+
+- Real.Interval.Mul.Laws
+  [说明]     乘法交换、分配、结合律。
+  [依赖]     Real.Interval.Mul, Real.Interval.Node, Real.Interval.Abs。
+  [被依赖]   Real.Interval.Mul.Cong, Real.Interval.Mul.Order, Real.Interval.Inverse, Real.Interval.Recip。
+
+- Real.Interval.Mul.Cong
+  [说明]     乘法相容性。
+  [依赖]     Real.Interval.Mul.Laws, Real.Interval.Mul.Core。
+  [被依赖]   Real.Interval.Inverse。
+
+- Real.Interval.Mul.Order
+  [说明]     乘法与序。
+  [依赖]     Real.Interval.Mul.Laws, Real.Interval.Abs。
+
+
+------------------------------------------------------------------------
+6. 倒数与除法
+
+依赖于乘法群律与序关系的高级运算。
+
+- Real.Interval.Inverse
+  [说明]     非零区间实数的倒数。
+  [依赖]     Real.Interval.Mul.Cong, Real.Interval.Mul.Laws。
+  [被依赖]   Real.Interval.RecipLaws, Real.Interval.Division, Real.Interval.Bundles。
+
+- Real.Interval.Recip
+  [说明]     区间实数的倒数核心定义。
+  [依赖]     Real.Interval.ArithLaws, Real.Interval.Mul.Laws, Real.Interval.Order。
+  [被依赖]   Real.Interval.MonotoneConvergence。
+
+- Real.Interval.RecipLaws
+  [说明]     正/非零区间实数的倒数定律。
+  [依赖]     Real.Interval.Inverse, Real.Interval.Mul.Laws, Real.Interval.Embed, Real.Interval.DensityArch。
+  [被依赖]   Real.Interval.Division, Real.Interval.Division.Laws。
+
+- Real.Interval.Division
+  [说明]     区间实数的显式除法。
+  [依赖]     Real.Interval.Inverse, Real.Interval.RecipLaws, Real.Interval.Mul.Laws, Real.Interval.Apartness。
+  [被依赖]   Real.Interval.Division.Laws。
+
+- Real.Interval.Division.Laws
+  [说明]     除法的派生定律。
+  [依赖]     Real.Interval.Division, Real.Interval.RecipLaws, Real.Interval.LimitLaws。
+
+
+------------------------------------------------------------------------
+7. 完备性、极限与收敛
+
+柯西完备性、单调收敛与弱完备性。
+
+- Real.Interval.WeakArith
+  [说明]     弱完备性所需的有理数算术辅助。
+  [依赖]     Real.Interval.Kit。
+  [被依赖]   Real.Interval.WeakComplete。
+
+- Real.Interval.Complete
+  [说明]     实数区间的完备性（柯西）。
+  [依赖]     Real.CauchyToInterval, Real.Interval.Node。
+  [被依赖]   Real.Interval.WeakComplete, Real.Interval.WeakCompleteFromCauchyI, Real.Interval.RetractCauchy, Real.Interval.MonotoneConvergence, Real.Interval.Countermodel, Real.CauchyConvergence, Real.Pushback, Real.ToleranceBridge。
+
+- Real.Interval.WeakComplete
+  [说明]     实数区间的弱完备性。
+  [依赖]     Real.Interval.RegularRep（见第 9 类）, Real.Interval.WeakArith, Real.Interval.Complete。
+  [被依赖]   Real.Interval.WeakCompleteFromCauchyI。
+
+- Real.Interval.WeakCompleteFromCauchyI
+  [说明]     CauchyI 是 WeakCauchy 的特例。
+  [依赖]     Real.Interval.WeakComplete, Real.Interval.Complete。
+
+- Real.Interval.LimitLaws
+  [说明]     收敛区间序列的极限运算律。
+  [依赖]     Real.Interval.Apartness, Real.Interval.OrderLe, Real.Interval.OrderComplete。
+  [被依赖]   Real.Interval.Division.Laws。
+
+- Real.Interval.MonotoneConvergence
+  [说明]     序完备与柯西完备的桥接。
+  [依赖]     Real.Interval.OrderComplete.Base, Real.Interval.OrderLe, Real.Interval.Recip, Real.Interval.Complete。
+  [被依赖]   Real.Interval.Infimum。
+
+- Real.Interval.DensityArch
+  [说明]     有理数的稠密性与阿基米德性。
+  [依赖]     Real.Interval.OrderLe。
+  [被依赖]   Real.Interval.RecipLaws, Real.Interval.Bundles。
+
+- Real.Pushback
+  [说明]     有理柯西收敛反映为逐层收敛。
+  [依赖]     Real.CauchyConvergence, Real.Interval.Complete。
+
+- Real.ToleranceBridge
+  [说明]     逐层收敛的任意正有理容差形态。
+  [依赖]     Real.CauchyConvergence, Real.Archimedean, Real.Interval.Complete。
+
+- Real.Interval.Countermodel
+  [说明]     逐中心层定义下加法运算律的反模型。
+  [依赖]     Real.Interval.Complete, Real.Interval.Node。
+
+
+------------------------------------------------------------------------
+8. 序完备性
+
+最小上界（上确界）的存在性证明。
+
+- Real.Interval.OrderComplete.Base
+  [说明]     序完备性的共享基础（二分法数据结构）。
+  [依赖]     Real.Interval.Node, Real.Interval.Order。
+  [被依赖]   Real.Interval.OrderComplete.Bisect, Real.Interval.OrderComplete, Real.Interval.MonotoneConvergence。
+
+- Real.Interval.OrderComplete.Bisect
+  [说明]     二分步骤与携带式括号流。
+  [依赖]     Real.Interval.OrderComplete.Base。
+  [被依赖]   Real.Interval.OrderComplete。
+
+- Real.Interval.OrderComplete
+  [说明]     实数区间的序完备性（上确界）。
+  [依赖]     Real.Interval.OrderComplete.Bisect, Real.Interval.OrderComplete.Base。
+  [被依赖]   Real.Interval.LimitLaws, Real.Interval.Infimum。
+
+
+------------------------------------------------------------------------
+9. 分离性、正则代表与往返等价
+
+实数表示形式的转换与拓扑性质。
+
+- Real.Interval.Apartness
+  [说明]     区间实数的分离性。
+  [依赖]     Real.Interval.Order, Real.Interval.Abs。
+  [被依赖]   Real.Interval.ApartnessInvertible, Real.Interval.LimitLaws, Real.Interval.Division。
+
+- Real.Interval.ApartnessInvertible
+  [说明]     可逆性蕴含分离性。
+  [依赖]     Real.Interval.Apartness, Real.Interval.Embed。
+  [被依赖]   Real.Interval.Bundles。
+
+- Real.Interval.RegularRep
+  [说明]     区间实数的正则有理代表。
+  [依赖]     Real.Interval.Kit, Real.IntervalEquiv。
+  [被依赖]   Real.Interval.WeakComplete, Real.Interval.RetractCauchy。
+
+- Real.Interval.Retract
+  [说明]     区间侧往返等价。
+  [依赖]     Real.Interval.Node, Real.CauchyToInterval。
+
+- Real.Interval.RetractCauchy
+  [说明]     柯西侧往返等价。
+  [依赖]     Real.Interval.RegularRep, Real.CauchyToInterval, Real.Interval.Complete。
+
+
+------------------------------------------------------------------------
+10. 其他视角与打包
+
+汇总包以及非嵌套区间链的独立视角。
+
+- Real.Interval.Infimum
+  [说明]     下确界（最大下界）。
+  [依赖]     Real.Interval.MonotoneConvergence, Real.Interval.OrderComplete。
+  [被依赖]   Real.Interval.Bundles。
+
+- Real.Interval.Bundles
+  [说明]     区间实数的打包结构（Algebra/Order 实例）。
+  [依赖]     Real.Interval.Inverse, Real.Interval.Infimum, Real.Interval.ApartnessInvertible, Real.Interval.Embed。
+
+- Real.Neighborhood
+  [说明]     余归纳实数作为邻域树（独立视角）。
+  [依赖]     Real。
+
+- Real.Sequence
+  [说明]     序列作为 E-M 树，柯西实数作为携带式子类型。
+  [依赖]     Real.Interval。
