@@ -100,11 +100,12 @@ jobs:
                   content = f.read()
 
               injected_html = """
-              <div style="margin: 10px 0; padding: 8px 12px; background: #f4f8fb; border-left: 3px solid #007bff; font-size: 0.9em; font-family: sans-serif;">
-                  <strong>📊 Interactive Architecture Graphs:</strong>
-                  <a href="deps-project.html" target="_blank" style="color: #0056b3; text-decoration: underline; margin-right: 15px;">Full Project Graph (240 nodes)</a>
-                  <a href="deps-real.html" target="_blank" style="color: #28a745; text-decoration: underline;">Real Module Graph (57 nodes)</a>
-              </div>
+              <span style="display: block; margin: 8px 0; padding: 6px 12px; background-color: #f6f8fa; border-left: 4px solid #28a745; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 13px; border-radius: 4px;">
+                  <strong style="color: #24292e;">📊 Interactive Graphs:</strong>
+                  <a href="deps-project.html" target="_blank" style="color: #0366d6; text-decoration: none; margin-left: 15px; font-weight: 600;">Full Project (240 nodes)</a>
+                  <span style="color: #ccc; margin: 0 8px;">|</span>
+                  <a href="deps-real.html" target="_blank" style="color: #28a745; text-decoration: none; font-weight: 600;">Real Module (57 nodes)</a>
+              </span>
               """
 
               pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)'
@@ -118,12 +119,7 @@ jobs:
                       content = content.replace(target_text, target_text + injected_html, 1)
                       print("Injected after text 'import Everything'.")
                   else:
-                      target_all = '-- All modules'
-                      if target_all in content:
-                          content = content.replace(target_all, injected_html + target_all, 1)
-                          print("Injected before '-- All modules'.")
-                      else:
-                          print("Warning: Could not find insertion point.")
+                      print("Warning: Could not find insertion point.")
                   
               with open(index_path, 'w', encoding='utf-8') as f:
                   f.write(content)
