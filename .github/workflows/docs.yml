@@ -175,9 +175,9 @@ jobs:
 
               injected_html = f"""
               <br><span style="font-family: monospace; color: #6a737d;">-- Interactive Graphs:</span><br>
-              <a href="deps-project.html" target="_blank" style="color: #0366d6; text-decoration: none; font-weight: 600;">Full Project ({proj_nodes} nodes)</a>
+              &nbsp;&nbsp;<a href="deps-project.html" target="_blank" style="font-family: monospace; color: #0366d6; text-decoration: none; font-weight: 600;">Full Project ({proj_nodes} nodes)</a>
               <span style="color: #d1d5da; margin: 0 4px;">|</span>
-              <a href="deps-real.html" target="_blank" style="color: #28a745; text-decoration: none; font-weight: 600;">Real Module ({real_nodes} nodes)</a><br>
+              <a href="deps-real.html" target="_blank" style="font-family: monospace; color: #28a745; text-decoration: none; font-weight: 600;">Real Module ({real_nodes} nodes)</a><br>
               """
               
               pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)\s*'
