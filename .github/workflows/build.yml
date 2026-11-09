@@ -12,7 +12,18 @@ jobs:
     steps:
 
       - name: Checkout ALMA
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
+
+      - name: Cache GHC and Cabal
+        uses: actions/cache@v4
+        id: cache-haskell
+        with:
+          path: |
+            ~/.ghcup
+            ~/.cabal/packages
+            ~/.cabal/store
+            ~/.cabal/bin
+          key: ${{ runner.os }}-agda-2.8.0-ghc-9.10.1-v2
 
       - name: Setup Haskell (GHC 9.10.1 + cabal)
         uses: haskell-actions/setup@v2
@@ -23,18 +34,8 @@ jobs:
       - name: Add cabal bin to PATH
         run: echo "$HOME/.cabal/bin" >> "$GITHUB_PATH"
 
-      - name: Cache cabal directories
-        uses: actions/cache@v6
-        id: cache-cabal
-        with:
-          path: |
-            ~/.cabal/packages
-            ~/.cabal/store
-            ~/.cabal/bin
-          key: ${{ runner.os }}-agda-2.8.0-ghc-9.10.1-v2
-
       - name: Install Agda 2.8.0
-        if: steps.cache-cabal.outputs.cache-hit != 'true'
+        if: steps.cache-haskell.outputs.cache-hit != 'true'
         run: |
           cabal update
           cabal install Agda-2.8.0 --overwrite-policy=always
@@ -81,6 +82,18 @@ jobs:
           echo "=== ~/.config/agda/libraries ==="; cat ~/.config/agda/libraries || true
           echo "=== ~/.config/agda/defaults  ==="; cat ~/.config/agda/defaults  || true
           echo "=== agda-categories.agda-lib ==="; cat agda-categories/agda-categories.agda-lib || true
+
+      - name: Cache Agda interface files
+        uses: actions/cache@v4
+        with:
+          path: |
+            _build/
+            src/**/*.agdai
+            agda-stdlib/**/*.agdai
+            agda-categories/**/*.agdai
+          key: agda-${{ runner.os }}-${{ hashFiles('src/**/*.agda') }}
+          restore-keys: |
+            agda-${{ runner.os }}-
 
       - name: Type-check project
         run: make check

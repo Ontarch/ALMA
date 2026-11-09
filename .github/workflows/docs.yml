@@ -22,6 +22,17 @@ jobs:
       - name: Checkout ALMA
         uses: actions/checkout@v4
 
+      - name: Cache GHC and Cabal
+        uses: actions/cache@v4
+        id: cache-haskell
+        with:
+          path: |
+            ~/.ghcup
+            ~/.cabal/packages
+            ~/.cabal/store
+            ~/.cabal/bin
+          key: ${{ runner.os }}-agda-2.8.0-ghc-9.10.1-v2
+
       - name: Setup Haskell (GHC 9.10.1 + cabal)
         uses: haskell-actions/setup@v2
         with:
@@ -31,18 +42,8 @@ jobs:
       - name: Add cabal bin to PATH
         run: echo "$HOME/.cabal/bin" >> "$GITHUB_PATH"
 
-      - name: Cache cabal directories
-        uses: actions/cache@v4
-        id: cache-cabal
-        with:
-          path: |
-            ~/.cabal/packages
-            ~/.cabal/store
-            ~/.cabal/bin
-          key: ${{ runner.os }}-agda-2.8.0-ghc-9.10.1-v2
-
       - name: Install Agda 2.8.0
-        if: steps.cache-cabal.outputs.cache-hit != 'true'
+        if: steps.cache-haskell.outputs.cache-hit != 'true'
         run: |
           cabal update
           cabal install Agda-2.8.0 --overwrite-policy=always
@@ -173,12 +174,15 @@ jobs:
               with open(index_path, 'r', encoding='utf-8') as f:
                   content = f.read()
 
-              injected_html = f"""
-              <br><span style="font-family: monospace; color: #6a737d;">-- Interactive Graphs:</span><br>
-              &nbsp;&nbsp;<a href="deps-project.html" target="_blank" style="font-family: monospace; color: #0366d6; text-decoration: none; font-weight: 600;">Full Project ({proj_nodes} nodes)</a>
-              <span style="color: #d1d5da; margin: 0 4px;">|</span>
-              <a href="deps-real.html" target="_blank" style="font-family: monospace; color: #28a745; text-decoration: none; font-weight: 600;">Real Module ({real_nodes} nodes)</a><br>
-              """
+              injected_html = (
+                  "<br>"
+                  "<span style='font-family: monospace; color: #6a737d;'>-- Interactive Graphs:</span><br>"
+                  "&nbsp;&nbsp;"
+                  "<a href='deps-project.html' target='_blank' style='display: inline; font-family: monospace; font-size: inherit; color: #0366d6; text-decoration: none; font-weight: 600;'>Full Project (" + str(proj_nodes) + " nodes)</a>"
+                  "<span style='color: #d1d5da; margin: 0 4px;'>|</span>"
+                  "<a href='deps-real.html' target='_blank' style='display: inline; font-family: monospace; font-size: inherit; color: #28a745; text-decoration: none; font-weight: 600;'>Real Module (" + str(real_nodes) + " nodes)</a>"
+                  "<br>"
+              )
               
               pattern = r'(<a\s+[^>]*href="Everything\.html"[^>]*>Everything</a>)\s*'
               
