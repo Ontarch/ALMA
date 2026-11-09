@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pages: write
@@ -16,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout ALMA
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Haskell (GHC 9.10.1 + cabal)
         uses: haskell-actions/setup@v2
@@ -28,7 +32,7 @@ jobs:
         run: echo "$HOME/.cabal/bin" >> "$GITHUB_PATH"
 
       - name: Cache cabal directories
-        uses: actions/cache@v6
+        uses: actions/cache@v4
         id: cache-cabal
         with:
           path: |
@@ -79,6 +83,18 @@ jobs:
           echo "$(pwd)/agda-categories/agda-categories.agda-lib" >> ~/.config/agda/libraries
           echo "standard-library" >> ~/.config/agda/defaults
           echo "agda-categories"  >> ~/.config/agda/defaults
+
+      - name: Cache Agda interface files
+        uses: actions/cache@v4
+        with:
+          path: |
+            _build/
+            src/**/*.agdai
+            agda-stdlib/**/*.agdai
+            agda-categories/**/*.agdai
+          key: agda-${{ runner.os }}-${{ hashFiles('src/**/*.agda') }}
+          restore-keys: |
+            agda-${{ runner.os }}-
 
       - name: Generate Agda HTML documentation
         run: make html
@@ -197,15 +213,10 @@ jobs:
 
       - name: Rewrite absolute paths for /ALMA/ subpath
         run: |
-          # HTML: href="/xxx" → href="/ALMA/xxx"  (排除 //)
           find ./docs -type f -name '*.html' \
             -exec sed -i 's|href="/\([^/]\)|href="/ALMA/\1|g' {} +
-
-          # HTML: src="/xxx" → src="/ALMA/xxx"
           find ./docs -type f -name '*.html' \
             -exec sed -i 's|src="/\([^/]\)|src="/ALMA/\1|g' {} +
-
-          # CSS: url(/xxx) → url(/ALMA/xxx)
           find ./docs -type f -name '*.css' \
             -exec sed -i 's|url(/\([^/]\)|url(/ALMA/\1|g' {} +
 
@@ -223,3 +234,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        timeout-minutes: 20
