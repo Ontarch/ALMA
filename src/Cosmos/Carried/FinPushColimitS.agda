@@ -36,7 +36,8 @@ open import Base.MCorr.Setoid using (SysEq)
 open import Base.MCorr.SetoidPush using (PushSimˢ)
 open import Base.MCorr.SetoidPushComp using (H∘G; push-comp)
 open import Base.MCorr.SetoidPushMap using (push-map)
-open import Cosmos.Carried.LimitSystemS using (TrivDetˢ; n-at)
+open import Cosmos.Carried.LimitSystem using (n-at)
+open import Cosmos.Carried.LimitSystemS using (TrivDetˢ)
 import Cosmos.Carried.LimitSystemS as LS
 
 open SysEq

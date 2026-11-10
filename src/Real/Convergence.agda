@@ -8,7 +8,7 @@
 
 module Real.Convergence where
 
-open import Data.Empty using (⊥; ⊥-elim)
+open import Data.Empty using (⊥-elim)
 open import Data.Nat using (ℕ; _≥_; _⊔_)
 open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; ≤-trans)
 open import Data.Product using (Σ; _,_)
@@ -17,7 +17,7 @@ open import Data.Rational using (ℚ; 0ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣)
 open import Data.Rational.Base using (positive)
 open import Data.Rational.Properties using
   (≤-refl; ≤-<-trans; <-irrefl; +-mono-<; +-identityˡ; +-inverseʳ; 0≤p⇒∣p∣≡p
-  ; positive⁻¹; pos*pos⇒pos; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; 0≤∣p∣
+  ; positive⁻¹; pos*pos⇒pos; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣; 0≤∣p∣; ≤⇒≯
   ; ∣p∣≡0⇒p≡0; <-cmp; neg-distrib-+)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; subst)
@@ -83,18 +83,12 @@ gap-bound {g} {l} {m} cl cm e 0<e =
       sum< = +-mono-< ha hb
   in ≤-<-trans tri sum<
 
--- A nonnegative value cannot be strictly below a smaller value.
---
--- 非负值不可能严格低于更小的值。
-≤∧<⇒⊥ : ∀ {a b} → a ≤ b → b < a → ⊥
-≤∧<⇒⊥ a≤b b<a = <-irrefl refl (≤-<-trans a≤b b<a)
-
 -- A nonnegative point that is not positive must be zero.
 --
 -- 非负且不为正的点必为零。
 nonneg-no-pos : ∀ {x} → 0ℚ ≤ x → ¬ (0ℚ < x) → x ≡ 0ℚ
 nonneg-no-pos {x} 0≤x ¬x>0 with <-cmp x 0ℚ
-nonneg-no-pos 0≤x ¬x>0 | tri< x<0 _ _ = ⊥-elim (≤∧<⇒⊥ 0≤x x<0)
+nonneg-no-pos 0≤x ¬x>0 | tri< x<0 _ _ = ⊥-elim (≤⇒≯ 0≤x x<0)
 nonneg-no-pos 0≤x ¬x>0 | tri≈ _ x≡0 _ = x≡0
 nonneg-no-pos 0≤x ¬x>0 | tri> _ _ 0<x = ⊥-elim (¬x>0 0<x)
 

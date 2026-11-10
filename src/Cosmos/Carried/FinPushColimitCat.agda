@@ -43,7 +43,7 @@ open import Categories.Category.Core using (Category)
 open import Categories.Functor using (Functor)
 
 open import Base.DetCat using (DetSys; DM; idDM; compDM; _≈DM_; DetCat)
-open import Cosmos.Carried.LimitSystemS using (n-at; natToFin; toℕ-natToFin)
+open import Cosmos.Carried.LimitSystem using (n-at; natToFin; toℕ-natToFin)
 import Cosmos.Carried.LimitSystemS as LS
 
 open DetSys using (I) renaming (step to step-det)

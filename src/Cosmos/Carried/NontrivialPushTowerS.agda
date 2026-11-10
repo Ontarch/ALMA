@@ -57,7 +57,7 @@ import Cosmos.Carried.SeqColimitCat as SQC
 open import Cosmos.Carried.SameIndexCatS using
   (LabelSys; dsys; Idx⇒; idxi; compi; _≈i_; ≈i-refl; ≈i-sym; ≈i-trans
   ; ∘-resp-≈i; SameIndexCat)
-open import Cosmos.Carried.LimitSystemS using (n-at)
+open import Cosmos.Carried.LimitSystem using (n-at)
 import Cosmos.Carried.LimitSystemS as LS
 
 open SysEq

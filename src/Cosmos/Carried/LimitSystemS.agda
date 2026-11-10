@@ -38,31 +38,8 @@ open import Base.MCorr using (M)
 open import Base.MCorr.Setoid using (SysEq; propEqOn; _≈Mˢ_; idAdjˢ)
 open import Base.MCorr.SetoidPush using (PushSimˢ)
 open import Cosmos.Carried.FinProj using (clamp; clamp-val)
-
+open import Cosmos.Carried.LimitSystem using (n-at; natToFin; toℕ-natToFin)
 open SysEq
-
-------------------------------------------------------------------------
--- Stage object-set size
---
--- n-at m = suc (suc m).
---
--- 每层对象集大小
---
--- n-at m = suc (suc m)。
-
-n-at : ℕ → ℕ
-n-at m = suc (suc m)
-
--- Canonical representative of v in stage v, always in range.
---
--- v 在第 v 层的典范代表，永远在范围内。
-natToFin : (v : ℕ) → Fin (n-at v)
-natToFin zero    = zero
-natToFin (suc v) = suc (natToFin v)
-
-toℕ-natToFin : (v : ℕ) → toℕ (natToFin v) ≡ v
-toℕ-natToFin zero    = refl
-toℕ-natToFin (suc v) = cong suc (toℕ-natToFin v)
 
 ------------------------------------------------------------------------
 -- Trivial-fibre deterministic setoid system

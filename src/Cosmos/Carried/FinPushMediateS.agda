@@ -32,7 +32,8 @@ open import Relation.Binary.PropositionalEquality.Core using (cong; trans; sym)
 open import Base.MCorr using (M)
 open import Base.MCorr.Setoid using (SysEq; _≈Mˢ_; idAdjˢ)
 open import Base.MCorr.SetoidPush using (PushSimˢ)
-open import Cosmos.Carried.LimitSystemS using (TrivDetˢ; n-at)
+open import Cosmos.Carried.LimitSystem using (n-at)
+open import Cosmos.Carried.LimitSystemS using (TrivDetˢ)
 import Cosmos.Carried.LimitSystemS as LS
 
 open SysEq

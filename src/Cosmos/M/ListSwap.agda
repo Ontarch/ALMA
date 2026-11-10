@@ -36,7 +36,7 @@ open import Axiom.UniquenessOfIdentityProofs using (module Decidable⇒UIP)
 open import Data.Unit.Polymorphic.Base using (⊤; tt)
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Fin.Base using
-  (Fin; toℕ; splitAt; join; opposite) renaming (zero to fzero; suc to fsuc)
+  (Fin; toℕ; splitAt; join; opposite) renaming (zero to fzero)
 open import Data.Fin.Properties using (opposite-involutive; join-splitAt; splitAt-join)
 open import Data.Sum.Base using (_⊎_; inj₁; inj₂)
 open import Data.Product.Base using (proj₁)
@@ -317,19 +317,12 @@ private
   e0 : LE (tt , 2) dList (tt , 0)
   e0 = fzero , refl
 
-  e1 : LE (tt , 2) (σlabel dList) (tt , 0)
-  e1 = fsuc fzero , refl
-
-private
   adjAt : FiberAdjˢ (propEqOn (LE (tt , 2) (σlabel dList) (tt , 0)))
                     (propEqOn (LE (tt , 2) dList (tt , 0)))
   adjAt = FMapˢ.adjFˢ (FMˢ.mor swapFMˢ) (tt , 2) dList (tt , 0)
 
   fwd : LE (tt , 2) dList (tt , 0) → LE (tt , 2) (σlabel dList) (tt , 0)
   fwd = FiberAdjˢ.to adjAt
-
-swap-sends-0→1 : fwd e0 ≡ e1
-swap-sends-0→1 = refl
 
 -- The forward edge leaving child shape 0 carries position 1, never
 -- position 0: the relabelling is not the identity on edges.
