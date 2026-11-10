@@ -42,12 +42,12 @@ open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
 open import Real.Interval.Mul.Laws using
   (*ℝ-comm; *ℝ-assoc; *ℝ-identityˡ; *ℝ-identityʳ)
 open import Real.Interval.Mul.Cong using (*ℝ-cong)
-open import Real.Interval.Mul.Order using (pos*pos; <-*mono; ≈-<-respʳ)
+open import Real.Interval.Mul.Order using (pos*pos; <-*mono; ≈-<-respʳ; u-dyadic-0)
 open import Real.Interval.ArithLaws using (negℝ-0ℝ)
 open import Real.Interval.Inverse using (*ℝ-inverse-pos)
 open import Real.Interval.Embed using (0ℝ<ℝ1ℝ)
 open import Real.Interval.Recip using
-  (recipℝ; recipℝ'; recipCauchy; realI→posCauchy; PosCauchy; u-0ℝ)
+  (recipℝ; recipℝ'; recipCauchy; realI→posCauchy; PosCauchy)
 open import Real.CauchyToInterval using
   (cauchy→realI; M; node-go)
 open import Real.Interval.Kit using (add-self; recip-antitone; strict-recip)
@@ -135,7 +135,7 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
   n₀ = proj₁ 0<x
 
   δn₀<l : δ n₀ < l x n₀
-  δn₀<l = subst (λ z → z < l x n₀) (u-0ℝ n₀) (proj₂ 0<x)
+  δn₀<l = subst (λ z → z < l x n₀) (u-dyadic-0 n₀) (proj₂ 0<x)
 
   l≤U : l x n₀ ≤ u x 0
   l≤U = ≤-trans (<⇒≤ (RealI.lo (node x n₀)))
@@ -253,7 +253,7 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
   goal : u 0ℝ n < l (cauchy→realI cs) n
   goal =
     subst (λ z → z < l (cauchy→realI cs) n)
-          (sym (u-0ℝ n))
+          (sym (u-dyadic-0 n))
           (subst (λ z → δ n < z) (sym lR≡) δn<lR)
 
 -- Sign preservation.

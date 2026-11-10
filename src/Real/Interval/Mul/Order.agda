@@ -29,6 +29,7 @@ open ≡-Reasoning
 
 open import Base.RationalRing using (neg-involutive)
 open import Real using (embed; ε; half; embed-mono-≤; embed-suc-pos; ε-half)
+open import Real.Archimedean using (ε-archimedean)
 open import Real.Interval using (RealI; δ; δ-pos; pos-pow)
 open import Real.IntervalEquiv using (node; l; u; centre; l-mono)
 open import Real.Interval.Arith using (0ℝ; _+ℝ_; _-ℝ_; negℝ)
@@ -37,7 +38,7 @@ open import Real.Interval.Node using
   (node-*ℝ; node-negℝ; centre-add; u-dyadic; centre-neg; l-neg; u-neg)
 open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-refl; ≈ℝ-sym; ≈ℝ-trans)
 open import Real.Interval.Order using (_<ℝ_)
-open import Real.Interval.OrderLaws using (eps-below; <-+mono; <-neg; <-sub; ≈-<-resp)
+open import Real.Interval.OrderLaws using (<-+mono; <-neg; <-sub; ≈-<-resp)
 open import Real.Interval.ArithLaws using
   (x-ℝx; +ℝ-assoc; +ℝ-inverseˡ; +ℝ-identityˡ; +ℝ-identityʳ)
 open import Real.Interval.Mul.Laws using (*ℝ-distribʳ-+)
@@ -421,10 +422,10 @@ pos*pos a b (n , δn<lan) (m , δm<lbm) = K , goal
              {{pos*pos⇒pos L {{positive 0<L}} M {{positive 0<M}}}}
 
     j : ℕ
-    j = proj₁ (eps-below (L * M) 0<LM)
+    j = proj₁ (ε-archimedean (L * M) 0<LM)
 
     δj<LM : δ j < L * M
-    δj<LM = ≤-<-trans (δ≤ε j) (proj₂ (eps-below (L * M) 0<LM))
+    δj<LM = ≤-<-trans (δ≤ε j) (proj₂ (ε-archimedean (L * M) 0<LM))
 
     K : ℕ
     K = j ⊔ℕ n ⊔ℕ m

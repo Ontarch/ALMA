@@ -30,9 +30,8 @@ open import Real.IntervalEquiv using
 open import Real.Interval.Arith using (_+ℝ_)
 open import Real.Interval.Complete using (_⟶_)
 open import Real.Interval.Node using (centre-add)
-open import Real.Interval.Rational using (sub-add)
-open import Real.Interval.Kit using
-  (two-half; 0≤half; add-self; *-mono-≤-nonNeg)
+open import Real.Interval.Rational using (cancel-plus)
+open import Real.Interval.Kit using (two-half; 0≤half; add-self; *-mono-≤-nonNeg)
 open import Real.Interval.Mul using (cancelʳ; cancel-z)
 
 ------------------------------------------------------------------------
@@ -58,9 +57,8 @@ prepend l0 u0 l0<u0 tail nest = record
 -- 共同的偏移 d 在差中抵消。
 shift-cancel : ∀ c d w → (c + d) - (w + d) ≡ c - w
 shift-cancel c d w =
-  trans (sub-add c d w d)
-    (trans (cong ((c - w) +_) (+-inverseʳ d))
-      (+-identityʳ (c - w)))
+  trans (cong₂ _-_ (+-comm c d) (+-comm w d))
+        (cancel-plus d c w)
 
 -- (q + W) - (q - W) ≡ W + W.
 --

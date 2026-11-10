@@ -18,8 +18,8 @@ open import Data.Rational.Properties using
   (≤-trans; ≤-refl; ≤-reflexive; <-≤-trans; ≤-<-trans; +-mono-≤; +-monoˡ-<
   ; +-assoc; +-identityˡ; +-identityʳ; +-inverseˡ; *-assoc; *-identityˡ
   ; *-identityʳ; *-comm; *-distribˡ-+; *-distribʳ-+; pos⇒nonNeg; 0≤∣p∣
-  ; neg-antimono-≤; neg-distrib-+; neg-distribˡ-*; +-comm; +-inverseʳ
-  ; *-monoˡ-<-pos; *-monoʳ-≤-nonNeg; +-monoʳ-<)
+  ; neg-antimono-≤; neg-distribˡ-*; +-comm; +-inverseʳ; *-monoˡ-<-pos
+  ; *-monoʳ-≤-nonNeg; +-monoʳ-<)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; trans; sym; cong; cong₂; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -32,40 +32,13 @@ open import Real.Interval.Node using (l-dyadic; u-dyadic)
 open import Real.Interval.Kit using (0<half; half+half≡1; add-self; 2ℚ*half≡1)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.OrderLaws using (width-below-strict)
-open import Real.Interval.Rational using (r≤|r|; pos-diff)
+open import Real.Interval.Rational using (r≤|r|; pos-diff; cancel-plus)
 open import Real.Interval.Reasoning using (begin≤_; _≤∎; _≈⟨_⟩_; _≤⟨_⟩_; _<⟨_⟩≤[_])
 
 ------------------------------------------------------------------------
 -- Shared rational arithmetic
 --
 -- 共享的有理算术
-
--- (x + y) − (x + z) ≡ y − z.
---
--- 消去公共加项。
-cancel-plus : ∀ x y z → (x + y) - (x + z) ≡ y - z
-cancel-plus x y z = begin
-  (x + y) - (x + z)
-    ≡⟨ cong (λ w → (x + y) + w) (neg-distrib-+ x z) ⟩
-  (x + y) + ((- x) + (- z))
-    ≡⟨ +-assoc x y ((- x) + (- z)) ⟩
-  x + (y + ((- x) + (- z)))
-    ≡⟨ cong (x +_)
-            (trans (sym (+-assoc y (- x) (- z)))
-                   (cong (λ w → w + (- z)) (+-comm y (- x)))) ⟩
-  x + (((- x) + y) + (- z))
-    ≡⟨ cong (x +_) (+-assoc (- x) y (- z)) ⟩
-  x + ((- x) + (y + (- z)))
-    ≡⟨ sym (+-assoc x (- x) (y + (- z))) ⟩
-  (x + (- x)) + (y + (- z))
-    ≡⟨ cong (λ w → w + (y + (- z)))
-            (+-inverseʳ x) ⟩
-  0ℚ + (y + (- z))
-    ≡⟨ +-identityˡ (y + (- z)) ⟩
-  y + (- z)
-    ≡⟨ refl ⟩
-  y - z
-  ∎
 
 embed1≡1 : embed 1 ≡ 1ℚ
 embed1≡1 = refl

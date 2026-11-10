@@ -225,15 +225,6 @@ distribˡ-pair-xy x y n =
                       (centre (x *ℝ y) n)))
           (centre-*ℝ≤ x y n)
 
-distribˡ-pair-xz : (x z : RealI) (n : ℕ) →
-  ∣ centre x (2 ℕ* n) * centre z (2 ℕ* n) - centre (x *ℝ z) n ∣
-    ≤ (width x (2 ℕ* n) * width z (2 ℕ* n)) * half
-distribˡ-pair-xz x z n =
-  ≤-trans (≤-reflexive
-            (abs-swap (centre x (2 ℕ* n) * centre z (2 ℕ* n))
-                      (centre (x *ℝ z) n)))
-          (centre-*ℝ≤ x z n)
-
 distribˡ-mid-rewrite : (x y z : RealI) (n : ℕ) →
   ∣ centre x (2 ℕ* n) * centre (y +ℝ z) (2 ℕ* n)
     - centre ((x *ℝ y) +ℝ (x *ℝ z)) n ∣
@@ -264,7 +255,7 @@ distribˡ-mid-split x y z n =
                   (centre (x *ℝ y) n) (centre (x *ℝ z) n) ⟩
     ∣ centre x (2 ℕ* n) * centre y (2 ℕ* n) - centre (x *ℝ y) n ∣
       + ∣ centre x (2 ℕ* n) * centre z (2 ℕ* n) - centre (x *ℝ z) n ∣
-      ≤⟨ +-mono-≤ (distribˡ-pair-xy x y n) (distribˡ-pair-xz x z n) ⟩
+      ≤⟨ +-mono-≤ (distribˡ-pair-xy x y n) (distribˡ-pair-xy x z n) ⟩
     (width x (2 ℕ* n) * width y (2 ℕ* n)) * half
       + (width x (2 ℕ* n) * width z (2 ℕ* n)) * half
   ≤∎
@@ -345,24 +336,6 @@ distribˡ-rec3 x y z n =
 --
 -- 右分配律：辅助引理
 
-distribʳ-pair-xz : (x z : RealI) (n : ℕ) →
-  ∣ centre x (2 ℕ* n) * centre z (2 ℕ* n) - centre (x *ℝ z) n ∣
-    ≤ (width x (2 ℕ* n) * width z (2 ℕ* n)) * half
-distribʳ-pair-xz x z n =
-  ≤-trans (≤-reflexive
-            (abs-swap (centre x (2 ℕ* n) * centre z (2 ℕ* n))
-                      (centre (x *ℝ z) n)))
-          (centre-*ℝ≤ x z n)
-
-distribʳ-pair-yz : (y z : RealI) (n : ℕ) →
-  ∣ centre y (2 ℕ* n) * centre z (2 ℕ* n) - centre (y *ℝ z) n ∣
-    ≤ (width y (2 ℕ* n) * width z (2 ℕ* n)) * half
-distribʳ-pair-yz y z n =
-  ≤-trans (≤-reflexive
-            (abs-swap (centre y (2 ℕ* n) * centre z (2 ℕ* n))
-                      (centre (y *ℝ z) n)))
-          (centre-*ℝ≤ y z n)
-
 distribʳ-mid-rewrite : (x y z : RealI) (n : ℕ) →
   ∣ centre (x +ℝ y) (2 ℕ* n) * centre z (2 ℕ* n)
     - centre ((x *ℝ z) +ℝ (y *ℝ z)) n ∣
@@ -393,7 +366,7 @@ distribʳ-mid-split x y z n =
                   (centre (x *ℝ z) n) (centre (y *ℝ z) n) ⟩
     ∣ centre x (2 ℕ* n) * centre z (2 ℕ* n) - centre (x *ℝ z) n ∣
       + ∣ centre y (2 ℕ* n) * centre z (2 ℕ* n) - centre (y *ℝ z) n ∣
-      ≤⟨ +-mono-≤ (distribʳ-pair-xz x z n) (distribʳ-pair-yz y z n) ⟩
+      ≤⟨ +-mono-≤ (distribˡ-pair-xy x z n) (distribˡ-pair-xy y z n) ⟩
     (width x (2 ℕ* n) * width z (2 ℕ* n)) * half
       + (width y (2 ℕ* n) * width z (2 ℕ* n)) * half
   ≤∎

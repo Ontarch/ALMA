@@ -25,7 +25,7 @@ open import Data.Rational.Properties using
   ; ≤-trans; 0≤p⇒∣p∣≡p; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; pos*pos⇒pos
   ; pos⇒nonNeg; <-≤-trans; ≤-<-trans; <⇒≤; *-monoˡ-≤-nonNeg; *-monoʳ-≤-nonNeg
   ; *-cancelˡ-≤-pos; *-cancelˡ-<-nonNeg; ∣p+q∣≤∣p∣+∣q∣; ∣-p∣≡∣p∣
-  ; <-trans; +-assoc; +-comm; +-inverseˡ; +-identityʳ; *-zeroˡ; *-monoʳ-<-pos
+  ; +-assoc; +-comm; +-inverseˡ; +-identityʳ; *-zeroˡ; *-monoʳ-<-pos
   ; neg-distribˡ-*)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; module ≡-Reasoning)
@@ -505,9 +505,6 @@ pick B 0≤B k = m , bound
 0<embed2 : 0ℚ < embed 2
 0<embed2 = embed-mono-< (s≤s z≤n)
 
-0<embed3 : 0ℚ < embed 3
-0<embed3 = <-trans 0<embed2 (embed-mono-< (s≤s (s≤s (s≤s z≤n))))
-
 -- Nonpositive inputs have nonnegative negation.
 --
 -- 非正数的取负非负。
@@ -539,13 +536,6 @@ npos⇒∣p∣≡neg {x} x≤0 =
 
 halveQ : ℚ → ℚ
 halveQ x = x * half
-
-half≥0' : 0ℚ ≤ half
-half≥0' =
-  let embed2-pos = positive (embed-mono-< (s≤s z≤n))
-      half-pos : Positive half
-      half-pos = 1/pos⇒pos (embed 2) {{embed2-pos}}
-  in <⇒≤ (positive⁻¹ half {{half-pos}})
 
 halveQ-mono : {a b : ℚ} → a ≤ b → halveQ a ≤ halveQ b
 halveQ-mono {a} {b} p =

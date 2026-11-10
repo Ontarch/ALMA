@@ -11,11 +11,10 @@ module Real.Interval.Recip where
 open import Data.Empty using (⊥)
 open import Data.Nat using (ℕ; suc; z≤n; _∸_; _^_; _≥_; s≤s)
   renaming (_≤_ to _≤ℕ_; _+_ to _+ℕ_; _*_ to _*ℕ_; _<_ to _<ℕ_)
-open import Data.Nat.Properties using
+open import Data.Nat.Properties as ℕP using
   (m≤m+n; m≤n+m; +-suc; *-mono-≤; *-suc; ^-distribʳ-*; ^-distribˡ-+-*)
   renaming (≤-trans to ≤ℕ-trans; ≤-refl to ≤ℕ-refl; *-comm to *ℕ-comm
-          ; *-assoc to *ℕ-assoc; *-identityʳ to *ℕ-identityʳ)
-import Data.Nat.Properties as ℕP
+  ; *-assoc to *ℕ-assoc; *-identityʳ to *ℕ-identityʳ)
 open import Data.Product using (proj₁; proj₂)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Rational using
@@ -26,7 +25,7 @@ open import Data.Rational.Properties using
   (pos⇒nonZero; positive⁻¹; 1/pos⇒pos; pos*pos⇒pos; pos⇒nonNeg; <⇒≤
   ; <-trans; ≤-reflexive; ≤-trans; <-irrefl; *-comm; *-assoc; *-identityˡ
   ; *-identityʳ; *-inverseʳ; *-inverseˡ; *-distribʳ-+; neg-distribˡ-*
-  ; neg-distrib-+; +-identityʳ; +-comm; <-≤-trans; ≤-<-trans; *-monoˡ-≤-nonNeg
+  ; neg-distrib-+; +-comm; <-≤-trans; ≤-<-trans; *-monoˡ-≤-nonNeg
   ; *-monoʳ-≤-nonNeg; *-monoˡ-<-pos; *-cancelˡ-≤-pos; 0≤∣p∣; ∣-p∣≡∣p∣
   ; ∣p*q∣≡∣p∣*∣q∣; 0≤p⇒∣p∣≡p)
 open import Relation.Nullary using (¬_)
@@ -38,9 +37,9 @@ open import Base.RationalRing using (neg-involutive)
 open import Real using
   (CauchySeq; ε; embed-mono-≤; embed; embed-suc-pos; embed-*-hom; 0≤embed; embed-mono-<)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
-open import Real.Interval using (RealI; δ; δ-pos)
+open import Real.Interval using (RealI; δ-pos)
 open import Real.IntervalEquiv using
-  (l; u; l-mono; centre-l; bound-w; realI→cauchy; n<2^n)
+  (l; l-mono; centre-l; bound-w; realI→cauchy; n<2^n)
 open import Real.CauchyToInterval using (cauchy→realI; K)
 open import Real.Interval.Order using (_<ℝ_)
 open import Real.Interval.Arith using (0ℝ; negℝ)
@@ -48,7 +47,7 @@ open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.ArithLaws using (negℝ-0ℝ)
 open import Real.Interval.Kit using
   (*-mono-≤-nonNeg; recip-antitone; n≤2n; strict-recip)
-open import Real.Interval.Node using (u-dyadic)
+open import Real.Interval.Mul.Order using (u-dyadic-0)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 open import Real.Interval.Rational using (suc∸1)
 
@@ -113,16 +112,6 @@ inv-sub : (A B : ℚ) {{A-nz : NonZero A}} {{B-nz : NonZero B}}
   {{AB-nz : NonZero (A * B)}} →
   (1/ A) - (1/ B) ≡ (B + neg A) * (1/ (A * B))
 inv-sub A B = InvSubAux.proof A B
-
--- Upper bound of the zero interval real
---
--- The upper bound of 0ℝ at precision K is exactly δ K.
---
--- 零区间实数的上界
---
--- 在精度 K 下，零区间实数的上界等于该层的二进半径。
-u-0ℝ : (K : ℕ) → u 0ℝ K ≡ δ K
-u-0ℝ K = trans (u-dyadic 0ℚ K) (+-identityʳ (δ K))
 
 ------------------------------------------------------------------------
 -- Positive Cauchy sequences
@@ -471,7 +460,7 @@ module RealIToPosCauchyAux (x : RealI) (0<x : 0ℝ <ℝ x) where
 
   0<lxn : 0ℚ < l x n
   0<lxn = <-trans (δ-pos n)
-            (subst (λ z → z < l x n) (u-0ℝ n) δn<lxn)
+            (subst (λ z → z < l x n) (u-dyadic-0 n) δn<lxn)
 
   bound : ∀ m → m ≥ n → l x n ≤ seq-f (realI→cauchy x) m
   bound m m≥n =

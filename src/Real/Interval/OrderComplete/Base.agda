@@ -20,8 +20,8 @@ open import Data.Rational.Base using (-_)
 open import Data.Rational.Properties using
   (≤-reflexive; ≤-trans; <-≤-trans; +-mono-≤; +-monoˡ-<; +-monoʳ-<; +-comm
   ; +-assoc; *-assoc; *-identityˡ; *-identityʳ; *-distribˡ-+; +-identityˡ
-  ; +-identityʳ; pos⇒nonNeg; *-monoˡ-<-pos; *-monoʳ-<-pos; *-zeroˡ
-  ; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; neg-antimono-≤; +-monoˡ-≤)
+  ; +-identityʳ; pos⇒nonNeg; *-monoʳ-≤-nonNeg; *-monoˡ-≤-nonNeg; neg-antimono-≤
+  ; +-monoˡ-≤; pos*pos⇒pos; positive⁻¹)
   renaming (+-inverseʳ to +-invʳ; +-inverseˡ to +-invˡ)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; trans; subst; subst₂; module ≡-Reasoning)
@@ -259,8 +259,8 @@ quarter : ℚ
 quarter = half * half
 
 0<quarter : 0ℚ < quarter
-0<quarter = subst (λ z → z < quarter) (*-zeroˡ half)
-              (*-monoʳ-<-pos half 0<half)
+0<quarter = positive⁻¹ quarter
+  {{pos*pos⇒pos half {{positive 0<half}} half {{positive 0<half}}}}
 
 qq≡h : quarter + quarter ≡ half
 qq≡h =
@@ -354,11 +354,6 @@ half≡32 =
       ≡⟨ refl ⟩
     embed 32 * q3
       ∎
-
-0<q2 : 0ℚ < quarter * quarter
-0<q2 = *-monoˡ-<-pos quarter 0<quarter
-0<q3 : 0ℚ < q3
-0<q3 = *-monoˡ-<-pos quarter 0<q2
 
 27≤32 : 27 ≤N 32
 27≤32 = m≤n+m 27 5

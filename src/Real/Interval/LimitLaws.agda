@@ -26,12 +26,12 @@ open import Relation.Binary.PropositionalEquality using
 open import Relation.Nullary using (¬_)
 
 open import Real using (ε; 0<ε; half; embed; embed-mono-≤; embed-suc-pos)
+open import Real.Archimedean using (ε-archimedean)
 open import Real.Interval using (RealI)
 open import Real.IntervalEquiv using (centre; l; u; centre-l; centre-u)
 open import Real.Interval.Arith using (negℝ)
 open import Real.Interval.Complete using (_⟶_)
 open import Real.Interval.Node using (centre-neg)
-open import Real.Interval.OrderLaws using (eps-below)
 open import Real.Interval.Equiv using (_≈ℝ_)
 open import Real.Interval.Rational using (r≤|r|; pos-diff)
 open import Real.Interval.Kit using (recip-antitone; two-half; abs-swap; 0<half)
@@ -190,7 +190,7 @@ gap-contradiction {A} {B} {f} {j} convA convB gap =
     0<g : 0ℚ < g
     0<g = pos-diff (u A j) (l B j) gap
 
-    q , εq< = eps-below (g * half)
+    q , εq< = ε-archimedean (g * half)
                 (positive⁻¹ (g * half)
                   {{pos*pos⇒pos g {{positive 0<g}} half {{positive 0<half}}}})
     p = q ⊔ j

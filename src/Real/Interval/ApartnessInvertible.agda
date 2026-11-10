@@ -11,7 +11,7 @@ module Real.Interval.ApartnessInvertible where
 open import Data.Empty using (⊥-elim)
 open import Data.Nat using (ℕ; zero; suc; _∸_; _^_; z≤n; s≤s)
   renaming (_*_ to _ℕ*_; _+_ to _ℕ+_; _<_ to _ℕ<_; _≤_ to _ℕ≤_; _≥_ to _ℕ≥_)
-open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; *-suc; m∸n+n≡m; ^-monoʳ-≤)
+open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; *-suc; ^-monoʳ-≤)
   renaming (<⇒≤ to ℕ<⇒≤)
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.Sum using (_⊎_; inj₁; inj₂; [_,_]′)
@@ -43,6 +43,7 @@ open import Real.IntervalEquiv using
   ; 0<width; n<2^n; 1≤2^n)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; _+ℝ_; negℝ; _-ℝ_)
 open import Real.Interval.Mul using (_*ℝ_)
+open import Real.Interval.Mul.Order using (δ-mono; u-dyadic-0)
 open import Real.Interval.Order using (_<ℝ_; l-mono'; u-mono')
 open import Real.Interval.AbsTriangle using (l0ℝ)
 open import Real.Interval.Apartness using (_#ℝ_)
@@ -377,10 +378,6 @@ pow2-nz n = pos⇒nonZero (pow2 n) {{posPow2 n}}
 δ-mono-aux n zero    = ≤-refl
 δ-mono-aux n (suc k) = ≤-trans (δs≤δ (k ℕ+ n)) (δ-mono-aux n k)
 
-δ-mono : {n m : ℕ} → n ℕ≤ m → δ m ≤ δ n
-δ-mono {n} {m} n≤m =
-  subst (λ z → δ z ≤ δ n) (m∸n+n≡m n≤m) (δ-mono-aux n (m ∸ n))
-
 pow2-mono : {n m : ℕ} → n ℕ≤ m → pow2 n ≤ pow2 m
 pow2-mono {n} {m} n≤m = embed-mono-≤ (^-monoʳ-≤ 2 n≤m)
 
@@ -609,12 +606,6 @@ l-sub x y n =
     l x n + neg (u y n)
   ∎
 
--- u 0ℝ n = δ n, l 0ℝ n = -δ n.
---
--- 零区间的上下端点分别为正负二进容差。
-u-0 : (n : ℕ) → u 0ℝ n ≡ δ n
-u-0 n = trans (u-dyadic 0ℚ n) (+-identityʳ (δ n))
-
 -- (x -ℝ y) <ℝ 0ℝ implies x <ℝ y.
 --
 -- 差严格小于零蕴含前者严格小于后者。
@@ -671,7 +662,7 @@ d<0⇒x<y x y (n , wn) =
 0<d⇒y<x : (x y : RealI) → 0ℝ <ℝ (x -ℝ y) → y <ℝ x
 0<d⇒y<x x y (n , wn) =
   let w2 : δ n < l x n - u y n
-      w2 = subst₂ _<_ (u-0 n) (l-sub x y n) wn
+      w2 = subst₂ _<_ (u-dyadic-0 n) (l-sub x y n) wn
       w3 : u y n + δ n < u y n + (l x n - u y n)
       w3 = +-monoʳ-< (u y n) w2
       rhs≡ : u y n + (l x n - u y n) ≡ l x n
@@ -842,7 +833,7 @@ inv⇒d#0 d (z , dz≈1) =
             ldn = l-mono' d {2 ℕ* n₀} {n} n≥2n
             δn<ldn : δ n < l d n
             δn<ldn = <-≤-trans δn<ld ldn
-        in inj₂ (n , subst₂ _<_ (sym (u-0 n)) refl δn<ldn)
+        in inj₂ (n , subst₂ _<_ (sym (u-dyadic-0 n)) refl δn<ldn)
 
       neg-case : u d (2 ℕ* n₀) < 0ℚ → d #ℝ 0ℝ
       neg-case ud<0 =

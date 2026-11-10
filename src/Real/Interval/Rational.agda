@@ -21,14 +21,15 @@ open import Data.Rational.Properties using
   ; *-comm; <⇒≤; <-cmp; ≤-trans; *-inverseʳ; *-identityʳ; ≤-antisym
   ; neg-antimono-≤; 0≤∣p∣; ∣-p∣≡∣p∣; *-inverseˡ; ∣p∣≡p∨∣p∣≡-p
   ; 0≤p⇒∣p∣≡p; toℚᵘ-cancel-<; toℚᵘ-fromℚᵘ; p⊓q≤p; p⊓q≤q; p≤p⊔q; p≤q⊔p
-  ; p≤q⇒p⊓q≡p; p≥q⇒p⊓q≡q; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p; ⊓-glb; ⊔-lub; ⊓-sel; ⊔-sel)
+  ; p≤q⇒p⊓q≡p; p≥q⇒p⊓q≡q; p≤q⇒p⊔q≡q; p≥q⇒p⊔q≡p; ⊓-glb; ⊔-lub; ⊓-sel; ⊔-sel
+  ; +-assoc; +-identityˡ)
 open import Data.Rational.Unnormalised.Base using
   (ℚᵘ; mkℚᵘ; _≃_; *≡*; *<*) renaming (_<_ to _<ᵘ_)
 open import Data.Rational.Unnormalised.Properties using (<-respˡ-≃; <-respʳ-≃)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Function.Base using (case_of_)
 open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; cong; cong₂; sym; subst; subst₂; module ≡-Reasoning)
+  (_≡_; refl; cong; cong₂; sym; trans; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 open import Relation.Nullary.Negation using (¬_)
 open import Relation.Binary.Definitions using (tri<; tri≈; tri>)
@@ -54,12 +55,13 @@ pos-diff a b a<b =
 ------------------------------------------------------------------------
 -- Algebra of subtraction
 --
--- sub-add distributes subtraction over addition; negsub and neg-sub
--- flip differences.
+-- sub-add distributes subtraction over addition; cancel-plus cancels a
+-- common addend; negsub and neg-sub flip differences.
 --
 -- 减法代数
 --
--- sub-add 把减法分配到加法；negsub 与 neg-sub 翻转差。
+-- sub-add 把减法分配到加法；cancel-plus 消去公共加项；negsub 与
+-- neg-sub 翻转差。
 
 sub-add : (a b c d : ℚ) → (a + b) - (c + d) ≡ (a - c) + (b - d)
 sub-add a b c d = begin
@@ -68,6 +70,32 @@ sub-add a b c d = begin
   (a + b) + (neg c + neg d)
     ≡⟨ +interchange a b (neg c) (neg d) ⟩
   (a - c) + (b - d)
+  ∎
+
+-- (x + y) − (x + z) ≡ y − z。
+--
+-- 消去公共加项。
+cancel-plus : ∀ x y z → (x + y) - (x + z) ≡ y - z
+cancel-plus x y z = begin
+  (x + y) - (x + z)
+    ≡⟨ cong (λ w → (x + y) + w) (neg-distrib-+ x z) ⟩
+  (x + y) + (neg x + neg z)
+    ≡⟨ +-assoc x y (neg x + neg z) ⟩
+  x + (y + (neg x + neg z))
+    ≡⟨ cong (λ w → x + w)
+            (trans (sym (+-assoc y (neg x) (neg z)))
+                   (cong (λ w → w + neg z) (+-comm y (neg x)))) ⟩
+  x + ((neg x + y) + neg z)
+    ≡⟨ cong (λ w → x + w) (+-assoc (neg x) y (neg z)) ⟩
+  x + (neg x + (y + neg z))
+    ≡⟨ sym (+-assoc x (neg x) (y + neg z)) ⟩
+  (x + neg x) + (y + neg z)
+    ≡⟨ cong (λ w → w + (y + neg z)) (+-inverseʳ x) ⟩
+  0ℚ + (y + neg z)
+    ≡⟨ +-identityˡ (y + neg z) ⟩
+  y + neg z
+    ≡⟨ refl ⟩
+  y - z
   ∎
 
 negsub : ∀ x y → neg (x - y) ≡ y - x

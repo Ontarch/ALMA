@@ -11,8 +11,8 @@ module Real.Interval.OrderLaws where
 open import Data.Nat using (ℕ; zero; suc; _≥_; _⊔_; _^_; _∸_; s≤s; z≤n)
   renaming (_≤_ to _≤ℕ_; _+_ to _+ℕ_)
 open import Data.Nat.Properties using (m≤m⊔n; m≤n⊔m; m∸n+n≡m)
-  renaming (≤-trans to ≤ℕ-trans; +-suc to +-sucℕ
-  ; +-comm to +-commℕ; +-identityʳ to +-identityʳℕ)
+  renaming (≤-trans to ≤ℕ-trans; +-suc to +-sucℕ; +-comm to +-commℕ
+  ; +-identityʳ to +-identityʳℕ)
 open import Data.Product using (Σ; _,_; _×_; proj₁; proj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _≤_; _<_; ∣_∣; Positive; NonZero; positive)
@@ -23,8 +23,7 @@ open import Data.Rational.Properties using
   ; *-monoˡ-<-pos; pos⇒nonZero; positive⁻¹; 1/pos⇒pos; pos⇒nonNeg; *-inverseʳ
   ; *-inverseˡ; *-comm; *-assoc; *-identityʳ; *-identityˡ; *-zeroˡ; *-zeroʳ
   ; *-distribˡ-+; +-inverseʳ; +-inverseˡ; +-identityʳ; +-identityˡ; +-comm
-  ; +-assoc; neg-distrib-+; neg-antimono-≤; neg-antimono-<; ∣-p∣≡∣p∣
-  ; *-cancelˡ-<-nonNeg)
+  ; +-assoc; neg-distrib-+; neg-antimono-≤; neg-antimono-<; ∣-p∣≡∣p∣)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; cong; cong₂; sym; subst; module ≡-Reasoning)
 open ≡-Reasoning
@@ -43,6 +42,7 @@ open import Real.Interval.Node using (l-hom; u-hom; l-neg; u-neg)
 open import Real.Interval.Mul using (le-shift)
 open import Real.Interval.Arith using (_+ℝ_; _-ℝ_; negℝ)
 open import Real.Interval.Rational using (r≤|r|)
+open import Real.Archimedean using (ε-archimedean)
 
 ------------------------------------------------------------------------
 -- Basic order-theoretic facts
@@ -58,64 +58,6 @@ open import Real.Interval.Rational using (r≤|r|)
 -- RealI 上 _<ℝ_ 与 _≈ℝ_ 的基本序论事实：任意正有理数下方有 ε 与
 -- 宽度，宽度随深度递减，上界由中心与宽度控制，序与近似相等相容，
 -- 序在加法、取负与减法下单调。
-
-eps-below : (b : ℚ) → 0ℚ < b → Σ ℕ (λ k → ε k < b)
-eps-below b 0<b = M , goal
-  where
-    instance
-      b-Positive : Positive b
-      b-Positive = positive 0<b
-
-      b-NonZero : NonZero b
-      b-NonZero = pos⇒nonZero b
-
-    inv : ℚ
-    inv = 1/ b
-
-    0<inv : 0ℚ < inv
-    0<inv = positive⁻¹ inv {{1/pos⇒pos b}}
-
-    M : ℕ
-    M = proj₁ (bound-w inv (<⇒≤ 0<inv))
-
-    inv≤M : inv ≤ embed M
-    inv≤M = proj₂ (bound-w inv (<⇒≤ 0<inv))
-
-    M<sM : embed M < embed (suc M)
-    M<sM = embed-mono-< {M} {suc M}
-             (s≤s (Data.Nat.Properties.≤-refl))
-
-    inv<sM : inv < embed (suc M)
-    inv<sM = ≤-<-trans inv≤M M<sM
-
-    sM : ℚ
-    sM = embed (suc M)
-
-    instance
-      sM-Positive : Positive sM
-      sM-Positive = embed-suc-pos
-
-      sM-NonZero : NonZero sM
-      sM-NonZero = pos⇒nonZero sM
-
-    b-inv<b-sM : b * inv < b * sM
-    b-inv<b-sM = *-monoʳ-<-pos b inv<sM
-
-    1<b-sM : 1ℚ < b * sM
-    1<b-sM = subst (λ z → z < b * sM) (*-inverseʳ b) b-inv<b-sM
-
-    sM-b : sM * b ≡ b * sM
-    sM-b = *-comm sM b
-
-    ε-eq : 1/ sM ≡ ε M
-    ε-eq = refl
-
-    goal : ε M < b
-    goal =
-      subst (λ z → z < b) ε-eq
-        (*-cancelˡ-<-nonNeg sM {{pos⇒nonNeg sM}}
-          (subst (λ z → z < sM * b) (sym (*-inverseʳ sM))
-                 (subst (λ z → 1ℚ < z) (sym sM-b) 1<b-sM)))
 
 -- A width below any positive rational
 --
@@ -394,7 +336,7 @@ half+half²<1 =
                 (*-monoˡ-<-pos half {{positive 0<half}} 0<d)
 
     e-res : Σ ℕ (λ j → ε j < b)
-    e-res = eps-below b 0<b
+    e-res = ε-archimedean b 0<b
 
     k : ℕ
     k = proj₁ e-res

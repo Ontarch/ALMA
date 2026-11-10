@@ -10,12 +10,8 @@ module Real.Interval.Infimum where
 
 open import Data.Product using (Σ; _,_; proj₁; proj₂; _×_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Rational using (ℚ; _-_; _<_; ∣_∣) renaming (-_ to neg)
-open import Data.Rational.Properties using
-  (neg-antimono-<; neg-distrib-+; ∣-p∣≡∣p∣)
-open import Relation.Binary.PropositionalEquality using
-  (_≡_; cong; cong₂; sym; subst; module ≡-Reasoning)
-open ≡-Reasoning
+open import Data.Rational using (ℚ; _<_) renaming (-_ to neg)
+open import Data.Rational.Properties using (neg-antimono-<)
 open import Function.Base using (case_of_)
 
 open import Real.Interval using (RealI; embedℚ)
@@ -26,13 +22,10 @@ open import Real.Interval.OrderComplete.Base using
   (Subset; Located; Upper; Occupied; _≤ℝ_)
 open import Real.Interval.OrderComplete using (order-complete)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
-open import Real.Interval.Mul.Order using (≈-<-respʳ)
+open import Real.Interval.Mul.Order using (≈-<-respʳ; ≈-neg)
 open import Real.Interval.OrderLe using (≤ℝ-trans; ≈⇒≤ℝ; ≤ℝ-resp-≈)
 open import Real.Interval.ArithLaws using (negℝ-negℝ)
 open import Real.Interval.Embed using (embedℚ-neg)
-open import Real.IntervalEquiv using (centre)
-open import Real.Interval.Node using (centre-neg)
-open import Real using (ε)
 
 ------------------------------------------------------------------------
 -- Reflected subset
@@ -47,40 +40,6 @@ reflect P y = Σ RealI λ x → P x × (y ≈ℝ negℝ x)
 -- P 的成员经取负成为反射集的成员。
 reflect-member : {P : Subset} {x : RealI} → P x → reflect P (negℝ x)
 reflect-member {P} {x} px = x , px , ≈ℝ-refl
-
-------------------------------------------------------------------------
--- Negation respects equivalence
---
--- 取负尊重等价
-
--- Rational helper: the difference of two negations is the negation of
--- the difference.
---
--- 有理辅助：两个取负之差等于差的取负。
-neg-diff : (p q : ℚ) → neg p - neg q ≡ neg (p - q)
-neg-diff p q = sym (neg-distrib-+ p (neg q))
-
--- Negation respects _≈ℝ_: the centres are negated, and the absolute
--- difference is unchanged, so the same witness from a ≈ b applies.
---
--- 取负尊重 _≈ℝ_：中心被取负，而绝对差不变，故同一见证仍然成立。
-negℝ-cong : {a b : RealI} → a ≈ℝ b → negℝ a ≈ℝ negℝ b
-negℝ-cong {a} {b} a≈b k =
-  let N , h = a≈b k
-  in N , λ n n≥N →
-    let eq : ∣ centre (negℝ a) n - centre (negℝ b) n ∣
-             ≡ ∣ centre a n - centre b n ∣
-        eq =
-          begin
-            ∣ centre (negℝ a) n - centre (negℝ b) n ∣
-              ≡⟨ cong₂ (λ p q → ∣ p - q ∣)
-                       (centre-neg a n) (centre-neg b n) ⟩
-            ∣ neg (centre a n) - neg (centre b n) ∣
-              ≡⟨ cong ∣_∣ (neg-diff (centre a n) (centre b n)) ⟩
-            ∣ neg (centre a n - centre b n) ∣
-              ≡⟨ ∣-p∣≡∣p∣ (centre a n - centre b n) ⟩
-            ∣ centre a n - centre b n ∣ ∎
-    in subst (λ z → z < ε k) (sym eq) (h n n≥N)
 
 ------------------------------------------------------------------------
 -- Lower locatedness
@@ -136,7 +95,7 @@ LocatedBelow P = ∀ (p q : ℚ) → p < q → Lower P p ⊎ OccupiedBelow P q
 --
 -- 有理嵌入两次取负后回到原嵌入。
 neg-emb-neg : (q : ℚ) → negℝ (embedℚ (neg q)) ≈ℝ embedℚ q
-neg-emb-neg q = ≈ℝ-trans (negℝ-cong (embedℚ-neg q)) (negℝ-negℝ (embedℚ q))
+neg-emb-neg q = ≈ℝ-trans (≈-neg (embedℚ-neg q)) (negℝ-negℝ (embedℚ q))
 
 -- A lower bound on the reflected side yields an upper bound on the
 -- original side.

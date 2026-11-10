@@ -45,7 +45,7 @@ open import Real.Interval.Abs using
   (∣_∣ℝ; absLo; absHi; lo-pos; hi-pos; lo-neg; hi-neg; lo-mid)
 open import Real.Interval.Kit using
   (≈ℝ-of-rec; half+half≡1; 0≤recipPow2; recipPow2-mul; recipPow2-n≤1
-  ; recipPow2-≤; halveQ; half≥0'; halveQ-mono; 0≤halveQ; halveQ-distrib
+  ; recipPow2-≤; halveQ; 0≤half; halveQ-mono; 0≤halveQ; halveQ-distrib
   ; halveQ-neg; same⇒diff0; 0≤diff; move-≤; move-≤-back; neg-of-nonpos
   ; npos⇒∣p∣≡neg; tail-bound; 0<embed2)
 open import Real.Interval.Rational using (r≤|r|)
@@ -142,7 +142,7 @@ abs-centre-≤ l u l≤u with ≤-total l 0ℚ | ≤-total u 0ℚ
             ∣ halveQ (p - q) ∣
               ≡⟨ ∣p*q∣≡∣p∣*∣q∣ (p - q) half ⟩
             ∣ p - q ∣ * ∣ half ∣
-              ≡⟨ cong (∣ p - q ∣ *_) (0≤p⇒∣p∣≡p half≥0') ⟩
+              ≡⟨ cong (∣ p - q ∣ *_) (0≤p⇒∣p∣≡p 0≤half) ⟩
             ∣ p - q ∣ * half
               ≡⟨ refl ⟩
             halveQ ∣ p - q ∣ ∎

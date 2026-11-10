@@ -67,5 +67,5 @@ const-tree q k .below (y , .(suc k)) (refl , _) =
 -- Embed a rational as a coinductive real.
 --
 -- 将有理数嵌入为余归纳实数。
-embedℚ : ℚ → RealC
-embedℚ q = q , const-tree q 0
+embedℚC : ℚ → RealC
+embedℚC q = q , const-tree q 0
