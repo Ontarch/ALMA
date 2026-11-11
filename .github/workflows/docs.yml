@@ -102,7 +102,7 @@ jobs:
 
       - name: Auto-generate Dependency Graphs
         run: |
-          agda --dependency-graph=src/deps.dot src/index.agda
+          agda --dependency-graph=src/deps.dot src/Everything.agda
           python3 scripts/filter_graph.py
 
       - name: Copy interactive HTML to docs

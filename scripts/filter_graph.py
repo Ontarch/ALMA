@@ -38,7 +38,7 @@ def filter_and_generate(in_file, out_dot, prefixes, out_html):
     subprocess.run(['python3', dot_to_html_path, out_dot, out_html], check=True)
 
 if __name__ == '__main__':
-    project_prefixes = ('Base.', 'Cosmos.', 'Equivalence.', 'Physics.', 'Real.', 'SecondPass.', 'SketchPass.', 'Wellspring.', 'Everything')
+    project_prefixes = ('Base', 'Cosmos', 'Equivalence', 'Physics', 'Real', 'SecondPass', 'SketchPass', 'Wellspring', 'Everything')
     filter_and_generate('src/deps.dot', 'deps-project.dot', project_prefixes, 'deps-project.html')
 
     real_prefixes = ('Real',)
