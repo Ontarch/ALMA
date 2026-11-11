@@ -1,12 +1,7 @@
 ------------------------------------------------------------------------
 -- Reciprocal law for arbitrary-tolerance convergence
 --
--- A sequence converging to a limit bounded away from zero has a
--- reciprocal sequence converging to the reciprocal of the limit.
---
 -- 任意容差收敛的倒数极限律
---
--- 收敛到远离零之极限的序列，其倒数序列收敛到极限的倒数。
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
@@ -47,13 +42,12 @@ open import Real.Interval.Rational using (recip-*-hom)
 ------------------------------------------------------------------------
 -- Uniqueness of a reciprocal
 --
+-- 倒数的唯一性
+
 -- Two reciprocals of the same nonzero element are equal, using only
 -- ring identities and no decision procedure.
 --
--- 倒数的唯一性
---
 -- 同一非零元素的两个倒数相等，仅用环恒等式，无需任何判定过程。
-
 unique-recip : ∀ a z w → a * z ≡ 1ℚ → a * w ≡ 1ℚ → z ≡ w
 unique-recip a z w az aw = begin
   z
@@ -253,9 +247,9 @@ recip-diff x y {{nx}} {{ny}} =
 --
 -- 倒数极限律
 --
--- 正界 b 位于 ∣ l ∣ 之下，故极限非零。越过第一个模数后，反三角不等式
--- 使每项 ∣ g n ∣ 高于 b * half；倒数之差即分子误差除以有下界的分母，
--- 因而用第二个模数收紧分子即可闭合目标容差。
+-- 极限非零是因为正界位于其绝对值之下。越过第一个模数后，反三角
+-- 不等式保证每项的绝对值有一个正下界；倒数之差即分子误差除以
+-- 有下界的分母，因此再用第二个模数收紧分子即可闭合目标容差。
 
 -- The limit is nonzero because the positive bound b lies below ∣ l ∣.
 --
