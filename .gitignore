@@ -3,3 +3,6 @@ _build/
 src/index.agda
 src/Everything.agda
 docs/
+_probe/
+tools/agda-dedup/archive/
+l1_results.json
