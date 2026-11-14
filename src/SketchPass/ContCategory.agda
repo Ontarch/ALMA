@@ -12,7 +12,7 @@
 -- 相等），验证范畴律，并构造 Category 实例。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SketchPass.ContCategory where
 

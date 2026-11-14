@@ -10,7 +10,7 @@
 -- 构造器。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SketchPass.ObjEquivFunctor where
 

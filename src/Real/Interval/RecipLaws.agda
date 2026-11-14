@@ -1,58 +1,45 @@
 ------------------------------------------------------------------------
--- Reciprocal laws for positive and non-zero interval reals
+-- Reciprocal laws and the layer structure
 --
--- 正区间实数与非零区间实数的倒数定律
+-- 倒数运算律与层结构
 ------------------------------------------------------------------------
 
 {-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module Real.Interval.RecipLaws where
 
-open import Data.Nat using (ℕ; suc; _^_; _≥_; z≤n)
-  renaming (_+_ to _+N_; _<_ to _<N_)
-open import Data.Nat.Properties using (m≤m+n; n<1+n)
-  renaming (<-trans to <N-trans; ≤-<-trans to ≤N-<-trans)
+open import Data.Nat using (ℕ; suc; _^_; _≥_; z≤n) renaming (_+_ to _+ℕ_; _<_ to _<ℕ_)
+open import Data.Nat.Properties using (m≤m+n; n<1+n) renaming (<-trans to <N-trans; ≤-<-trans to ≤N-<-trans)
 open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Sum using (inj₂)
-open import Data.Rational using
-  (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; NonZero; Positive; positive)
+open import Data.Rational using (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; NonZero; Positive; positive)
 open import Data.Rational.Base using (1/_) renaming (-_ to neg)
-open import Data.Rational.Properties using
-  (≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; +-monoˡ-<; +-assoc; +-identityʳ
-  ; +-inverseʳ; *-assoc; *-identityˡ; *-inverseʳ; pos⇒nonZero; pos*pos⇒pos
-  ; ≤-reflexive)
-  renaming (<-trans to <-transQ)
+open import Data.Rational.Properties using (≤-trans; <⇒≤; ≤-<-trans; <-≤-trans; +-monoˡ-<; +-assoc; +-identityʳ ; +-inverseʳ; *-assoc; *-identityˡ; *-inverseʳ; pos⇒nonZero; pos*pos⇒pos ; ≤-reflexive) renaming (<-trans to <-transQ)
 open import Relation.Nullary using (¬_)
-open import Relation.Binary.PropositionalEquality using
-  (_≡_; refl; sym; trans; cong; subst; module ≡-Reasoning)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; sym; trans; cong; subst; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Real using
-  (CauchySeq; embed; embed-*-hom; embed-mono-<; embed-suc-pos; reciprocal-cong)
+open import Real using (CauchySeq; embed; embed-*-hom; embed-mono-<; embed-suc-pos; reciprocal-cong)
 open CauchySeq renaming (f to seq-f)
+open import Real.CauchyToInterval using (cauchy→realI; M; node-go)
+open import Real.IntervalEquiv using (l; u; pp; centre; centre-u; u-mono; bound-w; n<2^n; realI→cauchy; node)
 open import Real.Interval using (RealI; δ; δ-pos)
-open import Real.Interval.Rational using (recip-*-hom)
 open import Real.Interval.Arith using (0ℝ; 1ℝ; negℝ)
-open import Real.Interval.Mul using (_*ℝ_)
+open import Real.Interval.ArithLaws using (negℝ-0ℝ)
 open import Real.Interval.Equiv using (_≈ℝ_; ≈ℝ-refl; ≈ℝ-sym; ≈ℝ-trans)
-open import Real.IntervalEquiv using
-  (l; u; pp; centre; centre-u; u-mono; bound-w; n<2^n; realI→cauchy; node)
-open import Real.Interval.Order using (_<ℝ_; <-irrefl)
-open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
-open import Real.Interval.Mul.Laws using
-  (*ℝ-comm; *ℝ-assoc; *ℝ-identityˡ; *ℝ-identityʳ)
+open import Real.Interval.Embed using (0ℝ<ℝ1ℝ)
+open import Real.Interval.Inverse using (*ℝ-inverse-pos)
+open import Real.Interval.Kit using (add-self; recip-antitone; strict-recip)
+open import Real.Interval.Mul using (_*ℝ_)
+open import Real.Interval.Mul.Laws using (*ℝ-comm; *ℝ-assoc; *ℝ-identityˡ; *ℝ-identityʳ)
 open import Real.Interval.Mul.Cong using (*ℝ-cong)
 open import Real.Interval.Mul.Order using (pos*pos; <-*mono; ≈-<-respʳ; u-dyadic-0)
-open import Real.Interval.ArithLaws using (negℝ-0ℝ)
-open import Real.Interval.Inverse using (*ℝ-inverse-pos)
-open import Real.Interval.Embed using (0ℝ<ℝ1ℝ)
-open import Real.Interval.Recip using
-  (recipℝ; recipℝ'; recipCauchy; realI→posCauchy; PosCauchy)
-open import Real.CauchyToInterval using
-  (cauchy→realI; M; node-go)
-open import Real.Interval.Kit using (add-self; recip-antitone; strict-recip)
+open import Real.Interval.Order using (_<ℝ_; <-irrefl)
 open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
+open import Real.Interval.OrderComplete.Base using (_≤ℝ_)
+open import Real.Interval.Rational using (recip-*-hom)
 open import Real.Interval.Reasoning.Equiv
+open import Real.Interval.Recip using (recipℝ; recipℝ'; recipCauchy; realI→posCauchy; PosCauchy)
 
 ------------------------------------------------------------------------
 -- Rational arithmetic helpers
@@ -81,16 +68,15 @@ add-cancel-< {a} {b} {c} s =
 ------------------------------------------------------------------------
 -- Sign preservation: 0 < recipℝ x
 --
+-- 保号性：0 < recipℝ x
+
 -- The reciprocal Cauchy sequence has terms h k = 1 / g k, with g k
 -- bounded above by U = u x 0 and below by b > 0. Hence h k ≥ 1 / U.
 -- Choosing n with 2 · δ n < 1 / U gives h (M cs n) - δ n > δ n.
 --
--- 保号性
---
 -- 倒数 Cauchy 序列的项以某个正有理数为下界、以上界 U 为上界，
 -- 故其倒数项不小于 1/U。选取足够深的层级使两倍二进容差低于 1/U，
 -- 即得该层下端点严格为正。
-
 module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
 
   pc : PosCauchy
@@ -112,10 +98,10 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
   low = PosCauchy.lower pc
 
   g : ℕ → ℚ
-  g k = centre x (N₀ +N k)
+  g k = centre x (N₀ +ℕ k)
 
   0<g : ∀ k → 0ℚ < g k
-  0<g k = <-≤-trans 0<b (low (N₀ +N k) (m≤m+n N₀ k))
+  0<g k = <-≤-trans 0<b (low (N₀ +ℕ k) (m≤m+n N₀ k))
 
   g-nz : ∀ k → NonZero (g k)
   g-nz k = pos⇒nonZero (g k) {{positive (0<g k)}}
@@ -125,8 +111,8 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
 
   g≤U : ∀ k → g k ≤ u x 0
   g≤U k =
-    ≤-trans (centre-u x (N₀ +N k))
-            (u-mono x (z≤n {N₀ +N k}))
+    ≤-trans (centre-u x (N₀ +ℕ k))
+            (u-mono x (z≤n {N₀ +ℕ k}))
 
   U : ℚ
   U = u x 0
@@ -202,7 +188,7 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
   iB : ℚ
   iB = (1/_) B {{nzB}}
 
-  Mw<2^n : Mw <N 2 ^ n
+  Mw<2^n : Mw <ℕ 2 ^ n
   Mw<2^n = <N-trans (n<1+n Mw) (n<2^n n)
 
   U<e2n : U < embed (2 ^ n)
@@ -256,9 +242,6 @@ module RecipPosAux (x : RealI) (0<x : 0ℝ <ℝ x) where
           (sym (u-dyadic-0 n))
           (subst (λ z → δ n < z) (sym lR≡) δn<lR)
 
--- Sign preservation.
---
--- 保号性。
 recipℝ-pos : (x : RealI) (0<x : 0ℝ <ℝ x) →
   0ℝ <ℝ recipℝ x 0<x
 recipℝ-pos x 0<x =
@@ -406,9 +389,6 @@ recipℝ-1 =
   R1 : RealI
   R1 = recipℝ 1ℝ 0ℝ<ℝ1ℝ
 
--- The reciprocal of a positive real is never equal to zero.
---
--- 正实数的倒数不可能等于零。
 recipℝ-nonzero : (x : RealI) (0<x : 0ℝ <ℝ x) →
   ¬ (recipℝ x 0<x ≈ℝ 0ℝ)
 recipℝ-nonzero x 0<x R≈0 =
@@ -417,7 +397,7 @@ recipℝ-nonzero x 0<x R≈0 =
 ------------------------------------------------------------------------
 -- Sign law for the signed reciprocal on a negative input
 --
--- 带符号倒数在负输入上的符号律
+-- 负输入上带符号倒数的符号律
 
 recipℝ'-neg : (x : RealI) (x<0 : x <ℝ 0ℝ) →
   recipℝ' x (inj₂ x<0) ≈ℝ
@@ -425,9 +405,9 @@ recipℝ'-neg : (x : RealI) (x<0 : x <ℝ 0ℝ) →
 recipℝ'-neg x x<0 = ≈ℝ-refl
 
 ------------------------------------------------------------------------
--- Cancelling a positive factor from a strict order
+-- Cancellation of a positive factor
 --
--- 从严格序中消去正因子
+-- 正因子的消去
 
 <-*cancel : (x y z : RealI) (0<z : 0ℝ <ℝ z) →
   x *ℝ z <ℝ y *ℝ z → x <ℝ y
@@ -473,3 +453,29 @@ recipℝ'-neg x x<0 = ≈ℝ-refl
   x *ℝ z ≤ℝ y *ℝ z
 ≤ℝ-*-mono {x} {y} {z} x≤y 0<z y*z<x*z =
   x≤y (<-*cancel y x z 0<z y*z<x*z)
+
+------------------------------------------------------------------------
+-- Layer structure of the reciprocal
+--
+-- 倒数的层结构
+
+-- Levels are reached by iterating next: IntervalEquiv defines
+-- l r n = RealI.l (node r n) and u r n = RealI.u (node r n). Unfolding
+-- recipℝ shows that layer t is the reciprocal of the centre of x at
+-- level N₀ + t, widened by δ t:
+--
+--   l (recipℝ x 0<x) t = 1/ (centre x (N₀ + t)) + (- δ t)
+--   u (recipℝ x 0<x) t = 1/ (centre x (N₀ + t)) + δ t
+--
+-- These are recorded as comments rather than as refl lemmas: the NonZero
+-- instance of 1/ that Recip builds internally is not exported, so a
+-- statement of the equation cannot name the very term the library
+-- produces. What is recorded below is the level bookkeeping.
+--
+-- 层级靠迭代 next 取得：IntervalEquiv 把层 n 的下、上端点定义为对
+-- node r n 取 l、u。展开 recipℝ 可见第 t 层是 x 在第 N₀ + t 层中心
+-- 之倒数，再向两侧各加宽 δ t。这两式只登记为注释而不写成 refl 引理：
+-- Recip 内部构造的 1/ NonZero 实例没有导出，语句无法指称库真正产出
+-- 的那一项。下面记录的是层级记账。
+level-at : (x : RealI) (0<x : 0ℝ <ℝ x) → ℕ
+level-at x 0<x = PosCauchy.N₀ (realI→posCauchy x 0<x)

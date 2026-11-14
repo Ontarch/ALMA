@@ -67,6 +67,12 @@ swap-mid = medial *-1-commutativeMonoid
 neg-involutive : ∀ x → - (- x) ≡ x
 neg-involutive = ⁻¹-involutive +-0-group
 
+-- Negating zero yields zero.
+--
+-- 零的取负仍是零。
+neg-0 : - 0ℚ ≡ 0ℚ
+neg-0 = refl
+
 -- The product of two negations is the original product.
 --
 -- 两个取负相乘得到原乘积。

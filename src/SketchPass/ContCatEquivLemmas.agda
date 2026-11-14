@@ -10,7 +10,8 @@
 -- （复合自然性的形状提取）。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
+
 module SketchPass.ContCatEquivLemmas where
 
 open import Agda.Primitive using (lsuc)

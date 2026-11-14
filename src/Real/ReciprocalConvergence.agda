@@ -32,7 +32,7 @@ open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; subst; subst₂; module ≡-Reasoning)
 open ≡-Reasoning
 
-open import Base.RationalRing using (neg-neg-mul; *ʳ-sub)
+open import Base.RationalRing using (neg-neg-mul; *ʳ-sub; neg-0)
 open import Real using (half)
 open import Real.Convergence using (Converges)
 open import Real.Interval.Kit using (two-half; strict-recip; 0<half; abs-swap)
@@ -86,9 +86,6 @@ contradict-nonzero {p} nz p≡0 =
           ≡⟨ refl ⟩
         0 ∎
   in ≢-nonZero⁻¹ n ⦃ nz ⦄ num0
-
-neg-0 : - 0ℚ ≡ 0ℚ
-neg-0 = refl
 
 neg-nonzero : ∀ {y} → NonZero y → NonZero (- y)
 neg-nonzero {y} ny = ≢-nonZero λ eq →

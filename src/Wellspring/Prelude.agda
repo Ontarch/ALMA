@@ -22,7 +22,7 @@
 -- 空类型消去 ⊥-elim -- 矛盾律
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module Wellspring.Prelude where
 

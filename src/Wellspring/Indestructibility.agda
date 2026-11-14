@@ -12,7 +12,7 @@
 -- 性定理 → 历史路径与本体论过程同一 → 认识论等价与本体论同一的区分。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module Wellspring.Indestructibility where
 

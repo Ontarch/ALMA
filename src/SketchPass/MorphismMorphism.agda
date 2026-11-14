@@ -11,7 +11,7 @@
 -- 自然变换的自然性所诱导的形状传输。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SketchPass.MorphismMorphism where
 

@@ -11,7 +11,7 @@
 -- unfolding）构建。Cosmos 是在类型论中内部化的多项式函子的终余代数。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SketchPass.Cosmos where
 

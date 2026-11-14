@@ -12,7 +12,7 @@
 -- 可逆性；过程及其张量积范畴结构、相干模式、演化与不可逆定理。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module Wellspring.Beings where
 

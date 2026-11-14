@@ -12,7 +12,7 @@
 -- 相干性与意识涌现、含相变的瞬态过程，以及标准模型总览。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module Wellspring.StandardModel where
 

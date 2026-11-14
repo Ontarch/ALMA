@@ -10,7 +10,7 @@
 -- actSOf / actPOf 的基础函子性（id、comp、resp-≈）。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SketchPass.ContCategoryLemmas where
 

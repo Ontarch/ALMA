@@ -13,7 +13,7 @@
 -- 宇宙结构、投影与不可重构定理、非均匀性必然定理、交互、耦合与共同本质。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module Wellspring.Universe where
 

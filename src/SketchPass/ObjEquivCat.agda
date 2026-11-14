@@ -11,7 +11,7 @@
 -- 实例采用范畴论中的同构概念。
 ------------------------------------------------------------------------
 
-{-# OPTIONS --safe --cubical-compatible --exact-split --guardedness --double-check #-}
+{-# OPTIONS --safe --cubical-compatible --guardedness --exact-split --double-check #-}
 
 module SketchPass.ObjEquivCat where
 

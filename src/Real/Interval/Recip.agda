@@ -16,7 +16,6 @@ open import Data.Nat.Properties as ℕP using
   renaming (≤-trans to ≤ℕ-trans; ≤-refl to ≤ℕ-refl; *-comm to *ℕ-comm
   ; *-assoc to *ℕ-assoc; *-identityʳ to *ℕ-identityʳ)
 open import Data.Product using (proj₁; proj₂)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Rational using
   (ℚ; 0ℚ; 1ℚ; _+_; _-_; _*_; _<_; _≤_; ∣_∣; Positive; NonZero; positive)
 open import Data.Rational.Base using (1/_; NonNegative; nonNegative)
@@ -28,6 +27,7 @@ open import Data.Rational.Properties using
   ; neg-distrib-+; +-comm; <-≤-trans; ≤-<-trans; *-monoˡ-≤-nonNeg
   ; *-monoʳ-≤-nonNeg; *-monoˡ-<-pos; *-cancelˡ-≤-pos; 0≤∣p∣; ∣-p∣≡∣p∣
   ; ∣p*q∣≡∣p∣*∣q∣; 0≤p⇒∣p∣≡p)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Nullary using (¬_)
 open import Relation.Binary.PropositionalEquality using
   (_≡_; refl; sym; trans; cong; cong₂; subst; subst₂; module ≡-Reasoning)
@@ -37,29 +37,24 @@ open import Base.RationalRing using (neg-involutive)
 open import Real using
   (CauchySeq; ε; embed-mono-≤; embed; embed-suc-pos; embed-*-hom; 0≤embed; embed-mono-<)
 open CauchySeq renaming (f to seq-f; μ to seq-μ; cauchy to seq-cauchy)
-open import Real.Interval using (RealI; δ-pos)
+open import Real.CauchyToInterval using (cauchy→realI; K)
 open import Real.IntervalEquiv using
   (l; l-mono; centre-l; bound-w; realI→cauchy; n<2^n)
-open import Real.CauchyToInterval using (cauchy→realI; K)
-open import Real.Interval.Order using (_<ℝ_)
+open import Real.Interval using (RealI; δ-pos)
 open import Real.Interval.Arith using (0ℝ; negℝ)
-open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.ArithLaws using (negℝ-0ℝ)
 open import Real.Interval.Kit using
   (*-mono-≤-nonNeg; recip-antitone; n≤2n; strict-recip)
 open import Real.Interval.Mul.Order using (u-dyadic-0)
+open import Real.Interval.Order using (_<ℝ_)
+open import Real.Interval.OrderLaws using (≈-<-resp; <-neg)
 open import Real.Interval.Reasoning using (begin≤_; _≈⟨_⟩_; _≤⟨_⟩_; _≤∎)
 open import Real.Interval.Rational using (suc∸1)
 
 ------------------------------------------------------------------------
 -- Common denominator
 --
--- The difference of two reciprocals is (B − A) times the reciprocal
--- of A * B.
---
 -- 公共分母
---
--- 把两个倒数之差通分成公共分母 A * B。
 
 module InvSubAux (A B : ℚ) {{A-nz : NonZero A}} {{B-nz : NonZero B}}
   {{AB-nz : NonZero (A * B)}} where
@@ -108,6 +103,10 @@ module InvSubAux (A B : ℚ) {{A-nz : NonZero A}} {{B-nz : NonZero B}}
       (B + neg A) * iP
         ∎
 
+-- The difference of two reciprocals is (B − A) times the reciprocal
+-- of A * B, i.e., a single product after clearing denominators.
+--
+-- 两个倒数之差通分成公共分母 A * B，写成单项乘积。
 inv-sub : (A B : ℚ) {{A-nz : NonZero A}} {{B-nz : NonZero B}}
   {{AB-nz : NonZero (A * B)}} →
   (1/ A) - (1/ B) ≡ (B + neg A) * (1/ (A * B))
@@ -116,13 +115,12 @@ inv-sub A B = InvSubAux.proof A B
 ------------------------------------------------------------------------
 -- Positive Cauchy sequences
 --
+-- 正 Cauchy 序列
+
 -- A Cauchy sequence is positive if it is eventually bounded below by
 -- a strictly positive rational number.
 --
--- 正 Cauchy 序列
---
 -- 一个 Cauchy 序列是正的，如果它最终有一个严格正的有理数作为下界。
-
 record PosCauchy : Set₁ where
   field
     seq   : CauchySeq
@@ -135,13 +133,12 @@ open PosCauchy
 ------------------------------------------------------------------------
 -- Convergence modulus for the reciprocal
 --
+-- 倒数的收敛模数
+
 -- Computes the modulus of convergence for the reciprocal of a
 -- positive Cauchy sequence, ensuring the error bounds are met.
 --
--- 倒数的收敛模数
---
 -- 计算正 Cauchy 序列倒数的收敛模数，确保满足误差界。
-
 module RecipModAux (b : ℚ) (0<b : 0ℚ < b) (k : ℕ) where
   bsq : ℚ
   bsq = b * b
@@ -185,13 +182,12 @@ recip-modulus b 0<b k =
 ------------------------------------------------------------------------
 -- Specification of recip-modulus
 --
+-- recip-modulus 的规格
+
 -- Proves that the chosen modulus M satisfies the required inequality:
 -- ε M < b² * ε k.
 --
--- recip-modulus 的规格
---
--- 证明所选模数满足所需的不等式。
-
+-- 证明所选模数满足所需的不等式 ε M < b² * ε k。
 module RecipModulusSpecAux (b : ℚ) (0<b : 0ℚ < b) (k : ℕ) where
   open RecipModAux b 0<b k
 
@@ -268,14 +264,14 @@ recip-modulus-spec b 0<b k = RecipModulusSpecAux.goal b 0<b k
 ------------------------------------------------------------------------
 -- Reciprocal of a positive Cauchy sequence
 --
+-- 正 Cauchy 序列的倒数
+
 -- Constructs the reciprocal Cauchy sequence from a positive Cauchy
 -- sequence, using the algebraic identity for reciprocal differences
 -- to establish the Cauchy condition.
 --
--- 正 Cauchy 序列的倒数
---
--- 从正 Cauchy 序列构造其倒数 Cauchy 序列，并建立柯西条件。
-
+-- 从正 Cauchy 序列构造其倒数 Cauchy 序列，用倒数差的代数恒等式建立
+-- 柯西条件。
 module RecipCauchyAux (pc : PosCauchy) where
   x    = PosCauchy.seq pc
   bp   = PosCauchy.b pc
@@ -475,19 +471,15 @@ realI→posCauchy x 0<x = record
   ; lower = RealIToPosCauchyAux.bound x 0<x
   }
 
-------------------------------------------------------------------------
--- Reciprocal of a positive interval real
+-- The reciprocal of a positive interval real.
 --
--- 正区间实数的倒数
-
+-- 正区间实数的倒数。
 recipℝ : (x : RealI) → 0ℝ <ℝ x → RealI
 recipℝ x 0<x = cauchy→realI (recipCauchy (realI→posCauchy x 0<x))
 
-------------------------------------------------------------------------
--- Reciprocal of a non-zero interval real
+-- The reciprocal of a non-zero interval real.
 --
--- 非零区间实数的倒数
-
+-- 非零区间实数的倒数。
 recipℝ' : (x : RealI) → (0ℝ <ℝ x) ⊎ (x <ℝ 0ℝ) → RealI
 recipℝ' x (inj₁ 0<x) = recipℝ x 0<x
 recipℝ' x (inj₂ x<0) =
@@ -498,6 +490,9 @@ recipℝ' x (inj₂ x<0) =
 --
 -- ℕ 算术辅助
 
+-- The product of two powers of two.
+--
+-- 二的幂的乘积。
 2^n*2^n≡4^n : ∀ n → 2 ^ n *ℕ 2 ^ n ≡ 4 ^ n
 2^n*2^n≡4^n n = sym (^-distribʳ-* n 2 2)
 
@@ -527,6 +522,9 @@ module FourNSqAux (n : ℕ) (n≥4 : n ≥ 4) where
   goal = ≤ℕ-trans 4n²≤4^m
                     (ℕP.≤-reflexive (cong (4 ^_) (sym n≡sucm)))
 
+-- The four-times-n-square bound.
+--
+-- 四倍 n 平方的界。
 4n²≤4^n : ∀ n → n ≥ 4 → 4 *ℕ (n *ℕ n) ≤ℕ 4 ^ n
 4n²≤4^n n n≥4 = FourNSqAux.goal n n≥4
 
@@ -575,9 +573,15 @@ module FourPowK2nAux (n : ℕ) where
   goal : 4 ^ n ≤ℕ K (2 *ℕ n)
   goal = ≤ℕ-trans (≤ℕ-trans p1 p2) (≤ℕ-trans p3 p4)
 
+-- The power of four is bounded by K at twice the index.
+--
+-- 四的幂被二倍下标处的 K 界住。
 4^n≤K-2n : ∀ n → 4 ^ n ≤ℕ K (2 *ℕ n)
 4^n≤K-2n n = FourPowK2nAux.goal n
 
+-- From the negation of a successor bound, get the reverse.
+--
+-- 由后继界的否定得到反向不等式。
 from-not : ∀ m n → ¬ (suc m ≤ℕ n) → n ≤ℕ m
 from-not m n f = ℕP.≤-pred (ℕP.≰⇒> f)
 
@@ -666,9 +670,11 @@ embed-n≥2b² :
 embed-n≥2b² b N base n n≥N =
   ≤-trans base (embed-mono-≤ n≥N)
 
+------------------------------------------------------------------------
 -- 2n·b² ≤ 4^n in the tail
 --
 -- 2n·b² ≤ 4^n 在尾部
+
 module TwoNB2Le4PowAux (b : ℚ) (0<b : 0ℚ < b) (N : ℕ) (N≥4 : N ≥ 4)
   (hb : ∀ n → n ≥ N → embed 2 * b * b ≤ embed n) (n : ℕ) (n≥N : n ≥ N) where
   b-pos : Positive b
@@ -768,9 +774,11 @@ module TwoNB2Le4PowAux (b : ℚ) (0<b : 0ℚ < b) (N : ℕ) (N≥4 : N ≥ 4)
 2n*b²≤4^n b 0<b N N≥4 hb n n≥N =
   TwoNB2Le4PowAux.goal b 0<b N N≥4 hb n n≥N
 
+------------------------------------------------------------------------
 -- recip-modulus at K(2n) is at least 2n
 --
 -- recip-modulus 在 K(2n) 处至少为 2n
+
 module RecipModulusGe2nAux (b : ℚ) (0<b : 0ℚ < b) (N : ℕ)
   (h : ∀ n → n ≥ N → embed (2 *ℕ n) * b * b ≤ embed (4 ^ n))
   (n : ℕ) (n≥N : n ≥ N) where
@@ -825,3 +833,22 @@ recip-modulus-≥2n :
     ∀ n → n ≥ N → recip-modulus b 0<b (K (2 *ℕ n)) ≥ 2 *ℕ n
 recip-modulus-≥2n b 0<b N h n n≥N =
   RecipModulusGe2nAux.helper b 0<b N h n n≥N
+
+------------------------------------------------------------------------
+-- The modulus of the reciprocal sequence, exposed
+--
+-- 倒数序列的模数，对外导出
+
+-- recipCauchy takes its modulus from RecipCauchyAux.μ-h, whose value
+-- is x's modulus at the precision recip-modulus bp 0<b k. Recording
+-- that as an exported identity lets the continuity module state that
+-- the sampled level is past x's own modulus.
+--
+-- recipCauchy 的模数取自 RecipCauchyAux.μ-h，其值是 x 在精度
+-- recip-modulus bp 0<b k 处的模数。把它记成一条导出恒等式，连续性
+-- 模块才能陈述"采样层已越过 x 自己的模数"。
+recipcauchy-μ : (pc : PosCauchy) (k : ℕ) →
+  CauchySeq.μ (recipCauchy pc) k
+    ≡ seq-μ (PosCauchy.seq pc)
+        (recip-modulus (PosCauchy.b pc) (PosCauchy.0<b pc) k)
+recipcauchy-μ pc k = refl
